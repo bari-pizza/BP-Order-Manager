@@ -33,6 +33,32 @@ export type Database = {
         }
         Relationships: []
       }
+      "drawers.drivers": {
+        Row: {
+          created_at: string
+          driver: string | null
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          driver?: string | null
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          driver?: string | null
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drawers.drivers_driver_fkey"
+            columns: ["driver"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           email: string | null

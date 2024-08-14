@@ -44,7 +44,7 @@ export const useSession = (): SupashipUserInfo => {
     }, [userInfo.session]);
 
     async function listenToUserProfileChanges(userId: string) {
-        const { data } = await supaClient.from('Profile').select('*').filter('id', 'eq', userId);
+        const { data } = await supaClient.from('profiles').select('*').filter('id', 'eq', userId);
         if (data?.[0]) {
             setUserInfo({ ...userInfo, profile: data?.[0] });
             queryClient.setQueryData(['profiles', { id: userId }], data?.[0]);
@@ -56,7 +56,7 @@ export const useSession = (): SupashipUserInfo => {
                 {
                     event: '*',
                     schema: 'public',
-                    table: 'Profile',
+                    table: 'profiles',
                     filter: `id=eq.${userId}`,
                 },
                 (payload) => {
