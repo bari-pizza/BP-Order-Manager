@@ -18,7 +18,7 @@ import { LayoutContext } from "./LayoutContext.tsx";
 import { UserContext } from "./UserContext.tsx";
 import { Session } from "@supabase/supabase-js";
 import { Profile } from "./supabaseQueries.ts";
-import { OrderDashboard } from "./components/OrderDashboard.tsx";
+import { OrderDashboard } from "./components/OrderDashboard/OrderDashboard.tsx";
 
 const router = createBrowserRouter([
   {
@@ -54,7 +54,7 @@ export default App;
 
 const queryClient = new QueryClient();
 
-const drawerWidth = 350;
+const drawerWidth = 300;
 
 function Layout() {
   useSession();
