@@ -11,27 +11,98 @@ export type Database = {
     Tables: {
       drawers: {
         Row: {
-          can_deliver: boolean
           created_at: string
           drawer_id: string
           drawer_type: Database["public"]["Enums"]["drawer_type"]
           name: string
         }
         Insert: {
-          can_deliver: boolean
           created_at?: string
           drawer_id?: string
           drawer_type: Database["public"]["Enums"]["drawer_type"]
           name: string
         }
         Update: {
-          can_deliver?: boolean
           created_at?: string
           drawer_id?: string
           drawer_type?: Database["public"]["Enums"]["drawer_type"]
           name?: string
         }
         Relationships: []
+      }
+      "drawers.drivers": {
+        Row: {
+          created_at: string
+          drawer_id: string
+          driver_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          drawer_id?: string
+          driver_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          drawer_id?: string
+          driver_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drawers.drivers_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drawers.drivers_id_fkey"
+            columns: ["drawer_id"]
+            isOneToOne: true
+            referencedRelation: "drawers"
+            referencedColumns: ["drawer_id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          business_date: string
+          created_at: string
+          drawer_id: string | null
+          order_id: string
+          order_number: number | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          phone: string | null
+          total_in_cents: number
+        }
+        Insert: {
+          business_date: string
+          created_at?: string
+          drawer_id?: string | null
+          order_id?: string
+          order_number?: number | null
+          order_type?: Database["public"]["Enums"]["order_type"]
+          phone?: string | null
+          total_in_cents?: number
+        }
+        Update: {
+          business_date?: string
+          created_at?: string
+          drawer_id?: string | null
+          order_id?: string
+          order_number?: number | null
+          order_type?: Database["public"]["Enums"]["order_type"]
+          phone?: string | null
+          total_in_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_drawer_id_fkey"
+            columns: ["drawer_id"]
+            isOneToOne: false
+            referencedRelation: "drawers"
+            referencedColumns: ["drawer_id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -74,6 +145,7 @@ export type Database = {
     }
     Enums: {
       drawer_type: "driver" | "register" | "third_party"
+      order_type: "delivery" | "pickup"
       payment_type: "cash" | "card" | "third_party"
       third_party: "DoorDash" | "Grubhub" | "Pizzamico" | "UberEats"
     }
