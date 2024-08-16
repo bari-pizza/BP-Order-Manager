@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { Drawer, DriverDrawer } from "../supabaseQueries";
+import type { Drawer, DriverDrawer } from "../../supabaseQueries";
 
 interface OrderDashboardContextProps {
   openDrawer: Drawer | DriverDrawer | null;
