@@ -10,7 +10,7 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
-import { Order } from "../../supabaseQueries";
+import { Order } from "../../../supabaseQueries";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 
 interface OrderEditorProps {

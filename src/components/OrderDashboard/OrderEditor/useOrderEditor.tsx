@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Order } from "../../supabaseQueries";
+import { Order } from "../../../supabaseQueries";
 import { OrderEditor } from "./OrderEditor";
 
 interface UseOrderEditorProps {

@@ -1,4 +1,4 @@
-import { Suspense, useRef } from "react";
+import { Suspense, useRef, useState } from "react";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import {
   QueryClientProvider,
@@ -9,16 +9,18 @@ import { Stack, Drawer } from "@mui/material";
 import { useSession } from "./useSession";
 import { NavBar } from "./components/NavBar";
 // import { APIProvider } from '@vis.gl/react-google-maps';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ErrorBoundary } from "./ErrorBoundary.tsx";
 import "./App.css";
-import { LayoutContext } from "./LayoutContext.tsx";
-import { UserContext } from "./UserContext.tsx";
+import { LayoutContext } from "./context/LayoutContext.tsx";
+import { UserContext } from "./context/UserContext.tsx";
+import { BusinessDateContext } from "./context/BusinessDateContext.tsx";
 import { Session } from "@supabase/supabase-js";
 import { Profile } from "./supabaseQueries.ts";
 import { OrderDashboard } from "./components/OrderDashboard/OrderDashboard.tsx";
+import dayjs from "dayjs";
 
 const router = createBrowserRouter([
   {
@@ -40,7 +42,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <ErrorBoundary>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div>Loading App...</div>}>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
           <ReactQueryDevtools initialIsOpen={false} />
@@ -73,47 +75,62 @@ function Layout() {
     initialData: null,
   });
   const sideBarRef = useRef<HTMLDivElement>(null);
+  const today = dayjs();
+  const [businessDate, setBusinessDate] = useState<dayjs.Dayjs>(today);
   return (
     // <APIProvider
     //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
     //     onLoad={() => console.log('Maps API has loaded.')}
     //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
     //     version="beta">
-    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
-    <LayoutContext.Provider value={{ sideBarRef }}>
-      <UserContext.Provider value={{ session, profile }}>
-        <Stack id="main" mt={2} direction="row" gap={2} justifyContent="center">
-          <NavBar />
-          <Stack id="content" direction="column" overflow="auto" width={"100%"}>
-            <Outlet />
-          </Stack>
-          <Drawer
-            sx={{
-              width: drawerWidth,
-              flexShrink: 0,
-              "& .MuiDrawer-paper": {
-                width: drawerWidth,
-                boxSizing: "border-box",
-              },
-            }}
-            PaperProps={{
-              sx: { justifyContent: "center", alignItems: "center" },
-            }}
-            id="sidebar-drawer"
-            anchor="right"
-            variant="permanent"
-          >
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <BusinessDateContext.Provider value={{ businessDate, setBusinessDate }}>
+        <LayoutContext.Provider value={{ sideBarRef }}>
+          <UserContext.Provider value={{ session, profile }}>
             <Stack
-              id="sidebar"
-              direction="column"
-              ref={sideBarRef}
-              sx={{ height: "100vh" }}
-            />
-          </Drawer>
-        </Stack>
-      </UserContext.Provider>
-    </LayoutContext.Provider>
-    //     </LocalizationProvider>
+              id="main"
+              mt={2}
+              direction="row"
+              gap={2}
+              justifyContent="center"
+            >
+              <NavBar />
+              <Stack
+                id="content"
+                direction="column"
+                overflow="auto"
+                width={"100%"}
+              >
+                <Outlet />
+              </Stack>
+              <Drawer
+                sx={{
+                  width: drawerWidth,
+                  flexShrink: 0,
+                  "& .MuiDrawer-paper": {
+                    width: drawerWidth,
+                    boxSizing: "border-box",
+                  },
+                }}
+                PaperProps={{
+                  sx: { justifyContent: "center", alignItems: "center" },
+                }}
+                id="sidebar-drawer"
+                anchor="right"
+                variant="permanent"
+              >
+                <Stack
+                  id="sidebar"
+                  direction="column"
+                  ref={sideBarRef}
+                  sx={{ height: "100vh" }}
+                />
+              </Drawer>
+            </Stack>
+          </UserContext.Provider>
+        </LayoutContext.Provider>
+      </BusinessDateContext.Provider>
+    </LocalizationProvider>
     // </APIProvider>
   );
 }

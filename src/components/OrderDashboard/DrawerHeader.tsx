@@ -24,7 +24,7 @@ export const DrawerHeader = () => {
   const combinedData = [...drawers, ...drivers];
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Loading DrawerHeader...</div>}>
       <Stack
         direction="row"
         justifyContent="space-around"

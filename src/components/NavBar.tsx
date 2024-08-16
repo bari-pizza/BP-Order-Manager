@@ -15,7 +15,9 @@ import {
   LocalPizza as LocalPizzaIcon,
 } from "@mui/icons-material";
 import { useContext } from "react";
-import { UserContext } from "../UserContext";
+import { UserContext } from "../context/UserContext";
+import { useBusinessDatePicker } from "./BusinessDatePicker/useBusinessDatePicker";
+import { CalendarIcon } from "@mui/x-date-pickers";
 
 const drawerWidth = 200;
 
@@ -28,6 +30,8 @@ interface NavBarItem {
 
 export function NavBar() {
   const { profile } = useContext(UserContext);
+  const { businessDatePicker, showBusinessDatePicker, businessDate } =
+    useBusinessDatePicker();
   const fullName = profile
     ? `${profile.first_name} ${profile.last_name}`
     : "X X";
@@ -37,6 +41,11 @@ export function NavBar() {
     .join("");
   const listItems: NavBarItem[] = [
     { path: "/", icon: <HomeIcon />, text: "Home" },
+    {
+      text: businessDate.format("MM/DD/YYYY"),
+      icon: <CalendarIcon />,
+      onClick: showBusinessDatePicker,
+    },
     { path: "/search", icon: <Search />, text: "Search" },
     { path: "/orders", icon: <LocalPizzaIcon />, text: "Orders" },
     {
@@ -52,6 +61,7 @@ export function NavBar() {
       text: "Profile",
     },
   ];
+
   return (
     <Drawer
       sx={{
@@ -71,6 +81,7 @@ export function NavBar() {
           <ListItem
             component={item.path ? Link : "div"}
             to={item.path}
+            unstable_viewTransition={!!item.path}
             key={item.text}
           >
             <ListItemButton onClick={item.onClick}>
@@ -80,6 +91,7 @@ export function NavBar() {
           </ListItem>
         ))}
       </List>
+      {businessDatePicker}
     </Drawer>
   );
 }

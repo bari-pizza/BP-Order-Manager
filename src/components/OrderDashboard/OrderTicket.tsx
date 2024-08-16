@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Button,
   Card,
@@ -7,7 +8,7 @@ import {
   CardActions,
 } from "@mui/material";
 import { Order } from "../../supabaseQueries";
-import { useOrderEditor } from "./useOrderEditor";
+import { useOrderEditor } from "./OrderEditor/useOrderEditor";
 
 interface OrderTicketProps {
   order: Order;
@@ -18,8 +19,15 @@ export const OrderTicket = ({ order }: OrderTicketProps) => {
     order,
     asDialog: true,
   });
+  const [collapsed, setCollapsed] = useState(false);
+
+  const cardSX = {
+    width: 200,
+    height: collapsed ? 100 : 300,
+  };
+
   return (
-    <Card variant="outlined" sx={{ width: 200, height: 300 }}>
+    <Card variant="outlined" sx={cardSX}>
       <CardHeader title={order.order_number} />
       <CardContent>
         <Typography variant="body1">{order.phone}</Typography>
@@ -29,6 +37,9 @@ export const OrderTicket = ({ order }: OrderTicketProps) => {
       </CardContent>
       <CardActions>
         <Button onClick={() => setOpen(true)}>Edit</Button>
+        <Button onClick={() => setCollapsed(!collapsed)}>
+          {collapsed ? "Show" : "Hide"} Details
+        </Button>
       </CardActions>
       {orderEditor}
     </Card>

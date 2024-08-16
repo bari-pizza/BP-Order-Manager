@@ -65,6 +65,7 @@ export const getAllDaysOrders = async ({
   month,
   day,
 }: GetAllDaysOrdersProps) => {
+  console.log(`getting orders for ${month}/${day}/${year}`);
   try {
     supabaseDate.parse({ year, month, day });
   } catch (error) {
@@ -82,4 +83,23 @@ export const getAllDaysOrders = async ({
   }
 
   return data as unknown as Order[];
+};
+
+interface DummyQueryFnProps<T> {
+  timeout?: number;
+  data?: T[];
+}
+
+export const dummyQueryFn = async <T>({
+  timeout = 1000,
+  data = [],
+}: DummyQueryFnProps<T> = {}): Promise<T[]> => {
+  console.log("calling dummyQueryFn with timeout", timeout, data);
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(data);
+      console.log("done calling dummyQueryFn with timeout", timeout);
+    }, timeout);
+  });
 };
