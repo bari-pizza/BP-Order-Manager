@@ -58,7 +58,6 @@ const drawerWidth = 300;
 
 function Layout() {
   useSession();
-  // const supashipUserInfo = useSession();
   const { data: session } = useSuspenseQuery({
     queryKey: ["session"],
     queryFn: () => queryClient.getQueryData(["session"]) as Session,
@@ -104,7 +103,12 @@ function Layout() {
             anchor="right"
             variant="permanent"
           >
-            <Stack id="sidebar" direction="column" ref={sideBarRef} />
+            <Stack
+              id="sidebar"
+              direction="column"
+              ref={sideBarRef}
+              sx={{ height: "100vh" }}
+            />
           </Drawer>
         </Stack>
       </UserContext.Provider>

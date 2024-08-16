@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { getAllDrawers, getAllDrivers } from "../../supabaseQueries";
 import { Stack } from "@mui/material";
@@ -23,14 +24,16 @@ export const DrawerHeader = () => {
   const combinedData = [...drawers, ...drivers];
 
   return (
-    <Stack
-      direction="row"
-      justifyContent="space-around"
-      sx={{ height: 175, overflow: "hidden" }}
-    >
-      {combinedData?.map((drawer) => (
-        <DrawerAvatar key={drawer.drawer_id} drawer={drawer} />
-      ))}
-    </Stack>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Stack
+        direction="row"
+        justifyContent="space-around"
+        sx={{ height: 175, overflow: "hidden" }}
+      >
+        {combinedData?.map((drawer) => (
+          <DrawerAvatar key={drawer.drawer_id} drawer={drawer} />
+        ))}
+      </Stack>
+    </Suspense>
   );
 };
