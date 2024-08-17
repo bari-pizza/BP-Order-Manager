@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useRef } from "react";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import {
   QueryClientProvider,
@@ -16,11 +16,9 @@ import { ErrorBoundary } from "./ErrorBoundary.tsx";
 import "./App.css";
 import { LayoutContext } from "./context/LayoutContext.tsx";
 import { UserContext } from "./context/UserContext.tsx";
-import { BusinessDateContext } from "./context/BusinessDateContext.tsx";
 import { Session } from "@supabase/supabase-js";
 import { Profile } from "./supabaseQueries.ts";
 import { OrderDashboard } from "./components/OrderDashboard/OrderDashboard.tsx";
-import dayjs from "dayjs";
 
 const router = createBrowserRouter([
   {
@@ -75,8 +73,9 @@ function Layout() {
     initialData: null,
   });
   const sideBarRef = useRef<HTMLDivElement>(null);
-  const today = dayjs();
-  const [businessDate, setBusinessDate] = useState<dayjs.Dayjs>(today);
+  // const today = dayjs();
+  // const [businessDate, setBusinessDate] = useState<dayjs.Dayjs>(today);
+  // const [businessDate, setBusinessDate] = useBusinessDate();
   // TODO: use useParams instead to get businessDate
   return (
     // <APIProvider
@@ -85,52 +84,50 @@ function Layout() {
     //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
     //     version="beta">
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <BusinessDateContext.Provider value={{ businessDate, setBusinessDate }}>
-        <LayoutContext.Provider value={{ sideBarRef }}>
-          <UserContext.Provider value={{ session, profile }}>
+      <LayoutContext.Provider value={{ sideBarRef }}>
+        <UserContext.Provider value={{ session, profile }}>
+          <Stack
+            id="main"
+            mt={2}
+            direction="row"
+            gap={2}
+            justifyContent="center"
+          >
+            <NavBar />
             <Stack
-              id="main"
-              mt={2}
-              direction="row"
-              gap={2}
-              justifyContent="center"
+              id="content"
+              direction="column"
+              overflow="auto"
+              width={"100%"}
             >
-              <NavBar />
-              <Stack
-                id="content"
-                direction="column"
-                overflow="auto"
-                width={"100%"}
-              >
-                <Outlet />
-              </Stack>
-              <Drawer
-                sx={{
-                  width: drawerWidth,
-                  flexShrink: 0,
-                  "& .MuiDrawer-paper": {
-                    width: drawerWidth,
-                    boxSizing: "border-box",
-                  },
-                }}
-                PaperProps={{
-                  sx: { justifyContent: "center", alignItems: "center" },
-                }}
-                id="sidebar-drawer"
-                anchor="right"
-                variant="permanent"
-              >
-                <Stack
-                  id="sidebar"
-                  direction="column"
-                  ref={sideBarRef}
-                  sx={{ height: "100vh" }}
-                />
-              </Drawer>
+              <Outlet />
             </Stack>
-          </UserContext.Provider>
-        </LayoutContext.Provider>
-      </BusinessDateContext.Provider>
+            <Drawer
+              sx={{
+                width: drawerWidth,
+                flexShrink: 0,
+                "& .MuiDrawer-paper": {
+                  width: drawerWidth,
+                  boxSizing: "border-box",
+                },
+              }}
+              PaperProps={{
+                sx: { justifyContent: "center", alignItems: "center" },
+              }}
+              id="sidebar-drawer"
+              anchor="right"
+              variant="permanent"
+            >
+              <Stack
+                id="sidebar"
+                direction="column"
+                ref={sideBarRef}
+                sx={{ height: "100vh" }}
+              />
+            </Drawer>
+          </Stack>
+        </UserContext.Provider>
+      </LayoutContext.Provider>
     </LocalizationProvider>
     // </APIProvider>
   );

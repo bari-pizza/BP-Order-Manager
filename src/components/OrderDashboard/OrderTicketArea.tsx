@@ -1,14 +1,13 @@
-import { useContext } from "react";
 import { Stack } from "@mui/material";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getAllDaysOrders } from "../../supabaseQueries";
 import { OrderTicket } from "./OrderTicket";
 import { Player } from "@lottiefiles/react-lottie-player";
-import { BusinessDateContext } from "../../context/BusinessDateContext";
 import { dayjsToMDY } from "../../utils";
+import { useBusinessDate } from "../BusinessDatePicker/useBusinessDate";
 
 export const OrderTicketArea = () => {
-  const { businessDate } = useContext(BusinessDateContext);
+  const [businessDate] = useBusinessDate();
   const MDY = dayjsToMDY(businessDate);
   const { data: orders } = useSuspenseQuery({
     queryKey: ["orders", businessDate.format("MM/DD/YYYY")],

@@ -1,9 +1,5 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
-import {
-  getAllDrawers,
-  getAllDrivers,
-  queryFnWrapper,
-} from "../../supabaseQueries";
+import { getAllDrawers, getAllDrivers } from "../../supabaseQueries";
 import { Stack } from "@mui/material";
 import { DrawerAvatar, DrawerAvatarSkeleton } from "./DrawerAvatar";
 
@@ -12,13 +8,13 @@ export const DrawerHeader = () => {
     queries: [
       {
         queryKey: ["drawers"],
-        queryFn: queryFnWrapper(getAllDrawers, 10000),
+        queryFn: getAllDrawers,
         staleTime: 1000 * 60 * 30,
         gcTime: 1000 * 60 * 30,
       },
       {
         queryKey: ["drivers"],
-        queryFn: queryFnWrapper(getAllDrivers, 10000),
+        queryFn: getAllDrivers,
         staleTime: 1000 * 60 * 1,
       },
     ],
@@ -46,6 +42,7 @@ export const DrawerHeaderSkeleton = () => {
       justifyContent="space-around"
       sx={{ height: 175, overflow: "hidden" }}
     >
+      <DrawerAvatarSkeleton />
       <DrawerAvatarSkeleton />
       <DrawerAvatarSkeleton />
       <DrawerAvatarSkeleton />
