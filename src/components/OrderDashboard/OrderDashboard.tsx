@@ -3,7 +3,7 @@ import type { Drawer, DriverDrawer } from "../../supabaseQueries";
 import { Button, Divider, Stack } from "@mui/material";
 import { Portal } from "@mui/base";
 import { OrderDashboardContext } from "./OrderDashboardContext";
-import { DrawerHeader } from "./DrawerHeader";
+import { DrawerHeader, DrawerHeaderSkeleton } from "./DrawerHeader";
 import { QuickInfoArea } from "./QuickInfoArea";
 import { OrderTicketArea } from "./OrderTicketArea";
 import { LayoutContext } from "../../context/LayoutContext";
@@ -24,9 +24,7 @@ export const OrderDashboard = () => {
   return (
     <OrderDashboardContext.Provider value={{ openDrawer, setOpenDrawer }}>
       <Stack direction="column" sx={{ height: "100%" }}>
-        <Suspense
-          fallback={<div>Loading DrawerHeader from OrderDashboard...</div>}
-        >
+        <Suspense fallback={<DrawerHeaderSkeleton />}>
           <DrawerHeader />
         </Suspense>
         <Divider />

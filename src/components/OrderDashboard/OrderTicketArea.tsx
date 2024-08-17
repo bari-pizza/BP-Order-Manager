@@ -1,4 +1,4 @@
-import { Suspense, useContext } from "react";
+import { useContext } from "react";
 import { Stack } from "@mui/material";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getAllDaysOrders } from "../../supabaseQueries";
@@ -13,24 +13,21 @@ export const OrderTicketArea = () => {
   const { data: orders } = useSuspenseQuery({
     queryKey: ["orders", businessDate.format("MM/DD/YYYY")],
     queryFn: () => getAllDaysOrders(MDY),
-    staleTime: 1000 * 60 * 3,
   });
 
   return (
-    <Suspense fallback={<div>Loading OrderTiketArea...</div>}>
-      <Stack>
-        {orders.length ? (
-          orders?.map((order) => (
-            <OrderTicket key={order.order_id} order={order} />
-          ))
-        ) : (
-          <Player
-            src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
-            loop
-            autoplay
-          />
-        )}
-      </Stack>
-    </Suspense>
+    <Stack>
+      {orders?.length ? (
+        orders?.map((order) => (
+          <OrderTicket key={order.order_id} order={order} />
+        ))
+      ) : (
+        <Player
+          src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
+          loop
+          autoplay
+        />
+      )}
+    </Stack>
   );
 };

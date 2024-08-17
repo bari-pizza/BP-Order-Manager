@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Avatar, Button, Stack, Typography } from "@mui/material";
+import { Avatar, Button, Skeleton, Stack, Typography } from "@mui/material";
 import type { Drawer, DriverDrawer } from "../../supabaseQueries";
 import { getDrawerFullName } from "../../utils";
 import { OrderDashboardContext } from "./OrderDashboardContext";
@@ -21,6 +21,25 @@ export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
       >
         <Avatar sx={{ height: "4em", width: "4em" }}>{fullName}</Avatar>
         <Typography>{fullName}</Typography>
+      </Stack>
+    </Button>
+  );
+};
+
+export const DrawerAvatarSkeleton = () => {
+  return (
+    <Button>
+      <Stack
+        direction="column"
+        sx={{ height: "100%", width: "min-content" }}
+        alignItems="center"
+      >
+        <Skeleton variant="circular">
+          <Avatar sx={{ height: "4em", width: "4em" }}>Full Name Here</Avatar>
+        </Skeleton>
+        <Skeleton variant="text">
+          <Typography>Full Name Here</Typography>
+        </Skeleton>
       </Stack>
     </Button>
   );

@@ -77,6 +77,7 @@ function Layout() {
   const sideBarRef = useRef<HTMLDivElement>(null);
   const today = dayjs();
   const [businessDate, setBusinessDate] = useState<dayjs.Dayjs>(today);
+  // TODO: use useParams instead to get businessDate
   return (
     // <APIProvider
     //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}

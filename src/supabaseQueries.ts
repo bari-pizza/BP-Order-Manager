@@ -103,3 +103,20 @@ export const dummyQueryFn = async <T>({
     }, timeout);
   });
 };
+
+export const queryFnWrapper = <T>(
+  fn: () => Promise<T>,
+  timeout: number
+): (() => Promise<T>) => {
+  return async () => {
+    const timeoutPromise = new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, timeout);
+    });
+
+    const result = await Promise.all([fn(), timeoutPromise]);
+
+    return result[0];
+  };
+};
