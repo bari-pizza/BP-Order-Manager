@@ -1,24 +1,32 @@
-import { Suspense } from "react";
-import { Stack, Typography } from "@mui/material";
+import { Stack } from "@mui/material";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getAllDaysOrders } from "../../supabaseQueries";
 import { OrderTicket } from "./OrderTicket";
+import { Player } from "@lottiefiles/react-lottie-player";
+import { dayjsToMDY } from "../../utils";
+import { useBusinessDate } from "../BusinessDatePicker/useBusinessDate";
 
 export const OrderTicketArea = () => {
+  const [businessDate] = useBusinessDate();
+  const MDY = dayjsToMDY(businessDate);
   const { data: orders } = useSuspenseQuery({
-    queryKey: ["orders"],
-    queryFn: () => getAllDaysOrders({ year: 2024, month: 8, day: 14 }),
-    staleTime: 1000 * 60 * 3,
+    queryKey: ["orders", businessDate.format("MM/DD/YYYY")],
+    queryFn: () => getAllDaysOrders(MDY),
   });
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Stack>
-        <Typography>Order Ticket Area</Typography>
-        {orders?.map((order) => (
+    <Stack>
+      {orders?.length ? (
+        orders?.map((order) => (
           <OrderTicket key={order.order_id} order={order} />
-        ))}
-      </Stack>
-    </Suspense>
+        ))
+      ) : (
+        <Player
+          src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
+          loop
+          autoplay
+        />
+      )}
+    </Stack>
   );
 };
