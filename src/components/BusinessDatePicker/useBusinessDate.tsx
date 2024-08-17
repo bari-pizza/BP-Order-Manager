@@ -15,6 +15,8 @@ export const useBusinessDate = (): [
     const date = searchParams.get("businessDate");
     if (date) {
       setBusinessDate(dayjs(date));
+    } else {
+      setBusinessDate(today);
     }
   }, [searchParams]);
 
@@ -26,7 +28,6 @@ export const useBusinessDate = (): [
     } else {
       setSearchParams({ businessDate: date.format("YYYY-MM-DD") });
     }
-    setBusinessDate(date);
   };
 
   return [businessDate, updateBusinessDate];
