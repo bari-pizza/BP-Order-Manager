@@ -1,5 +1,5 @@
-import { useContext, useEffect } from 'react';
-import { LayoutContext } from '../context/LayoutContext';
+import { useEffect } from 'react';
+import { useLayoutContext } from '../dataHooks/useContextData';
 import { Portal } from '@mui/base';
 
 type SideBarProps = {
@@ -8,7 +8,7 @@ type SideBarProps = {
 };
 
 export const SideBar = ({ width, children }: SideBarProps) => {
-    const { sideBarRef, setSideBarWidth } = useContext(LayoutContext);
+    const { sideBarRef, setSideBarWidth } = useLayoutContext();
     useEffect(() => {
         setSideBarWidth(width);
         return () => setSideBarWidth('0px');

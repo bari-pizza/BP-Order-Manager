@@ -2,7 +2,7 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supaClient } from '../supaClient';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useUserContext } from '../dataHooks/useUserContext';
+import { useUserContext } from '../dataHooks/useContextData';
 
 type LoginProps = {
     authMode: 'sign_in' | 'sign_up';

@@ -1,15 +1,14 @@
-import { useContext } from 'react';
 import { Avatar, Button, Skeleton, Stack, Typography } from '@mui/material';
 import type { Drawer, DriverDrawer } from '../../supabaseQueries';
 import { getDrawerFullName } from '../../utils';
-import { OrderDashboardContext } from '../../context/OrderDashboardContext';
+import { useOrderDashboardContext } from '../../dataHooks/useContextData';
 
 interface DrawerAvatarProps {
     drawer: Drawer | DriverDrawer;
 }
 
 export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
-    const { setOpenDrawer } = useContext(OrderDashboardContext);
+    const { setOpenDrawer } = useOrderDashboardContext();
     const fullName = getDrawerFullName(drawer);
     return (
         // large circle with image and name of drawer

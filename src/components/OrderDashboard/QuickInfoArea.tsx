@@ -1,10 +1,9 @@
 import { Stack, Typography } from '@mui/material';
-import { useContext } from 'react';
 import { getDrawerFullName } from '../../utils';
-import { OrderDashboardContext } from '../../context/OrderDashboardContext';
+import { useOrderDashboardContext } from '../../dataHooks/useContextData';
 
 export const QuickInfoArea = () => {
-    const { openDrawer: drawer } = useContext(OrderDashboardContext);
+    const { openDrawer: drawer } = useOrderDashboardContext();
     if (!drawer) {
         return <Stack sx={{ height: 150 }}></Stack>;
     }
