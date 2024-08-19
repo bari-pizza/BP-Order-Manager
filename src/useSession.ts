@@ -2,7 +2,6 @@ import { RealtimeChannel, Session } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { supaClient } from './supaClient';
 import { Profile } from './supabaseQueries.ts';
-import { useQueryClient } from '@tanstack/react-query';
 export interface SupashipUserInfo {
     session: Session | null;
     profile: Profile | null;
@@ -16,11 +15,12 @@ export const useSession = (): SupashipUserInfo => {
         profile: null,
         session: null,
     });
-    const queryClient = useQueryClient();
     const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+
     useEffect(() => {
         supaClient.auth.getSession().then(({ data: { session } }) => {
-            setUserInfo({ ...userInfo, session });
+            // setUserInfo({ ...userInfo, session });
+            setUserInfo((userInfo) => ({ ...userInfo, session }));
             supaClient.auth.onAuthStateChange((_event, session) => {
                 setUserInfo({ session, profile: null });
             });
@@ -28,6 +28,28 @@ export const useSession = (): SupashipUserInfo => {
     }, []);
 
     useEffect(() => {
+        async function listenToUserProfileChanges(userId: string) {
+            const { data } = await supaClient.from('profiles').select('*').filter('id', 'eq', userId);
+            if (data?.[0]) {
+                setUserInfo({ ...userInfo, profile: data?.[0] });
+            }
+            return supaClient
+                .channel(`public:Profile`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'profiles',
+                        filter: `id=eq.${userId}`,
+                    },
+                    (payload) => {
+                        setUserInfo({ ...userInfo, profile: payload.new as Profile });
+                    },
+                )
+                .subscribe();
+        }
+
         if (userInfo.session?.user && !userInfo.profile) {
             listenToUserProfileChanges(userInfo.session.user.id).then((newChannel) => {
                 if (channel) {
@@ -39,31 +61,7 @@ export const useSession = (): SupashipUserInfo => {
             channel?.unsubscribe();
             setChannel(null);
         }
-    }, [userInfo.session]);
-
-    async function listenToUserProfileChanges(userId: string) {
-        const { data } = await supaClient.from('profiles').select('*').filter('id', 'eq', userId);
-        if (data?.[0]) {
-            setUserInfo({ ...userInfo, profile: data?.[0] });
-            queryClient.setQueryData(['profiles', { id: userId }], data?.[0]);
-        }
-        return supaClient
-            .channel(`public:Profile`)
-            .on(
-                'postgres_changes',
-                {
-                    event: '*',
-                    schema: 'public',
-                    table: 'profiles',
-                    filter: `id=eq.${userId}`,
-                },
-                (payload) => {
-                    setUserInfo({ ...userInfo, profile: payload.new as Profile });
-                    queryClient.setQueryData(['profiles', { id: userId }], payload.new as Profile);
-                },
-            )
-            .subscribe();
-    }
+    }, [channel, userInfo]);
 
     return userInfo;
 };
