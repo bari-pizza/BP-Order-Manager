@@ -2,15 +2,6 @@ import { useContext, useEffect } from 'react';
 import { LayoutContext } from '../context/LayoutContext';
 import { Portal } from '@mui/base';
 
-// type SideBarProps = {
-//     sideBarRef: React.RefObject<HTMLDivElement> | null;
-//     children?: React.ReactNode;
-// };
-
-// export const SideBar = ({ sideBarRef, children }: SideBarProps) => {
-//     return <Portal container={sideBarRef?.current}>{children}</Portal>;
-// };
-
 type SideBarProps = {
     width: string | number;
     children?: React.ReactNode;

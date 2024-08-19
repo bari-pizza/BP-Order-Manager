@@ -1,16 +1,15 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { useContext } from 'react';
-import { UserContext } from '../context/UserContext';
 import { supaClient } from '../supaClient';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useUserContext } from '../dataHooks/useUserContext';
 
 type LoginProps = {
     authMode: 'sign_in' | 'sign_up';
 };
 
 export function Login({ authMode = 'sign_in' }: LoginProps) {
-    const { session } = useContext(UserContext);
+    const { session } = useUserContext();
     const location = useLocation();
     const from = location.state?.from?.pathname || '/';
 

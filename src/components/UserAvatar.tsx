@@ -1,9 +1,8 @@
-import { useContext } from 'react';
 import { Avatar, Skeleton } from '@mui/material';
-import { UserContext } from '../context/UserContext';
+import { useUserContext } from '../dataHooks/useUserContext';
 
 export const UserAvatar = () => {
-    const { session, profile } = useContext(UserContext);
+    const { session, profile } = useUserContext();
     let userAvatar = <Skeleton variant="circular" height={30} width={30} />;
     if (profile) {
         const fullName = `${profile.first_name} ${profile.last_name}`;

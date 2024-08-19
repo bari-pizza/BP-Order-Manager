@@ -1,9 +1,9 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import React, { Suspense, useContext } from 'react';
-import { UserContext } from '../context/UserContext';
+import React, { Suspense } from 'react';
+import { useUserContext } from '../dataHooks/useUserContext';
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    const { session } = useContext(UserContext);
+    const { session } = useUserContext();
     const location = useLocation();
 
     if (!session) {

@@ -1,7 +1,7 @@
 import { useState, Suspense } from 'react';
 import type { Drawer, DriverDrawer } from '../../supabaseQueries';
 import { Button, Divider, Stack } from '@mui/material';
-import { OrderDashboardContext } from './OrderDashboardContext';
+import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
 import { QuickInfoArea } from './QuickInfoArea';
 import { OrderTicketArea } from './OrderTicketArea';

@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon } from '@mui/material';
 import { Search, Home as HomeIcon, LocalPizza as LocalPizzaIcon } from '@mui/icons-material';
-import { useContext } from 'react';
-import { UserContext } from '../context/UserContext';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { CalendarIcon } from '@mui/x-date-pickers';
-import { useBusinessDate } from './BusinessDatePicker/useBusinessDate';
+import { useBusinessDate } from '../dataHooks/useBusinessDate';
 import { UserAvatar } from './UserAvatar';
+import { useUserContext } from '../dataHooks/useUserContext';
 
 const drawerWidth = 200;
 
@@ -18,7 +17,7 @@ interface NavBarItem {
 }
 
 export function NavBar() {
-    const { session } = useContext(UserContext);
+    const { session } = useUserContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
 
