@@ -1,23 +1,16 @@
-import { useState, useContext, Suspense, useEffect } from 'react';
+import { useState, Suspense } from 'react';
 import type { Drawer, DriverDrawer } from '../../supabaseQueries';
 import { Button, Divider, Stack } from '@mui/material';
-import { Portal } from '@mui/base';
 import { OrderDashboardContext } from './OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
 import { QuickInfoArea } from './QuickInfoArea';
 import { OrderTicketArea } from './OrderTicketArea';
-import { LayoutContext } from '../../context/LayoutContext';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
+import { SideBar } from '../SideBar';
 
 export const OrderDashboard = () => {
     const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer | null>(null);
-    const { sideBarRef, setSideBarWidth } = useContext(LayoutContext);
     const { orderEditor, open, setOpen } = useOrderEditor();
-
-    useEffect(() => {
-        setSideBarWidth('300px');
-        return () => setSideBarWidth('0px');
-    }, [setSideBarWidth]);
 
     const toggleOrderEditor = () => {
         setOpen((prev) => !prev);
@@ -33,12 +26,12 @@ export const OrderDashboard = () => {
                 <QuickInfoArea />
                 <Divider />
                 <OrderTicketArea />
-                <Portal container={sideBarRef?.current}>
+                <SideBar width="300px">
                     <Stack>
                         {!open && <Button onClick={toggleOrderEditor}>Add Order</Button>}
                         {orderEditor}
                     </Stack>
-                </Portal>
+                </SideBar>
             </Stack>
         </OrderDashboardContext.Provider>
     );

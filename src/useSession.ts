@@ -21,10 +21,8 @@ export const useSession = (): SupashipUserInfo => {
     useEffect(() => {
         supaClient.auth.getSession().then(({ data: { session } }) => {
             setUserInfo({ ...userInfo, session });
-            queryClient.setQueryData(['session'], session);
             supaClient.auth.onAuthStateChange((_event, session) => {
                 setUserInfo({ session, profile: null });
-                queryClient.setQueryData(['session'], session);
             });
         });
     }, []);
