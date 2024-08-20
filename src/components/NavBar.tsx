@@ -16,10 +16,14 @@ interface NavBarItem {
     onClick?: () => void;
 }
 
+// TODO: Add a way to choose drivers for the day
+// TODO: Handle order creation
+// TODO: Handle order update
+// TODO: Handle order deletion
+// TODO: Change Calendar color when it is today
+
 export function NavBar() {
     const { session } = useUserContext();
-    // const location = useLocation();
-    // const searchParams = new URLSearchParams(location.search);
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
 

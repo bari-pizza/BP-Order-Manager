@@ -7,6 +7,7 @@ export type Drawer = Tables<'drawers'>;
 export type DrawerType = Tables<'drawers'>['drawer_type'];
 export type DriverDrawer = Drawer & { driver: Profile };
 export type Order = Tables<'orders'>;
+export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 

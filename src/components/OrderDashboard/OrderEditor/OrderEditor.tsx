@@ -79,6 +79,7 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
                 </Typography>
                 {body}
                 <Button onClick={handleSubmit(onSubmit)}>Submit</Button>
+                <Button onClick={() => setOpen(false)}>Cancel</Button>
             </Stack>
         );
     }
