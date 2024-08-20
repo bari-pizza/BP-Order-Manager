@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { Stack, Drawer } from '@mui/material';
@@ -35,10 +35,8 @@ const router = createBrowserRouter([
             {
                 path: '/orders',
                 element: (
-                    <ProtectedRoute>
-                        <Suspense fallback={<OrderDashboardSkeleton />}>
-                            <OrderDashboard />
-                        </Suspense>
+                    <ProtectedRoute fallback={<OrderDashboardSkeleton />}>
+                        <OrderDashboard />
                     </ProtectedRoute>
                 ),
             },
@@ -70,9 +68,11 @@ export default App;
 const queryClient = new QueryClient();
 
 function Layout() {
-    const { session, profile } = useSession();
+    const { session, profile, loading } = useSession();
     const sideBarRef = useRef<HTMLDivElement>(null);
+    const sideBarSkeletonRef = useRef<HTMLDivElement>(null);
     const [sideBarWidth, setSideBarWidth] = useState<number | string>(0);
+    const [sideBarSkeletonWidth, setSideBarSkeletonWidth] = useState<number | string>(0);
     return (
         // <APIProvider
         //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
@@ -80,8 +80,9 @@ function Layout() {
         //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
         //     version="beta">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <LayoutContext.Provider value={{ sideBarRef, setSideBarWidth }}>
-                <UserContext.Provider value={{ session, profile }}>
+            <LayoutContext.Provider
+                value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
+                <UserContext.Provider value={{ session, profile, loading }}>
                     <Stack id="main" direction="row" justifyContent="center">
                         <NavBar />
                         <Stack id="content" direction="column" overflow="auto" width={'100%'}>
@@ -100,6 +101,25 @@ function Layout() {
                             anchor="right"
                             variant="permanent">
                             <Stack id="sidebar" direction="column" ref={sideBarRef} sx={{ height: '100vh' }} />
+                        </Drawer>
+                        <Drawer
+                            sx={{
+                                width: sideBarSkeletonWidth,
+                                flexShrink: 0,
+                                '& .MuiDrawer-paper': {
+                                    width: sideBarSkeletonWidth,
+                                    boxSizing: 'border-box',
+                                },
+                            }}
+                            id="sidebar-skeleton-drawer"
+                            anchor="right"
+                            variant="permanent">
+                            <Stack
+                                id="sidebar-skeleton"
+                                direction="column"
+                                ref={sideBarSkeletonRef}
+                                sx={{ height: '100vh' }}
+                            />
                         </Drawer>
                     </Stack>
                 </UserContext.Provider>

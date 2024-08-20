@@ -6,6 +6,7 @@ import { Profile } from '../supabaseQueries.ts';
 export interface SupashipUserInfo {
     session: Session | null;
     profile: Profile | null;
+    loading: boolean;
 }
 
 // for the future
@@ -15,15 +16,15 @@ export const useSession = (): SupashipUserInfo => {
     const [userInfo, setUserInfo] = useState<SupashipUserInfo>({
         profile: null,
         session: null,
+        loading: true,
     });
     const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
     useEffect(() => {
         supaClient.auth.getSession().then(({ data: { session } }) => {
-            // setUserInfo({ ...userInfo, session });
-            setUserInfo((userInfo) => ({ ...userInfo, session }));
+            setUserInfo((userInfo) => ({ ...userInfo, session, loading: false }));
             supaClient.auth.onAuthStateChange((_event, session) => {
-                setUserInfo({ session, profile: null });
+                setUserInfo({ session, profile: null, loading: false });
             });
         });
     }, []);

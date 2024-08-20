@@ -1,11 +1,11 @@
 import { useState, Suspense } from 'react';
 import { dummyQueryFn, Order, type Drawer, type DriverDrawer } from '../../supabaseQueries';
-import { Button, Divider, Drawer as MUIDrawer, Stack } from '@mui/material';
+import { Button, Divider, Stack } from '@mui/material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
 import { QuickInfoArea } from './QuickInfoArea';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
-import { SideBar } from '../SideBar';
+import { SideBar, SideBarSkeleton } from '../SideBar';
 import { useOrderTicketArea } from './OrderTicketArea/useOrderTicketArea';
 import { useBusinessDate } from '../../dataHooks/useBusinessDate';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -23,24 +23,22 @@ const dummyOrders = [
     createDummyOrder(),
 ].sort((a, b) => (a.order_number || 0) - (b.order_number || 0)) as Order[];
 
-// TODO: see how sidebar works in production (is there a flicker)
+// TODO: maybe get drawers and drivers at the top level rather than in Order Dashboard
+// TODO: would be better if only the ticket area were scrollable and the Header was fixed
 
 export const OrderDashboard = () => {
     const [businessDate] = useBusinessDate();
     // const MDY = dayjsToMDY(businessDate);
-    console.log('about to call dummyQuery');
     const { data: orders } = useSuspenseQuery({
         queryKey: ['orders', businessDate.format('MM/DD/YYYY')],
         // queryFn: () => getAllDaysOrders(MDY),
         queryFn: () =>
             dummyQueryFn({
                 data: dummyOrders,
-                timeout: 1,
             }),
         refetchOnWindowFocus: false,
         staleTime: Infinity,
     });
-    console.log('got orders', orders);
     const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer | null>(null);
     const { orderEditor, open: openOrderEditor, setOpen: setOpenOrderEditor } = useOrderEditor();
     const { orderTicketArea, toggleAllTickets } = useOrderTicketArea({ orders });
@@ -48,8 +46,6 @@ export const OrderDashboard = () => {
     const toggleOrderEditor = () => {
         setOpenOrderEditor((prev) => !prev);
     };
-
-    console.log('rendering order dashboard sidebar');
 
     return (
         <OrderDashboardContext.Provider value={{ openDrawer, setOpenDrawer }}>
@@ -61,16 +57,16 @@ export const OrderDashboard = () => {
                 <QuickInfoArea />
                 <Divider />
                 <Suspense fallback={<OrderTicketAreaSkeleton />}>{orderTicketArea}</Suspense>
-                <SideBar width="300px">
-                    <Stack id="sidebar-add-order">
-                        {!openOrderEditor && <Button onClick={toggleOrderEditor}>Add Order</Button>}
-                        {orderEditor}
-                    </Stack>
-                    <Stack id="sidebar-toggle-tickets">
-                        <Button onClick={toggleAllTickets}>Toggle Tickets</Button>
-                    </Stack>
-                </SideBar>
             </Stack>
+            <SideBar width="300px">
+                <Stack id="sidebar-add-order">
+                    {!openOrderEditor && <Button onClick={toggleOrderEditor}>Add Order</Button>}
+                    {orderEditor}
+                </Stack>
+                <Stack id="sidebar-toggle-tickets">
+                    <Button onClick={toggleAllTickets}>Toggle Tickets</Button>
+                </Stack>
+            </SideBar>
         </OrderDashboardContext.Provider>
     );
 };
@@ -83,20 +79,10 @@ export const OrderDashboardSkeleton = () => {
             <QuickInfoArea />
             <Divider />
             <OrderTicketAreaSkeleton />
-            <MUIDrawer
-                sx={{
-                    width: 300,
-                    flexShrink: 0,
-                    '& .MuiDrawer-paper': {
-                        width: 300,
-                        boxSizing: 'border-box',
-                    },
-                }}
-                anchor="right"
-                variant="permanent">
+            <SideBarSkeleton width="300px">
                 <Button disabled>Add Order</Button>
                 <Button disabled>Toggle Tickets</Button>
-            </MUIDrawer>
+            </SideBarSkeleton>
         </Stack>
     );
 };

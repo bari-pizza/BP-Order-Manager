@@ -76,12 +76,9 @@ interface DummyQueryFnProps<T> {
 }
 
 export const dummyQueryFn = async <T>({ timeout = 1000, data = [] }: DummyQueryFnProps<T> = {}): Promise<T[]> => {
-    console.log('calling dummyQueryFn with timeout', timeout, data);
-
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve(data);
-            console.log('done calling dummyQueryFn with timeout', timeout);
         }, timeout);
     });
 };
