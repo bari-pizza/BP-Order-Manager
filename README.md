@@ -58,3 +58,7 @@ configure({ asyncUtilTimeout: 5000 }); // Set global timeout to 5 seconds
 ```
 
 Create tests in /src/tests directory. Should end with test.tsx.
+
+### Links
+
+[Conditional Typing in TS](https://dev.to/maissenayed/conditional-react-props-with-typescript-43lg)

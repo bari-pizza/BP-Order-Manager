@@ -1,21 +1,11 @@
-import { Link } from 'react-router-dom';
-import {
-    Toolbar,
-    Drawer,
-    List,
-    ListItemButton,
-    ListItemText,
-    ListItem,
-    ListItemIcon,
-    Avatar,
-    Skeleton,
-} from '@mui/material';
+import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon } from '@mui/material';
 import { Search, Home as HomeIcon, LocalPizza as LocalPizzaIcon } from '@mui/icons-material';
-import { useContext } from 'react';
-import { UserContext } from '../context/UserContext';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { CalendarIcon } from '@mui/x-date-pickers';
-import { useBusinessDate } from './BusinessDatePicker/useBusinessDate';
+import { useBusinessDate } from '../dataHooks/useBusinessDate';
+import { UserAvatar } from './UserAvatar';
+import { useUserContext } from '../dataHooks/useContextData';
+import { SmartLink } from './SmartNavigate';
 
 const drawerWidth = 200;
 
@@ -27,18 +17,16 @@ interface NavBarItem {
 }
 
 export function NavBar() {
-    const { profile } = useContext(UserContext);
+    const { session } = useUserContext();
+    // const location = useLocation();
+    // const searchParams = new URLSearchParams(location.search);
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
-    let userAvatar = <Skeleton variant="circular" height={30} width={30} />;
-    if (profile) {
-        const fullName = `${profile.first_name} ${profile.last_name}`;
-        const initials = fullName
-            .split(' ')
-            .map((name) => name[0])
-            .join('');
-        userAvatar = <Avatar sx={{ height: 30, width: 30 }}>{initials}</Avatar>;
-    }
+
+    const userListItem: NavBarItem = session
+        ? { path: '/myaccount', icon: <UserAvatar />, text: 'Profile' }
+        : { path: '/login', icon: <UserAvatar />, text: 'Login' };
+
     const listItems: NavBarItem[] = [
         { path: '/', icon: <HomeIcon />, text: 'Home' },
         {
@@ -48,11 +36,7 @@ export function NavBar() {
         },
         { path: '/search', icon: <Search />, text: 'Search' },
         { path: '/orders', icon: <LocalPizzaIcon />, text: 'Orders' },
-        {
-            path: `/users/${profile?.id}`,
-            icon: userAvatar,
-            text: 'Profile',
-        },
+        userListItem,
     ];
 
     return (
@@ -71,9 +55,14 @@ export function NavBar() {
             <List>
                 {listItems.map((item) => (
                     <ListItem
-                        component={item.path ? Link : 'div'}
-                        to={item.path}
-                        {...(item.path ? { unstable_viewTransition: true } : {})}
+                        {...(item.path
+                            ? {
+                                  component: SmartLink,
+                                  to: item.path,
+                                  keepSearchParams: true,
+                                  unstable_viewTransition: true,
+                              }
+                            : { component: 'div' })}
                         key={item.text}>
                         <ListItemButton onClick={item.onClick}>
                             <ListItemIcon>{item.icon}</ListItemIcon>

@@ -1,62 +1,37 @@
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../context/UserContext";
-import { Dialog, DialogContent } from "@mui/material";
-import { supaClient } from "../supaClient";
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { supaClient } from '../supaClient';
+import { SmartNavigate } from './SmartNavigate';
+import { useUserContext } from '../dataHooks/useContextData';
 
-export function Login() {
-  const [showModal, setShowModal] = useState(false);
-  const [authMode, setAuthMode] = useState<"sign_in" | "sign_up">("sign_in");
-  const { session } = useContext(UserContext);
+type LoginProps = {
+    authMode: 'sign_in' | 'sign_up';
+};
 
-  useEffect(() => {
-    if (session?.user) {
-      setShowModal(false);
+export function Login({ authMode = 'sign_in' }: LoginProps) {
+    const { session } = useUserContext();
+    // const from = location.state?.from?.pathname || '/';
+
+    // console.log('sent here from:', location.state?.from?.pathname);
+
+    if (!session) {
+        return (
+            <Auth
+                supabaseClient={supaClient}
+                appearance={{
+                    theme: ThemeSupa,
+                    className: {
+                        container: 'login-form-container',
+                        label: 'login-form-label',
+                        button: 'login-form-button',
+                        input: 'login-form-input',
+                    },
+                }}
+                theme="dark"
+                view={authMode}
+            />
+        );
     }
-  }, [session]);
 
-  return (
-    <>
-      <div className="flex m-4 place-items-center">
-        <button
-          className="login-button"
-          onClick={() => {
-            setAuthMode("sign_in");
-            setShowModal(true);
-          }}
-        >
-          Login
-        </button>{" "}
-        <span className="p-2"> or </span>{" "}
-        <button
-          className="login-button"
-          onClick={() => {
-            setAuthMode("sign_up");
-            setShowModal(true);
-          }}
-        >
-          Sign Up
-        </button>
-      </div>
-      <Dialog open={showModal} onClose={() => setShowModal(false)}>
-        <DialogContent>
-          <Auth
-            supabaseClient={supaClient}
-            appearance={{
-              theme: ThemeSupa,
-              className: {
-                container: "login-form-container",
-                label: "login-form-label",
-                button: "login-form-button",
-                input: "login-form-input",
-              },
-            }}
-            view={authMode}
-          />
-          <button onClick={() => setShowModal(false)}>Close</button>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+    return <SmartNavigate keepSearchParams to="/" />;
 }
