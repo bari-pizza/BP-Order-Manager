@@ -35,7 +35,7 @@ export const SmartLink = ({ to, keepSearchParams, ...rest }: SmartLinkProps) => 
     });
     newTo.search = newSearchParams.toString();
 
-    return <Link to={newTo} {...rest} />;
+    return <Link to={newTo} {...rest} style={{ color: 'inherit' }} />;
 };
 
 /**

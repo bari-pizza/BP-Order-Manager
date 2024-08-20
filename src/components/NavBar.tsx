@@ -16,8 +16,6 @@ interface NavBarItem {
     onClick?: () => void;
 }
 
-// TODO: possibly make a hook that returns current searchParams and a function to update it (with keys to keep or remove)
-// TODO: might even make sense to make my own Navigate component that handles to and from with search params
 export function NavBar() {
     const { session } = useUserContext();
     // const location = useLocation();
@@ -57,10 +55,14 @@ export function NavBar() {
             <List>
                 {listItems.map((item) => (
                     <ListItem
-                        component={item.path ? SmartLink : 'div'}
-                        to={{ pathname: item.path }}
-                        {...(item.path ? { keepSearchParams: true } : {})}
-                        {...(item.path ? { unstable_viewTransition: true } : {})}
+                        {...(item.path
+                            ? {
+                                  component: SmartLink,
+                                  to: item.path,
+                                  keepSearchParams: true,
+                                  unstable_viewTransition: true,
+                              }
+                            : { component: 'div' })}
                         key={item.text}>
                         <ListItemButton onClick={item.onClick}>
                             <ListItemIcon>{item.icon}</ListItemIcon>
