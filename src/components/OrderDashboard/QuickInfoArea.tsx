@@ -14,3 +14,7 @@ export const QuickInfoArea = () => {
         </Stack>
     );
 };
+
+// export const QuickInfoAreaSkeleton = () => {
+//     return <Stack sx={{ height: 150 }}></Stack>;
+// };

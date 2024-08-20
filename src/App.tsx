@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { Stack, Drawer } from '@mui/material';
@@ -12,7 +12,7 @@ import './App.css';
 import { LayoutContext } from './context/LayoutContext.tsx';
 import { UserContext } from './context/UserContext.tsx';
 import { useSession } from './dataHooks/useSession.ts';
-import { OrderDashboard } from './components/OrderDashboard/OrderDashboard.tsx';
+import { OrderDashboard, OrderDashboardSkeleton } from './components/OrderDashboard/OrderDashboard.tsx';
 import { PageMissing } from './components/PageMissing.tsx';
 import { Home } from './components/Home.tsx';
 import { MyAccount } from './components/MyAccount.tsx';
@@ -36,7 +36,9 @@ const router = createBrowserRouter([
                 path: '/orders',
                 element: (
                     <ProtectedRoute>
-                        <OrderDashboard />
+                        <Suspense fallback={<OrderDashboardSkeleton />}>
+                            <OrderDashboard />
+                        </Suspense>
                     </ProtectedRoute>
                 ),
             },
