@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon } from '@mui/material';
 import { Search, Home as HomeIcon, LocalPizza as LocalPizzaIcon } from '@mui/icons-material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
@@ -6,6 +5,7 @@ import { CalendarIcon } from '@mui/x-date-pickers';
 import { useBusinessDate } from '../dataHooks/useBusinessDate';
 import { UserAvatar } from './UserAvatar';
 import { useUserContext } from '../dataHooks/useContextData';
+import { SmartLink } from './SmartNavigate';
 
 const drawerWidth = 200;
 
@@ -16,8 +16,12 @@ interface NavBarItem {
     onClick?: () => void;
 }
 
+// TODO: possibly make a hook that returns current searchParams and a function to update it (with keys to keep or remove)
+// TODO: might even make sense to make my own Navigate component that handles to and from with search params
 export function NavBar() {
     const { session } = useUserContext();
+    // const location = useLocation();
+    // const searchParams = new URLSearchParams(location.search);
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
 
@@ -53,8 +57,9 @@ export function NavBar() {
             <List>
                 {listItems.map((item) => (
                     <ListItem
-                        component={item.path ? Link : 'div'}
-                        to={item.path}
+                        component={item.path ? SmartLink : 'div'}
+                        to={{ pathname: item.path }}
+                        {...(item.path ? { keepSearchParams: true } : {})}
                         {...(item.path ? { unstable_viewTransition: true } : {})}
                         key={item.text}>
                         <ListItemButton onClick={item.onClick}>

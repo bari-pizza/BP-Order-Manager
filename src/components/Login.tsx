@@ -1,7 +1,7 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supaClient } from '../supaClient';
-import { Navigate, useLocation } from 'react-router-dom';
+import { SmartNavigate } from './SmartNavigate';
 import { useUserContext } from '../dataHooks/useContextData';
 
 type LoginProps = {
@@ -10,10 +10,9 @@ type LoginProps = {
 
 export function Login({ authMode = 'sign_in' }: LoginProps) {
     const { session } = useUserContext();
-    const location = useLocation();
-    const from = location.state?.from?.pathname || '/';
+    // const from = location.state?.from?.pathname || '/';
 
-    console.log('sent here from:', location.state?.from?.pathname);
+    // console.log('sent here from:', location.state?.from?.pathname);
 
     if (!session) {
         return (
@@ -34,7 +33,5 @@ export function Login({ authMode = 'sign_in' }: LoginProps) {
         );
     }
 
-    console.log('session found, redirecting to:', from);
-
-    return <Navigate to={from} replace />;
+    return <SmartNavigate keepSearchParams to="/" />;
 }

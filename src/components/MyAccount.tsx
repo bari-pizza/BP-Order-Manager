@@ -1,14 +1,18 @@
-import { useNavigate } from 'react-router-dom';
 import { Stack, Button } from '@mui/material';
 import { supaClient } from '../supaClient';
+import { useUserContext } from '../dataHooks/useContextData';
+import { SmartNavigate } from './SmartNavigate';
 
 export const MyAccount = () => {
-    const navigate = useNavigate();
+    const { session } = useUserContext();
 
     const handleLogout = async () => {
         supaClient.auth.signOut();
-        navigate('/');
     };
+
+    if (!session) {
+        return <SmartNavigate keepSearchParams to="/" />;
+    }
 
     return (
         <Stack direction="column" alignItems="center" justifyContent="center" height="100vh">
