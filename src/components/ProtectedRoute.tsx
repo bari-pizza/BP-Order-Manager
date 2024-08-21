@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { useUserContext } from '../dataHooks/useContextData';
 import { SmartNavigate } from './SmartNavigate';
 
@@ -12,5 +13,5 @@ export const ProtectedRoute = ({ children, fallback }: { children: React.ReactNo
         return <SmartNavigate redirect keepSearchParams to="/login" />;
     }
 
-    return <>{children}</>;
+    return <Suspense fallback={fallback}>{children}</Suspense>;
 };

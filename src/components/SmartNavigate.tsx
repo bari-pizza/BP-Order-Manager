@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Link, Navigate, NavigateProps, Path, To, useLocation } from 'react-router-dom';
 
 type SmartLinkProps = NavigateProps & {
@@ -8,7 +9,8 @@ type SmartNavigateProps = SmartLinkProps & {
     redirect?: boolean;
 };
 
-export const SmartLink = ({ to, keepSearchParams, ...rest }: SmartLinkProps) => {
+// export const SmartLink = ({ to, keepSearchParams, ...rest }: SmartLinkProps) => {
+export const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(({ to, keepSearchParams, ...rest }, ref) => {
     const location = useLocation();
     const existingSearchParams = new URLSearchParams(location.search);
 
@@ -35,8 +37,8 @@ export const SmartLink = ({ to, keepSearchParams, ...rest }: SmartLinkProps) => 
     });
     newTo.search = newSearchParams.toString();
 
-    return <Link to={newTo} {...rest} style={{ color: 'inherit' }} />;
-};
+    return <Link to={newTo} ref={ref} {...rest} style={{ color: 'inherit' }} />;
+});
 
 /**
  * @description SmartNavigate will navigate using .to unless location.state.from is set

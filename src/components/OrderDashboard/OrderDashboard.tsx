@@ -35,6 +35,7 @@ export const OrderDashboard = () => {
         queryFn: () =>
             dummyQueryFn({
                 data: dummyOrders,
+                timeout: 10,
             }),
         refetchOnWindowFocus: false,
         staleTime: Infinity,
