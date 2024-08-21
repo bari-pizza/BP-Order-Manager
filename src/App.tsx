@@ -20,7 +20,6 @@ import { Login } from './components/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllDrawers, getAllDrivers } from './supabaseQueries.ts';
 import { BusinessDayContext } from './context/BusinessDayContext.tsx';
-import { Logger } from './Logger.tsx';
 
 const router = createBrowserRouter([
     {
@@ -38,15 +37,8 @@ const router = createBrowserRouter([
             {
                 path: '/orders',
                 element: (
-                    <ProtectedRoute
-                        fallback={
-                            <Logger message="Loading Orders">
-                                <OrderDashboardSkeleton />
-                            </Logger>
-                        }>
-                        <Logger message="Loaded Orders">
-                            <OrderDashboard />
-                        </Logger>
+                    <ProtectedRoute fallback={<OrderDashboardSkeleton />}>
+                        <OrderDashboard />
                     </ProtectedRoute>
                 ),
             },
@@ -65,12 +57,10 @@ const router = createBrowserRouter([
 function App() {
     return (
         <ErrorBoundary>
-            {/* <Suspense fallback={<div>Loading...</div>}> */}
             <QueryClientProvider client={queryClient}>
                 <RouterProvider router={router} />
                 <ReactQueryDevtools initialIsOpen={false} />
             </QueryClientProvider>
-            {/* </Suspense> */}
         </ErrorBoundary>
     );
 }
