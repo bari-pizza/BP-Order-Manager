@@ -5,7 +5,7 @@ import lottieSrc from '../assets/Pizza Shop.json';
 export const Home = () => {
     return (
         <Stack alignItems="center" justifyContent="center" direction="column" height="100vh">
-            <Player autoplay loop src={lottieSrc} style={{ maxHeight: '100vh' }} />
+            <Player autoplay src={lottieSrc} style={{ maxHeight: '100vh' }} keepLastFrame />
         </Stack>
     );
 };

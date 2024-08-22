@@ -11,9 +11,7 @@ export const DrawerHeader = () => {
 
     return (
         <Stack direction="row" justifyContent="space-around" sx={{ height: 175, flex: 'none', overflow: 'hidden' }}>
-            {combinedData?.map((drawer) => (
-                <DrawerAvatar key={drawer.drawer_id} drawer={drawer} />
-            ))}
+            {combinedData?.map((drawer) => <DrawerAvatar key={drawer.drawer_id} drawer={drawer} />)}
         </Stack>
     );
 };
