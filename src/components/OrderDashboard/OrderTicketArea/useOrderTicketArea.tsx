@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { OrderTicketArea } from './OrderTicketArea';
 import type { Order } from '../../../supabaseQueries';
+import { Button } from '@mui/material';
 
 export const useOrderTicketArea = ({ orders }: { orders: Order[] }) => {
     const [collapsedTickets, setCollapsedTickets] = useState<string[]>([]);
@@ -26,8 +27,14 @@ export const useOrderTicketArea = ({ orders }: { orders: Order[] }) => {
         <OrderTicketArea orders={orders} collapsedTickets={collapsedTickets} toggleTicket={toggleTicket} />
     );
 
+    const toggleTicketsButton = (
+        <Button variant="contained" onClick={toggleAllTickets}>
+            {collapsedTickets.length === orders?.length ? 'Expand All' : 'Collapse All'} Tickets
+        </Button>
+    );
+
     return {
         orderTicketArea,
-        toggleAllTickets,
+        toggleTicketsButton,
     };
 };

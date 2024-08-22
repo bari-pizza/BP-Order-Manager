@@ -15,3 +15,12 @@ export const SideBar = ({ width, children }: SideBarProps) => {
     }, [setSideBarWidth, width]);
     return <Portal container={sideBarRef?.current}>{children}</Portal>;
 };
+
+export const SideBarSkeleton = ({ width, children }: SideBarProps) => {
+    const { sideBarSkeletonRef, setSideBarSkeletonWidth } = useLayoutContext();
+    useEffect(() => {
+        setSideBarSkeletonWidth(width);
+        return () => setSideBarSkeletonWidth('0px');
+    }, [setSideBarSkeletonWidth, width]);
+    return <Portal container={sideBarSkeletonRef?.current}>{children}</Portal>;
+};

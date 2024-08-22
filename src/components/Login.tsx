@@ -10,9 +10,6 @@ type LoginProps = {
 
 export function Login({ authMode = 'sign_in' }: LoginProps) {
     const { session } = useUserContext();
-    // const from = location.state?.from?.pathname || '/';
-
-    // console.log('sent here from:', location.state?.from?.pathname);
 
     if (!session) {
         return (

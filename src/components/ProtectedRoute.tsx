@@ -1,17 +1,17 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { useUserContext } from '../dataHooks/useContextData';
 import { SmartNavigate } from './SmartNavigate';
 
-export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    const { session } = useUserContext();
+export const ProtectedRoute = ({ children, fallback }: { children: React.ReactNode; fallback: React.ReactNode }) => {
+    const { session, loading } = useUserContext();
 
-    if (!session) {
-        return (
-            <Suspense fallback={<div>Loading</div>}>
-                <SmartNavigate redirect keepSearchParams to="/login" />
-            </Suspense>
-        );
+    if (loading) {
+        return <>{fallback}</>;
     }
 
-    return <>{children}</>;
+    if (!session) {
+        return <SmartNavigate redirect keepSearchParams to="/login" />;
+    }
+
+    return <Suspense fallback={fallback}>{children}</Suspense>;
 };

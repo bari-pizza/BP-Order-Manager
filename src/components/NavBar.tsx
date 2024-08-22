@@ -6,6 +6,7 @@ import { useBusinessDate } from '../dataHooks/useBusinessDate';
 import { UserAvatar } from './UserAvatar';
 import { useUserContext } from '../dataHooks/useContextData';
 import { SmartLink } from './SmartNavigate';
+import dayjs from 'dayjs';
 
 const drawerWidth = 200;
 
@@ -22,6 +23,8 @@ interface NavBarItem {
 // TODO: Handle order deletion
 // TODO: Change Calendar color when it is today
 
+const today = dayjs();
+
 export function NavBar() {
     const { session } = useUserContext();
     const [businessDate] = useBusinessDate();
@@ -34,7 +37,7 @@ export function NavBar() {
     const listItems: NavBarItem[] = [
         { path: '/', icon: <HomeIcon />, text: 'Home' },
         {
-            text: businessDate.format('MM/DD/YYYY'),
+            text: today.isSame(businessDate, 'day') ? 'Today' : businessDate.format('MM/DD/YYYY'),
             icon: <CalendarIcon />,
             onClick: showBusinessDatePicker,
         },

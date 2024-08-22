@@ -1,6 +1,6 @@
-import { Suspense, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import { Stack, Drawer } from '@mui/material';
 import { NavBar } from './components/NavBar';
 // import { APIProvider } from '@vis.gl/react-google-maps';
@@ -18,6 +18,8 @@ import { Home } from './components/Home.tsx';
 import { MyAccount } from './components/MyAccount.tsx';
 import { Login } from './components/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
+import { getAllDrawers, getAllDrivers } from './supabaseQueries.ts';
+import { BusinessDayContext } from './context/BusinessDayContext.tsx';
 
 const router = createBrowserRouter([
     {
@@ -35,10 +37,8 @@ const router = createBrowserRouter([
             {
                 path: '/orders',
                 element: (
-                    <ProtectedRoute>
-                        <Suspense fallback={<OrderDashboardSkeleton />}>
-                            <OrderDashboard />
-                        </Suspense>
+                    <ProtectedRoute fallback={<OrderDashboardSkeleton />}>
+                        <OrderDashboard />
                     </ProtectedRoute>
                 ),
             },
@@ -70,9 +70,28 @@ export default App;
 const queryClient = new QueryClient();
 
 function Layout() {
-    const { session, profile } = useSession();
+    const { session, profile, loading } = useSession();
     const sideBarRef = useRef<HTMLDivElement>(null);
+    const sideBarSkeletonRef = useRef<HTMLDivElement>(null);
     const [sideBarWidth, setSideBarWidth] = useState<number | string>(0);
+    const [sideBarSkeletonWidth, setSideBarSkeletonWidth] = useState<number | string>(0);
+    const [{ data: drawers }, { data: drivers }] = useSuspenseQueries({
+        queries: [
+            {
+                queryKey: ['drawers'],
+                queryFn: getAllDrawers,
+                staleTime: 1000 * 60 * 30,
+                gcTime: 1000 * 60 * 30,
+                refetchOnWindowFocus: false,
+            },
+            {
+                queryKey: ['drivers'],
+                queryFn: getAllDrivers,
+                staleTime: 1000 * 60 * 1,
+                refetchOnWindowFocus: false,
+            },
+        ],
+    });
     return (
         // <APIProvider
         //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
@@ -80,30 +99,52 @@ function Layout() {
         //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
         //     version="beta">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <LayoutContext.Provider value={{ sideBarRef, setSideBarWidth }}>
-                <UserContext.Provider value={{ session, profile }}>
-                    <Stack id="main" direction="row" justifyContent="center">
-                        <NavBar />
-                        <Stack id="content" direction="column" overflow="auto" width={'100%'}>
-                            <Outlet />
-                        </Stack>
-                        <Drawer
-                            sx={{
-                                width: sideBarWidth,
-                                flexShrink: 0,
-                                '& .MuiDrawer-paper': {
+            <BusinessDayContext.Provider value={{ drawers, drivers }}>
+                <LayoutContext.Provider
+                    value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
+                    <UserContext.Provider value={{ session, profile, loading }}>
+                        <Stack id="main" direction="row" justifyContent="center">
+                            <NavBar />
+                            <Stack id="content" direction="column" overflow="auto" width={'100%'}>
+                                <Outlet />
+                            </Stack>
+                            <Drawer
+                                sx={{
                                     width: sideBarWidth,
-                                    boxSizing: 'border-box',
-                                },
-                            }}
-                            id="sidebar-drawer"
-                            anchor="right"
-                            variant="permanent">
-                            <Stack id="sidebar" direction="column" ref={sideBarRef} sx={{ height: '100vh' }} />
-                        </Drawer>
-                    </Stack>
-                </UserContext.Provider>
-            </LayoutContext.Provider>
+                                    flexShrink: 0,
+                                    '& .MuiDrawer-paper': {
+                                        width: sideBarWidth,
+                                        boxSizing: 'border-box',
+                                    },
+                                }}
+                                id="sidebar-drawer"
+                                anchor="right"
+                                variant="permanent">
+                                <Stack id="sidebar" direction="column" ref={sideBarRef} sx={{ height: '100vh' }} />
+                            </Drawer>
+                            <Drawer
+                                sx={{
+                                    width: sideBarSkeletonWidth,
+                                    flexShrink: 0,
+                                    '& .MuiDrawer-paper': {
+                                        width: sideBarSkeletonWidth,
+                                        boxSizing: 'border-box',
+                                    },
+                                }}
+                                id="sidebar-skeleton-drawer"
+                                anchor="right"
+                                variant="permanent">
+                                <Stack
+                                    id="sidebar-skeleton"
+                                    direction="column"
+                                    ref={sideBarSkeletonRef}
+                                    sx={{ height: '100vh' }}
+                                />
+                            </Drawer>
+                        </Stack>
+                    </UserContext.Provider>
+                </LayoutContext.Provider>
+            </BusinessDayContext.Provider>
         </LocalizationProvider>
         // </APIProvider>
     );

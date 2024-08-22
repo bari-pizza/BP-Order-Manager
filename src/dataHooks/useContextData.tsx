@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { LayoutContext } from '../context/LayoutContext';
 import { OrderDashboardContext } from '../context/OrderDashboardContext';
 import { UserContext } from '../context/UserContext';
+import { BusinessDayContext } from '../context/BusinessDayContext';
 
 export const useUserContext = () => {
     return useContext(UserContext);
@@ -14,4 +15,8 @@ export const useLayoutContext = () => {
 
 export const useOrderDashboardContext = () => {
     return useContext(OrderDashboardContext);
+};
+
+export const useBusinessDayContext = () => {
+    return useContext(BusinessDayContext);
 };
