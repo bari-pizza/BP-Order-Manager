@@ -23,9 +23,6 @@ const dummyOrders = [
     createDummyOrder(),
 ].sort((a, b) => (a.order_number || 0) - (b.order_number || 0)) as Order[];
 
-// TODO: maybe get drawers and drivers at the top level rather than in Order Dashboard
-// TODO: would be better if only the ticket area were scrollable and the Header was fixed
-
 export const OrderDashboard = () => {
     const [businessDate] = useBusinessDate();
     // const MDY = dayjsToMDY(businessDate);
@@ -41,16 +38,12 @@ export const OrderDashboard = () => {
         staleTime: Infinity,
     });
     const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer | null>(null);
-    const { orderEditor, open: openOrderEditor, setOpen: setOpenOrderEditor } = useOrderEditor();
-    const { orderTicketArea, toggleAllTickets } = useOrderTicketArea({ orders });
-
-    const toggleOrderEditor = () => {
-        setOpenOrderEditor((prev) => !prev);
-    };
+    const { orderEditor, addOrderButton } = useOrderEditor();
+    const { orderTicketArea, toggleTicketsButton } = useOrderTicketArea({ orders });
 
     return (
         <OrderDashboardContext.Provider value={{ openDrawer, setOpenDrawer }}>
-            <Stack direction="column" sx={{ height: '100%' }} mt={2}>
+            <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>
                 <Suspense fallback={<DrawerHeaderSkeleton />}>
                     <DrawerHeader />
                 </Suspense>
@@ -60,12 +53,12 @@ export const OrderDashboard = () => {
                 <Suspense fallback={<OrderTicketAreaSkeleton />}>{orderTicketArea}</Suspense>
             </Stack>
             <SideBar width="300px">
-                <Stack id="sidebar-add-order">
-                    {!openOrderEditor && <Button onClick={toggleOrderEditor}>Add Order</Button>}
-                    {orderEditor}
-                </Stack>
-                <Stack id="sidebar-toggle-tickets">
-                    <Button onClick={toggleAllTickets}>Toggle Tickets</Button>
+                <Stack alignContent="center" justifyContent="space-between" direction="column" height="100%">
+                    <Stack>{orderEditor}</Stack>
+                    <Stack direction="column" m={2} gap={2}>
+                        {addOrderButton}
+                        {toggleTicketsButton}
+                    </Stack>
                 </Stack>
             </SideBar>
         </OrderDashboardContext.Provider>

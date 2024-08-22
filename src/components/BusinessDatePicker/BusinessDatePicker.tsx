@@ -24,7 +24,7 @@ export const BusinessDatePicker = ({ open, setOpen }: BusinessDatePickerProps) =
     return (
         <Dialog open={open} onClose={() => setOpen(false)}>
             <DialogContent>
-                <DateCalendar value={businessDate} onChange={handleChange} />
+                <DateCalendar value={businessDate} onChange={handleChange} disableFuture />
             </DialogContent>
         </Dialog>
     );

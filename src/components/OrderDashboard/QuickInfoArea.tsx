@@ -4,17 +4,11 @@ import { useOrderDashboardContext } from '../../dataHooks/useContextData';
 
 export const QuickInfoArea = () => {
     const { openDrawer: drawer } = useOrderDashboardContext();
-    if (!drawer) {
-        return <Stack sx={{ height: 150 }}></Stack>;
-    }
-    const fullName = getDrawerFullName(drawer);
+
+    const body = drawer && <Typography>{getDrawerFullName(drawer)} info goes here!</Typography>;
     return (
-        <Stack sx={{ height: 150 }}>
-            <Typography>{fullName} info goes here!</Typography>
+        <Stack height="150px" flex="none">
+            {body}
         </Stack>
     );
 };
-
-// export const QuickInfoAreaSkeleton = () => {
-//     return <Stack sx={{ height: 150 }}></Stack>;
-// };

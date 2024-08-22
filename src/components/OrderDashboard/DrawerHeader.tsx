@@ -5,27 +5,12 @@ import { DrawerAvatar, DrawerAvatarSkeleton } from './DrawerAvatar';
 import { useBusinessDayContext } from '../../dataHooks/useContextData';
 
 export const DrawerHeader = () => {
-    // const [{ data: drawers }, { data: drivers }] = useSuspenseQueries({
-    //     queries: [
-    //         {
-    //             queryKey: ['drawers'],
-    //             queryFn: getAllDrawers,
-    //             staleTime: 1000 * 60 * 30,
-    //             gcTime: 1000 * 60 * 30,
-    //         },
-    //         {
-    //             queryKey: ['drivers'],
-    //             queryFn: getAllDrivers,
-    //             staleTime: 1000 * 60 * 1,
-    //         },
-    //     ],
-    // });
     const { drawers, drivers } = useBusinessDayContext();
 
     const combinedData = [...drawers, ...drivers];
 
     return (
-        <Stack direction="row" justifyContent="space-around" sx={{ height: 175, overflow: 'hidden' }}>
+        <Stack direction="row" justifyContent="space-around" sx={{ height: 175, flex: 'none', overflow: 'hidden' }}>
             {combinedData?.map((drawer) => (
                 <DrawerAvatar key={drawer.drawer_id} drawer={drawer} />
             ))}
