@@ -47,7 +47,8 @@ const withLocalizationProvider = (storyFn: () => React.ReactNode) => {
     return <LocalizationProvider dateAdapter={AdapterDayjs}>{storyFn()}</LocalizationProvider>;
 };
 
-const withBusinessDayContext = (storyFn: () => React.ReactNode) => {
+// TODO: created a more general decorator that takes values to be injected in the context
+export const withBusinessDayContext = (storyFn: () => React.ReactNode) => {
     return (
         <BusinessDayContext.Provider
             value={{
