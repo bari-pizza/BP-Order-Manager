@@ -14,10 +14,12 @@ export const useBusinessDate = (): [dayjs.Dayjs, (date: dayjs.Dayjs) => void] =>
         const isValidDate = parsedDate.isValid() && !parsedDate.isAfter(today);
         if (isValidDate) {
             setBusinessDate(parsedDate);
-        } else {
+        } else if (dateString) {
             const urlSearchParams = new URLSearchParams(searchParams);
             urlSearchParams.delete('businessDate');
             setSearchParams(urlSearchParams);
+        } else {
+            setBusinessDate(today);
         }
     }, [searchParams, setSearchParams]);
 
