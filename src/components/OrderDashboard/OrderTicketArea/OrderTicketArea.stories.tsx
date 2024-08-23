@@ -35,7 +35,9 @@ export const Default: Story = {
     args: {
         orders: defaultOrders,
         collapsedTickets: [],
-        toggleTicket: () => {},
+        toggleCollapsedTicket: () => {},
+        selectedTickets: [],
+        toggleSelectedTicket: () => {},
     },
     render: Render,
 };
@@ -44,7 +46,9 @@ export const CollapsedStories: Story = {
     args: {
         orders: defaultOrders,
         collapsedTickets: defaultOrders.map((order) => order.order_id),
-        toggleTicket: () => {},
+        toggleCollapsedTicket: () => {},
+        selectedTickets: [],
+        toggleSelectedTicket: () => {},
     },
     render: Render,
 };

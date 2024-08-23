@@ -15,5 +15,7 @@ export const Default: Story = {
         order: dummyOrders.existing[0],
         collapsed: false,
         toggleCollapsed: () => {},
+        selected: false,
+        toggleSelected: () => {},
     },
 };
