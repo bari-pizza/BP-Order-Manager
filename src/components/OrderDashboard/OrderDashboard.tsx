@@ -30,6 +30,10 @@ export const OrderDashboard = () => {
     const { orderEditor, addOrderButton } = useOrderEditor();
     const { orderTicketArea, toggleTicketsButton } = useOrderTicketArea({ orders });
 
+    // TODO: create a useArrayToggle hook and use it for the order ticket area's collapsedTickets and selectedTickets
+    // TODO: bring collapsedTickets and selectedTickets OrderDashboardContext instead
+    // TODO: that should allow the user to add tickets to a drawer by clicking on it
+
     return (
         <OrderDashboardContext.Provider value={{ openDrawer, setOpenDrawer }}>
             <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>

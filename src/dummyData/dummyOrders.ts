@@ -38,12 +38,9 @@ const sortOrders = (a: Order | NewOrder, b: Order | NewOrder) => (a?.order_numbe
 const dummyExistingOrders = Array.from({ length: 20 })
     .map(() => {
         const order = createDummyOrder({ isNew: false });
-        console.log(order); // Add this log statement
         return order;
     })
     .sort(sortOrders);
-
-console.log('hi from dummy orders');
 
 const dummyNewOrders = Array.from({ length: 20 })
     .map(() => {
