@@ -15,3 +15,12 @@ body {
     transition: visibility 0.5s;
     opacity: 1;
 }
+
+.MuiCard-root .show-on-card-hover {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.MuiCard-root:hover .show-on-card-hover {
+    opacity: 1;
+}

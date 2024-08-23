@@ -6,20 +6,30 @@ import { Player } from '@lottiefiles/react-lottie-player';
 type OrderTicketAreaProps = {
     orders: Order[];
     collapsedTickets: string[];
-    toggleTicket: (order: Order) => void;
+    toggleCollapsedTicket: (order: Order) => void;
+    selectedTickets: string[];
+    toggleSelectedTicket: (order: Order) => void;
 };
 
-export const OrderTicketArea = ({ orders, collapsedTickets, toggleTicket }: OrderTicketAreaProps) => {
+export const OrderTicketArea = ({
+    orders,
+    collapsedTickets,
+    toggleCollapsedTicket,
+    selectedTickets,
+    toggleSelectedTicket,
+}: OrderTicketAreaProps) => {
     return (
         <Stack className="hover-scroll" p={1} pb="50px">
-            <Grid container rowGap={3} columnGap={1} justifyContent="space-evenly">
+            <Grid container rowGap={3} columnGap={1} justifyContent="space-between">
                 {orders?.length ? (
                     orders?.map((order) => (
                         <OrderTicket
                             key={order.order_id}
                             order={order}
-                            toggleCollapsed={toggleTicket}
+                            toggleCollapsed={toggleCollapsedTicket}
                             collapsed={collapsedTickets.includes(order.order_id)}
+                            toggleSelected={toggleSelectedTicket}
+                            selected={selectedTickets.includes(order.order_id)}
                         />
                     ))
                 ) : (

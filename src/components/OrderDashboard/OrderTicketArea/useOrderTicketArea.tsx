@@ -5,9 +5,19 @@ import { Button } from '@mui/material';
 
 export const useOrderTicketArea = ({ orders }: { orders: Order[] }) => {
     const [collapsedTickets, setCollapsedTickets] = useState<string[]>([]);
+    const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
 
-    const toggleTicket = (order: Order) => {
+    const toggleCollapsedTicket = (order: Order) => {
         setCollapsedTickets((prev) => {
+            if (prev.includes(order.order_id)) {
+                return prev.filter((id) => id !== order.order_id);
+            }
+            return [...prev, order.order_id];
+        });
+    };
+
+    const toggleSelectedTicket = (order: Order) => {
+        setSelectedTickets((prev) => {
             if (prev.includes(order.order_id)) {
                 return prev.filter((id) => id !== order.order_id);
             }
@@ -24,7 +34,13 @@ export const useOrderTicketArea = ({ orders }: { orders: Order[] }) => {
     };
 
     const orderTicketArea = (
-        <OrderTicketArea orders={orders} collapsedTickets={collapsedTickets} toggleTicket={toggleTicket} />
+        <OrderTicketArea
+            orders={orders}
+            collapsedTickets={collapsedTickets}
+            toggleCollapsedTicket={toggleCollapsedTicket}
+            selectedTickets={selectedTickets}
+            toggleSelectedTicket={toggleSelectedTicket}
+        />
     );
 
     const toggleTicketsButton = (

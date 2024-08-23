@@ -21,7 +21,12 @@ interface NavBarItem {
 // TODO: Handle order creation
 // TODO: Handle order update
 // TODO: Handle order deletion
-// TODO: Change Calendar color when it is today
+
+/* TODO: create BusinessDay.Drivers table
+    business_day, driver_id, is_locked
+
+    add is_locked to Order and Payment tables
+*/
 
 const today = dayjs();
 
