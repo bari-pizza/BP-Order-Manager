@@ -1,5 +1,5 @@
 import { useState, Suspense } from 'react';
-import { dummyQueryFn, Order, type Drawer, type DriverDrawer } from '../../supabaseQueries';
+import { dummyQueryFn, type Drawer, type DriverDrawer } from '../../supabaseQueries';
 import { Button, Divider, Stack } from '@mui/material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
@@ -9,19 +9,8 @@ import { SideBar, SideBarSkeleton } from '../SideBar';
 import { useOrderTicketArea } from './OrderTicketArea/useOrderTicketArea';
 import { useBusinessDate } from '../../dataHooks/useBusinessDate';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createDummyOrder } from '../../dummyData';
 import { OrderTicketAreaSkeleton } from './OrderTicketArea/OrderTicketArea';
-
-const dummyOrders = [
-    createDummyOrder(),
-    createDummyOrder(),
-    createDummyOrder(),
-    createDummyOrder(),
-    createDummyOrder(),
-    createDummyOrder(),
-    createDummyOrder(),
-    createDummyOrder(),
-].sort((a, b) => (a.order_number || 0) - (b.order_number || 0)) as Order[];
+import { dummyOrders } from '../../dummyData';
 
 export const OrderDashboard = () => {
     const [businessDate] = useBusinessDate();
@@ -31,7 +20,7 @@ export const OrderDashboard = () => {
         // queryFn: () => getAllDaysOrders(MDY),
         queryFn: () =>
             dummyQueryFn({
-                data: dummyOrders,
+                data: dummyOrders.existing.slice(0, 10),
                 timeout: 10,
             }),
         refetchOnWindowFocus: false,

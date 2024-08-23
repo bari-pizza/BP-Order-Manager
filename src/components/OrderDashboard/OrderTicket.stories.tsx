@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-
 import { OrderTicket } from './OrderTicket';
-import { createDummyOrder } from '../../dummyData';
+import { dummyOrders } from '../../dummyData';
 
 const meta = {
     component: OrderTicket,
@@ -13,7 +12,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
     args: {
-        order: createDummyOrder(),
+        order: dummyOrders.existing[0],
         collapsed: false,
         toggleCollapsed: () => {},
     },

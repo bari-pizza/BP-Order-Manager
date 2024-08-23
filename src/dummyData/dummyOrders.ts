@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker/locale/en_US';
 import dayjs from 'dayjs';
-import type { Order, NewOrder } from './supabaseQueries';
+import type { Order, NewOrder } from '../supabaseQueries';
 
 type DummyNewOrder = {
     data?: Partial<Order>;
@@ -12,7 +12,7 @@ type DummyExistingOrder = {
     isNew?: false;
 };
 
-export function createDummyOrder<
+function createDummyOrder<
     T extends DummyNewOrder | DummyExistingOrder | undefined,
     R = T extends DummyExistingOrder ? Order : NewOrder,
 >(props?: T) {
@@ -33,8 +33,26 @@ export function createDummyOrder<
     return order as R;
 }
 
-export const createDummyOrders = (amount: number, props?: (DummyNewOrder | DummyExistingOrder | undefined)[]) => {
-    return Array.from({ length: amount })
-        .map((_, index) => createDummyOrder(props?.[index]))
-        .sort((a, b) => (a?.order_number || 0) - (b?.order_number || 0));
+const sortOrders = (a: Order | NewOrder, b: Order | NewOrder) => (a?.order_number || 0) - (b?.order_number || 0);
+
+const dummyExistingOrders = Array.from({ length: 20 })
+    .map(() => {
+        const order = createDummyOrder({ isNew: false });
+        console.log(order); // Add this log statement
+        return order;
+    })
+    .sort(sortOrders);
+
+console.log('hi from dummy orders');
+
+const dummyNewOrders = Array.from({ length: 20 })
+    .map(() => {
+        const order = createDummyOrder({ isNew: true });
+        return order;
+    })
+    .sort(sortOrders);
+
+export default {
+    existing: dummyExistingOrders,
+    new: dummyNewOrders,
 };

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-
 import { OrderTicketArea } from './OrderTicketArea';
-import { createDummyOrder } from '../../../dummyData';
+import { dummyOrders } from '../../../dummyData';
+import { useArgs } from 'storybook/internal/preview-api';
 
 const meta = {
     component: OrderTicketArea,
@@ -11,9 +11,25 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const defaultOrders = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    .map(() => createDummyOrder({ isNew: false }))
-    .sort((a, b) => (a?.order_number || 0) - (b?.order_number || 0));
+const defaultOrders = dummyOrders.existing.slice(0, 10);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function Render(args: any) {
+    const [, updateArgs] = useArgs();
+
+    function toggleTicket() {
+        const collapsedTickets = args.collapsedTickets.slice();
+
+        if (collapsedTickets.includes(args.order.order_id)) {
+            updateArgs({ collapsedTickets: collapsedTickets.filter((id: string) => id !== args.order.order_id) });
+        } else {
+            collapsedTickets.push(args.order.order_id);
+            updateArgs({ collapsedTickets });
+        }
+    }
+
+    return <OrderTicketArea {...args} toggleTicket={toggleTicket} />;
+}
 
 export const Default: Story = {
     args: {
@@ -21,6 +37,7 @@ export const Default: Story = {
         collapsedTickets: [],
         toggleTicket: () => {},
     },
+    render: Render,
 };
 
 export const CollapsedStories: Story = {
@@ -29,4 +46,5 @@ export const CollapsedStories: Story = {
         collapsedTickets: defaultOrders.map((order) => order.order_id),
         toggleTicket: () => {},
     },
+    render: Render,
 };
