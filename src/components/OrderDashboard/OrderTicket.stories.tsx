@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Args, Meta, StoryObj } from '@storybook/react';
 import { OrderTicket } from './OrderTicket';
 import { dummyOrders } from '../../dummyData';
 import { useState } from 'react';
@@ -11,18 +11,18 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const Template = (args: any) => {
+const Template = (args: Args) => {
     const [collapsed, setCollapsed] = useState(args.collapsed);
     const [selected, setSelected] = useState(args.selected);
     const toggleCollapsed = () => {
-        setCollapsed((prev) => !prev);
+        setCollapsed((prev: boolean) => !prev);
     };
     const toggleSelected = () => {
-        setSelected((prev) => !prev);
+        setSelected((prev: boolean) => !prev);
     };
     return (
         <OrderTicket
-            {...args}
+            order={args.order}
             collapsed={collapsed}
             toggleCollapsed={toggleCollapsed}
             selected={selected}

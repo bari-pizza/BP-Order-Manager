@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Args, Meta, StoryObj } from '@storybook/react';
 import { OrderTicketArea } from './OrderTicketArea';
 import { dummyOrders } from '../../../dummyData';
-import { useArgs } from '@storybook/preview-api';
 import { useState } from 'react';
+import { Order } from '../../../supabaseQueries';
 
 const meta = {
     component: OrderTicketArea,
@@ -14,11 +14,11 @@ type Story = StoryObj<typeof meta>;
 
 const defaultOrders = dummyOrders.existing.slice(0, 10);
 
-const Template = (args: any) => {
+const Template = (args: Args) => {
     const [collapsedTickets, setCollapsedTickets] = useState(args.collapsedTickets);
     const [selectedTickets, setSelectedTickets] = useState(args.selectedTickets);
     const toggleCollapsedTicket = (order: Order) => {
-        setCollapsedTickets((prev) => {
+        setCollapsedTickets((prev: string[]) => {
             if (prev.includes(order.order_id)) {
                 return prev.filter((ticket) => ticket !== order.order_id);
             } else {
@@ -27,7 +27,7 @@ const Template = (args: any) => {
         });
     };
     const toggleSelectedTicket = (order: Order) => {
-        setSelectedTickets((prev) => {
+        setSelectedTickets((prev: string[]) => {
             if (prev.includes(order.order_id)) {
                 return prev.filter((ticket) => ticket !== order.order_id);
             } else {
@@ -37,7 +37,7 @@ const Template = (args: any) => {
     };
     return (
         <OrderTicketArea
-            {...args}
+            orders={args.orders}
             collapsedTickets={collapsedTickets}
             toggleCollapsedTicket={toggleCollapsedTicket}
             selectedTickets={selectedTickets}
