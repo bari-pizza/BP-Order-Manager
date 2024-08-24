@@ -1,40 +1,9 @@
-import {
-    Button,
-    Card,
-    // CardHeader,
-    CardContent,
-    Typography,
-    // CardActions,
-    CardActionArea,
-    Skeleton,
-    Stack,
-    Checkbox,
-    Collapse,
-    IconButtonProps,
-    styled,
-    IconButton,
-} from '@mui/material';
+import { Card, Typography, CardActionArea, Skeleton, Stack, Checkbox, Collapse, IconButton } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order } from '../../supabaseQueries';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
-
-interface ExpandMoreProps extends IconButtonProps {
-    expand: boolean;
-}
-
-const ExpandMore = styled((props: ExpandMoreProps) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { expand, ...other } = props;
-    return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-    }),
-}));
+import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 
 interface OrderTicketProps {
     order: Order;
@@ -83,37 +52,31 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                         />
                     </Stack>
                 </Stack>
-                <Typography m={1} mt={0} variant="subtitle1">
-                    {order.order_type}
-                </Typography>
             </CardActionArea>
-            <Collapse in={!collapsed} timeout="auto">
-                <CardContent>
-                    <Typography variant="body1">{order.phone}</Typography>
-                    <Typography variant="body1">${(order.total_in_cents / 100).toFixed(2)}</Typography>
-                </CardContent>
-            </Collapse>
             <CardActionArea
                 onClick={handleCollapse}
-                sx={{ display: 'flex', justifyContent: 'space-between', p: 1 }}
+                sx={{ display: 'flex', justifyContent: 'space-between' }}
                 disableRipple>
-                <Button variant="contained" onClick={handleEditClick} className="show-on-card-hover">
-                    Edit
-                </Button>
-                <ExpandMore expand={!collapsed} aria-expanded={!collapsed} aria-label="show more" disableRipple>
-                    <ExpandMoreIcon />
-                </ExpandMore>
+                <Stack direction="column" width="100%">
+                    <Collapse in={!collapsed} timeout="auto">
+                        <Stack direction="row" justifyContent="space-between" pl={1} pr={1}>
+                            <Stack direction="column">
+                                <Typography variant="body1">{order.phone}</Typography>
+                                <Typography variant="body1">${(order.total_in_cents / 100).toFixed(2)}</Typography>
+                            </Stack>
+                            <IconButton onClick={handleEditClick}>
+                                <OpenInNewIcon />
+                            </IconButton>
+                        </Stack>
+                    </Collapse>
+                    <Stack direction="row" justifyContent="space-between" m={1} mt={0} alignItems="center">
+                        <Typography variant="subtitle1">{order.order_type}</Typography>
+                        <IconButton>
+                            <ExpandMoreIcon />
+                        </IconButton>
+                    </Stack>
+                </Stack>
             </CardActionArea>
-            {/* <CardActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button onClick={() => setOpen(true)}>Edit</Button>
-                <ExpandMore
-                    expand={!collapsed}
-                    onClick={handleCollapse}
-                    aria-expanded={!collapsed}
-                    aria-label="show more">
-                    <ExpandMoreIcon />
-                </ExpandMore>
-            </CardActions> */}
             {orderEditor}
         </Card>
     );

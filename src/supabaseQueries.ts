@@ -2,17 +2,17 @@ import { supaClient } from './supaClient';
 import { Tables } from './supabase';
 import { z } from 'zod';
 
-export type Profile = Tables<'profiles'>;
-export type Drawer = Tables<'drawers'>;
-export type DrawerType = Tables<'drawers'>['drawer_type'];
+export type Profile = Tables<'Profile'>;
+export type Drawer = Tables<'Drawer'>;
+export type DrawerType = Tables<'Drawer'>['drawer_type'];
 export type DriverDrawer = Drawer & { driver: Profile };
-export type Order = Tables<'orders'>;
+export type Order = Tables<'Order'>;
 export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
 export const getAllDrawers = async () => {
-    const { data, error } = await supaClient.from('drawers').select('*').neq('drawer_type', 'driver');
+    const { data, error } = await supaClient.from('Drawer').select('*').neq('drawer_type', 'driver');
 
     if (error) {
         console.error(error);
@@ -30,7 +30,7 @@ const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): DriverDraw
 };
 
 export const getAllDrivers = async () => {
-    const { data, error } = await supaClient.from('drawers.drivers').select('drawer:drawers(*), driver:profiles(*)');
+    const { data, error } = await supaClient.from('Driver').select('drawer:Drawer(*), driver:Profile(*)');
 
     if (error) {
         console.error(error);
@@ -60,7 +60,7 @@ export const getAllDaysOrders = async ({ year, month, day }: GetAllDaysOrdersPro
         console.error(error);
         return [] as Order[];
     }
-    const { data, error } = await supaClient.from('orders').select('*').eq('business_date', `${year}-${month}-${day}`);
+    const { data, error } = await supaClient.from('Order').select('*').eq('business_date', `${year}-${month}-${day}`);
 
     if (error) {
         console.error(error);

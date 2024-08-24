@@ -31,7 +31,7 @@ export const useSession = (): SupashipUserInfo => {
 
     useEffect(() => {
         async function listenToUserProfileChanges(userId: string) {
-            const { data } = await supaClient.from('profiles').select('*').filter('id', 'eq', userId);
+            const { data } = await supaClient.from('Profile').select('*').filter('id', 'eq', userId);
             if (data?.[0]) {
                 setUserInfo({ ...userInfo, profile: data?.[0] });
             }
