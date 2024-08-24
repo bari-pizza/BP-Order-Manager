@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { OrderTicketArea } from './OrderTicketArea';
 import { dummyOrders } from '../../../dummyData';
-import { useArgs } from 'storybook/internal/preview-api';
+import { useArgs } from '@storybook/preview-api';
+import { useState } from 'react';
 
 const meta = {
     component: OrderTicketArea,
@@ -13,23 +14,37 @@ type Story = StoryObj<typeof meta>;
 
 const defaultOrders = dummyOrders.existing.slice(0, 10);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Render(args: any) {
-    const [, updateArgs] = useArgs();
-
-    function toggleTicket() {
-        const collapsedTickets = args.collapsedTickets.slice();
-
-        if (collapsedTickets.includes(args.order.order_id)) {
-            updateArgs({ collapsedTickets: collapsedTickets.filter((id: string) => id !== args.order.order_id) });
-        } else {
-            collapsedTickets.push(args.order.order_id);
-            updateArgs({ collapsedTickets });
-        }
-    }
-
-    return <OrderTicketArea {...args} toggleTicket={toggleTicket} />;
-}
+const Template = (args: any) => {
+    const [collapsedTickets, setCollapsedTickets] = useState(args.collapsedTickets);
+    const [selectedTickets, setSelectedTickets] = useState(args.selectedTickets);
+    const toggleCollapsedTicket = (order: Order) => {
+        setCollapsedTickets((prev) => {
+            if (prev.includes(order.order_id)) {
+                return prev.filter((ticket) => ticket !== order.order_id);
+            } else {
+                return [...prev, order.order_id];
+            }
+        });
+    };
+    const toggleSelectedTicket = (order: Order) => {
+        setSelectedTickets((prev) => {
+            if (prev.includes(order.order_id)) {
+                return prev.filter((ticket) => ticket !== order.order_id);
+            } else {
+                return [...prev, order.order_id];
+            }
+        });
+    };
+    return (
+        <OrderTicketArea
+            {...args}
+            collapsedTickets={collapsedTickets}
+            toggleCollapsedTicket={toggleCollapsedTicket}
+            selectedTickets={selectedTickets}
+            toggleSelectedTicket={toggleSelectedTicket}
+        />
+    );
+};
 
 export const Default: Story = {
     args: {
@@ -39,7 +54,7 @@ export const Default: Story = {
         selectedTickets: [],
         toggleSelectedTicket: () => {},
     },
-    render: Render,
+    render: Template,
 };
 
 export const CollapsedStories: Story = {
@@ -50,5 +65,5 @@ export const CollapsedStories: Story = {
         selectedTickets: [],
         toggleSelectedTicket: () => {},
     },
-    render: Render,
+    render: Template,
 };
