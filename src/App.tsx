@@ -18,7 +18,7 @@ import { Home } from './components/Home.tsx';
 import { MyAccount } from './components/MyAccount.tsx';
 import { Login } from './components/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
-import { getAllDrawers, getAllDrivers } from './supabaseQueries.ts';
+import { getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
 import { BusinessDayContext } from './context/BusinessDayContext.tsx';
 
 const router = createBrowserRouter([
@@ -75,7 +75,7 @@ function Layout() {
     const sideBarSkeletonRef = useRef<HTMLDivElement>(null);
     const [sideBarWidth, setSideBarWidth] = useState<number | string>(0);
     const [sideBarSkeletonWidth, setSideBarSkeletonWidth] = useState<number | string>(0);
-    const [{ data: drawers }, { data: drivers }] = useSuspenseQueries({
+    const [{ data: drawers }, { data: drivers }, { data: origins }] = useSuspenseQueries({
         queries: [
             {
                 queryKey: ['drawers'],
@@ -90,6 +90,12 @@ function Layout() {
                 staleTime: 1000 * 60 * 1,
                 refetchOnWindowFocus: false,
             },
+            {
+                queryKey: ['origins'],
+                queryFn: getAllOrigins,
+                staleTime: 1000 * 60 * 30,
+                refetchOnWindowFocus: false,
+            },
         ],
     });
     return (
@@ -99,7 +105,7 @@ function Layout() {
         //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
         //     version="beta">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <BusinessDayContext.Provider value={{ drawers, drivers }}>
+            <BusinessDayContext.Provider value={{ drawers, drivers, origins }}>
                 <LayoutContext.Provider
                     value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
                     <UserContext.Provider value={{ session, profile, loading }}>

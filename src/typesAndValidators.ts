@@ -7,6 +7,7 @@ export type DriverDrawer = Drawer & { driver: Profile };
 export type Order = Tables<'Order'>;
 export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 export type OrderOrigin = Tables<'OrderOrigin'>;
+export type OrderType = Tables<'Order'>['order_type'];
 
 const orderValidators = {
     order_number: {
@@ -29,6 +30,18 @@ const orderValidators = {
             return true;
         },
         setValueAs: (value: string | null) => (value === '' || value === null ? null : Number(value)),
+    },
+    phone: {
+        validate: (value: string | null) => {
+            if (value === null) {
+                return true;
+            }
+            if (value.length < 5) {
+                return 'Must be at least 5 characters';
+            }
+            return true;
+        },
+        setValueAs: (value: string | null) => (value === '' || value === null ? null : value),
     },
     total_in_cents: {
         validate: (value: number) => {

@@ -39,6 +39,7 @@ export const OrderDashboard = () => {
         }
     };
 
+    // TODO: Add logic for putting tickets in drawer
     const putTicketsInDrawer = () => {
         console.log('putting tickets in drawer', { selectedTickets, openDrawer });
         console.log('unselecting tickets');

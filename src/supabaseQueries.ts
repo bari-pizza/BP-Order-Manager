@@ -1,5 +1,5 @@
 import { supaClient } from './supaClient';
-import { Drawer, Profile, DriverDrawer, Order, NewOrder } from './typesAndValidators';
+import { Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
 import { z } from 'zod';
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
@@ -31,6 +31,16 @@ export const getAllDrivers = async () => {
     }
 
     return data.map((d) => convertToDriverDrawer(d as unknown as DirtyDriverDrawer));
+};
+
+export const getAllOrigins = async () => {
+    const { data, error } = await supaClient.from('OrderOrigin').select('*').order('name', { ascending: true });
+    if (error) {
+        console.error(error);
+        return [] as OrderOrigin[];
+    }
+
+    return data as unknown as OrderOrigin[];
 };
 
 interface GetAllDaysOrdersProps {

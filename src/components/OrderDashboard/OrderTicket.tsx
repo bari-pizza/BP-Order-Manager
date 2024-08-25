@@ -1,4 +1,4 @@
-import { Card, Typography, CardActionArea, Skeleton, Stack, Checkbox, Collapse, IconButton } from '@mui/material';
+import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order } from '../../typesAndValidators';
@@ -42,14 +42,8 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
             <CardActionArea onClick={handleSelect}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
-                        <Typography variant="h5">Order #{order.order_number}</Typography>
-                        <Checkbox
-                            className={selected ? '' : 'show-on-card-hover'}
-                            checked={selected}
-                            icon={<LocalPizzaOutlinedIcon />}
-                            checkedIcon={<LocalPizzaRoundedIcon />}
-                            disableRipple
-                        />
+                        <Typography variant="h5">{order.order_name ?? `Order #${order.order_number}`}</Typography>
+                        {selected ? <LocalPizzaRoundedIcon color={'primary'} /> : <LocalPizzaOutlinedIcon />}
                     </Stack>
                 </Stack>
             </CardActionArea>
@@ -64,16 +58,14 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                                 <Typography variant="body1">{order.phone}</Typography>
                                 <Typography variant="body1">${(order.total_in_cents / 100).toFixed(2)}</Typography>
                             </Stack>
-                            <IconButton onClick={handleEditClick}>
+                            <Box component="span" sx={{ cursor: 'pointer' }} onClick={handleEditClick}>
                                 <OpenInNewIcon />
-                            </IconButton>
+                            </Box>
                         </Stack>
                     </Collapse>
                     <Stack direction="row" justifyContent="space-between" m={1} mt={0} alignItems="center">
                         <Typography variant="subtitle1">{order.order_type}</Typography>
-                        <IconButton>
-                            <ExpandMoreIcon />
-                        </IconButton>
+                        <ExpandMoreIcon />
                     </Stack>
                 </Stack>
             </CardActionArea>

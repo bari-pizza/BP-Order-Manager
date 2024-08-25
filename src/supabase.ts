@@ -69,9 +69,10 @@ export type Database = {
           created_at: string
           drawer_id: string | null
           order_id: string
+          order_name: string | null
           order_number: number | null
           order_type: Database["public"]["Enums"]["order_type"]
-          origin: string
+          origin: Database["public"]["Enums"]["order_origin"]
           phone: string | null
           total_in_cents: number
         }
@@ -80,9 +81,10 @@ export type Database = {
           created_at?: string
           drawer_id?: string | null
           order_id?: string
+          order_name?: string | null
           order_number?: number | null
           order_type?: Database["public"]["Enums"]["order_type"]
-          origin?: string
+          origin?: Database["public"]["Enums"]["order_origin"]
           phone?: string | null
           total_in_cents?: number
         }
@@ -91,9 +93,10 @@ export type Database = {
           created_at?: string
           drawer_id?: string | null
           order_id?: string
+          order_name?: string | null
           order_number?: number | null
           order_type?: Database["public"]["Enums"]["order_type"]
-          origin?: string
+          origin?: Database["public"]["Enums"]["order_origin"]
           phone?: string | null
           total_in_cents?: number
         }
@@ -119,28 +122,31 @@ export type Database = {
           can_deliver: boolean
           can_tip: boolean
           default_is_prepaid: boolean
+          has_order_number: boolean
           icon: string | null
           is_prepaid_toggleable: boolean
           is_third_party: boolean
-          name: string
+          name: Database["public"]["Enums"]["order_origin"]
         }
         Insert: {
           can_deliver?: boolean
           can_tip?: boolean
           default_is_prepaid?: boolean
+          has_order_number?: boolean
           icon?: string | null
           is_prepaid_toggleable?: boolean
           is_third_party?: boolean
-          name: string
+          name: Database["public"]["Enums"]["order_origin"]
         }
         Update: {
           can_deliver?: boolean
           can_tip?: boolean
           default_is_prepaid?: boolean
+          has_order_number?: boolean
           icon?: string | null
           is_prepaid_toggleable?: boolean
           is_third_party?: boolean
-          name?: string
+          name?: Database["public"]["Enums"]["order_origin"]
         }
         Relationships: []
       }
@@ -229,9 +235,9 @@ export type Database = {
     }
     Enums: {
       drawer_type: "driver" | "register" | "third_party"
+      order_origin: "Bari Pizza" | "DoorDash" | "Pizzamico"
       order_type: "delivery" | "pickup"
       payment_type: "cash" | "card" | "third_party"
-      third_party: "DoorDash" | "Grubhub" | "Pizzamico" | "UberEats"
     }
     CompositeTypes: {
       [_ in never]: never
