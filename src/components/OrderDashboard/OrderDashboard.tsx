@@ -1,5 +1,10 @@
 import { useState, Suspense } from 'react';
-import { dummyQueryFn, type Drawer, type DriverDrawer } from '../../supabaseQueries';
+import {
+    // dummyQueryFn,
+    getAllDaysOrders,
+    type Drawer,
+    type DriverDrawer,
+} from '../../supabaseQueries';
 import { Button, Divider, Stack } from '@mui/material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
@@ -10,19 +15,20 @@ import { useOrderTicketArea } from './OrderTicketArea/useOrderTicketArea';
 import { useBusinessDate } from '../../dataHooks/useBusinessDate';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { OrderTicketAreaSkeleton } from './OrderTicketArea/OrderTicketArea';
-import { dummyOrders } from '../../dummyData';
+// import { dummyOrders } from '../../dummyData';
+import { dayjsToMDY } from '../../utils';
 
 export const OrderDashboard = () => {
     const [businessDate] = useBusinessDate();
-    // const MDY = dayjsToMDY(businessDate);
+    const MDY = dayjsToMDY(businessDate);
     const { data: orders } = useSuspenseQuery({
         queryKey: ['orders', businessDate.format('MM/DD/YYYY')],
-        // queryFn: () => getAllDaysOrders(MDY),
-        queryFn: () =>
-            dummyQueryFn({
-                data: dummyOrders.existing.slice(0, 10),
-                timeout: 10,
-            }),
+        queryFn: () => getAllDaysOrders(MDY),
+        // queryFn: () =>
+        //     dummyQueryFn({
+        //         data: dummyOrders.existing.slice(0, 10),
+        //         timeout: 10,
+        //     }),
         refetchOnWindowFocus: false,
         staleTime: Infinity,
     });

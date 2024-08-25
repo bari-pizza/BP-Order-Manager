@@ -96,3 +96,22 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
         return result[0];
     };
 };
+
+export const createNewOrder = async (newOrder: NewOrder) => {
+    const { data, error } = await supaClient.from('Order').insert([newOrder]).select();
+    if (error) {
+        console.error(error);
+        throw error;
+    }
+
+    if (!data) {
+        return null;
+    }
+
+    return data[0] as unknown as Order;
+};
+
+export const updateOrder = async (order: Order) => {
+    // TODO: create a mutation to update an order
+    console.log({ order });
+};

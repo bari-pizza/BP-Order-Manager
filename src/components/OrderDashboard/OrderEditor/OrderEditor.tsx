@@ -9,8 +9,10 @@ import {
     TextField,
     MenuItem,
 } from '@mui/material';
-import { Order } from '../../../supabaseQueries';
+import { Order, createNewOrder, updateOrder } from '../../../supabaseQueries';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
+import { useBusinessDate } from '../../../dataHooks/useBusinessDate';
 
 interface OrderEditorProps {
     open: boolean;
@@ -22,18 +24,52 @@ interface OrderEditorProps {
 type FormValues = Order;
 
 export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps) => {
-    const { handleSubmit, register, control } = useForm<FormValues>({
+    const [businessDate] = useBusinessDate();
+    const {
+        handleSubmit,
+        register,
+        control,
+        setError,
+        formState: { errors },
+    } = useForm<FormValues>({
         defaultValues: {
             order_number: null,
             order_type: 'delivery',
             phone: '',
             total_in_cents: 0,
+            business_date: businessDate.format('YYYY-MM-DD'),
         },
         values: order,
     });
 
+    const createNewOrderMutation = useMutation({
+        mutationFn: createNewOrder,
+        onSuccess: (data) => {
+            console.log({ data });
+            setOpen(false);
+        },
+
+        onError: (error) => {
+            console.log('there was an oopsie!');
+            setError('root', { message: error.message });
+        },
+    });
+
+    const updateOrderMutation = useMutation({
+        mutationFn: updateOrder,
+        onSuccess: (data) => {
+            console.log({ data });
+            setOpen(false);
+        },
+        onError: (error) => {
+            console.log('there was an oopsie!');
+            setError('root', { message: error.message });
+        },
+    });
+
     const body = (
         <Stack direction="column" spacing={2} mt={2}>
+            {errors.root && <Typography color="error">{errors.root.message}</Typography>}
             <Controller
                 name="order_type"
                 control={control}
@@ -51,9 +87,13 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
     );
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log({ data });
+        console.log('onSubmit');
         // this should be a mutation using react query
-        setOpen(false);
+        if (order) {
+            updateOrderMutation.mutate(data);
+        } else {
+            createNewOrderMutation.mutate(data);
+        }
     };
 
     if (asDialog) {
@@ -68,8 +108,6 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
             </Dialog>
         );
     }
-
-    // add react hook form
 
     if (open) {
         return (
