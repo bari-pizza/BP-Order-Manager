@@ -71,6 +71,7 @@ export type Database = {
           order_id: string
           order_number: number | null
           order_type: Database["public"]["Enums"]["order_type"]
+          origin: string
           phone: string | null
           total_in_cents: number
         }
@@ -81,6 +82,7 @@ export type Database = {
           order_id?: string
           order_number?: number | null
           order_type?: Database["public"]["Enums"]["order_type"]
+          origin?: string
           phone?: string | null
           total_in_cents?: number
         }
@@ -91,10 +93,18 @@ export type Database = {
           order_id?: string
           order_number?: number | null
           order_type?: Database["public"]["Enums"]["order_type"]
+          origin?: string
           phone?: string | null
           total_in_cents?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "Order_origin_fkey"
+            columns: ["origin"]
+            isOneToOne: false
+            referencedRelation: "OrderOrigin"
+            referencedColumns: ["name"]
+          },
           {
             foreignKeyName: "orders_drawer_id_fkey"
             columns: ["drawer_id"]
@@ -103,6 +113,36 @@ export type Database = {
             referencedColumns: ["drawer_id"]
           },
         ]
+      }
+      OrderOrigin: {
+        Row: {
+          can_deliver: boolean
+          can_tip: boolean
+          default_is_prepaid: boolean
+          icon: string | null
+          is_prepaid_toggleable: boolean
+          is_third_party: boolean
+          name: string
+        }
+        Insert: {
+          can_deliver?: boolean
+          can_tip?: boolean
+          default_is_prepaid?: boolean
+          icon?: string | null
+          is_prepaid_toggleable?: boolean
+          is_third_party?: boolean
+          name: string
+        }
+        Update: {
+          can_deliver?: boolean
+          can_tip?: boolean
+          default_is_prepaid?: boolean
+          icon?: string | null
+          is_prepaid_toggleable?: boolean
+          is_third_party?: boolean
+          name?: string
+        }
+        Relationships: []
       }
       Payment: {
         Row: {
@@ -174,36 +214,18 @@ export type Database = {
           },
         ]
       }
-      ThirdParty: {
-        Row: {
-          can_deliver: boolean | null
-          can_tip: boolean | null
-          icon: string | null
-          is_prepaid: boolean | null
-          name: Database["public"]["Enums"]["third_party"]
-        }
-        Insert: {
-          can_deliver?: boolean | null
-          can_tip?: boolean | null
-          icon?: string | null
-          is_prepaid?: boolean | null
-          name: Database["public"]["Enums"]["third_party"]
-        }
-        Update: {
-          can_deliver?: boolean | null
-          can_tip?: boolean | null
-          icon?: string | null
-          is_prepaid?: boolean | null
-          name?: Database["public"]["Enums"]["third_party"]
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      "Add order to drawer": {
+        Args: {
+          p_order_id: string
+          p_drawer_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       drawer_type: "driver" | "register" | "third_party"

@@ -1,13 +1,6 @@
 import { supaClient } from './supaClient';
-import { Tables } from './supabase';
+import { Drawer, Profile, DriverDrawer, Order, NewOrder } from './typesAndValidators';
 import { z } from 'zod';
-
-export type Profile = Tables<'Profile'>;
-export type Drawer = Tables<'Drawer'>;
-export type DrawerType = Tables<'Drawer'>['drawer_type'];
-export type DriverDrawer = Drawer & { driver: Profile };
-export type Order = Tables<'Order'>;
-export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -60,7 +53,11 @@ export const getAllDaysOrders = async ({ year, month, day }: GetAllDaysOrdersPro
         console.error(error);
         return [] as Order[];
     }
-    const { data, error } = await supaClient.from('Order').select('*').eq('business_date', `${year}-${month}-${day}`);
+    const { data, error } = await supaClient
+        .from('Order')
+        .select('*')
+        .eq('business_date', `${year}-${month}-${day}`)
+        .order('order_number', { ascending: true });
 
     if (error) {
         console.error(error);
@@ -75,6 +72,7 @@ interface DummyQueryFnProps<T> {
     data?: T[];
 }
 
+// return preset data with a set timeout
 export const dummyQueryFn = async <T>({ timeout = 1000, data = [] }: DummyQueryFnProps<T> = {}): Promise<T[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -83,6 +81,7 @@ export const dummyQueryFn = async <T>({ timeout = 1000, data = [] }: DummyQueryF
     });
 };
 
+// run a function with a set timeout
 export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() => Promise<T>) => {
     return async () => {
         const timeoutPromise = new Promise<void>((resolve) => {
@@ -98,6 +97,7 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
 };
 
 export const createNewOrder = async (newOrder: NewOrder) => {
+    console.log({ newOrder });
     const { data, error } = await supaClient.from('Order').insert([newOrder]).select();
     if (error) {
         console.error(error);
@@ -112,6 +112,15 @@ export const createNewOrder = async (newOrder: NewOrder) => {
 };
 
 export const updateOrder = async (order: Order) => {
-    // TODO: create a mutation to update an order
-    console.log({ order });
+    const { data, error } = await supaClient.from('Order').update(order).eq('order_id', order.order_id).select();
+    if (error) {
+        console.error(error);
+        throw error;
+    }
+
+    if (!data) {
+        return null;
+    }
+
+    return data[0] as unknown as Order;
 };

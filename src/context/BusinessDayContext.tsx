@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { Drawer, DriverDrawer } from '../supabaseQueries';
+import type { Drawer, DriverDrawer } from '../typesAndValidators';
 
 interface BusinessDayContextProps {
     drawers: Drawer[];

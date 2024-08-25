@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { OrderTicketArea } from './OrderTicketArea';
-import type { Order } from '../../../supabaseQueries';
+import type { Order } from '../../../typesAndValidators';
 import { Button } from '@mui/material';
 
 export const useOrderTicketArea = ({ orders }: { orders: Order[] }) => {
@@ -52,5 +52,7 @@ export const useOrderTicketArea = ({ orders }: { orders: Order[] }) => {
     return {
         orderTicketArea,
         toggleTicketsButton,
+        selectedTickets,
+        setSelectedTickets,
     };
 };

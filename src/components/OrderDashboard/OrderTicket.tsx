@@ -1,7 +1,7 @@
 import { Card, Typography, CardActionArea, Skeleton, Stack, Checkbox, Collapse, IconButton } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
-import { Order } from '../../supabaseQueries';
+import { Order } from '../../typesAndValidators';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
 import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 

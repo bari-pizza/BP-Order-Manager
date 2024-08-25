@@ -1,5 +1,5 @@
 import { Avatar, Button, Skeleton, Stack, Typography } from '@mui/material';
-import type { Drawer, DriverDrawer } from '../../supabaseQueries';
+import type { Drawer, DriverDrawer } from '../../typesAndValidators';
 import { getDrawerFullName } from '../../utils';
 import { useOrderDashboardContext } from '../../dataHooks/useContextData';
 
@@ -8,11 +8,14 @@ interface DrawerAvatarProps {
 }
 
 export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
-    const { setOpenDrawer } = useOrderDashboardContext();
+    const { openDrawer, handleDrawerClick } = useOrderDashboardContext();
     const fullName = getDrawerFullName(drawer);
+
+    const isOpen = openDrawer?.drawer_id === drawer?.drawer_id;
+
     return (
         // large circle with image and name of drawer
-        <Button onClick={() => setOpenDrawer(drawer)}>
+        <Button onClick={() => handleDrawerClick(drawer)} variant={isOpen ? 'contained' : 'text'}>
             <Stack direction="column" sx={{ height: '100%', width: 'min-content' }} alignItems="center">
                 <Avatar sx={{ height: '4em', width: '4em' }}>{fullName}</Avatar>
                 <Typography>{fullName}</Typography>

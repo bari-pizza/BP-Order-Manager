@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker/locale/en_US';
-import type { Drawer, DriverDrawer } from '../supabaseQueries';
+import type { Drawer, DriverDrawer } from '../typesAndValidators';
 
 const drawers: Drawer[] = [
     {

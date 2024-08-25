@@ -9,9 +9,10 @@ import {
     TextField,
     MenuItem,
 } from '@mui/material';
-import { Order, createNewOrder, updateOrder } from '../../../supabaseQueries';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
+import { createNewOrder, updateOrder } from '../../../supabaseQueries';
+import { Order, validators } from '../../../typesAndValidators';
+import { useForm, Controller, SubmitHandler, SubmitErrorHandler, FieldErrors } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../dataHooks/useBusinessDate';
 
 interface OrderEditorProps {
@@ -31,27 +32,34 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
         control,
         setError,
         formState: { errors },
+        reset,
     } = useForm<FormValues>({
         defaultValues: {
             order_number: null,
             order_type: 'delivery',
-            phone: '',
+            phone: null,
             total_in_cents: 0,
             business_date: businessDate.format('YYYY-MM-DD'),
+            drawer_id: null,
         },
         values: order,
+        reValidateMode: 'onBlur',
+        // resolver: order ? zodResolver(orderSchema) : zodResolver(newOrderSchema),
     });
+
+    const queryClient = useQueryClient();
 
     const createNewOrderMutation = useMutation({
         mutationFn: createNewOrder,
         onSuccess: (data) => {
             console.log({ data });
             setOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['orders', data?.business_date] });
         },
 
         onError: (error) => {
-            console.log('there was an oopsie!');
-            setError('root', { message: error.message });
+            console.error('Issue creating new order', error);
+            setError('root', { message: "Couldn't create new order" });
         },
     });
 
@@ -60,10 +68,11 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
         onSuccess: (data) => {
             console.log({ data });
             setOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['orders', data?.business_date] });
         },
         onError: (error) => {
-            console.log('there was an oopsie!');
-            setError('root', { message: error.message });
+            console.error(`Issue updating order: "${order?.order_id}`, error);
+            setError('root', { message: "Couldn't update order" });
         },
     });
 
@@ -80,19 +89,46 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
                     </TextField>
                 )}
             />
-            <TextField label="Order Number" {...register('order_number')} />
-            <TextField label="Phone" {...register('phone')} />
-            <TextField label="Total" {...register('total_in_cents')} />
+            <TextField
+                label="Order Number"
+                {...register('order_number', {
+                    ...validators.order.order_number,
+                })}
+                error={!!errors.order_number}
+                helperText={errors.order_number?.message}
+            />
+            <TextField label="Phone" {...register('phone')} error={!!errors.phone} helperText={errors.phone?.message} />
+            <TextField
+                label="Total"
+                {...register('total_in_cents', {
+                    ...validators.order.total_in_cents,
+                })}
+                error={!!errors.total_in_cents}
+                helperText={errors.total_in_cents?.message}
+            />
         </Stack>
     );
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log('onSubmit');
-        // this should be a mutation using react query
+        console.log({ data });
         if (order) {
             updateOrderMutation.mutate(data);
         } else {
             createNewOrderMutation.mutate(data);
+        }
+    };
+
+    const onError: SubmitErrorHandler<FieldErrors> = (fields) => {
+        console.log({ fields });
+        console.error('Invalid form submission');
+    };
+
+    const handleCancel = () => {
+        setOpen(false);
+        if (order) {
+            reset(order);
+        } else {
+            reset();
         }
     };
 
@@ -102,8 +138,8 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
                 <DialogTitle>Order Editor</DialogTitle>
                 <DialogContent>{body}</DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button onClick={handleSubmit(onSubmit)}>Save</Button>
+                    <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
+                    <Button onClick={handleCancel}>Cancel</Button>
                 </DialogActions>
             </Dialog>
         );
@@ -116,8 +152,8 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
                     Order Editor
                 </Typography>
                 {body}
-                <Button onClick={handleSubmit(onSubmit)}>Submit</Button>
-                <Button onClick={() => setOpen(false)}>Cancel</Button>
+                <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
+                <Button onClick={handleCancel}>Cancel</Button>
             </Stack>
         );
     }

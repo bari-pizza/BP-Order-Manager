@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Order } from '../../../supabaseQueries';
+import { Order } from '../../../typesAndValidators';
 import { OrderEditor } from './OrderEditor';
 import { Button } from '@mui/material';
 

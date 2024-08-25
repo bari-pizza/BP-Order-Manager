@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker/locale/en_US';
 import dayjs from 'dayjs';
-import type { Order, NewOrder } from '../supabaseQueries';
+import type { Order, NewOrder } from '../typesAndValidators';
 
 type DummyNewOrder = {
     data?: Partial<Order>;

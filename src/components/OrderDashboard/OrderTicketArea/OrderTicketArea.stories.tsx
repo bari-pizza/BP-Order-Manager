@@ -2,7 +2,7 @@ import type { Args, Meta, StoryObj } from '@storybook/react';
 import { OrderTicketArea } from './OrderTicketArea';
 import { dummyOrders } from '../../../dummyData';
 import { useState } from 'react';
-import { Order } from '../../../supabaseQueries';
+import { Order } from '../../../typesAndValidators';
 
 const meta = {
     component: OrderTicketArea,

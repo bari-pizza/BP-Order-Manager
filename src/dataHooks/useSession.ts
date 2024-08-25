@@ -1,7 +1,7 @@
 import { RealtimeChannel, Session } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
-import { supaClient } from '../supaClient.ts';
-import { Profile } from '../supabaseQueries.ts';
+import { supaClient } from '../supaClient';
+import { Profile } from '../typesAndValidators';
 
 export interface SupashipUserInfo {
     session: Session | null;
