@@ -1,5 +1,5 @@
 import { Avatar, Skeleton } from '@mui/material';
-import { useUserContext } from '../dataHooks/useContextData';
+import { useUserContext } from '../hooks/data/useContextData';
 
 export const UserAvatar = () => {
     const { session, profile } = useUserContext();

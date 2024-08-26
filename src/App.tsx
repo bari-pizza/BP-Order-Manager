@@ -11,7 +11,7 @@ import { ErrorBoundary } from './ErrorBoundary.tsx';
 import './App.css';
 import { LayoutContext } from './context/LayoutContext.tsx';
 import { UserContext } from './context/UserContext.tsx';
-import { useSession } from './dataHooks/useSession.ts';
+import { useSession } from './hooks/data/useSession.ts';
 import { OrderDashboard, OrderDashboardSkeleton } from './components/OrderDashboard/OrderDashboard.tsx';
 import { PageMissing } from './components/PageMissing.tsx';
 import { Home } from './components/Home.tsx';

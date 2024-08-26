@@ -1,7 +1,10 @@
 import { Drawer, DriverDrawer } from './typesAndValidators';
 import dayjs from 'dayjs';
 
-export const getDrawerFullName = (drawer: Drawer | DriverDrawer) => {
+export const getDrawerFullName = (drawer: Drawer | DriverDrawer | null) => {
+    if (!drawer) {
+        return '';
+    }
     if ('driver' in drawer) {
         return `${drawer.driver.first_name} ${drawer.driver.last_name}`;
     }

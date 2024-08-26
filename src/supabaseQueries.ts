@@ -142,6 +142,7 @@ export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: stri
     });
     if (error) {
         console.error(error);
+        throw error;
     } else {
         console.log(data);
         return data;

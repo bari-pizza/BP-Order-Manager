@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { useUserContext } from '../dataHooks/useContextData';
+import { useUserContext } from '../hooks/data/useContextData';
 import { SmartNavigate } from './SmartNavigate';
 
 export const ProtectedRoute = ({ children, fallback }: { children: React.ReactNode; fallback: React.ReactNode }) => {
