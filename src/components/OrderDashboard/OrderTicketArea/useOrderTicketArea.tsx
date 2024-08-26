@@ -25,7 +25,7 @@ export const useOrderTicketArea = ({ orders }: { orders: Order[] }) => {
         });
     };
 
-    const toggleAllTickets = () => {
+    const toggleCollapseAllTickets = () => {
         if (collapsedTickets.length === orders?.length) {
             setCollapsedTickets([]);
         } else {
@@ -44,10 +44,14 @@ export const useOrderTicketArea = ({ orders }: { orders: Order[] }) => {
     );
 
     const toggleTicketsButton = (
-        <Button variant="contained" onClick={toggleAllTickets}>
+        <Button variant="contained" onClick={toggleCollapseAllTickets}>
             {collapsedTickets.length === orders?.length ? 'Expand All' : 'Collapse All'} Tickets
         </Button>
     );
+
+    // TODO: Add toggleSelectAllTickets
+    // maybe redesign these to return button props instead of a button
+    // would contain onClick, buttonText, variant, etc.
 
     return {
         orderTicketArea,

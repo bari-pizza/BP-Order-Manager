@@ -134,3 +134,29 @@ export const updateOrder = async (order: Order) => {
 
     return data[0] as unknown as Order;
 };
+
+export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
+    const { data, error } = await supaClient.rpc('add_orders_to_drawer', {
+        p_drawer_id: drawerID,
+        p_order_ids: orderIDs,
+    });
+    if (error) {
+        console.error(error);
+    } else {
+        console.log(data);
+        return data;
+    }
+};
+
+export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
+    const { data, error } = await supaClient.rpc('remove_orders_from_drawer', {
+        p_drawer_id: drawerID,
+        p_order_ids: orderIDs,
+    });
+    if (error) {
+        console.error(error);
+    } else {
+        console.log(data);
+        return data;
+    }
+};

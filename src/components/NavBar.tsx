@@ -18,8 +18,6 @@ interface NavBarItem {
 }
 
 // TODO: Add a way to choose drivers for the day
-// TODO: Handle order creation
-// TODO: Handle order update
 // TODO: Handle order deletion
 
 /* TODO: create BusinessDay.Drivers table

@@ -68,6 +68,7 @@ export type Database = {
           business_date: string
           created_at: string
           drawer_id: string | null
+          is_prepaid: boolean
           order_id: string
           order_name: string | null
           order_number: number | null
@@ -80,6 +81,7 @@ export type Database = {
           business_date: string
           created_at?: string
           drawer_id?: string | null
+          is_prepaid?: boolean
           order_id?: string
           order_name?: string | null
           order_number?: number | null
@@ -92,6 +94,7 @@ export type Database = {
           business_date?: string
           created_at?: string
           drawer_id?: string | null
+          is_prepaid?: boolean
           order_id?: string
           order_name?: string | null
           order_number?: number | null
@@ -225,12 +228,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      "Add order to drawer": {
+      add_orders_to_drawer: {
         Args: {
-          p_order_id: string
+          p_order_ids: Json
           p_drawer_id: string
         }
-        Returns: undefined
+        Returns: Json
       }
     }
     Enums: {

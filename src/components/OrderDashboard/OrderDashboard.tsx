@@ -2,6 +2,8 @@ import { useState, Suspense } from 'react';
 import {
     // dummyQueryFn,
     getAllDaysOrders,
+    addOrdersToDrawer,
+    removeOrdersFromDrawer,
 } from '../../supabaseQueries';
 import { Drawer, DriverDrawer } from '../../typesAndValidators';
 import { Button, Divider, Stack } from '@mui/material';
@@ -12,7 +14,7 @@ import { useOrderEditor } from './OrderEditor/useOrderEditor';
 import { SideBar, SideBarSkeleton } from '../SideBar';
 import { useOrderTicketArea } from './OrderTicketArea/useOrderTicketArea';
 import { useBusinessDate } from '../../dataHooks/useBusinessDate';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { OrderTicketAreaSkeleton } from './OrderTicketArea/OrderTicketArea';
 import { dayjsToMDY } from '../../utils';
 
@@ -23,12 +25,44 @@ export const OrderDashboard = () => {
         queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
         queryFn: () => getAllDaysOrders(MDY),
         refetchOnWindowFocus: false,
-        staleTime: Infinity,
+        staleTime: 1000 * 60 * 30,
     });
     const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer | null>(null);
     const { orderEditor, addOrderButton } = useOrderEditor();
+    const drawersOrders = orders?.filter((order) => order.drawer_id === (openDrawer ? openDrawer.drawer_id : null));
     const { orderTicketArea, toggleTicketsButton, selectedTickets, setSelectedTickets } = useOrderTicketArea({
-        orders,
+        orders: drawersOrders,
+    });
+
+    const queryClient = useQueryClient();
+
+    const assignOrdersToDrawerMutation = useMutation({
+        mutationFn: ({ drawerID, orderIDs }: { drawerID: string; orderIDs: string[] }) =>
+            addOrdersToDrawer({ drawerID, orderIDs }),
+        // TODO: error is being thrown but onSuccess is being called
+        onSuccess: (data: string[]) => {
+            console.log({ data });
+            // should be ids of orders that were successfully updated
+            setSelectedTickets((prev) => prev.filter((id) => !data.includes(id)));
+            queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
+        },
+        onError: (error) => {
+            console.error(`Issue updating order(s): "${error}"`, error);
+        },
+    });
+
+    const unassignOrdersFromDrawerMutation = useMutation({
+        mutationFn: ({ drawerID, orderIDs }: { drawerID: string; orderIDs: string[] }) =>
+            removeOrdersFromDrawer({ drawerID, orderIDs }),
+        onSuccess: (data: string[]) => {
+            console.log({ data });
+            // should be ids of orders that were successfully updated
+            setSelectedTickets((prev) => prev.filter((id) => !data.includes(id)));
+            queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
+        },
+        onError: (error) => {
+            console.error(`Issue updating order(s): "${error}"`, error);
+        },
     });
 
     const toggleDrawerOpen = (drawer: Drawer | DriverDrawer) => {
@@ -39,23 +73,26 @@ export const OrderDashboard = () => {
         }
     };
 
-    // TODO: Add logic for putting tickets in drawer
-    const putTicketsInDrawer = () => {
-        console.log('putting tickets in drawer', { selectedTickets, openDrawer });
-        console.log('unselecting tickets');
-        setSelectedTickets([]);
+    const putTicketsInDrawer = ({ drawerID }: { drawerID: string }) => {
+        console.log('putting tickets in drawer', { selectedTickets, drawerID });
+        assignOrdersToDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
+    };
+
+    const removeTicketsFromDrawer = ({ drawerID }: { drawerID: string }) => {
+        console.log('removing tickets from drawer', { selectedTickets, drawerID });
+        unassignOrdersFromDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 
     const handleDrawerClick = (drawer: Drawer | DriverDrawer) => {
         if (selectedTickets.length > 0) {
-            putTicketsInDrawer();
+            putTicketsInDrawer({ drawerID: drawer.drawer_id });
         } else {
             toggleDrawerOpen(drawer);
         }
     };
 
     return (
-        <OrderDashboardContext.Provider value={{ openDrawer, handleDrawerClick }}>
+        <OrderDashboardContext.Provider value={{ openDrawer, handleDrawerClick, removeTicketsFromDrawer }}>
             <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>
                 <Suspense fallback={<DrawerHeaderSkeleton />}>
                     <DrawerHeader />
