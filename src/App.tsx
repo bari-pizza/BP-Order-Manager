@@ -4,6 +4,8 @@ import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/
 import { Stack, Drawer } from '@mui/material';
 import { NavBar } from './components/NavBar';
 // import { APIProvider } from '@vis.gl/react-google-maps';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { themeOptions } from './theme/theme.ts';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -69,6 +71,8 @@ export default App;
 
 const queryClient = new QueryClient();
 
+const theme = createTheme(themeOptions);
+
 function Layout() {
     const { session, profile, loading } = useSession();
     const sideBarRef = useRef<HTMLDivElement>(null);
@@ -105,52 +109,54 @@ function Layout() {
         //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
         //     version="beta">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <BusinessDayContext.Provider value={{ drawers, drivers, origins }}>
-                <LayoutContext.Provider
-                    value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
-                    <UserContext.Provider value={{ session, profile, loading }}>
-                        <Stack id="main" direction="row" justifyContent="center">
-                            <NavBar />
-                            <Stack id="content" direction="column" overflow="auto" width={'100%'}>
-                                <Outlet />
-                            </Stack>
-                            <Drawer
-                                sx={{
-                                    width: sideBarWidth,
-                                    flexShrink: 0,
-                                    '& .MuiDrawer-paper': {
+            <ThemeProvider theme={theme}>
+                <BusinessDayContext.Provider value={{ drawers, drivers, origins }}>
+                    <LayoutContext.Provider
+                        value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
+                        <UserContext.Provider value={{ session, profile, loading }}>
+                            <Stack id="main" direction="row" justifyContent="center">
+                                <NavBar />
+                                <Stack id="content" direction="column" overflow="auto" width={'100%'}>
+                                    <Outlet />
+                                </Stack>
+                                <Drawer
+                                    sx={{
                                         width: sideBarWidth,
-                                        boxSizing: 'border-box',
-                                    },
-                                }}
-                                id="sidebar-drawer"
-                                anchor="right"
-                                variant="permanent">
-                                <Stack id="sidebar" direction="column" ref={sideBarRef} sx={{ height: '100vh' }} />
-                            </Drawer>
-                            <Drawer
-                                sx={{
-                                    width: sideBarSkeletonWidth,
-                                    flexShrink: 0,
-                                    '& .MuiDrawer-paper': {
+                                        flexShrink: 0,
+                                        '& .MuiDrawer-paper': {
+                                            width: sideBarWidth,
+                                            boxSizing: 'border-box',
+                                        },
+                                    }}
+                                    id="sidebar-drawer"
+                                    anchor="right"
+                                    variant="permanent">
+                                    <Stack id="sidebar" direction="column" ref={sideBarRef} sx={{ height: '100vh' }} />
+                                </Drawer>
+                                <Drawer
+                                    sx={{
                                         width: sideBarSkeletonWidth,
-                                        boxSizing: 'border-box',
-                                    },
-                                }}
-                                id="sidebar-skeleton-drawer"
-                                anchor="right"
-                                variant="permanent">
-                                <Stack
-                                    id="sidebar-skeleton"
-                                    direction="column"
-                                    ref={sideBarSkeletonRef}
-                                    sx={{ height: '100vh' }}
-                                />
-                            </Drawer>
-                        </Stack>
-                    </UserContext.Provider>
-                </LayoutContext.Provider>
-            </BusinessDayContext.Provider>
+                                        flexShrink: 0,
+                                        '& .MuiDrawer-paper': {
+                                            width: sideBarSkeletonWidth,
+                                            boxSizing: 'border-box',
+                                        },
+                                    }}
+                                    id="sidebar-skeleton-drawer"
+                                    anchor="right"
+                                    variant="permanent">
+                                    <Stack
+                                        id="sidebar-skeleton"
+                                        direction="column"
+                                        ref={sideBarSkeletonRef}
+                                        sx={{ height: '100vh' }}
+                                    />
+                                </Drawer>
+                            </Stack>
+                        </UserContext.Provider>
+                    </LayoutContext.Provider>
+                </BusinessDayContext.Provider>
+            </ThemeProvider>
         </LocalizationProvider>
         // </APIProvider>
     );

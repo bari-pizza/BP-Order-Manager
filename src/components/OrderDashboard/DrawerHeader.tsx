@@ -10,7 +10,13 @@ export const DrawerHeader = () => {
     const combinedData = [...drawers, ...drivers];
 
     return (
-        <Stack direction="row" justifyContent="space-around" sx={{ height: 175, flex: 'none', overflow: 'hidden' }}>
+        <Stack
+            direction="row"
+            justifyContent="space-around"
+            alignItems="center"
+            height="175px"
+            overflow="hidden"
+            pb={1}>
             {combinedData?.map((drawer) => <DrawerAvatar key={drawer.drawer_id} drawer={drawer} />)}
         </Stack>
     );
@@ -18,7 +24,13 @@ export const DrawerHeader = () => {
 
 export const DrawerHeaderSkeleton = () => {
     return (
-        <Stack direction="row" justifyContent="space-around" sx={{ height: 175, overflow: 'hidden' }}>
+        <Stack
+            direction="row"
+            justifyContent="space-around"
+            alignItems="center"
+            height="175px"
+            overflow="hidden"
+            pb={1}>
             <DrawerAvatarSkeleton />
             <DrawerAvatarSkeleton />
             <DrawerAvatarSkeleton />

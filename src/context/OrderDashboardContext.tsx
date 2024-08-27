@@ -12,6 +12,15 @@ interface OrderDashboardContextProps {
             collapse: () => void;
             areCollapsed: boolean;
             areSelected: boolean;
+            count: number;
+        };
+        none: {
+            areSelected: boolean;
+            areCollapsed: boolean;
+        };
+        some: {
+            areSelected: boolean;
+            areCollapsed: boolean;
         };
     };
     drawer: {
@@ -37,6 +46,15 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
             collapse: () => {},
             areCollapsed: false,
             areSelected: false,
+            count: 0,
+        },
+        none: {
+            areSelected: true,
+            areCollapsed: true,
+        },
+        some: {
+            areSelected: false,
+            areCollapsed: false,
         },
     },
     drawer: {

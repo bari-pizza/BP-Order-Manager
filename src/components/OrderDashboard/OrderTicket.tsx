@@ -4,6 +4,7 @@ import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order } from '../../typesAndValidators';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
 import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 
 interface OrderTicketProps {
     order: Order;
@@ -18,11 +19,15 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
         order,
         asDialog: true,
     });
+    const theme = useTheme();
 
     const cardSX = {
         width: 200,
         height: 'min-content',
+        backgroundColor: selected ? theme.palette.primary.light : 'background.paper',
     };
+
+    // TODO: debug removeOrdersFromDrawer (not removing, maybe invalidate issue?)
 
     const handleSelect = () => {
         toggleSelected(order);

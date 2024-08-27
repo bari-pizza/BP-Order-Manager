@@ -27,8 +27,13 @@ export const useOrdersDrawersTickets = () => {
     const [collapsedTickets, setCollapsedTickets] = useState<string[]>([]);
     const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
 
-    const allCollapsed = collapsedTickets.length === orders?.length;
-    const allSelected = selectedTickets.length === orders?.length;
+    const orderCount = orders?.length ?? 0;
+
+    const allCollapsed = collapsedTickets.length === orderCount;
+    const allSelected = selectedTickets.length === orderCount;
+
+    const noneCollapsed = collapsedTickets.length === 0;
+    const noneSelected = selectedTickets.length === 0;
 
     const toggleCollapsedTicket = (order: Order) => {
         setCollapsedTickets((prev) => {
@@ -147,6 +152,15 @@ export const useOrdersDrawersTickets = () => {
                 collapse: toggleCollapseAllTickets,
                 areCollapsed: allCollapsed,
                 areSelected: allSelected,
+                count: orderCount,
+            },
+            none: {
+                areCollapsed: noneCollapsed,
+                areSelected: noneSelected,
+            },
+            some: {
+                areCollapsed: !noneCollapsed && orderCount > 0,
+                areSelected: !noneSelected && orderCount > 0,
             },
         },
         drawer: {
