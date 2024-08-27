@@ -99,7 +99,9 @@ export const useOrdersDrawersTickets = () => {
             // should be ids of orders that were successfully updated
             // do something with errors here
             console.log({ updated_order_ids, errors });
-            setSelectedTickets((prev) => prev.filter((id) => !updated_order_ids.includes(id)));
+            // setSelectedTickets((prev) => prev.filter((id) => !updated_order_ids.includes(id)));
+            // remove all selectedTickets (even on failure)
+            setSelectedTickets([]);
             queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
         },
         onError: (error) => {
@@ -133,16 +135,25 @@ export const useOrdersDrawersTickets = () => {
         unassignOrdersFromDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 
+    // TODO: add toaster for errors when putting tickets in drawer
+    // TODO: create little animation of putting tickets in drawer
+
+    // 5 Tickets added to drawer
+    // Ticket unable to be put in drawer
+
     const handleDrawerClick = (drawer: Drawer | DriverDrawer) => {
         if (selectedTickets.length > 0) {
-            if (drawer.drawer_id === 'unassigned') {
+            if (drawer.drawer_id === openDrawer.drawer_id) {
+                setSelectedTickets([]);
+            } else if (drawer.drawer_id === 'unassigned') {
                 removeTicketsFromDrawer();
+                return;
             } else {
                 putTicketsInDrawer(drawer);
+                return;
             }
-        } else {
-            toggleDrawerOpen(drawer);
         }
+        toggleDrawerOpen(drawer);
     };
 
     const getOrdersByDrawerID = (drawerID?: string) => {
