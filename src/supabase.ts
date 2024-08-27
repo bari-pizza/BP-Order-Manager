@@ -235,9 +235,16 @@ export type Database = {
         }
         Returns: Json
       }
+      remove_orders_from_drawer: {
+        Args: {
+          p_order_ids: Json
+          p_drawer_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      drawer_type: "driver" | "register" | "third_party"
+      drawer_type: "driver" | "register" | "third_party" | "unassigned"
       order_origin: "Bari Pizza" | "DoorDash" | "Pizzamico"
       order_type: "delivery" | "pickup"
       payment_type: "cash" | "card" | "third_party"

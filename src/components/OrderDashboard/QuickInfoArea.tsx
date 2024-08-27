@@ -3,10 +3,10 @@ import { useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { UnfoldMore as UnfoldMoreIcon, UnfoldLess as UnfoldLessIcon } from '@mui/icons-material';
 
 export const QuickInfoArea = () => {
-    const { drawer, ticket } = useOrderDashboardContext();
-
-    // TODO: maybe add drawer avatar for unassigned
-    // TODO: add tooltip for drawer avatar that only shows on hover that drawer isnt open and some tickets are selected and
+    const {
+        // drawer,
+        ticket,
+    } = useOrderDashboardContext();
 
     const body = (
         <>
@@ -21,20 +21,19 @@ export const QuickInfoArea = () => {
                     <Button variant="contained" onClick={ticket.all.select}>
                         {ticket.all.areSelected ? 'Unselect' : 'Select'} All
                     </Button>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        {ticket.some.areSelected && (
-                            <Button variant="contained" onClick={drawer.removeOrders}>
-                                Remove Selected Orders
-                            </Button>
-                        )}
-                    </Stack>
                 </Stack>
             )}
         </>
     );
     // TODO: make this prettier
     return (
-        <Stack height="150px" direction="column" justifyContent="center" alignItems="space-evenly" spacing={1}>
+        <Stack
+            height="150px"
+            minHeight="150px"
+            direction="column"
+            justifyContent="center"
+            alignItems="space-evenly"
+            spacing={1}>
             {body}
         </Stack>
     );

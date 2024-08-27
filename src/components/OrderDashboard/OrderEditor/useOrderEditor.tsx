@@ -8,6 +8,8 @@ interface UseOrderEditorProps {
     asDialog?: boolean;
 }
 
+// TODO: get rid of useOrderEditor
+
 export const useOrderEditor = ({ order, asDialog }: UseOrderEditorProps = {}) => {
     const [open, setOpen] = useState(false);
 

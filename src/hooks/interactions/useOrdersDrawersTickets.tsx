@@ -5,6 +5,13 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 import { useBusinessDate } from '../data/useBusinessDate';
 import { dayjsToMDY } from '../../utils';
 
+const unassignedDrawer: Drawer = {
+    drawer_id: 'unassigned',
+    name: 'Unassigned',
+    created_at: '2024-08-27T00:00:00.000Z',
+    drawer_type: 'unassigned',
+};
+
 export const useOrdersDrawersTickets = () => {
     const [businessDate] = useBusinessDate();
     const MDY = dayjsToMDY(businessDate);
@@ -14,8 +21,13 @@ export const useOrdersDrawersTickets = () => {
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 30,
     });
-    const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer | null>(null);
-    const orders = allOrders?.filter((order) => order.drawer_id === (openDrawer ? openDrawer.drawer_id : null));
+
+    // const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer | null>(null);
+    const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer>(unassignedDrawer);
+    // const orders = allOrders?.filter((order) => order.drawer_id === (openDrawer ? openDrawer.drawer_id : null));
+    const orders = allOrders?.filter(
+        (order) => order.drawer_id === (openDrawer.drawer_id === 'unassigned' ? null : openDrawer.drawer_id),
+    );
     const ordersByDrawer = allOrders?.reduce((acc: { [key: string]: Order[] }, order) => {
         const key = order.drawer_id ?? 'unassigned';
         if (!acc[key]) {
@@ -71,7 +83,8 @@ export const useOrdersDrawersTickets = () => {
 
     const toggleDrawerOpen = (drawer: Drawer | DriverDrawer) => {
         if (openDrawer === drawer) {
-            setOpenDrawer(null);
+            // setOpenDrawer(null);
+            setOpenDrawer(unassignedDrawer);
         } else {
             setOpenDrawer(drawer);
         }
@@ -115,17 +128,18 @@ export const useOrdersDrawersTickets = () => {
     };
 
     const removeTicketsFromDrawer = () => {
-        const drawerID = openDrawer?.drawer_id;
-        if (!drawerID) {
-            return;
-        }
+        const drawerID = openDrawer.drawer_id;
         console.log('removing tickets from drawer', { selectedTickets, drawerID });
         unassignOrdersFromDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 
     const handleDrawerClick = (drawer: Drawer | DriverDrawer) => {
         if (selectedTickets.length > 0) {
-            putTicketsInDrawer(drawer);
+            if (drawer.drawer_id === 'unassigned') {
+                removeTicketsFromDrawer();
+            } else {
+                putTicketsInDrawer(drawer);
+            }
         } else {
             toggleDrawerOpen(drawer);
         }
@@ -158,15 +172,17 @@ export const useOrdersDrawersTickets = () => {
                 areCollapsed: noneCollapsed,
                 areSelected: noneSelected,
             },
-            some: {
-                areCollapsed: !noneCollapsed && orderCount > 0,
-                areSelected: !noneSelected && orderCount > 0,
+            count: {
+                selected: selectedTickets.length,
+                collapsed: collapsedTickets.length,
             },
         },
         drawer: {
             onClick: handleDrawerClick,
             removeOrders: removeTicketsFromDrawer,
             current: openDrawer,
+            unassigned: unassignedDrawer,
+            isUnassignedDrawer: openDrawer?.drawer_id === 'unassigned',
         },
         orders: {
             forCurrentDrawer: orders,

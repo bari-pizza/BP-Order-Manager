@@ -1,4 +1,5 @@
-import { Avatar, Badge, Button, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
+import { createElement } from 'react';
+import { Avatar, Badge, Button, Skeleton, Stack, SvgIconTypeMap, Tooltip, Typography } from '@mui/material';
 import type { Drawer, DriverDrawer } from '../../typesAndValidators';
 import { getDrawerFullName } from '../../utils';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
@@ -8,6 +9,7 @@ import {
     Face as FaceIcon,
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
+import { OverridableComponent } from '@mui/material/OverridableComponent';
 
 interface DrawerAvatarProps {
     drawer: Drawer | DriverDrawer;
@@ -24,11 +26,13 @@ export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
         avatar: {
             height: '4em',
             width: '4em',
-            bgcolor: theme.palette.secondary.main,
+            color: theme.palette.primary.main,
+            bgcolor: 'white',
+            border: '4px solid ' + theme.palette.primary.main,
         },
         badge: {
             '& .MuiBadge-badge': {
-                bgcolor: theme.palette.primary.main,
+                bgcolor: theme.palette.secondary.main,
                 color: '#fff',
                 boxShadow: '1px 1px 5px black',
             },
@@ -36,60 +40,89 @@ export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
         avatarIcon: {
             height: '2em',
             width: '2em',
+            '& .MuiAvatar-root': {
+                backgroundColor: 'white !important',
+            },
         },
         button: {
             height: '100%',
-            '&:hover, &.open-drawer': {
+            width: '100px',
+            '& .MuiTypography-root': {
+                color: theme.palette.primary.main,
+            },
+            '&.open-drawer': {
                 '& .MuiAvatar-root': {
                     bgcolor: theme.palette.primary.main,
+                    color: 'white',
+                    borderColor: 'white',
                 },
                 '& .MuiTypography-root': {
                     color: 'white',
                 },
-                '& .MuiBadge-badge': {
-                    bgcolor: theme.palette.secondary.main,
+                backgroundColor: theme.palette.primary.main,
+            },
+            '&:hover:not(.open-drawer)': {
+                backgroundColor: theme.palette.primary.light,
+                '& .MuiAvatar-root': {
+                    borderColor: theme.palette.primary.main,
                 },
-                backgroundColor: theme.palette.secondary.main,
             },
         },
     };
 
-    const avatarChild =
-        drawer.drawer_type === 'register' ? (
-            <PointOfSaleIcon sx={sx.avatarIcon} />
-        ) : drawer.drawer_type === 'third_party' ? (
-            <DeliveryDiningIcon sx={sx.avatarIcon} />
+    const iconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
+        register: PointOfSaleIcon,
+        third_party: DeliveryDiningIcon,
+        driver: FaceIcon,
+        unassigned: FaceIcon,
+    };
+
+    const avatarChild = createElement(iconMap[drawer.drawer_type], { sx: sx.avatarIcon });
+
+    const selectedTicketsCount = ticket.count.selected;
+
+    const tooltip =
+        !isOpen && selectedTicketsCount ? (
+            <Typography variant="body2">
+                Add {selectedTicketsCount} tickets to {fullName}
+            </Typography>
         ) : (
-            <FaceIcon sx={sx.avatarIcon} />
+            ''
         );
-
-    const tooltip = !isOpen && ticket.some.areSelected ? `Add tickets to ${fullName}` : '';
-
-    // TODO: change size of avatar if hovered or openDrawer is true
-    // TODO: animate the transition of the avatar
 
     return (
         <Tooltip title={tooltip}>
             <Button
                 className={isOpen ? 'open-drawer' : ''}
                 onClick={() => ctxDrawer.onClick(drawer)}
-                variant={isOpen ? 'contained' : 'text'}
-                color="secondary"
+                variant="outlined"
+                color="primary"
                 sx={sx.button}>
                 <Stack direction="column" sx={{ height: '100%', width: '80px' }} alignItems="center">
                     <Badge badgeContent={orderCount} sx={sx.badge} overlap="circular">
-                        <Avatar sx={sx.avatar}>{avatarChild}</Avatar>
+                        <Avatar
+                            sx={sx.avatar}
+                            src={drawer.drawer_type === 'driver' ? 'https://mui.com/static/images/avatar/2.jpg' : ''}>
+                            {avatarChild}
+                        </Avatar>
                     </Badge>
-                    <Typography>{fullName}</Typography>
+                    <Typography pt={1} variant="body2">
+                        {fullName}
+                    </Typography>
                 </Stack>
             </Button>
         </Tooltip>
     );
 };
 
+export const UnassignedDrawerAvatar = () => {
+    const { drawer } = useOrderDashboardContext();
+    return <DrawerAvatar drawer={drawer.unassigned} />;
+};
+
 export const DrawerAvatarSkeleton = () => {
     return (
-        <Button>
+        <Button variant="contained">
             <Stack direction="column" sx={{ height: '100%', width: 'min-content' }} alignItems="center">
                 <Skeleton variant="circular">
                     <Avatar sx={{ height: '4em', width: '4em' }}>Full Name Here</Avatar>

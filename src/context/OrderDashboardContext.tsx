@@ -18,15 +18,17 @@ interface OrderDashboardContextProps {
             areSelected: boolean;
             areCollapsed: boolean;
         };
-        some: {
-            areSelected: boolean;
-            areCollapsed: boolean;
+        count: {
+            selected: number;
+            collapsed: number;
         };
     };
     drawer: {
         onClick: (drawer: Drawer | DriverDrawer) => void;
         removeOrders: () => void;
         current: Drawer | DriverDrawer | null;
+        unassigned: Drawer;
+        isUnassignedDrawer: boolean;
     };
     orders: {
         forCurrentDrawer: Order[];
@@ -52,15 +54,22 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
             areSelected: true,
             areCollapsed: true,
         },
-        some: {
-            areSelected: false,
-            areCollapsed: false,
+        count: {
+            selected: 0,
+            collapsed: 0,
         },
     },
     drawer: {
         onClick: () => {},
         removeOrders: () => {},
         current: null,
+        unassigned: {
+            drawer_id: 'unassigned',
+            name: 'Unassigned',
+            created_at: '2024-08-27T00:00:00.000Z',
+            drawer_type: 'unassigned',
+        },
+        isUnassignedDrawer: true,
     },
     orders: {
         forCurrentDrawer: [],
