@@ -22,6 +22,8 @@ import { Login } from './components/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
 import { BusinessDayContext } from './context/BusinessDayContext.tsx';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const router = createBrowserRouter([
     {
@@ -114,6 +116,15 @@ function Layout() {
                     <LayoutContext.Provider
                         value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
+                            <ToastContainer
+                                style={{
+                                    width: 'maxContent',
+                                    justifyContent: 'right',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'flex-end',
+                                }}
+                            />
                             <Stack id="main" direction="row" justifyContent="center">
                                 <NavBar />
                                 <Stack id="content" direction="column" overflow="auto" width={'100%'}>

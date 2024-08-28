@@ -7,7 +7,6 @@ import { useOrderDashboardContext } from './../../hooks/data/useContextData';
 export const OrderTicketArea = () => {
     const { orders, ticket } = useOrderDashboardContext();
     const drawerOrders = orders.forCurrentDrawer;
-    console.log('drawerOrders length', drawerOrders?.length);
     return (
         <Stack className="hover-scroll" p={1} pb="50px">
             <Grid container rowGap={3} columnGap={1} justifyContent="space-between">

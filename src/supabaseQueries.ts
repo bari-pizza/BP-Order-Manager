@@ -56,7 +56,6 @@ const supabaseDate = z.object({
 });
 
 export const getAllDaysOrders = async ({ year, month, day }: GetAllDaysOrdersProps) => {
-    console.log(`getting orders for ${month}/${day}/${year}`);
     try {
         supabaseDate.parse({ year, month, day });
     } catch (error) {
@@ -144,7 +143,6 @@ export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: stri
         console.error(error);
         throw error;
     } else {
-        console.log(data);
         return data;
     }
 };
@@ -157,7 +155,6 @@ export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs:
     if (error) {
         console.error(error);
     } else {
-        console.log(data);
         return data;
     }
 };

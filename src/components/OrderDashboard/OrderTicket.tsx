@@ -7,6 +7,7 @@ import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/i
 import { useTheme } from '@mui/material/styles';
 import { useRef } from 'react';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
+import pizzaSrc from '../../assets/pizza slice.png';
 
 interface OrderTicketProps {
     order: Order;
@@ -35,8 +36,6 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
         backgroundColor: selected ? theme.palette.primary.light : 'background.paper',
     };
 
-    // TODO: debug removeOrdersFromDrawer (not removing, maybe invalidate issue?)
-
     const handleSelect = () => {
         toggleSelected(order);
     };
@@ -57,7 +56,16 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
                         <Typography variant="h5">{order.order_name ?? `Order #${order.order_number}`}</Typography>
                         {selected ? (
-                            <LocalPizzaRoundedIcon color={'primary'} ref={ticketRef} />
+                            <>
+                                <LocalPizzaRoundedIcon color={'primary'} ref={ticketRef} />
+                                <img
+                                    src={pizzaSrc}
+                                    alt="pizza"
+                                    width="24px"
+                                    height="24px"
+                                    style={{ position: 'fixed', opacity: 0 }}
+                                />
+                            </>
                         ) : (
                             <LocalPizzaOutlinedIcon />
                         )}
