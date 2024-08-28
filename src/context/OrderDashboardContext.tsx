@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, RefObject } from 'react';
 import type { Drawer, DriverDrawer, Order } from '../typesAndValidators';
 
 interface OrderDashboardContextProps {
@@ -22,6 +22,9 @@ interface OrderDashboardContextProps {
             selected: number;
             collapsed: number;
         };
+        refs: {
+            [key: string]: RefObject<SVGSVGElement>;
+        };
     };
     drawer: {
         onClick: (drawer: Drawer | DriverDrawer) => void;
@@ -29,6 +32,9 @@ interface OrderDashboardContextProps {
         current: Drawer | DriverDrawer | null;
         unassigned: Drawer;
         isUnassignedDrawer: boolean;
+        refs: {
+            [key: string]: RefObject<HTMLDivElement>;
+        };
     };
     orders: {
         forCurrentDrawer: Order[];
@@ -58,6 +64,7 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
             selected: 0,
             collapsed: 0,
         },
+        refs: {},
     },
     drawer: {
         onClick: () => {},
@@ -70,6 +77,7 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
             drawer_type: 'unassigned',
         },
         isUnassignedDrawer: true,
+        refs: {},
     },
     orders: {
         forCurrentDrawer: [],

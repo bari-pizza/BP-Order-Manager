@@ -1,4 +1,13 @@
-import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon } from '@mui/material';
+import {
+    Toolbar,
+    Drawer,
+    List,
+    ListItemButton,
+    ListItemText,
+    ListItem,
+    ListItemIcon,
+    SvgIconTypeMap,
+} from '@mui/material';
 import { Search, Home as HomeIcon, LocalPizza as LocalPizzaIcon } from '@mui/icons-material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { CalendarIcon } from '@mui/x-date-pickers';
@@ -28,6 +37,8 @@ interface NavBarItem {
 
 const today = dayjs();
 
+const iconProps: SvgIconTypeMap['props'] = { color: 'primary', sx: { fontSize: '35px' } };
+
 export function NavBar() {
     const { session } = useUserContext();
     const [businessDate] = useBusinessDate();
@@ -38,14 +49,14 @@ export function NavBar() {
         : { path: '/login', icon: <UserAvatar />, text: 'Login' };
 
     const listItems: NavBarItem[] = [
-        { path: '/', icon: <HomeIcon />, text: 'Home' },
+        { path: '/', icon: <HomeIcon {...iconProps} />, text: 'Home' },
         {
             text: today.isSame(businessDate, 'day') ? 'Today' : businessDate.format('MM/DD/YYYY'),
-            icon: <CalendarIcon />,
+            icon: <CalendarIcon {...iconProps} />,
             onClick: showBusinessDatePicker,
         },
-        { path: '/search', icon: <Search />, text: 'Search' },
-        { path: '/orders', icon: <LocalPizzaIcon />, text: 'Orders' },
+        { path: '/search', icon: <Search {...iconProps} />, text: 'Search' },
+        { path: '/orders', icon: <LocalPizzaIcon {...iconProps} />, text: 'Orders' },
         userListItem,
     ];
 

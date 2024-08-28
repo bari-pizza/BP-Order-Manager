@@ -5,6 +5,8 @@ import { Order } from '../../typesAndValidators';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
 import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
+import { useRef } from 'react';
+import { useOrderDashboardContext } from '../../hooks/data/useContextData';
 
 interface OrderTicketProps {
     order: Order;
@@ -19,7 +21,13 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
         order,
         asDialog: true,
     });
+    const { ticket } = useOrderDashboardContext();
     const theme = useTheme();
+    const ticketRef = useRef<SVGSVGElement>(null);
+
+    if (ticketRef.current) {
+        ticket.refs[order.order_id] = ticketRef;
+    }
 
     const cardSX = {
         width: 200,
@@ -48,7 +56,11 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
                         <Typography variant="h5">{order.order_name ?? `Order #${order.order_number}`}</Typography>
-                        {selected ? <LocalPizzaRoundedIcon color={'primary'} /> : <LocalPizzaOutlinedIcon />}
+                        {selected ? (
+                            <LocalPizzaRoundedIcon color={'primary'} ref={ticketRef} />
+                        ) : (
+                            <LocalPizzaOutlinedIcon />
+                        )}
                     </Stack>
                 </Stack>
             </CardActionArea>

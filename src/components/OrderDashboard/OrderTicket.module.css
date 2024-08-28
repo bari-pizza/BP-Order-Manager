@@ -1,0 +1,24 @@
+/* Ticket.module.css */
+.ticket-enter {
+    opacity: 0;
+    /* transform: scale(0.5); Start smaller to emphasize growth */
+}
+
+.ticket-enter-active {
+    opacity: 1;
+    /* transform: scale(1.2); Grow larger than normal before settling */
+    transition: opacity 1000ms;
+    /* transform 1000ms ease-out; Slower transition */
+}
+
+.ticket-exit {
+    opacity: 1;
+    transform: scale(1); /* Start at the normal size */
+}
+
+.ticket-exit-active {
+    opacity: 0;
+    /* transform: scale(0.5); Shrink down to emphasize disappearance */
+    transition: opacity 1000ms;
+    /* transform 1000ms ease-in; Slower transition */
+}

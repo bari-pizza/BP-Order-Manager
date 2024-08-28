@@ -4,24 +4,18 @@ import { OrderTicket, OrderTicketSkeleton } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useOrderDashboardContext } from './../../hooks/data/useContextData';
 
-// export const OrderTicketArea = ({
-// orders,
-// collapsedTickets,
-// toggleCollapsedTicket,
-// selectedTickets,
-// toggleSelectedTicket,
-// }: OrderTicketAreaProps) => {
 export const OrderTicketArea = () => {
     const { orders, ticket } = useOrderDashboardContext();
     const drawerOrders = orders.forCurrentDrawer;
+    console.log('drawerOrders length', drawerOrders?.length);
     return (
         <Stack className="hover-scroll" p={1} pb="50px">
             <Grid container rowGap={3} columnGap={1} justifyContent="space-between">
                 {drawerOrders?.length ? (
                     drawerOrders?.map((order) => (
                         <OrderTicket
-                            key={order.order_id}
                             order={order}
+                            key={order.order_id}
                             toggleCollapsed={() => ticket.collapse(order)}
                             collapsed={ticket.isCollapsed(order)}
                             toggleSelected={() => ticket.select(order)}

@@ -1,4 +1,4 @@
-import { createElement } from 'react';
+import { createElement, useRef } from 'react';
 import { Avatar, Badge, Button, Skeleton, Stack, SvgIconTypeMap, Tooltip, Typography } from '@mui/material';
 import type { Drawer, DriverDrawer } from '../../typesAndValidators';
 import { getDrawerFullName } from '../../utils';
@@ -21,6 +21,11 @@ export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
     const isOpen = ctxDrawer.current?.drawer_id === drawer?.drawer_id;
     const orderCount = orders.byDrawerID(drawer.drawer_id).length;
     const theme = useTheme();
+    const drawerRef = useRef<HTMLDivElement>(null);
+
+    if (drawerRef.current) {
+        ctxDrawer.refs[drawer.drawer_id] = drawerRef;
+    }
 
     const sx = {
         avatar: {
@@ -101,6 +106,7 @@ export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
                 <Stack direction="column" sx={{ height: '100%', width: '80px' }} alignItems="center">
                     <Badge badgeContent={orderCount} sx={sx.badge} overlap="circular">
                         <Avatar
+                            ref={drawerRef}
                             sx={sx.avatar}
                             src={drawer.drawer_type === 'driver' ? 'https://mui.com/static/images/avatar/2.jpg' : ''}>
                             {avatarChild}
