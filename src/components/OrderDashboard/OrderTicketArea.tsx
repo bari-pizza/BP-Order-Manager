@@ -1,5 +1,4 @@
 import { Grid, Stack } from '@mui/material';
-// import { Order } from '../../../typesAndValidators';
 import { OrderTicket, OrderTicketSkeleton } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useOrderDashboardContext } from './../../hooks/data/useContextData';

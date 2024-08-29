@@ -1,19 +1,39 @@
 import { toast, UpdateOptions } from 'react-toastify';
 import { Drawer, DriverDrawer } from '../typesAndValidators';
 
-// action -> Message | id
-
-// add orders -> Adding order(s) to drawer | adding
-// remove orders -> Removing order(s) from drawer | removing
-
-// orderSuccess -> Order(s) added to drawer | added
-
 interface ToastPromiseProps {
     pending?: string | UpdateOptions<unknown>;
     success?: string | UpdateOptions<unknown>;
     error?: string | UpdateOptions<unknown>;
     timeout?: number;
 }
+
+interface HandleOutcomeWrapperProps<T> {
+    resolve: Resolve<T>;
+    reject: Reject;
+}
+
+export interface HandleOutcomeProps {
+    data?: DataWithPayload | null;
+    errors?: DataWithError[];
+    forEachError?: (error: DataWithError) => void;
+    ref?: React.RefObject<HTMLElement>;
+}
+
+const handleOutcomeWrapper = ({ resolve, reject }: HandleOutcomeWrapperProps<DataWithPayload>) => {
+    const handleOutcome = ({ data, errors, forEachError }: HandleOutcomeProps) => {
+        if (data) {
+            resolve(data);
+        }
+        if (errors?.length) {
+            reject(errors);
+            if (forEachError) {
+                errors.forEach(forEachError);
+            }
+        }
+    };
+    return handleOutcome;
+};
 
 export const toastPromise = ({ pending = 'Loading', success = 'Success!', error = 'Error!' }: ToastPromiseProps) => {
     const { promise, resolve, reject } = Promise.withResolvers();
@@ -22,25 +42,31 @@ export const toastPromise = ({ pending = 'Loading', success = 'Success!', error 
         success,
         error,
     });
-    return { resolve, reject };
+    const handleOutcome = handleOutcomeWrapper({ resolve, reject });
+    return { handleOutcome };
 };
 
 type DataWithPayload = {
-    message: string;
+    message?: string;
     payload?: unknown;
 };
 
-type DataWithErrors = {
-    errors: { message: string; [key: string]: string | string[] }[];
+type DataWithError = {
+    message?: string;
+    [key: string]: string | undefined;
 };
 
+// TODO: create a simple toast.error wrapper that uses a sad pizza icon
+// TODO: create a simple toast.success wrapper that uses a happy pizza icon
+
 export const addOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDrawer) => {
-    const { resolve, reject } = toastPromise({
+    const { handleOutcome } = toastPromise({
         pending: {
             render: () => `Adding ${orderIDs.length} ticket${orderIDs.length > 1 ? 's' : ''} to ${drawer.name}`,
         },
         success: {
-            render: ({ data }) => {
+            render: (props) => {
+                const { data } = props;
                 const { payload } = data as DataWithPayload;
                 const { orderIDs } = payload as { orderIDs: string[] };
                 return `Added ${orderIDs.length} ticket${orderIDs.length > 1 ? 's' : ''} to ${drawer.name}`;
@@ -51,7 +77,7 @@ export const addOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDrawer
         },
         error: {
             render: ({ data }) => {
-                const { errors } = data as DataWithErrors;
+                const errors = data as DataWithError[];
                 return `Could not add ${errors.length} ticket${errors.length > 1 ? 's' : ''} to ${drawer.name}.`;
             },
             type: 'error',
@@ -59,11 +85,11 @@ export const addOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDrawer
             isLoading: false,
         },
     });
-    return { resolve, reject };
+    return handleOutcome;
 };
 
 export const removeOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDrawer) => {
-    const { resolve, reject } = toastPromise({
+    const { handleOutcome } = toastPromise({
         pending: {
             render: () => `Removing ${orderIDs.length} ticket${orderIDs.length > 1 ? 's' : ''} from ${drawer.name}`,
         },
@@ -79,7 +105,7 @@ export const removeOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDra
         },
         error: {
             render: ({ data }) => {
-                const { errors } = data as DataWithErrors;
+                const errors = data as DataWithError[];
                 return `${errors?.length} order(s) could not be removed from ${drawer.name}.`;
             },
             type: 'error',
@@ -87,5 +113,5 @@ export const removeOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDra
             autoClose: 2000,
         },
     });
-    return { resolve, reject };
+    return handleOutcome;
 };

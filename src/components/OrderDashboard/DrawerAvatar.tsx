@@ -106,6 +106,7 @@ export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
                 <Stack direction="column" sx={{ height: '100%', width: '80px' }} alignItems="center">
                     <Badge badgeContent={orderCount} sx={sx.badge} overlap="circular">
                         <Avatar
+                            className={'drawer-avatar-' + drawer.drawer_id}
                             ref={drawerRef}
                             sx={sx.avatar}
                             src={drawer.drawer_type === 'driver' ? 'https://mui.com/static/images/avatar/2.jpg' : ''}>

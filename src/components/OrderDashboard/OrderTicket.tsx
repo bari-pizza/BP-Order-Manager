@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
@@ -5,7 +6,6 @@ import { Order } from '../../typesAndValidators';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
 import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { useRef } from 'react';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
 import pizzaSrc from '../../assets/pizza slice.png';
 
@@ -33,7 +33,19 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
     const cardSX = {
         width: 200,
         height: 'min-content',
-        backgroundColor: selected ? theme.palette.primary.light : 'background.paper',
+        transition: 'background-color 1s ease',
+        '&:not(.toast-error)': {
+            backgroundColor: selected ? theme.palette.primary.light : 'background.paper',
+        },
+        '&.toast-error': {
+            backgroundColor: theme.palette.error.light,
+            transition: 'background-color 1s ease',
+        },
+        '&.ticket-animating': {
+            '&.hide-when-animating': {
+                Visibility: 'hidden',
+            },
+        },
     };
 
     const handleSelect = () => {
@@ -67,7 +79,7 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                                 />
                             </>
                         ) : (
-                            <LocalPizzaOutlinedIcon />
+                            <LocalPizzaOutlinedIcon className="hide-when-animating" />
                         )}
                     </Stack>
                 </Stack>

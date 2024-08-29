@@ -4,7 +4,7 @@ import { addOrdersToDrawer, getAllDaysOrders, removeOrdersFromDrawer } from '../
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useBusinessDate } from '../data/useBusinessDate';
 import { dayjsToMDY } from '../../utils';
-import { addOrdersToast, removeOrdersToast } from '../../helpers/toast';
+import { addOrdersToast, HandleOutcomeProps, removeOrdersToast } from '../../helpers/toast';
 import { toast } from 'react-toastify';
 
 const unassignedDrawer: Drawer = {
@@ -40,7 +40,9 @@ export const useOrdersDrawersTickets = () => {
     const [collapsedTickets, setCollapsedTickets] = useState<string[]>([]);
     const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
     const [handlingDrawerClick, setHandlingDrawerClick] = useState(false);
-    const toastRef = useRef<{ [orderID: string]: { resolve: Resolve<unknown>; reject: Reject } }>({});
+    const toastRef = useRef<{
+        [orderID: string]: ({ data, errors, forEachError }: HandleOutcomeProps) => void;
+    }>({});
 
     const orderCount = orders?.length ?? 0;
 
@@ -93,27 +95,38 @@ export const useOrdersDrawersTickets = () => {
         }
     };
 
+    // TODO: when all tickets have errors, they're not visible because the page immediately refreshes
+
     const animateTicketToDrawer = (
         ticketRef: RefObject<SVGSVGElement>,
         drawerRef: RefObject<HTMLDivElement>,
         index: number = 0,
     ): Promise<void> => {
         return new Promise((resolve) => {
-            const ticket = ticketRef.current;
-            const drawer = drawerRef.current;
-
-            if (!ticket || !drawer) {
+            const originalTicket = ticketRef.current;
+            if (!originalTicket || !drawerRef.current) {
                 resolve();
                 return;
             }
 
+            const drawer = drawerRef.current;
+            const card = originalTicket.closest('.MuiPaper-root') as HTMLDivElement;
+            card.classList.add('ticket-animating');
+            // make a copy so that the animation can finish even if the original ticket is removed
+            const ticket = originalTicket.cloneNode() as SVGSVGElement;
+            const pizzaImg = originalTicket.nextSibling?.cloneNode() as HTMLImageElement;
+            const root = document.querySelector('#root') as HTMLBodyElement;
+            root.append(ticket);
+            root.append(pizzaImg);
+            // document.body.appendChild(ticket); bad idea
+            // document.body.appendChild(pizzaImg); bad idea
+
             // Calculate the position differences
-            const ticketRect = ticket.getBoundingClientRect();
+            const ticketRect = originalTicket.getBoundingClientRect();
             const drawerRect = drawer.getBoundingClientRect();
 
             const drawerWidth = (drawer.computedStyleMap().get('width') as CSSUnitValue).value;
-            // TODO: maybe make a copy of ticket so that even if the ticket is no longer visible, it can still be animated
-            const pizzaImg = ticket.nextSibling as HTMLImageElement;
+            // const drawerWidth = drawerRect.width;
             const scale = drawerRect.height / ticketRect.height / 2;
             const scalePizza = drawerWidth / pizzaImg.width / 2;
 
@@ -128,7 +141,7 @@ export const useOrdersDrawersTickets = () => {
             ticket.style.top = `${ticketRect.top}px`;
             ticket.style.left = `${ticketRect.left}px`;
 
-            // pizzaImg.style.position = 'fixed';
+            pizzaImg.style.position = 'fixed';
             pizzaImg.style.top = `${ticketRect.top}px`;
             pizzaImg.style.left = `${ticketRect.left}px`;
 
@@ -141,15 +154,16 @@ export const useOrdersDrawersTickets = () => {
             const delay = index * 100;
 
             // Trigger the animation
-            ticket.style.transition = 'all .75s ease-in-out';
+            ticket.style.transition = 'all .6s ease-in-out';
             ticket.style.transform = `
             translate(${deltaX}px, ${deltaY}px)
             scale(${scale})
             rotate(${angle}rad)
             `;
             ticket.style.opacity = '0';
+            originalTicket.style.opacity = '0';
 
-            pizzaImg.style.transition = 'all .75s ease-in-out';
+            pizzaImg.style.transition = 'transform .6s ease-in-out';
             pizzaImg.style.transform = `
             translate(${deltaX}px, ${deltaY}px)
             scale(${scalePizza})
@@ -161,13 +175,17 @@ export const useOrdersDrawersTickets = () => {
             pizzaImg.style.transitionDelay = `${delay}ms`;
 
             setTimeout(async () => {
-                // // Reset the icon's position
+                // Put everything back the way it was
+                // both were copies so we have to remove them
+
                 ticket.style.display = 'none';
-                ticket.style.position = 'static';
-                ticket.style.transform = `translate(0, 0)`;
                 ticket.style.transition = 'none';
-                pizzaImg.style.transition = 'opacity .25s ease-in-out';
+                ticket.remove();
+
                 pizzaImg.style.opacity = '0';
+                pizzaImg.style.transition = 'opacity .25s ease-in-out';
+                pizzaImg.remove();
+
                 resolve();
             }, 1000 + delay); // Adjust to match your transition duration
         });
@@ -184,11 +202,27 @@ export const useOrdersDrawersTickets = () => {
             return animateTicketToDrawer(ticketRef, drawerRef, index);
         });
 
-        Promise.all(animations).then(() => {
-            setSelectedTickets([]);
-            queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
-            setHandlingDrawerClick(false);
-        });
+        // THIS DUMMY PROMISE MAKES SURE THAT ERROR ANIMATIONS STILL RUN BEFORE TICKETS ARE UNSELECTED
+        if (animations.length === 0) {
+            new Promise<void>((resolve) =>
+                setTimeout(() => {
+                    setHandlingDrawerClick(false);
+                    resolve();
+                }, 2000),
+            );
+            return;
+        }
+
+        Promise.all(animations)
+            .then(() => {
+                queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
+            })
+            .then(() => {
+                setTimeout(() => {
+                    setSelectedTickets([]);
+                    setHandlingDrawerClick(false);
+                }, 1000);
+            });
     };
 
     const assignOrdersToDrawerMutation = useMutation({
@@ -202,24 +236,30 @@ export const useOrdersDrawersTickets = () => {
             updated_order_ids: string[];
             errors: { message: string; order_id: string }[];
             drawer_id: string;
+            // TODO: would be nice if we got the drawer name here
         }) => {
-            const { resolve, reject } = toastRef.current['add'];
-            if (updatedOrderIDs.length) {
-                resolve({
-                    payload: { orderIDs: updatedOrderIDs },
-                });
-            }
-            if (errors.length) {
-                reject({ errors });
-                errors.forEach(({ order_id }) => {
+            const handleOutcome = toastRef.current['add'];
+            handleOutcome({
+                data: updatedOrderIDs.length ? { payload: { orderIDs: updatedOrderIDs } } : null,
+                errors,
+                forEachError: ({ order_id }) => {
                     const order = allOrders.find((order) => order.order_id === order_id);
+                    if (!order) {
+                        return;
+                    }
                     const orderTitle = order?.order_name ?? `Order ${order?.order_number}`;
-                    toast.error(`Error adding ${orderTitle} to drawer`, {
-                        autoClose: 3000,
-                    });
-                });
-                // errors.forEach here
-            }
+                    const body = `Error adding ${orderTitle} to drawer`;
+                    const ticketRef = ticketRefs.current[order?.order_id];
+                    const cardWithError = ticketRef?.current?.closest('.MuiPaper-root') as HTMLElement;
+                    cardWithError.classList.add('toast-error');
+                    const autoClose = 1500;
+                    setTimeout(() => {
+                        cardWithError.classList.remove('toast-error');
+                    }, autoClose);
+
+                    toast.error(body, { autoClose });
+                },
+            });
             handleAnimations(updatedOrderIDs, drawerID);
         },
         onError: (error) => {
@@ -231,11 +271,8 @@ export const useOrdersDrawersTickets = () => {
         mutationFn: ({ drawerID, orderIDs }: { drawerID: string; orderIDs: string[] }) =>
             removeOrdersFromDrawer({ drawerID, orderIDs }),
         onSuccess: (orderIDs) => {
-            console.log({ orderIDs });
-            // should be ids of orders that were successfully updated
-            const { resolve } = toastRef.current['remove'];
-            resolve({ payload: { orderIDs } });
-            // if I want to add error handling, I need to add errors to the supabase response
+            const handleOutcome = toastRef.current['remove'];
+            handleOutcome({ data: orderIDs.length ? { payload: { orderIDs } } : null });
             handleAnimations(orderIDs, 'unassigned');
         },
         onError: (error) => {
@@ -243,29 +280,15 @@ export const useOrdersDrawersTickets = () => {
         },
     });
 
-    // const handleToastCreation = (orderIDs: string[], drawer: Drawer | DriverDrawer, isAdding = true) => {
-    //     if (orderIDs.length > 0) {
-    //         // const id = toast.loading(
-    //         //     `${isAdding ? 'Added' : 'Removed'} ${orderIDs.length} ticket${orderIDs.length > 1 ? 's' : ''} ${isAdding ? 'to' : 'from'} ${drawer.name}`,
-    //         //     {
-    //         //         type: 'info',
-    //         //     },
-    //         // );
-    //         // toastRef.current[`${isAdding ? 'add' : 'remove'}`] = id;
-    //     }
-    // };
-
     const putTicketsInDrawer = (drawer: Drawer | DriverDrawer) => {
         const drawerID = drawer.drawer_id;
-        const { resolve, reject } = addOrdersToast(selectedTickets, drawer);
-        toastRef.current['add'] = { resolve, reject };
+        toastRef.current['add'] = addOrdersToast(selectedTickets, drawer);
         assignOrdersToDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 
     const removeTicketsFromDrawer = () => {
         const drawerID = openDrawer.drawer_id;
-        const { resolve, reject } = removeOrdersToast(selectedTickets, openDrawer);
-        toastRef.current['remove'] = { resolve, reject };
+        toastRef.current['remove'] = removeOrdersToast(selectedTickets, openDrawer);
         unassignOrdersFromDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 
