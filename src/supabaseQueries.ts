@@ -1,6 +1,9 @@
 import { supaClient } from './supaClient';
 import { Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
 import { z } from 'zod';
+import doorDashLogo from './assets/doorDash logo.png';
+import bariPizzaLogo from './assets/BP logo.png';
+import pizzamicoLogo from './assets/Pizzamico logo.ico';
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -39,6 +42,16 @@ export const getAllOrigins = async () => {
         console.error(error);
         return [] as OrderOrigin[];
     }
+    // TODO: remove this hack once the logos are added to supabase
+    const icons: Record<string, string> = {
+        DoorDash: doorDashLogo,
+        'Bari Pizza': bariPizzaLogo,
+        Pizzamico: pizzamicoLogo,
+    };
+
+    data.forEach((origin: OrderOrigin) => {
+        origin.icon = origin.icon || icons[origin.name] || '';
+    });
 
     return data as unknown as OrderOrigin[];
 };

@@ -22,8 +22,11 @@ import { Login } from './components/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
 import { BusinessDayContext } from './context/BusinessDayContext.tsx';
+import { AdminDashboard, AdminDashboardSkeleton } from './components/Admin/AdminDashboard.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// TODO: add admin page - protected - only by admins
 
 const router = createBrowserRouter([
     {
@@ -42,6 +45,8 @@ const router = createBrowserRouter([
                 path: '/orders',
                 element: (
                     <ProtectedRoute fallback={<OrderDashboardSkeleton />}>
+                        {/* TODO: maybe add a protection within OrderDashboard for manager/driver */}
+                        {/* TODO: maybe make two protected routes and show null for wrong role */}
                         <OrderDashboard />
                     </ProtectedRoute>
                 ),
@@ -54,6 +59,18 @@ const router = createBrowserRouter([
                 path: '/myaccount',
                 element: <MyAccount />,
             },
+            {
+                path: '/admin',
+                element: (
+                    <ProtectedRoute
+                        fallback={<AdminDashboardSkeleton />}
+                        // protections={{ isAdmin: true }}
+                        redirect="/denied">
+                        <AdminDashboard />
+                    </ProtectedRoute>
+                ),
+            },
+            { path: '/denied', element: <div>Access Denied!</div> },
         ],
     },
 ]);

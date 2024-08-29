@@ -12,6 +12,43 @@ export const OrderDashboard = () => {
     const { orderEditor, addOrderButton } = useOrderEditor();
     const { ticket, drawer, orders } = useOrdersDrawersTickets();
 
+    // TODO: would be cool to have the number of selectedTickets follow the mouse while moving on the page
+    /*
+    import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
+
+const MouseFollower = styled('div')({
+  position: 'absolute',
+  pointerEvents: 'none',
+  fontSize: 24,
+  fontWeight: 'bold',
+});
+
+const MouseFollowerComponent = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({ x: event.clientX, y: event.clientY });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  return (
+    <MouseFollower style={{ top: mousePosition.y, left: mousePosition.x }}>
+      123
+    </MouseFollower>
+  );
+};
+
+export default MouseFollowerComponent;
+    */
+
     return (
         <OrderDashboardContext.Provider value={{ ticket, drawer, orders }}>
             <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>

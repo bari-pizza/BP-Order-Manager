@@ -4,9 +4,14 @@ import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order } from '../../typesAndValidators';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
-import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import {
+    ExpandMore as ExpandMoreIcon,
+    OpenInNew as OpenInNewIcon,
+    TwoWheeler as DeliveryIcon,
+    Restaurant as PickupIcon,
+} from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { useOrderDashboardContext } from '../../hooks/data/useContextData';
+import { useBusinessDayContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import pizzaSrc from '../../assets/pizza slice.png';
 
 interface OrderTicketProps {
@@ -18,6 +23,7 @@ interface OrderTicketProps {
 }
 
 export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected, selected }: OrderTicketProps) => {
+    const { origins } = useBusinessDayContext();
     const { setOpen, orderEditor } = useOrderEditor({
         order,
         asDialog: true,
@@ -61,6 +67,8 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
         setOpen(true);
     };
 
+    const originLogo = origins.find((origin) => origin.name === order.origin)?.icon || '';
+
     return (
         <Card variant="outlined" sx={cardSX}>
             <CardActionArea onClick={handleSelect}>
@@ -101,7 +109,18 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                         </Stack>
                     </Collapse>
                     <Stack direction="row" justifyContent="space-between" m={1} mt={0} alignItems="center">
-                        <Typography variant="subtitle1">{order.order_type}</Typography>
+                        <Stack direction="row" alignItems="center" gap={1}>
+                            {originLogo && (
+                                <img
+                                    src={originLogo}
+                                    alt={order.origin}
+                                    width="24px"
+                                    height="24px"
+                                    style={{ borderRadius: '50%' }}
+                                />
+                            )}
+                            {order.order_type === 'pickup' ? <PickupIcon /> : <DeliveryIcon />}
+                        </Stack>
                         <ExpandMoreIcon />
                     </Stack>
                 </Stack>

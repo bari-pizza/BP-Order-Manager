@@ -8,7 +8,12 @@ import {
     ListItemIcon,
     SvgIconTypeMap,
 } from '@mui/material';
-import { Search, Home as HomeIcon, LocalPizza as LocalPizzaIcon } from '@mui/icons-material';
+import {
+    Search,
+    Home as HomeIcon,
+    LocalPizza as LocalPizzaIcon,
+    AdminPanelSettings as AdminIcon,
+} from '@mui/icons-material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { CalendarIcon } from '@mui/x-date-pickers';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
@@ -16,6 +21,7 @@ import { UserAvatar } from './UserAvatar';
 import { useUserContext } from '../hooks/data/useContextData';
 import { SmartLink } from './SmartNavigate';
 import dayjs from 'dayjs';
+import { useLocation } from 'react-router-dom';
 
 const drawerWidth = 200;
 
@@ -30,9 +36,9 @@ interface NavBarItem {
 // TODO: Handle order deletion
 
 /* TODO: create BusinessDay.Drivers table
-    business_day, driver_id, is_locked
+   TODO: business_day, driver_id, is_locked
 
-    add is_locked to Order and Payment tables
+   TODO: add is_locked to Order and Payment tables
 */
 
 const today = dayjs();
@@ -43,6 +49,7 @@ export function NavBar() {
     const { session } = useUserContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
+    const location = useLocation();
 
     const userListItem: NavBarItem = session
         ? { path: '/myaccount', icon: <UserAvatar />, text: 'Profile' }
@@ -56,6 +63,7 @@ export function NavBar() {
             onClick: showBusinessDatePicker,
         },
         { path: '/search', icon: <Search {...iconProps} />, text: 'Search' },
+        { path: '/admin', icon: <AdminIcon {...iconProps} />, text: 'Admin' },
         { path: '/orders', icon: <LocalPizzaIcon {...iconProps} />, text: 'Orders' },
         userListItem,
     ];
@@ -85,9 +93,9 @@ export function NavBar() {
                               }
                             : { component: 'div' })}
                         key={item.text}>
-                        <ListItemButton onClick={item.onClick}>
+                        <ListItemButton selected={location.pathname === item.path} onClick={item.onClick}>
                             <ListItemIcon>{item.icon}</ListItemIcon>
-                            <ListItemText>{item.text}</ListItemText>
+                            <ListItemText primary={item.text} primaryTypographyProps={{ color: 'primary' }} />
                         </ListItemButton>
                     </ListItem>
                 ))}

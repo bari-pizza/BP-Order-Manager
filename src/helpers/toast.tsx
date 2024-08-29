@@ -17,16 +17,24 @@ export interface HandleOutcomeProps {
     data?: DataWithPayload | null;
     errors?: DataWithError[];
     forEachError?: (error: DataWithError) => void;
-    ref?: React.RefObject<HTMLElement>;
 }
 
 const handleOutcomeWrapper = ({ resolve, reject }: HandleOutcomeWrapperProps<DataWithPayload>) => {
     const handleOutcome = ({ data, errors, forEachError }: HandleOutcomeProps) => {
+        let promiseFulfilled = false;
         if (data) {
+            // console.log('calling resolve');
             resolve(data);
+            promiseFulfilled = true;
         }
         if (errors?.length) {
-            reject(errors);
+            if (!promiseFulfilled) {
+                // console.log('calling reject');
+                reject(errors);
+                promiseFulfilled = true;
+            } else {
+                // console.log('promise already fulfilled, cannot reject');
+            }
             if (forEachError) {
                 errors.forEach(forEachError);
             }
@@ -51,7 +59,7 @@ type DataWithPayload = {
     payload?: unknown;
 };
 
-type DataWithError = {
+export type DataWithError = {
     message?: string;
     [key: string]: string | undefined;
 };

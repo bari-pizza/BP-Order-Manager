@@ -51,7 +51,6 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
             is_prepaid: false,
             phone: null,
             total_in_cents: 0,
-            business_date: businessDate.format('YYYY-MM-DD'),
             drawer_id: null,
         },
         values: order,
@@ -219,10 +218,10 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
     );
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log({ data });
         if (order) {
             updateOrderMutation.mutate(data);
         } else {
+            data.business_date = businessDate.format('YYYY-MM-DD');
             createNewOrderMutation.mutate(data);
         }
     };

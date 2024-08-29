@@ -4,7 +4,7 @@ import { addOrdersToDrawer, getAllDaysOrders, removeOrdersFromDrawer } from '../
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useBusinessDate } from '../data/useBusinessDate';
 import { dayjsToMDY } from '../../utils';
-import { addOrdersToast, HandleOutcomeProps, removeOrdersToast } from '../../helpers/toast';
+import { addOrdersToast, DataWithError, HandleOutcomeProps, removeOrdersToast } from '../../helpers/toast';
 import { toast } from 'react-toastify';
 
 const unassignedDrawer: Drawer = {
@@ -88,7 +88,6 @@ export const useOrdersDrawersTickets = () => {
 
     const toggleDrawerOpen = (drawer: Drawer | DriverDrawer) => {
         if (openDrawer === drawer) {
-            // setOpenDrawer(null);
             setOpenDrawer(unassignedDrawer);
         } else {
             setOpenDrawer(drawer);
@@ -193,7 +192,7 @@ export const useOrdersDrawersTickets = () => {
 
     const queryClient = useQueryClient();
 
-    const handleAnimations = (orderIDs: string[], drawerID: string) => {
+    const handleAnimations = async (orderIDs: string[], drawerID: string) => {
         let index = -1;
         const animations = orderIDs.map((id) => {
             const ticketRef = ticketRefs.current[id];
@@ -201,28 +200,26 @@ export const useOrdersDrawersTickets = () => {
             index++;
             return animateTicketToDrawer(ticketRef, drawerRef, index);
         });
+        return await Promise.all(animations);
+    };
 
-        // THIS DUMMY PROMISE MAKES SURE THAT ERROR ANIMATIONS STILL RUN BEFORE TICKETS ARE UNSELECTED
-        if (animations.length === 0) {
-            new Promise<void>((resolve) =>
-                setTimeout(() => {
-                    setHandlingDrawerClick(false);
-                    resolve();
-                }, 2000),
-            );
+    const handleEachError = (data: DataWithError) => {
+        const { order_id } = data;
+        const order = allOrders.find((order) => order.order_id === order_id);
+        if (!order) {
             return;
         }
+        const orderTitle = order?.order_name ?? `Order ${order?.order_number}`;
+        const body = `Error adding ${orderTitle} to drawer`;
+        const ticketRef = ticketRefs.current[order?.order_id];
+        const cardWithError = ticketRef?.current?.closest('.MuiPaper-root') as HTMLElement;
+        cardWithError.classList.add('toast-error');
+        const autoClose = 1500;
+        setTimeout(() => {
+            cardWithError.classList.remove('toast-error');
+        }, autoClose);
 
-        Promise.all(animations)
-            .then(() => {
-                queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
-            })
-            .then(() => {
-                setTimeout(() => {
-                    setSelectedTickets([]);
-                    setHandlingDrawerClick(false);
-                }, 1000);
-            });
+        toast.error(body, { autoClose });
     };
 
     const assignOrdersToDrawerMutation = useMutation({
@@ -234,33 +231,26 @@ export const useOrdersDrawersTickets = () => {
             drawer_id: drawerID,
         }: {
             updated_order_ids: string[];
-            errors: { message: string; order_id: string }[];
+            errors: DataWithError & { order_id: string }[];
             drawer_id: string;
             // TODO: would be nice if we got the drawer name here
         }) => {
+            const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
             const handleOutcome = toastRef.current['add'];
             handleOutcome({
                 data: updatedOrderIDs.length ? { payload: { orderIDs: updatedOrderIDs } } : null,
                 errors,
-                forEachError: ({ order_id }) => {
-                    const order = allOrders.find((order) => order.order_id === order_id);
-                    if (!order) {
-                        return;
-                    }
-                    const orderTitle = order?.order_name ?? `Order ${order?.order_number}`;
-                    const body = `Error adding ${orderTitle} to drawer`;
-                    const ticketRef = ticketRefs.current[order?.order_id];
-                    const cardWithError = ticketRef?.current?.closest('.MuiPaper-root') as HTMLElement;
-                    cardWithError.classList.add('toast-error');
-                    const autoClose = 1500;
-                    setTimeout(() => {
-                        cardWithError.classList.remove('toast-error');
-                    }, autoClose);
-
-                    toast.error(body, { autoClose });
-                },
+                forEachError: handleEachError,
             });
-            handleAnimations(updatedOrderIDs, drawerID);
+            if (updatedOrderIDs.length) {
+                // path 5a and 5b
+                setSelectedTickets(unsuccessfulOrderIDs);
+                handleAnimations(updatedOrderIDs, drawerID).then(() => {
+                    queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
+                });
+            }
+            // path 5a, 5b, and 5c
+            setHandlingDrawerClick(false);
         },
         onError: (error) => {
             console.error(`Issue updating order(s): "${error}"`, error);
@@ -271,9 +261,25 @@ export const useOrdersDrawersTickets = () => {
         mutationFn: ({ drawerID, orderIDs }: { drawerID: string; orderIDs: string[] }) =>
             removeOrdersFromDrawer({ drawerID, orderIDs }),
         onSuccess: (orderIDs) => {
+            // TODO: refactor this eventually so that success accepts {update_order_ids, errors}
+            // TODO: would require updating supabase function
             const handleOutcome = toastRef.current['remove'];
-            handleOutcome({ data: orderIDs.length ? { payload: { orderIDs } } : null });
-            handleAnimations(orderIDs, 'unassigned');
+            const errors: (DataWithError & { order_id: string })[] = [];
+            const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
+            handleOutcome({
+                data: orderIDs.length ? { payload: { orderIDs } } : null,
+                errors,
+                forEachError: handleEachError,
+            });
+            if (orderIDs.length) {
+                // path 3a and 3b
+                setSelectedTickets(unsuccessfulOrderIDs);
+                handleAnimations(orderIDs, 'unassigned').then(() => {
+                    queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
+                });
+            }
+            // path 3a, 3b, and 3c
+            setHandlingDrawerClick(false);
         },
         onError: (error) => {
             console.error(`Issue updating order(s): "${error}"`, error);
@@ -294,23 +300,66 @@ export const useOrdersDrawersTickets = () => {
 
     const handleDrawerClick = (drawer: Drawer | DriverDrawer) => {
         if (handlingDrawerClick) {
-            toggleDrawerOpen(drawer);
             return;
         }
+        /* 
+            paths: 
+                click on own drawer 
+                    1. with selected tickets
+                        set openDrawer to unassigned
+                        set selected tickets to []
+                    2. without 
+                        set openDrawer to unassigned
+                
+                click on UNASSIGNED drawer
+                    3. with selected tickets
+                        attempt to remove tickets from drawer
+                            a) complete success
+                                set selected tickets to []
+                                invalidate query
+                            b) partial success
+                                set selected tickets to [...unsuccessful tickets]
+                                invalidate query
+                            c) error
+                                nothing
+                    4. without
+                        set openDrawer to unassigned
+
+                click on other drawer
+                    5. with selected tickets
+                        attempt to put tickets in drawer
+                            a) complete success
+                                set selected tickets to []
+                                invalidate query
+                            b) partial success
+                                set selected tickets to [...unsuccessful tickets]
+                                invalidate query
+                            c) error
+                                nothing
+                    6. without
+                        set openDrawer to drawer
+
+                    
+        */
         setHandlingDrawerClick(true);
         if (selectedTickets.length > 0) {
             if (drawer.drawer_id === openDrawer.drawer_id) {
+                // path 1
                 setSelectedTickets([]);
+                toggleDrawerOpen(drawer);
                 setHandlingDrawerClick(false);
                 return;
             } else if (drawer.drawer_id === 'unassigned') {
+                // path 3
                 removeTicketsFromDrawer();
                 return;
             } else {
+                // path 5
                 putTicketsInDrawer(drawer);
                 return;
             }
         }
+        // path 2, 4, and 6
         toggleDrawerOpen(drawer);
         setHandlingDrawerClick(false);
     };
