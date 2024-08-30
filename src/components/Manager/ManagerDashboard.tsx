@@ -1,4 +1,4 @@
-import { backdropClasses, Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
 

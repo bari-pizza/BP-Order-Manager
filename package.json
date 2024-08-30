@@ -8,7 +8,7 @@
         "test": "vitest",
         "build": "tsc -b && vite build",
         "start": "vite preview",
-        "lint": "eslint .",
+        "lint": "eslint . && tsc -b",
         "preview": "vite preview",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",

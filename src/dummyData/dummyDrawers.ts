@@ -35,6 +35,8 @@ const createDummyDriver: () => DriverDrawer = () => {
             phone: null,
             last_name: fullName.split(' ')[1],
             first_name: fullName.split(' ')[0],
+            is_admin: false,
+            is_manager: false,
         },
     };
 };
