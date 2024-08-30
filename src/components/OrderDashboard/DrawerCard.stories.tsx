@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { DrawerAvatar } from './DrawerAvatar';
+import { DrawerCard } from './DrawerCard';
 import { dummyDrawers } from '../../dummyData';
 
 const meta = {
-    component: DrawerAvatar,
-} satisfies Meta<typeof DrawerAvatar>;
+    component: DrawerCard,
+} satisfies Meta<typeof DrawerCard>;
 
 export default meta;
 

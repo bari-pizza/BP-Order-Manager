@@ -1,7 +1,7 @@
 // import { useSuspenseQueries } from '@tanstack/react-query';
 // import { getAllDrawers, getAllDrivers } from '../../supabaseQueries';
 import { Stack, StackOwnProps } from '@mui/material';
-import { DrawerAvatar, DrawerAvatarSkeleton, UnassignedDrawerAvatar } from './DrawerAvatar';
+import { DrawerCard, DrawerAvatarSkeleton, UnassignedDrawerAvatar } from './DrawerCard';
 import { useBusinessDayContext } from '../../hooks/data/useContextData';
 
 const stackProps: Partial<StackOwnProps> = {
@@ -22,7 +22,7 @@ export const DrawerHeader = () => {
     return (
         <Stack {...stackProps}>
             <UnassignedDrawerAvatar />
-            {combinedData?.map((drawer) => <DrawerAvatar key={drawer.drawer_id} drawer={drawer} />)}
+            {combinedData?.map((drawer) => <DrawerCard key={drawer.drawer_id} drawer={drawer} />)}
         </Stack>
     );
 };

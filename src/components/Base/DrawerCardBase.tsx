@@ -1,8 +1,7 @@
-import { createElement, useRef } from 'react';
-import { Avatar, Badge, Button, Skeleton, Stack, SvgIconTypeMap, Tooltip, Typography } from '@mui/material';
+import { createElement } from 'react';
+import { deepmerge } from '@mui/utils';
+import { Avatar, Badge, Button, Skeleton, Stack, SvgIconTypeMap, Typography } from '@mui/material';
 import type { Drawer, DriverDrawer } from '../../typesAndValidators';
-import { getDrawerFullName } from '../../utils';
-import { useOrderDashboardContext } from '../../hooks/data/useContextData';
 import {
     PointOfSale as PointOfSaleIcon,
     DeliveryDining as DeliveryDiningIcon,
@@ -11,23 +10,24 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 
-interface DrawerAvatarProps {
+interface DrawerCardBaseProps {
     drawer: Drawer | DriverDrawer;
+    drawerRef?: React.RefObject<HTMLDivElement>;
+    isOpen?: boolean;
+    badgeCount?: number;
+    handleClick?: () => void;
+    sx?: {
+        avatar?: React.CSSProperties;
+        badge?: React.CSSProperties;
+        avatarIcon?: React.CSSProperties;
+        button?: React.CSSProperties;
+    };
 }
 
-export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
-    const { drawer: ctxDrawer, orders, ticket } = useOrderDashboardContext();
-    const fullName = getDrawerFullName(drawer);
-    const isOpen = ctxDrawer.current?.drawer_id === drawer?.drawer_id;
-    const orderCount = orders.byDrawerID(drawer.drawer_id).length;
+export const DrawerCardBase = ({ drawer, drawerRef, isOpen, badgeCount, handleClick, sx }: DrawerCardBaseProps) => {
     const theme = useTheme();
-    const drawerRef = useRef<HTMLDivElement>(null);
 
-    if (drawerRef.current) {
-        ctxDrawer.refs[drawer.drawer_id] = drawerRef;
-    }
-
-    const sx = {
+    const baseSX = {
         avatar: {
             height: '4em',
             width: '4em',
@@ -73,7 +73,10 @@ export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
                 },
             },
         },
+        text: {},
     };
+
+    const overrideSX = deepmerge(baseSX, sx);
 
     const iconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
         register: PointOfSaleIcon,
@@ -82,52 +85,41 @@ export const DrawerAvatar = ({ drawer }: DrawerAvatarProps) => {
         unassigned: FaceIcon,
     };
 
-    const avatarChild = createElement(iconMap[drawer.drawer_type], { sx: sx.avatarIcon });
-
-    const selectedTicketsCount = ticket.count.selected;
-
-    const tooltip =
-        !isOpen && selectedTicketsCount ? (
-            <Typography variant="body2">
-                Add {selectedTicketsCount} tickets to {fullName}
-            </Typography>
-        ) : (
-            ''
-        );
+    const avatarChild = createElement(iconMap[drawer.drawer_type], { sx: overrideSX.avatarIcon });
 
     return (
-        <Tooltip title={tooltip}>
-            <Button
-                className={isOpen ? 'open-drawer' : ''}
-                onClick={() => ctxDrawer.onClick(drawer)}
-                variant="outlined"
-                color="primary"
-                sx={sx.button}>
-                <Stack direction="column" sx={{ height: '100%', width: '80px' }} alignItems="center">
-                    <Badge badgeContent={orderCount} sx={sx.badge} overlap="circular">
-                        <Avatar
-                            className={'drawer-avatar-' + drawer.drawer_id}
-                            ref={drawerRef}
-                            sx={sx.avatar}
-                            src={drawer.drawer_type === 'driver' ? 'https://mui.com/static/images/avatar/2.jpg' : ''}>
-                            {avatarChild}
-                        </Avatar>
-                    </Badge>
+        <Button
+            className={isOpen ? 'open-drawer' : ''}
+            onClick={handleClick}
+            variant="outlined"
+            color="primary"
+            sx={overrideSX.button}>
+            <Stack
+                direction="column"
+                sx={{ height: '100%', width: '80px' }}
+                alignItems="center"
+                gap={1}
+                justifyContent="space-between">
+                <Badge badgeContent={badgeCount} sx={overrideSX.badge} overlap="circular">
+                    <Avatar
+                        className={'drawer-avatar-' + drawer.drawer_id}
+                        ref={drawerRef}
+                        sx={overrideSX.avatar}
+                        src={drawer.drawer_type === 'driver' ? 'https://mui.com/static/images/avatar/2.jpg' : ''}>
+                        {avatarChild}
+                    </Avatar>
+                </Badge>
+                <Stack justifyContent="center" alignItems="center" height="100%">
                     <Typography pt={1} variant="body2">
-                        {fullName}
+                        {drawer.name}
                     </Typography>
                 </Stack>
-            </Button>
-        </Tooltip>
+            </Stack>
+        </Button>
     );
 };
 
-export const UnassignedDrawerAvatar = () => {
-    const { drawer } = useOrderDashboardContext();
-    return <DrawerAvatar drawer={drawer.unassigned} />;
-};
-
-export const DrawerAvatarSkeleton = () => {
+export const DrawerCardBaseSkeleton = () => {
     return (
         <Button variant="contained">
             <Stack direction="column" sx={{ height: '100%', width: 'min-content' }} alignItems="center">

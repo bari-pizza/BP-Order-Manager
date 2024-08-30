@@ -111,6 +111,7 @@ export const useOrdersDrawersTickets = () => {
             const drawer = drawerRef.current;
             const card = originalTicket.closest('.MuiPaper-root') as HTMLDivElement;
             card.classList.add('ticket-animating');
+            card.classList.remove('toast-error'); // remove any previous errors
             // make a copy so that the animation can finish even if the original ticket is removed
             const ticket = originalTicket.cloneNode() as SVGSVGElement;
             const pizzaImg = originalTicket.nextSibling?.cloneNode() as HTMLImageElement;
