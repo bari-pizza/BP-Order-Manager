@@ -27,7 +27,7 @@ export const ProtectedRoute = ({
 
     const allProtections = { ...defaultProtections, ...protections };
 
-    if (loading) {
+    if (loading || (session?.user && !profile)) {
         return <>{fallback}</>;
     }
 

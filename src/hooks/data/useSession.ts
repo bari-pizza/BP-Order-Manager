@@ -12,6 +12,8 @@ export interface SupashipUserInfo {
 // for the future
 // https://dev.to/ankitjey/the-magic-of-react-query-and-supabase-1pom
 
+// TODO: would be better if we could use queryClient for this
+
 export const useSession = (): SupashipUserInfo => {
     const [userInfo, setUserInfo] = useState<SupashipUserInfo>({
         profile: null,
@@ -22,7 +24,7 @@ export const useSession = (): SupashipUserInfo => {
 
     useEffect(() => {
         supaClient.auth.getSession().then(({ data: { session } }) => {
-            setUserInfo((userInfo) => ({ ...userInfo, session, loading: false }));
+            setUserInfo((userInfo) => ({ ...userInfo, session, loading: true }));
             supaClient.auth.onAuthStateChange((_event, session) => {
                 setUserInfo({ session, profile: null, loading: false });
             });
@@ -33,7 +35,7 @@ export const useSession = (): SupashipUserInfo => {
         async function listenToUserProfileChanges(userId: string) {
             const { data } = await supaClient.from('Profile').select('*').filter('id', 'eq', userId);
             if (data?.[0]) {
-                setUserInfo({ ...userInfo, profile: data?.[0] });
+                setUserInfo({ ...userInfo, profile: data?.[0], loading: false });
             }
             return supaClient
                 .channel(`public:Profile`)
@@ -46,7 +48,7 @@ export const useSession = (): SupashipUserInfo => {
                         filter: `id=eq.${userId}`,
                     },
                     (payload) => {
-                        setUserInfo({ ...userInfo, profile: payload.new as Profile });
+                        setUserInfo({ ...userInfo, profile: payload.new as Profile, loading: false });
                     },
                 )
                 .subscribe();
