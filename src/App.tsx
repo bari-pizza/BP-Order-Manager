@@ -25,6 +25,7 @@ import { BusinessDayContext } from './context/BusinessDayContext.tsx';
 import { AdminDashboard, AdminDashboardSkeleton } from './components/Admin/AdminDashboard.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ManagerDashboard, ManagerDashboardSkeleton } from './components/Manager/ManagerDashboard.tsx';
 
 // TODO: add admin page - protected - only by admins
 
@@ -64,9 +65,20 @@ const router = createBrowserRouter([
                 element: (
                     <ProtectedRoute
                         fallback={<AdminDashboardSkeleton />}
-                        // protections={{ isAdmin: true }}
+                        protections={{ isAdmin: true }}
                         redirect="/denied">
                         <AdminDashboard />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: '/manager',
+                element: (
+                    <ProtectedRoute
+                        fallback={<ManagerDashboardSkeleton />}
+                        protections={{ isManager: true }}
+                        redirect="/denied">
+                        <ManagerDashboard />
                     </ProtectedRoute>
                 ),
             },

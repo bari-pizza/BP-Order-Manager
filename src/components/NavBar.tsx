@@ -11,8 +11,9 @@ import {
 import {
     Search,
     Home as HomeIcon,
+    Key as AdminIcon,
     LocalPizza as LocalPizzaIcon,
-    AdminPanelSettings as AdminIcon,
+    ManageAccounts as ManagerIcon,
 } from '@mui/icons-material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { CalendarIcon } from '@mui/x-date-pickers';
@@ -64,6 +65,7 @@ export function NavBar() {
         },
         { path: '/search', icon: <Search {...iconProps} />, text: 'Search' },
         { path: '/admin', icon: <AdminIcon {...iconProps} />, text: 'Admin' },
+        { path: '/manager', icon: <ManagerIcon {...iconProps} />, text: 'Manager' },
         { path: '/orders', icon: <LocalPizzaIcon {...iconProps} />, text: 'Orders' },
         userListItem,
     ];

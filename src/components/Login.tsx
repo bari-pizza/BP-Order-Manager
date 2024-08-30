@@ -32,3 +32,5 @@ export function Login({ authMode = 'sign_in' }: LoginProps) {
 
     return <SmartNavigate keepSearchParams to="/" />;
 }
+
+// TODO: make this pretter

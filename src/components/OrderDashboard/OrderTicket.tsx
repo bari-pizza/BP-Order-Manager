@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box } from '@mui/material';
+import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box, BoxProps } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order } from '../../typesAndValidators';
@@ -10,9 +10,38 @@ import {
     TwoWheeler as DeliveryIcon,
     Restaurant as PickupIcon,
 } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { useBusinessDayContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import pizzaSrc from '../../assets/pizza slice.png';
+
+interface ExpandMoreProps extends BoxProps {
+    expand: boolean;
+}
+
+const ExpandMore = styled((props: ExpandMoreProps) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { expand, ...other } = props;
+    return <Box {...other} />;
+})(({ theme }) => ({
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+        duration: theme.transitions.duration.shortest,
+    }),
+    variants: [
+        {
+            props: ({ expand }) => !expand,
+            style: {
+                transform: 'rotate(0deg)',
+            },
+        },
+        {
+            props: ({ expand }) => !!expand,
+            style: {
+                transform: 'rotate(180deg)',
+            },
+        },
+    ],
+}));
 
 interface OrderTicketProps {
     order: Order;
@@ -70,7 +99,7 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
     const originLogo = origins.find((origin) => origin.name === order.origin)?.icon || '';
 
     return (
-        <Card variant="outlined" sx={cardSX}>
+        <Card variant="elevation" sx={cardSX} raised>
             <CardActionArea onClick={handleSelect}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
@@ -121,7 +150,9 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                             )}
                             {order.order_type === 'pickup' ? <PickupIcon /> : <DeliveryIcon />}
                         </Stack>
-                        <ExpandMoreIcon />
+                        <ExpandMore expand={!collapsed}>
+                            <ExpandMoreIcon />
+                        </ExpandMore>
                     </Stack>
                 </Stack>
             </CardActionArea>
