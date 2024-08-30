@@ -1,39 +1,46 @@
-import {
-    Button,
-    Card,
-    // CardHeader,
-    CardContent,
-    Typography,
-    // CardActions,
-    CardActionArea,
-    Skeleton,
-    Stack,
-    Checkbox,
-    Collapse,
-    IconButtonProps,
-    styled,
-    IconButton,
-} from '@mui/material';
+import { useRef } from 'react';
+import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box, BoxProps } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
-import { Order } from '../../supabaseQueries';
+import { Order } from '../../typesAndValidators';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import {
+    ExpandMore as ExpandMoreIcon,
+    OpenInNew as OpenInNewIcon,
+    TwoWheeler as DeliveryIcon,
+    Restaurant as PickupIcon,
+} from '@mui/icons-material';
+import { styled, useTheme } from '@mui/material/styles';
+import { useBusinessDayContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
+import pizzaSrc from '../../assets/pizza slice.png';
 
-interface ExpandMoreProps extends IconButtonProps {
+interface ExpandMoreProps extends BoxProps {
     expand: boolean;
 }
 
 const ExpandMore = styled((props: ExpandMoreProps) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { expand, ...other } = props;
-    return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+    return <Box {...other} />;
+})(({ theme }) => ({
     marginLeft: 'auto',
     transition: theme.transitions.create('transform', {
         duration: theme.transitions.duration.shortest,
     }),
+    variants: [
+        {
+            props: ({ expand }) => !expand,
+            style: {
+                transform: 'rotate(0deg)',
+            },
+        },
+        {
+            props: ({ expand }) => !!expand,
+            style: {
+                transform: 'rotate(180deg)',
+            },
+        },
+    ],
 }));
 
 interface OrderTicketProps {
@@ -45,14 +52,35 @@ interface OrderTicketProps {
 }
 
 export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected, selected }: OrderTicketProps) => {
+    const { origins } = useBusinessDayContext();
     const { setOpen, orderEditor } = useOrderEditor({
         order,
         asDialog: true,
     });
+    const { ticket } = useOrderDashboardContext();
+    const theme = useTheme();
+    const ticketRef = useRef<SVGSVGElement>(null);
+
+    if (ticketRef.current) {
+        ticket.refs[order.order_id] = ticketRef;
+    }
 
     const cardSX = {
         width: 200,
         height: 'min-content',
+        transition: 'background-color 1s ease',
+        '&:not(.toast-error)': {
+            backgroundColor: selected ? theme.palette.primary.light : 'background.paper',
+        },
+        '&.toast-error': {
+            backgroundColor: theme.palette.error.light,
+            transition: 'background-color 1s ease',
+        },
+        '&.ticket-animating': {
+            '&.hide-when-animating': {
+                Visibility: 'hidden',
+            },
+        },
     };
 
     const handleSelect = () => {
@@ -68,52 +96,66 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
         setOpen(true);
     };
 
+    const originLogo = origins.find((origin) => origin.name === order.origin)?.icon || '';
+
     return (
-        <Card variant="outlined" sx={cardSX}>
+        <Card variant="elevation" sx={cardSX} raised>
             <CardActionArea onClick={handleSelect}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
-                        <Typography variant="h5">Order #{order.order_number}</Typography>
-                        <Checkbox
-                            className={selected ? '' : 'show-on-card-hover'}
-                            checked={selected}
-                            icon={<LocalPizzaOutlinedIcon />}
-                            checkedIcon={<LocalPizzaRoundedIcon />}
-                            disableRipple
-                        />
+                        <Typography variant="h5">{order.order_name ?? `Order #${order.order_number}`}</Typography>
+                        {selected ? (
+                            <>
+                                <LocalPizzaRoundedIcon color={'primary'} ref={ticketRef} />
+                                <img
+                                    src={pizzaSrc}
+                                    alt="pizza"
+                                    width="24px"
+                                    height="24px"
+                                    style={{ position: 'fixed', opacity: 0 }}
+                                />
+                            </>
+                        ) : (
+                            <LocalPizzaOutlinedIcon className="hide-when-animating" />
+                        )}
                     </Stack>
                 </Stack>
-                <Typography m={1} mt={0} variant="subtitle1">
-                    {order.order_type}
-                </Typography>
             </CardActionArea>
-            <Collapse in={!collapsed} timeout="auto">
-                <CardContent>
-                    <Typography variant="body1">{order.phone}</Typography>
-                    <Typography variant="body1">${(order.total_in_cents / 100).toFixed(2)}</Typography>
-                </CardContent>
-            </Collapse>
             <CardActionArea
                 onClick={handleCollapse}
-                sx={{ display: 'flex', justifyContent: 'space-between', p: 1 }}
+                sx={{ display: 'flex', justifyContent: 'space-between' }}
                 disableRipple>
-                <Button variant="contained" onClick={handleEditClick} className="show-on-card-hover">
-                    Edit
-                </Button>
-                <ExpandMore expand={!collapsed} aria-expanded={!collapsed} aria-label="show more" disableRipple>
-                    <ExpandMoreIcon />
-                </ExpandMore>
+                <Stack direction="column" width="100%">
+                    <Collapse in={!collapsed} timeout="auto">
+                        <Stack direction="row" justifyContent="space-between" pl={1} pr={1}>
+                            <Stack direction="column">
+                                <Typography variant="body1">{order.phone}</Typography>
+                                <Typography variant="body1">${(order.total_in_cents / 100).toFixed(2)}</Typography>
+                            </Stack>
+                            <Box component="span" sx={{ cursor: 'pointer' }} onClick={handleEditClick}>
+                                <OpenInNewIcon />
+                            </Box>
+                        </Stack>
+                    </Collapse>
+                    <Stack direction="row" justifyContent="space-between" m={1} mt={0} alignItems="center">
+                        <Stack direction="row" alignItems="center" gap={1}>
+                            {originLogo && (
+                                <img
+                                    src={originLogo}
+                                    alt={order.origin}
+                                    width="24px"
+                                    height="24px"
+                                    style={{ borderRadius: '50%' }}
+                                />
+                            )}
+                            {order.order_type === 'pickup' ? <PickupIcon /> : <DeliveryIcon />}
+                        </Stack>
+                        <ExpandMore expand={!collapsed}>
+                            <ExpandMoreIcon />
+                        </ExpandMore>
+                    </Stack>
+                </Stack>
             </CardActionArea>
-            {/* <CardActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button onClick={() => setOpen(true)}>Edit</Button>
-                <ExpandMore
-                    expand={!collapsed}
-                    onClick={handleCollapse}
-                    aria-expanded={!collapsed}
-                    aria-label="show more">
-                    <ExpandMoreIcon />
-                </ExpandMore>
-            </CardActions> */}
             {orderEditor}
         </Card>
     );

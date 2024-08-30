@@ -1,18 +1,14 @@
 import { supaClient } from './supaClient';
-import { Tables } from './supabase';
+import { Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
 import { z } from 'zod';
-
-export type Profile = Tables<'profiles'>;
-export type Drawer = Tables<'drawers'>;
-export type DrawerType = Tables<'drawers'>['drawer_type'];
-export type DriverDrawer = Drawer & { driver: Profile };
-export type Order = Tables<'orders'>;
-export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
+import doorDashLogo from './assets/doorDash logo.png';
+import bariPizzaLogo from './assets/BP logo.png';
+import pizzamicoLogo from './assets/Pizzamico logo.ico';
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
 export const getAllDrawers = async () => {
-    const { data, error } = await supaClient.from('drawers').select('*').neq('drawer_type', 'driver');
+    const { data, error } = await supaClient.from('Drawer').select('*').neq('drawer_type', 'driver');
 
     if (error) {
         console.error(error);
@@ -30,7 +26,7 @@ const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): DriverDraw
 };
 
 export const getAllDrivers = async () => {
-    const { data, error } = await supaClient.from('drawers.drivers').select('drawer:drawers(*), driver:profiles(*)');
+    const { data, error } = await supaClient.from('Driver').select('drawer:Drawer(*), driver:Profile(*)');
 
     if (error) {
         console.error(error);
@@ -38,6 +34,26 @@ export const getAllDrivers = async () => {
     }
 
     return data.map((d) => convertToDriverDrawer(d as unknown as DirtyDriverDrawer));
+};
+
+export const getAllOrigins = async () => {
+    const { data, error } = await supaClient.from('OrderOrigin').select('*').order('name', { ascending: true });
+    if (error) {
+        console.error(error);
+        return [] as OrderOrigin[];
+    }
+    // TODO: remove this hack once the logos are added to supabase
+    const icons: Record<string, string> = {
+        DoorDash: doorDashLogo,
+        'Bari Pizza': bariPizzaLogo,
+        Pizzamico: pizzamicoLogo,
+    };
+
+    data.forEach((origin: OrderOrigin) => {
+        origin.icon = origin.icon || icons[origin.name] || '';
+    });
+
+    return data as unknown as OrderOrigin[];
 };
 
 interface GetAllDaysOrdersProps {
@@ -53,14 +69,17 @@ const supabaseDate = z.object({
 });
 
 export const getAllDaysOrders = async ({ year, month, day }: GetAllDaysOrdersProps) => {
-    console.log(`getting orders for ${month}/${day}/${year}`);
     try {
         supabaseDate.parse({ year, month, day });
     } catch (error) {
         console.error(error);
         return [] as Order[];
     }
-    const { data, error } = await supaClient.from('orders').select('*').eq('business_date', `${year}-${month}-${day}`);
+    const { data, error } = await supaClient
+        .from('Order')
+        .select('*')
+        .eq('business_date', `${year}-${month}-${day}`)
+        .order('order_number', { ascending: true });
 
     if (error) {
         console.error(error);
@@ -75,6 +94,7 @@ interface DummyQueryFnProps<T> {
     data?: T[];
 }
 
+// return preset data with a set timeout
 export const dummyQueryFn = async <T>({ timeout = 1000, data = [] }: DummyQueryFnProps<T> = {}): Promise<T[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -83,6 +103,7 @@ export const dummyQueryFn = async <T>({ timeout = 1000, data = [] }: DummyQueryF
     });
 };
 
+// run a function with a set timeout
 export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() => Promise<T>) => {
     return async () => {
         const timeoutPromise = new Promise<void>((resolve) => {
@@ -95,4 +116,58 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
 
         return result[0];
     };
+};
+
+export const createNewOrder = async (newOrder: NewOrder) => {
+    console.log({ newOrder });
+    const { data, error } = await supaClient.from('Order').insert([newOrder]).select();
+    if (error) {
+        console.error(error);
+        throw error;
+    }
+
+    if (!data) {
+        return null;
+    }
+
+    return data[0] as unknown as Order;
+};
+
+export const updateOrder = async (order: Order) => {
+    const { data, error } = await supaClient.from('Order').update(order).eq('order_id', order.order_id).select();
+    if (error) {
+        console.error(error);
+        throw error;
+    }
+
+    if (!data) {
+        return null;
+    }
+
+    return data[0] as unknown as Order;
+};
+
+export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
+    const { data, error } = await supaClient.rpc('add_orders_to_drawer', {
+        p_drawer_id: drawerID,
+        p_order_ids: orderIDs,
+    });
+    if (error) {
+        console.error(error);
+        throw error;
+    } else {
+        return data;
+    }
+};
+
+export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
+    const { data, error } = await supaClient.rpc('remove_orders_from_drawer', {
+        p_drawer_id: drawerID,
+        p_order_ids: orderIDs,
+    });
+    if (error) {
+        console.error(error);
+    } else {
+        return data;
+    }
 };

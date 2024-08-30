@@ -1,13 +1,39 @@
-import { Stack, Typography } from '@mui/material';
-import { getDrawerFullName } from '../../utils';
-import { useOrderDashboardContext } from '../../dataHooks/useContextData';
+import { Button, Stack } from '@mui/material';
+import { useOrderDashboardContext } from '../../hooks/data/useContextData';
+import { UnfoldMore as UnfoldMoreIcon, UnfoldLess as UnfoldLessIcon } from '@mui/icons-material';
 
 export const QuickInfoArea = () => {
-    const { openDrawer: drawer } = useOrderDashboardContext();
+    const {
+        // drawer,
+        ticket,
+    } = useOrderDashboardContext();
 
-    const body = drawer && <Typography>{getDrawerFullName(drawer)} info goes here!</Typography>;
+    const body = (
+        <>
+            {ticket.all.count > 0 && (
+                <Stack direction="row" spacing={1} justifyContent="space-evenly">
+                    <Button
+                        variant="contained"
+                        onClick={ticket.all.collapse}
+                        startIcon={ticket.all.areCollapsed ? <UnfoldMoreIcon /> : <UnfoldLessIcon />}>
+                        {ticket.all.areCollapsed ? 'Expand' : 'Collapse'} All
+                    </Button>
+                    <Button variant="contained" onClick={ticket.all.select}>
+                        {ticket.all.areSelected ? 'Unselect' : 'Select'} All
+                    </Button>
+                </Stack>
+            )}
+        </>
+    );
+    // TODO: make this prettier
     return (
-        <Stack height="150px" flex="none">
+        <Stack
+            height="150px"
+            minHeight="150px"
+            direction="column"
+            justifyContent="center"
+            alignItems="space-evenly"
+            spacing={1}>
             {body}
         </Stack>
     );

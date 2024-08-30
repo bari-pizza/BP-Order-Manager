@@ -9,7 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      drawers: {
+      Drawer: {
         Row: {
           created_at: string
           drawer_id: string
@@ -30,7 +30,7 @@ export type Database = {
         }
         Relationships: []
       }
-      "drawers.drivers": {
+      Driver: {
         Row: {
           created_at: string
           drawer_id: string
@@ -51,26 +51,29 @@ export type Database = {
             foreignKeyName: "drawers.drivers_driver_id_fkey"
             columns: ["driver_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "Profile"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "drawers.drivers_id_fkey"
             columns: ["drawer_id"]
             isOneToOne: true
-            referencedRelation: "drawers"
+            referencedRelation: "Drawer"
             referencedColumns: ["drawer_id"]
           },
         ]
       }
-      orders: {
+      Order: {
         Row: {
           business_date: string
           created_at: string
           drawer_id: string | null
+          is_prepaid: boolean
           order_id: string
+          order_name: string | null
           order_number: number | null
           order_type: Database["public"]["Enums"]["order_type"]
+          origin: Database["public"]["Enums"]["order_origin"]
           phone: string | null
           total_in_cents: number
         }
@@ -78,9 +81,12 @@ export type Database = {
           business_date: string
           created_at?: string
           drawer_id?: string | null
+          is_prepaid?: boolean
           order_id?: string
+          order_name?: string | null
           order_number?: number | null
           order_type?: Database["public"]["Enums"]["order_type"]
+          origin?: Database["public"]["Enums"]["order_origin"]
           phone?: string | null
           total_in_cents?: number
         }
@@ -88,27 +94,110 @@ export type Database = {
           business_date?: string
           created_at?: string
           drawer_id?: string | null
+          is_prepaid?: boolean
           order_id?: string
+          order_name?: string | null
           order_number?: number | null
           order_type?: Database["public"]["Enums"]["order_type"]
+          origin?: Database["public"]["Enums"]["order_origin"]
           phone?: string | null
           total_in_cents?: number
         }
         Relationships: [
           {
+            foreignKeyName: "Order_origin_fkey"
+            columns: ["origin"]
+            isOneToOne: false
+            referencedRelation: "OrderOrigin"
+            referencedColumns: ["name"]
+          },
+          {
             foreignKeyName: "orders_drawer_id_fkey"
             columns: ["drawer_id"]
             isOneToOne: false
-            referencedRelation: "drawers"
+            referencedRelation: "Drawer"
             referencedColumns: ["drawer_id"]
           },
         ]
       }
-      profiles: {
+      OrderOrigin: {
+        Row: {
+          can_deliver: boolean
+          can_tip: boolean
+          default_is_prepaid: boolean
+          has_order_number: boolean
+          icon: string | null
+          is_prepaid_toggleable: boolean
+          is_third_party: boolean
+          name: Database["public"]["Enums"]["order_origin"]
+        }
+        Insert: {
+          can_deliver?: boolean
+          can_tip?: boolean
+          default_is_prepaid?: boolean
+          has_order_number?: boolean
+          icon?: string | null
+          is_prepaid_toggleable?: boolean
+          is_third_party?: boolean
+          name: Database["public"]["Enums"]["order_origin"]
+        }
+        Update: {
+          can_deliver?: boolean
+          can_tip?: boolean
+          default_is_prepaid?: boolean
+          has_order_number?: boolean
+          icon?: string | null
+          is_prepaid_toggleable?: boolean
+          is_third_party?: boolean
+          name?: Database["public"]["Enums"]["order_origin"]
+        }
+        Relationships: []
+      }
+      Payment: {
+        Row: {
+          amount_in_cents: number
+          created_at: string
+          order_id: string
+          payment_id: string
+          payment_type: Database["public"]["Enums"]["payment_type"]
+          special_note: string
+          tip_in_cents: number
+        }
+        Insert: {
+          amount_in_cents?: number
+          created_at?: string
+          order_id: string
+          payment_id?: string
+          payment_type: Database["public"]["Enums"]["payment_type"]
+          special_note?: string
+          tip_in_cents?: number
+        }
+        Update: {
+          amount_in_cents?: number
+          created_at?: string
+          order_id?: string
+          payment_id?: string
+          payment_type?: Database["public"]["Enums"]["payment_type"]
+          special_note?: string
+          tip_in_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "Order"
+            referencedColumns: ["order_id"]
+          },
+        ]
+      }
+      Profile: {
         Row: {
           email: string | null
           first_name: string | null
           id: string
+          is_admin: boolean
+          is_manager: boolean
           last_name: string | null
           phone: string | null
         }
@@ -116,6 +205,8 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id: string
+          is_admin?: boolean
+          is_manager?: boolean
           last_name?: string | null
           phone?: string | null
         }
@@ -123,6 +214,8 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          is_admin?: boolean
+          is_manager?: boolean
           last_name?: string | null
           phone?: string | null
         }
@@ -141,13 +234,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_orders_to_drawer: {
+        Args: {
+          p_order_ids: Json
+          p_drawer_id: string
+        }
+        Returns: Json
+      }
+      remove_orders_from_drawer: {
+        Args: {
+          p_order_ids: Json
+          p_drawer_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      drawer_type: "driver" | "register" | "third_party"
+      drawer_type: "driver" | "register" | "third_party" | "unassigned"
+      order_origin: "Bari Pizza" | "DoorDash" | "Pizzamico"
       order_type: "delivery" | "pickup"
       payment_type: "cash" | "card" | "third_party"
-      third_party: "DoorDash" | "Grubhub" | "Pizzamico" | "UberEats"
     }
     CompositeTypes: {
       [_ in never]: never

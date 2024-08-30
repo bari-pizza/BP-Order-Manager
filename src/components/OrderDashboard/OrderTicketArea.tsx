@@ -1,35 +1,23 @@
 import { Grid, Stack } from '@mui/material';
-import { Order } from '../../../supabaseQueries';
-import { OrderTicket, OrderTicketSkeleton } from '../OrderTicket';
+import { OrderTicket, OrderTicketSkeleton } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
+import { useOrderDashboardContext } from './../../hooks/data/useContextData';
 
-type OrderTicketAreaProps = {
-    orders: Order[];
-    collapsedTickets: string[];
-    toggleCollapsedTicket: (order: Order) => void;
-    selectedTickets: string[];
-    toggleSelectedTicket: (order: Order) => void;
-};
-
-export const OrderTicketArea = ({
-    orders,
-    collapsedTickets,
-    toggleCollapsedTicket,
-    selectedTickets,
-    toggleSelectedTicket,
-}: OrderTicketAreaProps) => {
+export const OrderTicketArea = () => {
+    const { orders, ticket } = useOrderDashboardContext();
+    const drawerOrders = orders.forCurrentDrawer;
     return (
         <Stack className="hover-scroll" p={1} pb="50px">
             <Grid container rowGap={3} columnGap={1} justifyContent="space-between">
-                {orders?.length ? (
-                    orders?.map((order) => (
+                {drawerOrders?.length ? (
+                    drawerOrders?.map((order) => (
                         <OrderTicket
-                            key={order.order_id}
                             order={order}
-                            toggleCollapsed={toggleCollapsedTicket}
-                            collapsed={collapsedTickets.includes(order.order_id)}
-                            toggleSelected={toggleSelectedTicket}
-                            selected={selectedTickets.includes(order.order_id)}
+                            key={order.order_id}
+                            toggleCollapsed={() => ticket.collapse(order)}
+                            collapsed={ticket.isCollapsed(order)}
+                            toggleSelected={() => ticket.select(order)}
+                            selected={ticket.isSelected(order)}
                         />
                     ))
                 ) : (

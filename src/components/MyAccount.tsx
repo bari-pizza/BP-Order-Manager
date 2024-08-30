@@ -1,6 +1,6 @@
 import { Stack, Button } from '@mui/material';
 import { supaClient } from '../supaClient';
-import { useUserContext } from '../dataHooks/useContextData';
+import { useUserContext } from '../hooks/data/useContextData';
 import { SmartNavigate } from './SmartNavigate';
 
 export const MyAccount = () => {

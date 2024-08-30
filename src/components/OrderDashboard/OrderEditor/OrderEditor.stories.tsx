@@ -5,6 +5,7 @@ import { dummyOrders } from '../../../dummyData';
 
 const meta = {
     component: OrderEditor,
+    parameters: { layout: 'centered' },
 } satisfies Meta<typeof OrderEditor>;
 
 export default meta;

@@ -1,5 +1,13 @@
 import { Avatar, Skeleton } from '@mui/material';
-import { useUserContext } from '../dataHooks/useContextData';
+import { useUserContext } from '../hooks/data/useContextData';
+
+const avatarSX = {
+    height: 35,
+    width: 35,
+    bgcolor: 'primary.main',
+    border: '3px solid',
+    borderColor: 'primary.main',
+};
 
 export const UserAvatar = () => {
     const { session, profile } = useUserContext();
@@ -10,11 +18,15 @@ export const UserAvatar = () => {
             .split(' ')
             .map((name) => name[0])
             .join('');
-        userAvatar = <Avatar sx={{ height: 30, width: 30 }}>{initials}</Avatar>;
+        userAvatar = (
+            <Avatar sx={avatarSX} src="https://mui.com/static/images/avatar/2.jpg">
+                {initials}
+            </Avatar>
+        );
     }
 
     if (!session) {
-        userAvatar = <Avatar sx={{ height: 30, width: 30 }} />;
+        userAvatar = <Avatar sx={avatarSX} />;
     }
 
     return userAvatar;

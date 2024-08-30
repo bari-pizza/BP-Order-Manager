@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Order } from '../../../supabaseQueries';
+import { Order } from '../../../typesAndValidators';
 import { OrderEditor } from './OrderEditor';
 import { Button } from '@mui/material';
 
@@ -7,6 +7,8 @@ interface UseOrderEditorProps {
     order?: Order;
     asDialog?: boolean;
 }
+
+// TODO: get rid of useOrderEditor
 
 export const useOrderEditor = ({ order, asDialog }: UseOrderEditorProps = {}) => {
     const [open, setOpen] = useState(false);

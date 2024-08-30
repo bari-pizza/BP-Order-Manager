@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { SupashipUserInfo } from '../dataHooks/useSession';
+import { SupashipUserInfo } from '../hooks/data/useSession';
 
 export const UserContext = createContext<SupashipUserInfo>({
     session: null,

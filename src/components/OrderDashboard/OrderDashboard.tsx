@@ -1,41 +1,56 @@
-import { useState, Suspense } from 'react';
-import { dummyQueryFn, type Drawer, type DriverDrawer } from '../../supabaseQueries';
+import { Suspense } from 'react';
 import { Button, Divider, Stack } from '@mui/material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
 import { QuickInfoArea } from './QuickInfoArea';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
 import { SideBar, SideBarSkeleton } from '../SideBar';
-import { useOrderTicketArea } from './OrderTicketArea/useOrderTicketArea';
-import { useBusinessDate } from '../../dataHooks/useBusinessDate';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { OrderTicketAreaSkeleton } from './OrderTicketArea/OrderTicketArea';
-import { dummyOrders } from '../../dummyData';
+import { useOrdersDrawersTickets } from '../../hooks/interactions/useOrdersDrawersTickets';
+import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 
 export const OrderDashboard = () => {
-    const [businessDate] = useBusinessDate();
-    // const MDY = dayjsToMDY(businessDate);
-    const { data: orders } = useSuspenseQuery({
-        queryKey: ['orders', businessDate.format('MM/DD/YYYY')],
-        // queryFn: () => getAllDaysOrders(MDY),
-        queryFn: () =>
-            dummyQueryFn({
-                data: dummyOrders.existing.slice(0, 10),
-                timeout: 10,
-            }),
-        refetchOnWindowFocus: false,
-        staleTime: Infinity,
-    });
-    const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer | null>(null);
     const { orderEditor, addOrderButton } = useOrderEditor();
-    const { orderTicketArea, toggleTicketsButton } = useOrderTicketArea({ orders });
+    const { ticket, drawer, orders } = useOrdersDrawersTickets();
 
-    // TODO: create a useArrayToggle hook and use it for the order ticket area's collapsedTickets and selectedTickets
-    // TODO: bring collapsedTickets and selectedTickets OrderDashboardContext instead
-    // TODO: that should allow the user to add tickets to a drawer by clicking on it
+    // TODO: would be cool to have the number of selectedTickets follow the mouse while moving on the page
+    /*
+    import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
+
+const MouseFollower = styled('div')({
+  position: 'absolute',
+  pointerEvents: 'none',
+  fontSize: 24,
+  fontWeight: 'bold',
+});
+
+const MouseFollowerComponent = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({ x: event.clientX, y: event.clientY });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  return (
+    <MouseFollower style={{ top: mousePosition.y, left: mousePosition.x }}>
+      123
+    </MouseFollower>
+  );
+};
+
+export default MouseFollowerComponent;
+    */
 
     return (
-        <OrderDashboardContext.Provider value={{ openDrawer, setOpenDrawer }}>
+        <OrderDashboardContext.Provider value={{ ticket, drawer, orders }}>
             <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>
                 <Suspense fallback={<DrawerHeaderSkeleton />}>
                     <DrawerHeader />
@@ -43,14 +58,15 @@ export const OrderDashboard = () => {
                 <Divider />
                 <QuickInfoArea />
                 <Divider />
-                <Suspense fallback={<OrderTicketAreaSkeleton />}>{orderTicketArea}</Suspense>
+                <Suspense fallback={<OrderTicketAreaSkeleton />}>
+                    <OrderTicketArea />
+                </Suspense>
             </Stack>
             <SideBar width="300px">
                 <Stack alignContent="center" justifyContent="space-between" direction="column" height="100%">
                     <Stack>{orderEditor}</Stack>
                     <Stack direction="column" m={2} gap={2}>
                         {addOrderButton}
-                        {toggleTicketsButton}
                     </Stack>
                 </Stack>
             </SideBar>

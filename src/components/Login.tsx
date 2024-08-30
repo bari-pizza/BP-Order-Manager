@@ -2,7 +2,7 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supaClient } from '../supaClient';
 import { SmartNavigate } from './SmartNavigate';
-import { useUserContext } from '../dataHooks/useContextData';
+import { useUserContext } from '../hooks/data/useContextData';
 
 type LoginProps = {
     authMode: 'sign_in' | 'sign_up';
@@ -32,3 +32,5 @@ export function Login({ authMode = 'sign_in' }: LoginProps) {
 
     return <SmartNavigate keepSearchParams to="/" />;
 }
+
+// TODO: make this pretter
