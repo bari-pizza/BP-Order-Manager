@@ -13,3 +13,5 @@ export const LayoutContext = createContext<LayoutContextProps>({
     sideBarSkeletonRef: null,
     setSideBarSkeletonWidth: () => {},
 });
+
+// for dealing with Sidebar. Only called by Sidebar.tsx

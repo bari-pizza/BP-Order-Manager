@@ -1,4 +1,5 @@
-import businessDayContextDecorators from './businessDayContextDecorators';
+import React from 'react';
+import bariPizzaContextDecorators from './bariPizzaContextDecorators';
 
 function createContextDecorator<T>(context: React.Context<T>, value: T) {
     const withContextDecorator = (storyFn: () => React.ReactNode) => {
@@ -7,4 +8,4 @@ function createContextDecorator<T>(context: React.Context<T>, value: T) {
     return withContextDecorator;
 }
 
-export { businessDayContextDecorators, createContextDecorator };
+export { bariPizzaContextDecorators, createContextDecorator };

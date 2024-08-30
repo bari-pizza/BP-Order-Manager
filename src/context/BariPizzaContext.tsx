@@ -1,14 +1,16 @@
 import { createContext } from 'react';
 import type { Drawer, DriverDrawer, OrderOrigin } from '../typesAndValidators';
 
-interface BusinessDayContextProps {
+interface BariPizzaContextProps {
     drawers: Drawer[];
     drivers: DriverDrawer[];
     origins: OrderOrigin[];
 }
 
-export const BusinessDayContext = createContext<BusinessDayContextProps>({
+export const BariPizzaContext = createContext<BariPizzaContextProps>({
     drawers: [],
     drivers: [],
     origins: [],
 });
+
+// For all drawers, drivers, and origins

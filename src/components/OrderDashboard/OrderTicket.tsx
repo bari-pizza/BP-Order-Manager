@@ -11,7 +11,7 @@ import {
     Restaurant as PickupIcon,
 } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
-import { useBusinessDayContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
+import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import pizzaSrc from '../../../public/pizza slice.png';
 
 interface ExpandMoreProps extends BoxProps {
@@ -52,7 +52,7 @@ interface OrderTicketProps {
 }
 
 export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected, selected }: OrderTicketProps) => {
-    const { origins } = useBusinessDayContext();
+    const { origins } = useBariPizzaContext();
     const { setOpen, orderEditor } = useOrderEditor({
         order,
         asDialog: true,

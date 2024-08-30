@@ -2,6 +2,8 @@ import { Stack, StackOwnProps } from '@mui/material';
 import { DriverDrawer } from '../../typesAndValidators';
 import { DrawerCardBase } from '../Base/DrawerCardBase';
 
+// TODO: create a new context for todays drawers and drivers
+
 /* TODO: create BusinessDay.Drivers table
 
    TODO: Add a way to choose drivers for the day
@@ -89,7 +91,6 @@ export const DriversTab = () => {
                         key={driver.drawer_id}
                         drawer={driver}
                         handleClick={() => handleDriverClick(driver)}
-                        // sx={{ button: { width: '150px' } }}
                     />
                 ))}
             </Stack>

@@ -4,7 +4,7 @@ import { reactRouterParameters, withRouter } from 'storybook-addon-remix-react-r
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { businessDayContextDecorators } from './contextDecorators';
+import { bariPizzaContextDecorators } from './contextDecorators';
 
 const withLocalizationProvider = (storyFn: () => React.ReactNode) => {
     return <LocalizationProvider dateAdapter={AdapterDayjs}>{storyFn()}</LocalizationProvider>;
@@ -26,7 +26,7 @@ const preview: Preview = {
         },
         reactRouter: reactRouterParameters({ location: { pathParams: {}, searchParams: {} } }),
     },
-    decorators: [withRouter, withQueryClient, businessDayContextDecorators.default, withLocalizationProvider],
+    decorators: [withRouter, withQueryClient, bariPizzaContextDecorators.default, withLocalizationProvider],
 };
 
 export default preview;

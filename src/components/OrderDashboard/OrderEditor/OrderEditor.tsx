@@ -16,7 +16,7 @@ import { Order, validators } from '../../../typesAndValidators';
 import { useForm, Controller, SubmitHandler, SubmitErrorHandler, FieldErrors } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
-import { useBusinessDayContext } from '../../../hooks/data/useContextData';
+import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { useEffect } from 'react';
 
 interface OrderEditorProps {
@@ -32,7 +32,7 @@ type FormValues = Order & {
 
 export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
-    const { origins } = useBusinessDayContext();
+    const { origins } = useBariPizzaContext();
     const {
         handleSubmit,
         register,

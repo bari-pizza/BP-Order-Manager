@@ -85,3 +85,5 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
         byDrawerID: () => [],
     },
 });
+
+// For current business day's orders, drawers, tickets, and their interactions

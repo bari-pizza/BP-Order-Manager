@@ -1,6 +1,8 @@
 import { toast, UpdateOptions } from 'react-toastify';
 import { Drawer, DriverDrawer } from '../typesAndValidators';
 
+// TODO: add a way to undo changes
+
 interface ToastPromiseProps {
     pending?: string | UpdateOptions<unknown>;
     success?: string | UpdateOptions<unknown>;

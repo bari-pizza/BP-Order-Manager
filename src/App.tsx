@@ -21,7 +21,7 @@ import { MyAccount } from './components/MyAccount.tsx';
 import { Login } from './components/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
-import { BusinessDayContext } from './context/BusinessDayContext.tsx';
+import { BariPizzaContext } from './context/BariPizzaContext.tsx';
 import { AdminDashboard, AdminDashboardSkeleton } from './components/Admin/AdminDashboard.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -141,7 +141,7 @@ function Layout() {
         //     version="beta">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <ThemeProvider theme={theme}>
-                <BusinessDayContext.Provider value={{ drawers, drivers, origins }}>
+                <BariPizzaContext.Provider value={{ drawers, drivers, origins }}>
                     <LayoutContext.Provider
                         value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
@@ -195,7 +195,7 @@ function Layout() {
                             </Stack>
                         </UserContext.Provider>
                     </LayoutContext.Provider>
-                </BusinessDayContext.Provider>
+                </BariPizzaContext.Provider>
             </ThemeProvider>
         </LocalizationProvider>
         // </APIProvider>

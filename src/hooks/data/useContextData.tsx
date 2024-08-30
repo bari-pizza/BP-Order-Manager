@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { LayoutContext } from '../../context/LayoutContext';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { UserContext } from '../../context/UserContext';
-import { BusinessDayContext } from '../../context/BusinessDayContext';
+import { BariPizzaContext } from '../../context/BariPizzaContext';
 
 export const useUserContext = () => {
     return useContext(UserContext);
@@ -17,6 +17,6 @@ export const useOrderDashboardContext = () => {
     return useContext(OrderDashboardContext);
 };
 
-export const useBusinessDayContext = () => {
-    return useContext(BusinessDayContext);
+export const useBariPizzaContext = () => {
+    return useContext(BariPizzaContext);
 };
