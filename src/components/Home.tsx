@@ -1,6 +1,6 @@
 import { Player } from '@lottiefiles/react-lottie-player';
 import { Stack } from '@mui/material';
-import lottieSrc from '../assets/Pizza Shop.json';
+import lottieSrc from '../../public/Pizza Shop.json';
 
 export const Home = () => {
     return (

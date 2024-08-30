@@ -1,9 +1,9 @@
 import { supaClient } from './supaClient';
 import { Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
 import { z } from 'zod';
-import doorDashLogo from './assets/doorDash logo.png';
-import bariPizzaLogo from './assets/BP logo.png';
-import pizzamicoLogo from './assets/Pizzamico logo.ico';
+import doorDashLogo from '../public/DoorDash logo.png';
+import bariPizzaLogo from '../public/BP logo.png';
+import pizzamicoLogo from '../public/Pizzamico logo.ico';
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 

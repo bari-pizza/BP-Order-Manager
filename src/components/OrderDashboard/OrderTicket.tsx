@@ -12,7 +12,7 @@ import {
 } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useBusinessDayContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
-import pizzaSrc from '../../assets/pizza slice.png';
+import pizzaSrc from '../../../public/pizza slice.png';
 
 interface ExpandMoreProps extends BoxProps {
     expand: boolean;
