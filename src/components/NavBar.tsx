@@ -32,15 +32,7 @@ interface NavBarItem {
     text: string;
     onClick?: () => void;
 }
-
-// TODO: Add a way to choose drivers for the day
 // TODO: Handle order deletion
-
-/* TODO: create BusinessDay.Drivers table
-   TODO: business_day, driver_id, is_locked
-
-   TODO: add is_locked to Order and Payment tables
-*/
 
 const today = dayjs();
 

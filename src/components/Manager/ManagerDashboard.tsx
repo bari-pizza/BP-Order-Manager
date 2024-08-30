@@ -1,9 +1,9 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
+import { DriversTab } from './DriversTab';
 
-/*
-    TODO: About Today
+/*    TODO: About Today
         Sales
             Charts
             Reports
@@ -92,7 +92,7 @@ export const ManagerDashboard = () => {
                 Sales go here!
             </TabPanel>
             <TabPanel tabName="drivers" value={tabName}>
-                Drivers go here!
+                <DriversTab />
             </TabPanel>
             <TabPanel tabName="orders" value={tabName}>
                 Orders go here!
