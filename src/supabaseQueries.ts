@@ -1,11 +1,11 @@
 import { supaClient } from './supaClient';
 import { BusinessDayDriver, Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
 import { z } from 'zod';
-import doorDashLogo from '../public/DoorDash logo.png';
-import bariPizzaLogo from '../public/BP logo.png';
-import pizzamicoLogo from '../public/Pizzamico logo.ico';
 import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
+const bariPizzaLogo = new URL('./BP logo.png', import.meta.url).href;
+const doorDashLogo = new URL('./DoorDash logo.png', import.meta.url).href;
+const pizzamicoLogo = new URL('./Pizzamico logo.ico', import.meta.url).href;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -107,6 +107,40 @@ export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
     }
 
     return data as unknown as BusinessDayDriver[];
+};
+
+export const addDriverToBusinessDay = async ({
+    drawerID,
+    businessDate,
+}: {
+    drawerID: string;
+    businessDate: dayjs.Dayjs;
+}) => {
+    const { month, day, year } = dayjsToMDY(businessDate);
+    try {
+        supabaseDate.parse({ year, month, day });
+    } catch (error) {
+        console.error(error);
+        return [] as BusinessDayDriver[];
+    }
+    const business_date = `${year}-${month}-${day}`;
+    const { data, error } = await supaClient
+        .from('BusinessDayDriver')
+        .insert({
+            business_date,
+            drawer_id: drawerID,
+        })
+        .select();
+    if (error) {
+        console.error(error);
+        throw error;
+    }
+
+    if (!data) {
+        return null;
+    }
+
+    return data[0] as unknown as BusinessDayDriver;
 };
 
 interface DummyQueryFnProps<T> {

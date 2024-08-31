@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
 import { DriversTab } from './DriversTab';
 import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
-import { useOrdersDrawersTickets } from '../../hooks/interactions/useOrdersDrawersTickets';
+import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
 
@@ -49,7 +49,7 @@ type TabName = 'sales' | 'drivers' | 'orders' | 'settings';
 export const ManagerDashboard = () => {
     const { orders } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
-    const drivers = useDrivers();
+    const { drivers } = useDrivers();
     const [tabName, setTabName] = useState<TabName>('sales');
     const theme = useTheme();
 
@@ -85,11 +85,12 @@ export const ManagerDashboard = () => {
                     all: drivers.all,
                     todays: drivers.todays,
                     current: null,
-                    add: () => {}, // some supabase mutation
-                    remove: () => {}, // some supabase mutation
+                    add: drivers.add,
+                    remove: drivers.remove, // some supabase mutation
                     close: () => {}, // some supabase mutation
                     reOpen: () => {}, // some supabase mutation
                 },
+                // all these properties should eventually come from useDrivers
             }}>
             <Stack height="100vh" width="100%">
                 <Stack m={2}>

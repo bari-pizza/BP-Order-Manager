@@ -1,7 +1,8 @@
 import { Stack, StackOwnProps } from '@mui/material';
-import { DriverDrawer } from '../../typesAndValidators';
-import { DrawerCardBase } from '../Base/DrawerCardBase';
+import { DriverCard } from './DriverCard';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
+import { AddDriverCard } from './AddDriverCard';
+import { useDialogProps } from '../../hooks/ui/useDialogProps';
 
 /*
 
@@ -21,44 +22,18 @@ const stackProps: Partial<StackOwnProps> = {
     pb: 1,
 };
 
-const AddDriverCard = ({ handleClick }: { handleClick: () => void }) => {
-    const dummyDrawer: DriverDrawer = {
-        created_at: '2024-08-27T00:00:00.000Z',
-        drawer_id: '3',
-        drawer_type: 'driver',
-        name: 'Add Driver',
-        driver: {
-            id: '3',
-            email: 'vI8Pb@example.com',
-            first_name: 'Jane',
-            is_admin: false,
-            is_manager: false,
-            last_name: 'Doe',
-            phone: '555-555-5555',
-            avatar_src: null,
-        },
-    };
-
-    return <DrawerCardBase drawer={dummyDrawer} handleClick={handleClick} />;
-};
-
 export const DriversTab = () => {
-    const {
-        driver: { todays: todaysDrivers },
-    } = useManagerDashboardContext();
-    const handleDriverClick = (driver: DriverDrawer) => {
-        console.log('clicked driver', driver);
-    };
-    const handleAddDriverClick = () => {
-        console.log('clicked add driver');
-    };
+    const driverCardDialogProps = useDialogProps();
+    const addDriverCardDialogProps = useDialogProps();
+    const { driver } = useManagerDashboardContext();
+    const { todays: todaysDrivers } = driver;
 
     return (
         <Stack {...stackProps} justifyContent={'start'} gap={2} direction="row" width="100%">
             {todaysDrivers.map((driver) => (
-                <DrawerCardBase key={driver.drawer_id} drawer={driver} handleClick={() => handleDriverClick(driver)} />
+                <DriverCard key={driver.drawer_id} driver={driver} {...driverCardDialogProps} />
             ))}
-            <AddDriverCard handleClick={handleAddDriverClick} />
+            <AddDriverCard {...addDriverCardDialogProps} />
         </Stack>
     );
 };

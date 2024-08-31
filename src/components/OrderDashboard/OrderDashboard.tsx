@@ -5,12 +5,12 @@ import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
 import { QuickInfoArea } from './QuickInfoArea';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
 import { SideBar, SideBarSkeleton } from '../SideBar';
-import { useOrdersDrawersTickets } from '../../hooks/interactions/useOrdersDrawersTickets';
+import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
 
 export const OrderDashboard = () => {
-    const drivers = useDrivers();
+    const { drivers } = useDrivers();
     const { orderEditor, addOrderButton } = useOrderEditor();
     const { ticket, drawer, orders } = useOrdersDrawersTickets();
 

@@ -16,6 +16,8 @@ const withQueryClient = (storyFn: () => React.ReactNode) => {
     return <QueryClientProvider client={queryClient}>{storyFn()}</QueryClientProvider>;
 };
 
+// TODO: create a decorator to provide theme options
+
 const preview: Preview = {
     parameters: {
         controls: {
