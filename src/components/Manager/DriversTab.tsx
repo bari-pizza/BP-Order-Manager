@@ -6,7 +6,7 @@ import { useDialogProps } from '../../hooks/ui/useDialogProps';
 
 /*
 
-   TODO: Add a way to choose drivers for the day
+    TODO: ****NEXT**** add a way to remove a driver
    TODO: business_day, driver_id, is_locked
 
    TODO: add is_locked to Order and Payment tables

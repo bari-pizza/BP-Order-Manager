@@ -3,9 +3,9 @@ import { BusinessDayDriver, Drawer, Profile, DriverDrawer, Order, NewOrder, Orde
 import { z } from 'zod';
 import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
-const bariPizzaLogo = new URL('./BP logo.png', import.meta.url).href;
-const doorDashLogo = new URL('./DoorDash logo.png', import.meta.url).href;
-const pizzamicoLogo = new URL('./Pizzamico logo.ico', import.meta.url).href;
+const bariPizzaLogo = new URL('/BP logo.png', import.meta.url).href;
+const doorDashLogo = new URL('/DoorDash logo.png', import.meta.url).href;
+const pizzamicoLogo = new URL('/Pizzamico logo.ico', import.meta.url).href;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -94,12 +94,14 @@ export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
         console.error(error);
         return [] as BusinessDayDriver[];
     }
+
     const { data, error } = await supaClient
         .from('BusinessDayDriver')
         .select('*')
         .eq('business_date', `${year}-${month}-${day}`);
 
-    console.log({ data, error });
+    if (error) console.error(error);
+    else console.log(data);
 
     if (error) {
         console.error(error);
@@ -140,6 +142,38 @@ export const addDriverToBusinessDay = async ({
         return null;
     }
 
+    return data[0] as unknown as BusinessDayDriver;
+};
+
+export const removeDriverFromBusinessDay = async ({
+    drawerID,
+    businessDate,
+}: {
+    drawerID: string;
+    businessDate: dayjs.Dayjs;
+}) => {
+    const { month, day, year } = dayjsToMDY(businessDate);
+    try {
+        supabaseDate.parse({ year, month, day });
+    } catch (error) {
+        console.error(error);
+        return [] as BusinessDayDriver[];
+    }
+    const business_date = `${year}-${month}-${day}`;
+    const { data, error } = await supaClient
+        .from('BusinessDayDriver')
+        .delete()
+        .eq('business_date', business_date)
+        .eq('drawer_id', drawerID)
+        .select();
+    if (error) {
+        console.error(error);
+        throw error;
+    }
+    if (!data) {
+        console.log('there was no data to delete');
+        return null;
+    }
     return data[0] as unknown as BusinessDayDriver;
 };
 
