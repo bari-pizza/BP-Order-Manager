@@ -35,7 +35,6 @@ export const ProtectedRoute = ({
         return <SmartNavigate redirect to="/login" />;
     }
 
-    // TODO: create a page for this
     if (allProtections.isAdmin && !profile?.is_admin) {
         if (redirect) {
             return <SmartNavigate redirect keepSearchParams to={redirect} />;

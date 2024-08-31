@@ -27,8 +27,6 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ManagerDashboard, ManagerDashboardSkeleton } from './components/Manager/ManagerDashboard.tsx';
 
-// TODO: add admin page - protected - only by admins
-
 const router = createBrowserRouter([
     {
         path: '/',
@@ -122,7 +120,7 @@ function Layout() {
             {
                 queryKey: ['drivers'],
                 queryFn: getAllDrivers,
-                staleTime: 1000 * 60 * 1,
+                staleTime: 1000 * 60 * 30,
                 refetchOnWindowFocus: false,
             },
             {

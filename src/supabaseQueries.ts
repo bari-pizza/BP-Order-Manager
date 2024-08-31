@@ -1,9 +1,11 @@
 import { supaClient } from './supaClient';
-import { Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
+import { BusinessDayDriver, Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
 import { z } from 'zod';
 import doorDashLogo from '../public/DoorDash logo.png';
 import bariPizzaLogo from '../public/BP logo.png';
 import pizzamicoLogo from '../public/Pizzamico logo.ico';
+import dayjs from 'dayjs';
+import { dayjsToMDY } from './utils';
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -56,21 +58,16 @@ export const getAllOrigins = async () => {
     return data as unknown as OrderOrigin[];
 };
 
-interface GetAllDaysOrdersProps {
-    year: number;
-    month: number;
-    day: number;
-}
-
 const supabaseDate = z.object({
     year: z.number().min(2024).max(2100),
     month: z.number().min(1).max(12),
     day: z.number().min(1).max(31),
 });
 
-export const getAllDaysOrders = async ({ year, month, day }: GetAllDaysOrdersProps) => {
+export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
+    const { month, day, year } = dayjsToMDY(businessDate);
     try {
-        supabaseDate.parse({ year, month, day });
+        supabaseDate.parse({ month, day, year });
     } catch (error) {
         console.error(error);
         return [] as Order[];
@@ -87,6 +84,29 @@ export const getAllDaysOrders = async ({ year, month, day }: GetAllDaysOrdersPro
     }
 
     return data as unknown as Order[];
+};
+
+export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
+    const { month, day, year } = dayjsToMDY(businessDate);
+    try {
+        supabaseDate.parse({ year, month, day });
+    } catch (error) {
+        console.error(error);
+        return [] as BusinessDayDriver[];
+    }
+    const { data, error } = await supaClient
+        .from('BusinessDayDriver')
+        .select('*')
+        .eq('business_date', `${year}-${month}-${day}`);
+
+    console.log({ data, error });
+
+    if (error) {
+        console.error(error);
+        return [] as BusinessDayDriver[];
+    }
+
+    return data as unknown as BusinessDayDriver[];
 };
 
 interface DummyQueryFnProps<T> {

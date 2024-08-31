@@ -9,6 +9,29 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      BusinessDayDriver: {
+        Row: {
+          business_date: string
+          drawer_id: string
+        }
+        Insert: {
+          business_date: string
+          drawer_id: string
+        }
+        Update: {
+          business_date?: string
+          drawer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businessdaysdriver_drawer_id_fkey"
+            columns: ["drawer_id"]
+            isOneToOne: false
+            referencedRelation: "Drawer"
+            referencedColumns: ["drawer_id"]
+          },
+        ]
+      }
       Drawer: {
         Row: {
           created_at: string
@@ -193,6 +216,7 @@ export type Database = {
       }
       Profile: {
         Row: {
+          avatar_src: string | null
           email: string | null
           first_name: string | null
           id: string
@@ -202,6 +226,7 @@ export type Database = {
           phone: string | null
         }
         Insert: {
+          avatar_src?: string | null
           email?: string | null
           first_name?: string | null
           id: string
@@ -211,6 +236,7 @@ export type Database = {
           phone?: string | null
         }
         Update: {
+          avatar_src?: string | null
           email?: string | null
           first_name?: string | null
           id?: string

@@ -41,6 +41,10 @@ interface OrderDashboardContextProps {
         all: Order[];
         byDrawerID: (drawerID: string) => Order[];
     };
+    drivers: {
+        all: DriverDrawer[];
+        todays: DriverDrawer[];
+    };
 }
 
 export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
@@ -83,6 +87,10 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
         forCurrentDrawer: [],
         all: [],
         byDrawerID: () => [],
+    },
+    drivers: {
+        all: [],
+        todays: [],
     },
 });
 

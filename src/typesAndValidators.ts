@@ -8,6 +8,7 @@ export type Order = Tables<'Order'>;
 export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 export type OrderOrigin = Tables<'OrderOrigin'>;
 export type OrderType = Tables<'Order'>['order_type'];
+export type BusinessDayDriver = Tables<'BusinessDayDriver'>;
 
 const orderValidators = {
     order_number: {

@@ -7,8 +7,10 @@ import { useOrderEditor } from './OrderEditor/useOrderEditor';
 import { SideBar, SideBarSkeleton } from '../SideBar';
 import { useOrdersDrawersTickets } from '../../hooks/interactions/useOrdersDrawersTickets';
 import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
+import { useDrivers } from '../../hooks/data/useDrivers';
 
 export const OrderDashboard = () => {
+    const drivers = useDrivers();
     const { orderEditor, addOrderButton } = useOrderEditor();
     const { ticket, drawer, orders } = useOrdersDrawersTickets();
 
@@ -50,7 +52,7 @@ export default MouseFollowerComponent;
     */
 
     return (
-        <OrderDashboardContext.Provider value={{ ticket, drawer, orders }}>
+        <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers }}>
             <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>
                 <Suspense fallback={<DrawerHeaderSkeleton />}>
                     <DrawerHeader />

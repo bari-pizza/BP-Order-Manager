@@ -4,6 +4,7 @@ import { LayoutContext } from '../../context/LayoutContext';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { UserContext } from '../../context/UserContext';
 import { BariPizzaContext } from '../../context/BariPizzaContext';
+import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
 
 export const useUserContext = () => {
     return useContext(UserContext);
@@ -19,4 +20,8 @@ export const useOrderDashboardContext = () => {
 
 export const useBariPizzaContext = () => {
     return useContext(BariPizzaContext);
+};
+
+export const useManagerDashboardContext = () => {
+    return useContext(ManagerDashboardContext);
 };

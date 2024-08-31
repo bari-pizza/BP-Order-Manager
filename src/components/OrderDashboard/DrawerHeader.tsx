@@ -2,7 +2,7 @@
 // import { getAllDrawers, getAllDrivers } from '../../supabaseQueries';
 import { Stack, StackOwnProps } from '@mui/material';
 import { DrawerCard, DrawerAvatarSkeleton, UnassignedDrawerAvatar } from './DrawerCard';
-import { useBariPizzaContext } from '../../hooks/data/useContextData';
+import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 
 const stackProps: Partial<StackOwnProps> = {
     direction: 'row',
@@ -15,9 +15,10 @@ const stackProps: Partial<StackOwnProps> = {
 };
 
 export const DrawerHeader = () => {
-    const { drawers, drivers } = useBariPizzaContext();
+    const { drivers } = useOrderDashboardContext();
+    const { drawers } = useBariPizzaContext();
 
-    const combinedData = [...drawers, ...drivers];
+    const combinedData = [...drawers, ...drivers.todays];
 
     return (
         <Stack {...stackProps}>

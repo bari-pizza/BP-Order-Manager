@@ -3,7 +3,6 @@ import type { Drawer, DriverDrawer, Order } from '../../typesAndValidators';
 import { addOrdersToDrawer, getAllDaysOrders, removeOrdersFromDrawer } from '../../supabaseQueries';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useBusinessDate } from '../data/useBusinessDate';
-import { dayjsToMDY } from '../../utils';
 import { addOrdersToast, DataWithError, HandleOutcomeProps, removeOrdersToast } from '../../helpers/toast';
 import { toast } from 'react-toastify';
 
@@ -16,10 +15,9 @@ const unassignedDrawer: Drawer = {
 
 export const useOrdersDrawersTickets = () => {
     const [businessDate] = useBusinessDate();
-    const MDY = dayjsToMDY(businessDate);
     const { data: allOrders } = useSuspenseQuery({
         queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
-        queryFn: () => getAllDaysOrders(MDY),
+        queryFn: () => getAllDaysOrders(businessDate),
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 30,
     });
@@ -93,8 +91,6 @@ export const useOrdersDrawersTickets = () => {
             setOpenDrawer(drawer);
         }
     };
-
-    // TODO: when all tickets have errors, they're not visible because the page immediately refreshes
 
     const animateTicketToDrawer = (
         ticketRef: RefObject<SVGSVGElement>,

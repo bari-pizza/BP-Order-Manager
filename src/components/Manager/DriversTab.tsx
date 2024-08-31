@@ -1,10 +1,9 @@
 import { Stack, StackOwnProps } from '@mui/material';
 import { DriverDrawer } from '../../typesAndValidators';
 import { DrawerCardBase } from '../Base/DrawerCardBase';
+import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 
-// TODO: create a new context for todays drawers and drivers
-
-/* TODO: create BusinessDay.Drivers table
+/*
 
    TODO: Add a way to choose drivers for the day
    TODO: business_day, driver_id, is_locked
@@ -36,6 +35,7 @@ const AddDriverCard = ({ handleClick }: { handleClick: () => void }) => {
             is_manager: false,
             last_name: 'Doe',
             phone: '555-555-5555',
+            avatar_src: null,
         },
     };
 
@@ -43,39 +43,9 @@ const AddDriverCard = ({ handleClick }: { handleClick: () => void }) => {
 };
 
 export const DriversTab = () => {
-    const allDrivers: DriverDrawer[] = [
-        {
-            drawer_id: '1',
-            drawer_type: 'driver',
-            name: 'John Doe',
-            created_at: '2024-08-27T00:00:00.000Z',
-            driver: {
-                id: '1',
-                first_name: 'John',
-                last_name: 'Doe',
-                phone: '555-555-5555',
-                email: 'vI8Pb@example.com',
-                is_admin: false,
-                is_manager: false,
-            },
-        },
-        {
-            drawer_id: '2',
-            drawer_type: 'driver',
-            name: 'Jane Doe',
-            created_at: '2024-08-27T00:00:00.000Z',
-            driver: {
-                id: '2',
-                first_name: 'Jane',
-                last_name: 'Doe',
-                phone: '555-555-5555',
-                email: 'vI8Pb@example.com',
-                is_admin: false,
-                is_manager: false,
-            },
-        },
-    ];
-    const todaysDrivers: DriverDrawer[] = [allDrivers[0]];
+    const {
+        driver: { todays: todaysDrivers },
+    } = useManagerDashboardContext();
     const handleDriverClick = (driver: DriverDrawer) => {
         console.log('clicked driver', driver);
     };
@@ -84,19 +54,11 @@ export const DriversTab = () => {
     };
 
     return (
-        <Stack direction="row">
-            <Stack {...stackProps} justifyContent={'start'} gap={2} direction="row" width="100%">
-                {todaysDrivers.map((driver) => (
-                    <DrawerCardBase
-                        key={driver.drawer_id}
-                        drawer={driver}
-                        handleClick={() => handleDriverClick(driver)}
-                    />
-                ))}
-            </Stack>
-            <Stack {...stackProps} width="120px" justifyContent="end">
-                <AddDriverCard handleClick={handleAddDriverClick} />
-            </Stack>
+        <Stack {...stackProps} justifyContent={'start'} gap={2} direction="row" width="100%">
+            {todaysDrivers.map((driver) => (
+                <DrawerCardBase key={driver.drawer_id} drawer={driver} handleClick={() => handleDriverClick(driver)} />
+            ))}
+            <AddDriverCard handleClick={handleAddDriverClick} />
         </Stack>
     );
 };
