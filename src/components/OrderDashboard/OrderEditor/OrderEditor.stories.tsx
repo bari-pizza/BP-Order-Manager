@@ -48,7 +48,7 @@ export const Edit: Story = {
     args: {
         open: true,
         setOpen: () => {},
-        order: dummyOrders.existing[0],
+        order: dummyOrders.one.existing(),
         asDialog: false,
     },
     render: Render,
@@ -58,7 +58,7 @@ export const EditDialog: Story = {
     args: {
         open: true,
         setOpen: () => {},
-        order: dummyOrders.existing[0],
+        order: dummyOrders.one.existing(),
         asDialog: true,
     },
     render: Render,
