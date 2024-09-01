@@ -20,13 +20,12 @@ export const useDrivers = () => {
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 30,
     });
-    const [openDriver, setOpenDriver] = useState<DriverDrawer | null>(null);
-
     const todaysDrivers = businessDayDrivers
         .map(({ drawer_id }) => {
             return drivers.find((driver) => driver.drawer_id === drawer_id);
         })
         .filter((driver) => driver !== undefined) as DriverDrawer[];
+    const [openDriver, setOpenDriver] = useState<DriverDrawer | null>(todaysDrivers[0] || null);
 
     const availableDrivers =
         drivers.filter((driver) => {

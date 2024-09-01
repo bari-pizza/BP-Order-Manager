@@ -1,11 +1,12 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
-import { useState } from 'react';
+import { useLocalStorage } from '../../hooks/data/useLocalStorage';
 import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
 import { DriversTab } from './DriversTab';
 import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
+import { ManagerDashboardTabName } from '../../typesAndValidators';
 
 /*    TODO: About Today
         Sales
@@ -44,18 +45,20 @@ function TabPanel(props: TabPanelProps) {
     );
 }
 
-type TabName = 'sales' | 'drivers' | 'orders' | 'settings';
+type TabName = ManagerDashboardTabName;
 
 export const ManagerDashboard = () => {
-    const { orders } = useOrdersDrawersTickets();
+    const { orders, drawer } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
-    const [tabName, setTabName] = useState<TabName>('sales');
+    const { value: tabName, setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>(
+        'managerDashboardTabName',
+        'drivers',
+    );
     const theme = useTheme();
 
     const handleChange = (tab: TabName) => {
         setTabName(tab);
-        console.log(tab);
     };
 
     const sx = {
@@ -79,7 +82,10 @@ export const ManagerDashboard = () => {
         <ManagerDashboardContext.Provider
             value={{
                 orders,
-                drawers,
+                drawers: {
+                    all: drawers,
+                    onClick: drawer.onClick,
+                },
                 origins,
                 drivers: {
                     all: drivers.all,

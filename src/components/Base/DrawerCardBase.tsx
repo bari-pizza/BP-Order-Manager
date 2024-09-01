@@ -1,6 +1,20 @@
 import { createElement } from 'react';
 import { deepmerge } from '@mui/utils';
-import { Avatar, Badge, Button, Skeleton, Stack, SvgIconTypeMap, Typography } from '@mui/material';
+import {
+    Avatar,
+    AvatarProps,
+    Badge,
+    BadgeProps,
+    Button,
+    ButtonProps,
+    Skeleton,
+    Stack,
+    StackProps,
+    SvgIconProps,
+    SvgIconTypeMap,
+    Typography,
+    TypographyProps,
+} from '@mui/material';
 import type { Drawer, DriverDrawer } from '../../typesAndValidators';
 import {
     PointOfSale as PointOfSaleIcon,
@@ -9,6 +23,16 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
+
+export interface DrawerCardSlotProps {
+    button?: Partial<ButtonProps>;
+    buttonStack?: Partial<StackProps>;
+    badge?: Partial<BadgeProps>;
+    avatar?: Partial<AvatarProps>;
+    avatarIcon?: Partial<SvgIconProps>;
+    nameStack?: Partial<StackProps>;
+    nameTypography?: Partial<TypographyProps>;
+}
 
 interface DrawerCardBaseProps {
     drawer: Drawer | DriverDrawer;
@@ -22,9 +46,18 @@ interface DrawerCardBaseProps {
         avatarIcon?: React.CSSProperties;
         button?: React.CSSProperties;
     };
+    props?: DrawerCardSlotProps;
 }
 
-export const DrawerCardBase = ({ drawer, drawerRef, isOpen, badgeCount, handleClick, sx }: DrawerCardBaseProps) => {
+export const DrawerCardBase = ({
+    drawer,
+    drawerRef,
+    isOpen,
+    badgeCount,
+    handleClick,
+    sx,
+    props,
+}: DrawerCardBaseProps) => {
     const theme = useTheme();
 
     const baseSX = {
@@ -73,6 +106,10 @@ export const DrawerCardBase = ({ drawer, drawerRef, isOpen, badgeCount, handleCl
                 },
             },
         },
+        buttonStack: {
+            height: '100%',
+            // width: '80px',
+        },
         text: {},
     };
 
@@ -85,7 +122,10 @@ export const DrawerCardBase = ({ drawer, drawerRef, isOpen, badgeCount, handleCl
         unassigned: FaceIcon,
     };
 
-    const avatarChild = createElement(iconMap[drawer.drawer_type], { sx: overrideSX.avatarIcon });
+    const avatarChild = createElement(iconMap[drawer.drawer_type], {
+        sx: overrideSX.avatarIcon,
+        ...props?.avatarIcon,
+    });
 
     return (
         <Button
@@ -93,24 +133,27 @@ export const DrawerCardBase = ({ drawer, drawerRef, isOpen, badgeCount, handleCl
             onClick={handleClick}
             variant="outlined"
             color="primary"
-            sx={overrideSX.button}>
+            sx={overrideSX.button}
+            {...props?.button}>
             <Stack
                 direction="column"
-                sx={{ height: '100%', width: '80px' }}
+                sx={overrideSX.buttonStack}
                 alignItems="center"
                 gap={1}
-                justifyContent="space-between">
-                <Badge badgeContent={badgeCount} sx={overrideSX.badge} overlap="circular">
+                justifyContent="space-between"
+                {...props?.buttonStack}>
+                <Badge badgeContent={badgeCount} sx={overrideSX.badge} overlap="circular" {...props?.badge}>
                     <Avatar
                         className={'drawer-avatar-' + drawer.drawer_id}
                         ref={drawerRef}
                         sx={overrideSX.avatar}
-                        src={drawer.drawer_type === 'driver' ? 'https://mui.com/static/images/avatar/2.jpg' : ''}>
+                        src={drawer.drawer_type === 'driver' ? 'https://mui.com/static/images/avatar/2.jpg' : ''}
+                        {...props?.avatar}>
                         {avatarChild}
                     </Avatar>
                 </Badge>
-                <Stack justifyContent="center" alignItems="center" height="100%">
-                    <Typography pt={1} variant="body2">
+                <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
+                    <Typography pt={1} variant="body2" {...props?.nameTypography}>
                         {drawer.name}
                     </Typography>
                 </Stack>

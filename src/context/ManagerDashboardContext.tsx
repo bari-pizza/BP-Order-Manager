@@ -5,7 +5,10 @@ interface ManagerDashboardProps {
     // all orders, drivers, and origins are already provided by BariPizzaContext
     // take parts of BariPizzaContext that are needed and pass them down to ManagerDashboard
     // drawers and origins from BariPizzaContext
-    drawers: Drawer[];
+    drawers: {
+        all: Drawer[];
+        onClick: (drawer: Drawer | DriverDrawer) => void;
+    };
     origins: OrderOrigin[];
     drivers: {
         all: DriverDrawer[];
@@ -27,7 +30,10 @@ interface ManagerDashboardProps {
 }
 
 export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
-    drawers: [],
+    drawers: {
+        all: [],
+        onClick: () => {},
+    },
     origins: [],
     drivers: {
         all: [],

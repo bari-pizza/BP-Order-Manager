@@ -10,6 +10,12 @@ export type OrderOrigin = Tables<'OrderOrigin'>;
 export type OrderType = Tables<'Order'>['order_type'];
 export type BusinessDayDriver = Tables<'BusinessDayDriver'>;
 
+export type ManagerDashboardTabName = 'sales' | 'drivers' | 'orders' | 'settings';
+export type LocalStorageField = {
+    managerDashboardTabName: ManagerDashboardTabName;
+    openDrawer: Drawer | DriverDrawer;
+};
+
 const orderValidators = {
     order_number: {
         validate: (value: number | null) => {

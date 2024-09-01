@@ -6,6 +6,7 @@ import { useBusinessDate } from '../data/useBusinessDate';
 import { DataWithError, HandleOutcomeProps } from '../../toast/toast';
 import { addOrdersToast, removeOrdersToast } from '../../toast/ordersToast';
 import { toast } from 'react-toastify';
+import { useLocalStorage } from './useLocalStorage';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -24,7 +25,11 @@ export const useOrdersDrawersTickets = () => {
     });
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
     const drawerRefs = useRef<{ [key: string]: RefObject<HTMLDivElement> }>({});
-    const [openDrawer, setOpenDrawer] = useState<Drawer | DriverDrawer>(unassignedDrawer);
+
+    const { value: openDrawer, setValue: setOpenDrawer } = useLocalStorage<'openDrawer'>(
+        'openDrawer',
+        unassignedDrawer,
+    );
     const orders = allOrders?.filter(
         (order) => order.drawer_id === (openDrawer.drawer_id === 'unassigned' ? null : openDrawer.drawer_id),
     );
