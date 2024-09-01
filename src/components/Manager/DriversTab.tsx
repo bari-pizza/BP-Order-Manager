@@ -3,10 +3,9 @@ import { DriverCard } from './DriverCard';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { AddDriverCard } from './AddDriverCard';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
+import { SideBar } from '../SideBar';
 
 /*
-
-    TODO: ****NEXT**** add a way to remove a driver
    TODO: business_day, driver_id, is_locked
 
    TODO: add is_locked to Order and Payment tables
@@ -23,17 +22,29 @@ const stackProps: Partial<StackOwnProps> = {
 };
 
 export const DriversTab = () => {
-    const driverCardDialogProps = useDialogProps();
     const addDriverCardDialogProps = useDialogProps();
-    const { driver } = useManagerDashboardContext();
-    const { todays: todaysDrivers } = driver;
+    const { drivers } = useManagerDashboardContext();
+    const { todays: todaysDrivers } = drivers;
+    // TODO: add is_locked to database
+    // if is_locked is true, only option is to unlock
+    // if unlocked, can close the drawer or remove the driver (if no orders have been assigned)
+
+    console.log({ drivers });
 
     return (
         <Stack {...stackProps} justifyContent={'start'} gap={2} direction="row" width="100%">
             {todaysDrivers.map((driver) => (
-                <DriverCard key={driver.drawer_id} driver={driver} {...driverCardDialogProps} />
+                <DriverCard key={driver.drawer_id} driver={driver} />
             ))}
             <AddDriverCard {...addDriverCardDialogProps} />
+            {drivers.current && (
+                <SideBar width="500px">
+                    <Stack alignContent="center" justifyContent="space-between" direction="column" height="100%">
+                        {drivers.current?.name}
+                    </Stack>
+                </SideBar>
+            )}
         </Stack>
+        // TODO: ***NEXT*** Add a way to create a brand new driver
     );
 };

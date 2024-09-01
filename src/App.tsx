@@ -139,7 +139,8 @@ function Layout() {
         //     version="beta">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <ThemeProvider theme={theme}>
-                <BariPizzaContext.Provider value={{ drawers, drivers, origins }}>
+                <BariPizzaContext.Provider
+                    value={{ drawers, drivers: drivers.sort((a, b) => a.name.localeCompare(b.name)), origins }}>
                     <LayoutContext.Provider
                         value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
                         <UserContext.Provider value={{ session, profile, loading }}>

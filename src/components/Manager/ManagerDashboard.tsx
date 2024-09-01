@@ -81,21 +81,23 @@ export const ManagerDashboard = () => {
                 orders,
                 drawers,
                 origins,
-                driver: {
+                drivers: {
                     all: drivers.all,
                     todays: drivers.todays,
-                    current: null,
+                    current: drivers.current,
+                    available: drivers.available,
                     add: drivers.add,
                     remove: drivers.remove, // some supabase mutation
                     close: () => {}, // some supabase mutation
                     reOpen: () => {}, // some supabase mutation
+                    handleClick: drivers.handleClick,
                 },
                 // all these properties should eventually come from useDrivers
             }}>
             <Stack height="100vh" width="100%">
                 <Stack m={2}>
                     <Typography
-                        variant="h1"
+                        variant="h2"
                         color="primary"
                         sx={{ textShadow: `0px 3px 0px ${theme.palette.primary.dark}` }}>
                         Manager Dashboard

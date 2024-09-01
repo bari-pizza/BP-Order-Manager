@@ -7,14 +7,16 @@ interface ManagerDashboardProps {
     // drawers and origins from BariPizzaContext
     drawers: Drawer[];
     origins: OrderOrigin[];
-    driver: {
+    drivers: {
         all: DriverDrawer[];
         todays: DriverDrawer[];
+        available: DriverDrawer[];
         current: DriverDrawer | null;
         add: (driver: DriverDrawer) => void;
         remove: (driver: DriverDrawer) => void;
         close: (driver: DriverDrawer) => void;
         reOpen: (driver: DriverDrawer) => void;
+        handleClick: (driver: DriverDrawer) => void;
     };
     orders: {
         all: Order[];
@@ -24,4 +26,23 @@ interface ManagerDashboardProps {
     };
 }
 
-export const ManagerDashboardContext = createContext<ManagerDashboardProps>({} as ManagerDashboardProps);
+export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
+    drawers: [],
+    origins: [],
+    drivers: {
+        all: [],
+        todays: [],
+        available: [],
+        current: null,
+        add: () => {},
+        remove: () => {},
+        close: () => {},
+        reOpen: () => {},
+        handleClick: () => {},
+    },
+    orders: {
+        all: [],
+        forCurrentDrawer: [],
+        byDrawerID: () => [],
+    },
+});

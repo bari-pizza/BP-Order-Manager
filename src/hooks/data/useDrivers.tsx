@@ -4,13 +4,9 @@ import { useBusinessDate } from './useBusinessDate';
 import { useBariPizzaContext } from './useContextData';
 import { DriverDrawer } from '../../typesAndValidators';
 import dayjs from 'dayjs';
-import { useRef } from 'react';
-import {
-    DataWithError,
-    HandleOutcomeProps,
-    addDriverToBusinessDayToast,
-    removeDriverFromBusinessDayToast,
-} from '../../helpers/toast';
+import { useRef, useState } from 'react';
+import { DataWithError, HandleOutcomeProps } from '../../toast/toast';
+import { addDriverToBusinessDayToast, removeDriverFromBusinessDayToast } from '../../toast/driversToast';
 
 export const useDrivers = () => {
     const [businessDate] = useBusinessDate();
@@ -24,12 +20,18 @@ export const useDrivers = () => {
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 30,
     });
+    const [openDriver, setOpenDriver] = useState<DriverDrawer | null>(null);
 
     const todaysDrivers = businessDayDrivers
         .map(({ drawer_id }) => {
             return drivers.find((driver) => driver.drawer_id === drawer_id);
         })
         .filter((driver) => driver !== undefined) as DriverDrawer[];
+
+    const availableDrivers =
+        drivers.filter((driver) => {
+            return !todaysDrivers.some((todaysDriver) => todaysDriver.drawer_id === driver.drawer_id);
+        }) || [];
 
     const queryClient = useQueryClient();
 
@@ -76,10 +78,21 @@ export const useDrivers = () => {
         removeDriverFromDayMutation.mutate({ drawerID, businessDate });
     };
 
+    const handleDriverClick = (driver: DriverDrawer) => {
+        if (openDriver?.drawer_id === driver.drawer_id) {
+            setOpenDriver(null);
+        } else {
+            setOpenDriver(driver);
+        }
+    };
+
     return {
         drivers: {
             all: drivers,
             todays: todaysDrivers,
+            available: availableDrivers,
+            current: openDriver,
+            handleClick: handleDriverClick,
             add: addDriver,
             remove: removeDriver,
         },
