@@ -4,6 +4,7 @@ import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { AddDriverCard } from './AddDriverCard';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import { DriverSideBar } from './DriverSideBar';
+import { ContextMenu } from '../Base/ContextMenu';
 
 /*
    TODO: business_day, driver_id, is_locked
@@ -32,11 +33,18 @@ export const DriversTab = () => {
     return (
         <Stack {...stackProps} justifyContent={'start'} gap={2} direction="row" width="100%">
             {todaysDrivers.map((driver) => (
-                <DriverCard key={driver.drawer_id} driver={driver} />
+                <ContextMenu openOnType="right-click" key={driver.drawer_id}>
+                    <ContextMenu.Base>
+                        <DriverCard key={driver.drawer_id} driver={driver} />
+                    </ContextMenu.Base>
+                    <ContextMenu.Menu>
+                        <ContextMenu.MenuItem>words</ContextMenu.MenuItem>
+                    </ContextMenu.Menu>
+                    <DriverCard.contextMenu driver={driver} />
+                </ContextMenu>
             ))}
             <AddDriverCard {...addDriverCardDialogProps} />
             <DriverSideBar />
         </Stack>
-        // TODO: ***NEXT*** Add a way to create a brand new driver
     );
 };

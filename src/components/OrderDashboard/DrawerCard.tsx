@@ -3,13 +3,24 @@ import { Tooltip, Typography } from '@mui/material';
 import type { Drawer, DriverDrawer } from '../../typesAndValidators';
 import { getDrawerFullName } from '../../utils';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
-import { DrawerCardBase, DrawerCardBaseSkeleton } from '../Base/DrawerCardBase';
+import { DrawerCardBase, DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../Base/DrawerCardBase';
+import { ContextMenu } from '../Base/ContextMenu';
+import { useLocalStorage } from '../../hooks/data/useLocalStorage';
+import { useNavigate } from 'react-router-dom';
+import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 
 interface DrawerCardProps {
     drawer: Drawer | DriverDrawer;
+    sx?: {
+        avatar?: React.CSSProperties;
+        badge?: React.CSSProperties;
+        avatarIcon?: React.CSSProperties;
+        button?: React.CSSProperties;
+    };
+    props?: DrawerCardSlotProps;
 }
 
-export const DrawerCard = ({ drawer }: DrawerCardProps) => {
+export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
     const { drawer: ctxDrawer, orders, ticket } = useOrderDashboardContext();
     const fullName = getDrawerFullName(drawer);
     const isOpen = ctxDrawer.current?.drawer_id === drawer?.drawer_id;
@@ -41,6 +52,8 @@ export const DrawerCard = ({ drawer }: DrawerCardProps) => {
                     isOpen={isOpen}
                     badgeCount={orderCount}
                     handleClick={() => ctxDrawer.onClick(drawer)}
+                    sx={sx}
+                    props={props}
                 />
             </>
         </Tooltip>
@@ -55,3 +68,26 @@ export const UnassignedDrawerAvatar = () => {
 export const DrawerAvatarSkeleton = () => {
     return <DrawerCardBaseSkeleton />;
 };
+
+const DriverContextMenu = ({ driver }: { driver: DriverDrawer }) => {
+    const { setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>('managerDashboardTabName');
+    const { setValue: setDriver } = useLocalStorage<'openDrawer'>('openDrawer');
+    const navigate = useNavigate();
+
+    const navigateToManagerDashboard = () => {
+        setTabName('drivers');
+        setDriver(driver);
+        navigate('/manager');
+    };
+
+    return (
+        <ContextMenu.Menu>
+            <ContextMenu.MenuItem onClick={navigateToManagerDashboard} icon={<OpenInNewIcon />}>
+                Open in Manager
+            </ContextMenu.MenuItem>
+            <ContextMenu.MenuItem>Some info goes here</ContextMenu.MenuItem>
+        </ContextMenu.Menu>
+    );
+};
+
+DrawerCard.driverContextMenu = DriverContextMenu;

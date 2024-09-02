@@ -3,9 +3,6 @@ import { DrawerCard, DrawerAvatarSkeleton, UnassignedDrawerAvatar } from './Draw
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../Base/ContextMenu';
 import { DriverDrawer } from '../../typesAndValidators';
-import { useNavigate } from 'react-router-dom';
-import { useLocalStorage } from '../../hooks/data/useLocalStorage';
-import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 
 const stackProps: Partial<StackOwnProps> = {
     direction: 'row',
@@ -20,15 +17,6 @@ const stackProps: Partial<StackOwnProps> = {
 export const DrawerHeader = () => {
     const { drivers } = useOrderDashboardContext();
     const { drawers } = useBariPizzaContext();
-    // const navigateToManagerDashboard = useNavigateToManagerDashboard();
-    const { setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>('managerDashboardTabName');
-    const { setValue: setDriver } = useLocalStorage<'openDrawer'>('openDrawer');
-    const navigate = useNavigate();
-    const navigateToManagerDashboard = (driver: DriverDrawer) => {
-        setTabName('drivers');
-        setDriver(driver);
-        navigate('/manager');
-    };
 
     const combinedData = [...drawers, ...drivers.todays];
 
@@ -43,11 +31,7 @@ export const DrawerHeader = () => {
                                 <DrawerCard key={drawer.drawer_id} drawer={drawer} />
                             </ContextMenu.Base>
                             <ContextMenu.Menu>
-                                <ContextMenu.MenuItem
-                                    onClick={() => navigateToManagerDashboard(drawer as DriverDrawer)}
-                                    icon={<OpenInNewIcon />}>
-                                    Open in Manager
-                                </ContextMenu.MenuItem>
+                                <DrawerCard.driverContextMenu driver={drawer as DriverDrawer} />
                             </ContextMenu.Menu>
                         </ContextMenu>
                     );

@@ -13,6 +13,7 @@ import {
     Stack,
     Divider,
 } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
 
 interface AddDriverCardProps {
     open: () => void;
@@ -22,8 +23,7 @@ interface AddDriverCardProps {
 
 export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
     const { drivers } = useManagerDashboardContext();
-    const { add: addDriver, available: availableDrivers } = drivers;
-    const [selectedDriver, setSelectedDriver] = useState<DriverDrawer | null>(null);
+    const { available: availableDrivers } = drivers;
     const [mode, setMode] = useState<'existing' | 'new'>('existing');
 
     const dummyDrawer: DriverDrawer = {
@@ -43,17 +43,8 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
         },
     };
 
-    const handleChange = (drawerID: string) => {
-        console.log({ drawerID });
-        const driver = availableDrivers.find((d) => d.drawer_id === drawerID) as DriverDrawer;
-        setSelectedDriver(driver);
-        // addDriver(driver);
-        // close();
-    };
-
-    const handleChooseExistingDriver = () => {
-        addDriver(selectedDriver as DriverDrawer);
-        setSelectedDriver(null);
+    const closeDialog = () => {
+        setMode('existing');
         close();
     };
 
@@ -61,88 +52,129 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
         open();
     };
 
+    const sx = {
+        button: {
+            height: '16em',
+            width: '12em',
+        },
+        avatar: {
+            width: '6em',
+            height: '6em',
+        },
+    };
+
     return (
         <>
-            <DrawerCardBase
-                sx={{
-                    button: {
-                        height: '16em',
-                        width: '12em',
-                    },
-                    avatar: {
-                        width: '6em',
-                        height: '6em',
-                    },
-                }}
-                drawer={dummyDrawer}
-                handleClick={handleClick}
-            />
-
-            <Dialog open={isOpen} onClose={close}>
-                <DialogTitle sx={{ textAlign: 'center' }}>
-                    {mode === 'existing' ? 'Choose' : 'Create'} Driver
-                </DialogTitle>
-                <DialogContent>
-                    <Stack direction="column" mt={2} gap={2}>
-                        {mode === 'existing' ? (
-                            availableDrivers.length ? (
-                                <Autocomplete
-                                    options={availableDrivers.map((driver) => driver.drawer_id)}
-                                    sx={{ width: 225 }}
-                                    onChange={(_, drawerID) => handleChange(drawerID || '')}
-                                    renderInput={(params) => <TextField {...params} label="Driver" />}
-                                    getOptionLabel={(option) =>
-                                        availableDrivers.find((d) => d.drawer_id === option)?.name || ''
-                                    }
-                                />
-                            ) : (
-                                <TextField label="No Drivers Available" disabled />
-                            )
-                        ) : (
-                            <CreateNewDriverForm />
-                        )}
-                    </Stack>
-                </DialogContent>
-                <DialogActions sx={{ justifyContent: 'center', alignItems: 'center', marginTop: '1em' }}>
-                    <Stack direction="column" gap={2} mb={2}>
-                        {mode === 'existing' ? (
-                            <>
-                                <Button
-                                    variant="contained"
-                                    onClick={handleChooseExistingDriver}
-                                    disabled={!selectedDriver}>
-                                    Add Driver
-                                </Button>
-                                <Divider />
-                                <Button variant="text" onClick={() => setMode('new')}>
-                                    Create a New Driver
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Button variant="contained" onClick={() => console.log('add driver')}>
-                                    Create New Driver
-                                </Button>
-                                <Divider />
-                                <Button variant="text" onClick={() => setMode('existing')}>
-                                    Select an Existing Driver
-                                </Button>
-                            </>
-                        )}
-                    </Stack>
-                </DialogActions>
+            <DrawerCardBase sx={sx} drawer={dummyDrawer} handleClick={handleClick} />
+            <Dialog open={isOpen} onClose={closeDialog}>
+                {mode === 'existing' ? (
+                    <ChooseExistingDriverForm setMode={setMode} closeDialog={closeDialog} />
+                ) : (
+                    <CreateNewDriverForm setMode={setMode} closeDialog={closeDialog} />
+                )}
             </Dialog>
         </>
     );
 };
 
-const CreateNewDriverForm = () => {
+interface FormProps {
+    setMode: (mode: 'existing' | 'new') => void;
+    closeDialog: () => void;
+}
+
+const ChooseExistingDriverForm = ({ setMode, closeDialog }: FormProps) => {
+    const { drivers } = useManagerDashboardContext();
+    const { available: availableDrivers, add: addDriver } = drivers;
+    const [selectedDriver, setSelectedDriver] = useState<DriverDrawer | null>(null);
+
+    const handleChange = (drawerID: string) => {
+        console.log({ drawerID });
+        const driver = availableDrivers.find((d) => d.drawer_id === drawerID) as DriverDrawer;
+        setSelectedDriver(driver);
+    };
+
+    const handleChooseExistingDriver = () => {
+        addDriver(selectedDriver as DriverDrawer);
+        setSelectedDriver(null);
+        closeDialog();
+    };
+
     return (
         <>
-            <TextField label="First Name" />
-            <TextField label="Last Name" />
-            <TextField label="Email" />
-            <TextField label="Phone" />
+            <DialogTitle sx={{ textAlign: 'center' }}>Choose Driver</DialogTitle>
+            <DialogContent>
+                <Stack direction="column" mt={2} gap={2}>
+                    {availableDrivers.length ? (
+                        <Autocomplete
+                            options={availableDrivers.map((driver) => driver.drawer_id)}
+                            sx={{ width: 225 }}
+                            onChange={(_, drawerID) => handleChange(drawerID || '')}
+                            renderInput={(params) => <TextField {...params} label="Driver" />}
+                            getOptionLabel={(option) =>
+                                availableDrivers.find((d) => d.drawer_id === option)?.name || ''
+                            }
+                        />
+                    ) : (
+                        <TextField label="No Drivers Available" disabled />
+                    )}
+                </Stack>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: 'center', alignItems: 'center', marginTop: '1em' }}>
+                <Stack direction="column" gap={2} mb={2}>
+                    <Button variant="contained" onClick={handleChooseExistingDriver} disabled={!selectedDriver}>
+                        Add Driver
+                    </Button>
+                    <Divider />
+                    <Button variant="text" onClick={() => setMode('new')}>
+                        Create a New Driver
+                    </Button>
+                </Stack>
+            </DialogActions>
+        </>
+    );
+};
+
+const CreateNewDriverForm = ({ setMode, closeDialog }: FormProps) => {
+    const { control, handleSubmit } = useForm({
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+        },
+    });
+
+    const onSubmit = (data: unknown) => {
+        console.log(data);
+        closeDialog();
+    };
+
+    return (
+        <>
+            <DialogTitle sx={{ textAlign: 'center' }}>Create Driver</DialogTitle>
+            <DialogContent>
+                <Stack direction="column" mt={2} gap={2}>
+                    <Controller
+                        name="firstName"
+                        control={control}
+                        render={({ field }) => <TextField {...field} label="First Name" />}
+                    />
+                    <TextField label="Last Name" />
+                    <TextField label="Email" />
+                    <TextField label="Phone" />
+                </Stack>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: 'center', alignItems: 'center', marginTop: '1em' }}>
+                <Stack direction="column" gap={2} mb={2}>
+                    <Button variant="contained" onClick={handleSubmit(onSubmit)}>
+                        Create New Driver
+                    </Button>
+                    <Divider />
+                    <Button variant="text" onClick={() => setMode('existing')}>
+                        Select an Existing Driver
+                    </Button>
+                </Stack>
+            </DialogActions>
         </>
     );
 };
