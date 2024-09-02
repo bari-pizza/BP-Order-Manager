@@ -6,7 +6,7 @@ import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
-import { ManagerDashboardTabName } from '../../typesAndValidators';
+import { DriverDrawer, ManagerDashboardTabName } from '../../typesAndValidators';
 
 /*    TODO: About Today
         Sales
@@ -94,7 +94,9 @@ export const ManagerDashboard = () => {
                     available: drivers.available,
                     add: drivers.add,
                     remove: drivers.remove, // some supabase mutation
-                    close: () => {}, // some supabase mutation
+                    close: (driver: DriverDrawer) => {
+                        console.log('close driver', driver);
+                    }, // some supabase mutation
                     reOpen: () => {}, // some supabase mutation
                     handleClick: drivers.handleClick,
                 },

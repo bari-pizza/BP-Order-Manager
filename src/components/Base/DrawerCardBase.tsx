@@ -83,7 +83,7 @@ export const DrawerCardBase = ({
             },
         },
         button: {
-            height: '100%',
+            height: '175px',
             width: '100px',
             '& .MuiTypography-root': {
                 color: theme.palette.primary.main,

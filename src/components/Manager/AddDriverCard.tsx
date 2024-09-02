@@ -11,6 +11,7 @@ import {
     DialogContent,
     DialogActions,
     Stack,
+    Divider,
 } from '@mui/material';
 
 interface AddDriverCardProps {
@@ -22,13 +23,14 @@ interface AddDriverCardProps {
 export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
     const { drivers } = useManagerDashboardContext();
     const { add: addDriver, available: availableDrivers } = drivers;
-    const [selectedDriver, setSelectedDriver] = useState<DriverDrawer | null>(null);
+    // const [selectedDriver, setSelectedDriver] = useState<DriverDrawer | null>(null);
+    const [mode, setMode] = useState<'existing' | 'new'>('existing');
 
     const dummyDrawer: DriverDrawer = {
         created_at: '2024-08-27T00:00:00.000Z',
         drawer_id: '3',
         drawer_type: 'driver',
-        name: availableDrivers?.length ? 'Add Driver' : 'No Drivers Available',
+        name: 'Add Driver',
         driver: {
             id: '3',
             email: 'vI8Pb@example.com',
@@ -41,34 +43,50 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
         },
     };
 
-    const handleSubmit = () => {
-        console.log({ selectedDriver });
-        // call a mutation to add the driver to the business day
-        if (selectedDriver) {
-            addDriver(selectedDriver);
-        }
-        close();
-    };
+    // const handleSubmit = () => {
+    //     console.log({ selectedDriver });
+    //     // call a mutation to add the driver to the business day
+    //     if (selectedDriver) {
+    //         addDriver(selectedDriver);
+    //     }
+    //     close();
+    // };
 
     const handleChange = (drawerID: string) => {
         console.log({ drawerID });
         const driver = availableDrivers.find((d) => d.drawer_id === drawerID) as DriverDrawer;
-        setSelectedDriver(driver);
+        // setSelectedDriver(driver);
+        addDriver(driver);
+        close();
     };
 
     const handleClick = () => {
-        setSelectedDriver(null);
+        // setSelectedDriver(null);
         open();
     };
 
     return (
         <>
-            <DrawerCardBase drawer={dummyDrawer} handleClick={handleClick} />
-            {availableDrivers?.length > 0 && (
-                <Dialog open={isOpen} onClose={close}>
-                    <DialogTitle>Add Driver</DialogTitle>
-                    <DialogContent>
-                        <Stack direction="row" mt={2}>
+            <DrawerCardBase
+                sx={{
+                    button: {
+                        height: '16em',
+                        width: '12em',
+                    },
+                    avatar: {
+                        width: '6em',
+                        height: '6em',
+                    },
+                }}
+                drawer={dummyDrawer}
+                handleClick={handleClick}
+            />
+
+            <Dialog open={isOpen} onClose={close}>
+                <DialogTitle>Add Driver</DialogTitle>
+                <DialogContent>
+                    <Stack direction="row" mt={2}>
+                        {mode === 'existing' && (
                             <Autocomplete
                                 options={availableDrivers.map((driver) => driver.drawer_id)}
                                 sx={{ width: 300 }}
@@ -78,13 +96,24 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
                                     availableDrivers.find((d) => d.drawer_id === option)?.name || ''
                                 }
                             />
-                        </Stack>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleSubmit}>Submit</Button>
-                    </DialogActions>
-                </Dialog>
-            )}
+                        )}
+                    </Stack>
+                </DialogContent>
+                <Divider />
+                <DialogActions sx={{ justifyContent: 'center', alignItems: 'center' }}>
+                    {/* <Button onClick={handleSubmit}>Submit</Button> */}
+
+                    {mode === 'existing' ? (
+                        <Button variant="text" onClick={() => setMode('new')}>
+                            Create a New Driver
+                        </Button>
+                    ) : (
+                        <Button variant="text" onClick={() => setMode('existing')}>
+                            Select an Existing Driver
+                        </Button>
+                    )}
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

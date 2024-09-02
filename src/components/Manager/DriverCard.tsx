@@ -13,6 +13,16 @@ export const DriverCard = ({ driver }: DriverCardProps) => {
 
     return (
         <DrawerCardBase
+            sx={{
+                button: {
+                    height: '16em',
+                    width: '12em',
+                },
+                avatar: {
+                    width: '6em',
+                    height: '6em',
+                },
+            }}
             key={driver.drawer_id}
             drawer={driver}
             handleClick={() => drivers.handleClick(driver)}

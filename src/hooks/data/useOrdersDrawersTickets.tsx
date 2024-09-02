@@ -91,7 +91,7 @@ export const useOrdersDrawersTickets = () => {
     };
 
     const toggleDrawerOpen = (drawer: Drawer | DriverDrawer) => {
-        if (openDrawer === drawer) {
+        if (openDrawer.drawer_id === drawer.drawer_id) {
             setOpenDrawer(unassignedDrawer);
         } else {
             setOpenDrawer(drawer);

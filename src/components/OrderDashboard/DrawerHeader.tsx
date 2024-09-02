@@ -1,13 +1,11 @@
-// import { useSuspenseQueries } from '@tanstack/react-query';
-// import { getAllDrawers, getAllDrivers } from '../../supabaseQueries';
 import { Stack, StackOwnProps } from '@mui/material';
 import { DrawerCard, DrawerAvatarSkeleton, UnassignedDrawerAvatar } from './DrawerCard';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../Base/ContextMenu';
-// import { useNavigateToManagerDashboard } from '../../hooks/navigation';
 import { DriverDrawer } from '../../typesAndValidators';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
+import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 
 const stackProps: Partial<StackOwnProps> = {
     direction: 'row',
@@ -40,15 +38,15 @@ export const DrawerHeader = () => {
             {combinedData?.map((drawer) => {
                 if ('driver' in drawer) {
                     return (
-                        <ContextMenu openOnType="right-click">
+                        <ContextMenu openOnType="right-click" key={drawer.drawer_id}>
                             <ContextMenu.Base>
                                 <DrawerCard key={drawer.drawer_id} drawer={drawer} />
                             </ContextMenu.Base>
                             <ContextMenu.Menu>
                                 <ContextMenu.MenuItem
-                                    //onClick={() => navigateToManagerDashboard({ tab: 'drivers', driver: drawer })}
-                                    onClick={() => navigateToManagerDashboard(drawer as DriverDrawer)}>
-                                    Driver Details
+                                    onClick={() => navigateToManagerDashboard(drawer as DriverDrawer)}
+                                    icon={<OpenInNewIcon />}>
+                                    Open in Manager
                                 </ContextMenu.MenuItem>
                             </ContextMenu.Menu>
                         </ContextMenu>

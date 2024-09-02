@@ -1,7 +1,6 @@
 import { Skeleton } from '@mui/material';
-// import { Drawer, DriverDrawer, Profile } from '../../typesAndValidators';
 
-/* TODO: ALL THE FOLLOWING
+/* TODO: ADMIN DASHBOARD
 
 
 TODO: should show workers (profiles)

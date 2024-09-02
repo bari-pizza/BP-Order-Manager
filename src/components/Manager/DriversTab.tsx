@@ -15,8 +15,8 @@ const stackProps: Partial<StackOwnProps> = {
     direction: 'row',
     // justifyContent: 'space-between',
     alignItems: 'center',
-    minHeight: '175px',
-    height: '175px',
+    minHeight: '300px',
+    height: '300px',
     overflow: 'hidden',
     pb: 1,
 };

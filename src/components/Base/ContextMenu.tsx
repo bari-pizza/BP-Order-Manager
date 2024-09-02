@@ -1,18 +1,20 @@
-import { Menu as MuiMenu, MenuItem as MuiMenuItem } from '@mui/material';
+import { Box, Menu as MuiMenu, MenuItem as MuiMenuItem, Stack } from '@mui/material';
 import React, { createContext, useContext, useState, MouseEventHandler } from 'react';
 
 interface ContextMenuContextProps {
     handleClick: MouseEventHandler<HTMLElement>;
-    anchorEl: HTMLElement | null;
+    // anchorEl: HTMLElement | null;
+    contextMenu: { mouseX: number; mouseY: number } | null;
     handleClose: () => void;
     openOnType: 'click' | 'right-click';
 }
 
-const RightClickContext = createContext<ContextMenuContextProps>({
+const ContextMenuContext = createContext<ContextMenuContextProps>({
     handleClick: () => {},
-    anchorEl: null,
+    // anchorEl: null,
     handleClose: () => {},
     openOnType: 'click',
+    contextMenu: null,
 });
 
 interface ContextMenuProps {
@@ -21,58 +23,97 @@ interface ContextMenuProps {
 }
 
 export const ContextMenu = ({ children, openOnType = 'right-click' }: ContextMenuProps) => {
-    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+    const [contextMenu, setContextMenu] = useState<{
+        mouseX: number;
+        mouseY: number;
+    } | null>(null);
 
-    const handleClick: MouseEventHandler<HTMLElement> = (e: React.MouseEvent) => {
-        setAnchorEl(e.currentTarget as HTMLElement);
-        e.preventDefault();
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        setContextMenu({ mouseX: event.clientX + 2, mouseY: event.clientY - 6 });
     };
 
     const handleClose = () => {
-        setAnchorEl(null);
+        setContextMenu(null);
     };
 
     return (
-        <RightClickContext.Provider value={{ handleClick, anchorEl, handleClose, openOnType }}>
+        <ContextMenuContext.Provider value={{ contextMenu, handleClick, handleClose, openOnType }}>
             {children}
-        </RightClickContext.Provider>
+        </ContextMenuContext.Provider>
     );
 };
 
 const Base = ({ children }: { children: React.ReactNode }) => {
-    const { handleClick, openOnType } = useContext(RightClickContext);
+    const { handleClick, openOnType } = useContext(ContextMenuContext);
 
-    const style = { cursor: 'pointer' };
+    const sx = {
+        cursor: 'pointer',
+    };
 
     if (openOnType === 'click') {
         return (
-            <div style={style} onClick={handleClick}>
+            <Box className="click-handler" sx={sx} onClick={handleClick}>
                 {children}
-            </div>
+            </Box>
         );
     }
 
-    return <div onContextMenu={handleClick}>{children}</div>;
+    return (
+        <Box className="click-handler" sx={sx} onContextMenu={handleClick}>
+            {children}
+        </Box>
+    );
 };
 
 const Menu = ({ children }: { children: React.ReactNode }) => {
-    const { anchorEl, handleClose } = useContext(RightClickContext);
-    const open = Boolean(anchorEl);
+    const { handleClose, contextMenu } = useContext(ContextMenuContext);
 
     return (
-        <MuiMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <MuiMenu
+            slotProps={{ paper: { sx: { minWidth: 200 } } }}
+            open={contextMenu !== null}
+            onClose={handleClose}
+            anchorReference="anchorPosition"
+            anchorPosition={contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}>
             {children}
         </MuiMenu>
     );
 };
 
-const MenuItem = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => {
-    const { handleClose } = useContext(RightClickContext);
+const MenuItem = ({
+    children,
+    onClick,
+    icon,
+}: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    icon?: React.ReactNode;
+}) => {
+    const { handleClose } = useContext(ContextMenuContext);
+
+    if (!onClick) {
+        return (
+            <MuiMenuItem disabled disableRipple>
+                <Stack direction="row" alignItems="center" gap={2}>
+                    {icon} {children}
+                </Stack>
+            </MuiMenuItem>
+        );
+    }
+
     const handleClick = () => {
         handleClose();
         onClick();
     };
-    return <MuiMenuItem onClick={handleClick}>{children}</MuiMenuItem>;
+
+    return (
+        <MuiMenuItem disableRipple onClick={handleClick}>
+            <Stack direction="row" alignItems="center" gap={2}>
+                {icon} {children}
+            </Stack>
+        </MuiMenuItem>
+    );
 };
 
 ContextMenu.Base = Base;
