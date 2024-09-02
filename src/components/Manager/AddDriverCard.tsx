@@ -23,7 +23,7 @@ interface AddDriverCardProps {
 export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
     const { drivers } = useManagerDashboardContext();
     const { add: addDriver, available: availableDrivers } = drivers;
-    // const [selectedDriver, setSelectedDriver] = useState<DriverDrawer | null>(null);
+    const [selectedDriver, setSelectedDriver] = useState<DriverDrawer | null>(null);
     const [mode, setMode] = useState<'existing' | 'new'>('existing');
 
     const dummyDrawer: DriverDrawer = {
@@ -43,25 +43,21 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
         },
     };
 
-    // const handleSubmit = () => {
-    //     console.log({ selectedDriver });
-    //     // call a mutation to add the driver to the business day
-    //     if (selectedDriver) {
-    //         addDriver(selectedDriver);
-    //     }
-    //     close();
-    // };
-
     const handleChange = (drawerID: string) => {
         console.log({ drawerID });
         const driver = availableDrivers.find((d) => d.drawer_id === drawerID) as DriverDrawer;
-        // setSelectedDriver(driver);
-        addDriver(driver);
+        setSelectedDriver(driver);
+        // addDriver(driver);
+        // close();
+    };
+
+    const handleChooseExistingDriver = () => {
+        addDriver(selectedDriver as DriverDrawer);
+        setSelectedDriver(null);
         close();
     };
 
     const handleClick = () => {
-        // setSelectedDriver(null);
         open();
     };
 
@@ -83,37 +79,70 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
             />
 
             <Dialog open={isOpen} onClose={close}>
-                <DialogTitle>Add Driver</DialogTitle>
+                <DialogTitle sx={{ textAlign: 'center' }}>
+                    {mode === 'existing' ? 'Choose' : 'Create'} Driver
+                </DialogTitle>
                 <DialogContent>
-                    <Stack direction="row" mt={2}>
-                        {mode === 'existing' && (
-                            <Autocomplete
-                                options={availableDrivers.map((driver) => driver.drawer_id)}
-                                sx={{ width: 300 }}
-                                onChange={(_, drawerID) => handleChange(drawerID || '')}
-                                renderInput={(params) => <TextField {...params} label="Driver" />}
-                                getOptionLabel={(option) =>
-                                    availableDrivers.find((d) => d.drawer_id === option)?.name || ''
-                                }
-                            />
+                    <Stack direction="column" mt={2} gap={2}>
+                        {mode === 'existing' ? (
+                            availableDrivers.length ? (
+                                <Autocomplete
+                                    options={availableDrivers.map((driver) => driver.drawer_id)}
+                                    sx={{ width: 225 }}
+                                    onChange={(_, drawerID) => handleChange(drawerID || '')}
+                                    renderInput={(params) => <TextField {...params} label="Driver" />}
+                                    getOptionLabel={(option) =>
+                                        availableDrivers.find((d) => d.drawer_id === option)?.name || ''
+                                    }
+                                />
+                            ) : (
+                                <TextField label="No Drivers Available" disabled />
+                            )
+                        ) : (
+                            <CreateNewDriverForm />
                         )}
                     </Stack>
                 </DialogContent>
-                <Divider />
-                <DialogActions sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                    {/* <Button onClick={handleSubmit}>Submit</Button> */}
-
-                    {mode === 'existing' ? (
-                        <Button variant="text" onClick={() => setMode('new')}>
-                            Create a New Driver
-                        </Button>
-                    ) : (
-                        <Button variant="text" onClick={() => setMode('existing')}>
-                            Select an Existing Driver
-                        </Button>
-                    )}
+                <DialogActions sx={{ justifyContent: 'center', alignItems: 'center', marginTop: '1em' }}>
+                    <Stack direction="column" gap={2} mb={2}>
+                        {mode === 'existing' ? (
+                            <>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleChooseExistingDriver}
+                                    disabled={!selectedDriver}>
+                                    Add Driver
+                                </Button>
+                                <Divider />
+                                <Button variant="text" onClick={() => setMode('new')}>
+                                    Create a New Driver
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button variant="contained" onClick={() => console.log('add driver')}>
+                                    Create New Driver
+                                </Button>
+                                <Divider />
+                                <Button variant="text" onClick={() => setMode('existing')}>
+                                    Select an Existing Driver
+                                </Button>
+                            </>
+                        )}
+                    </Stack>
                 </DialogActions>
             </Dialog>
+        </>
+    );
+};
+
+const CreateNewDriverForm = () => {
+    return (
+        <>
+            <TextField label="First Name" />
+            <TextField label="Last Name" />
+            <TextField label="Email" />
+            <TextField label="Phone" />
         </>
     );
 };

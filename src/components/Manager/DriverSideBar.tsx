@@ -63,7 +63,10 @@ export const DriverSideBar = () => {
     let handleRemoveDriverClick;
 
     if (driverSummary.orders === 0) {
-        handleRemoveDriverClick = () => drivers.remove(currentDriver);
+        handleRemoveDriverClick = () => {
+            drivers.remove(currentDriver);
+            drivers.handleClick(currentDriver);
+        };
     }
 
     return (
