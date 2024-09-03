@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
-import { Link, Navigate, NavigateProps, Path, To, useLocation } from 'react-router-dom';
+import { Link, Navigate, Path, To, useLocation, LinkProps } from 'react-router-dom';
 
-type SmartLinkProps = NavigateProps & {
+type SmartLinkProps = LinkProps & {
     keepSearchParams?: boolean | string[];
 };
 
@@ -9,7 +9,6 @@ type SmartNavigateProps = SmartLinkProps & {
     redirect?: boolean;
 };
 
-// export const SmartLink = ({ to, keepSearchParams, ...rest }: SmartLinkProps) => {
 export const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(({ to, keepSearchParams, ...rest }, ref) => {
     const location = useLocation();
     const existingSearchParams = new URLSearchParams(location.search);

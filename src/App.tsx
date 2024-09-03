@@ -26,6 +26,7 @@ import { AdminDashboard, AdminDashboardSkeleton } from './components/Admin/Admin
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ManagerDashboard, ManagerDashboardSkeleton } from './components/Manager/ManagerDashboard.tsx';
+import { UnderConstruction } from './UnderConstruction.tsx';
 
 const router = createBrowserRouter([
     {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
             {
                 path: '/',
                 element: <Home />,
+            },
+            {
+                path: '/search',
+                element: <UnderConstruction />,
             },
             {
                 path: '/orders',

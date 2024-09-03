@@ -28,7 +28,10 @@ const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): DriverDraw
 };
 
 export const getAllDrivers = async () => {
-    const { data, error } = await supaClient.from('Driver').select('drawer:Drawer(*), driver:Profile(*)');
+    const { data, error } = await supaClient
+        .from('Driver')
+        .select('drawer:Drawer(*), driver:Profile(*)')
+        .eq('is_deleted', false);
 
     if (error) {
         console.error(error);
@@ -255,7 +258,30 @@ export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs:
     });
     if (error) {
         console.error(error);
+        throw error;
     } else {
         return data;
+    }
+};
+
+export const getAllEmployees = async () => {
+    const { data, error } = await supaClient.from('Profile').select('*');
+    if (error) {
+        console.error(error);
+        throw error;
+    } else {
+        return data as unknown as Profile[];
+    }
+};
+
+export const updateEmployee = async (employee: Profile, is_driver: boolean) => {
+    const { data, error } = await supaClient.rpc('handle_employee_update', {
+        p_is_driver: is_driver,
+        p_profile: employee,
+    });
+    if (error) {
+        throw error;
+    } else {
+        return data; // should be null
     }
 };

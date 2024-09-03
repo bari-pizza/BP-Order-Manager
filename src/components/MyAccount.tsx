@@ -3,6 +3,8 @@ import { supaClient } from '../supaClient';
 import { useUserContext } from '../hooks/data/useContextData';
 import { SmartNavigate } from './SmartNavigate';
 
+// TODO: Add a way to edit profile (avatar_src, first_name, last_name,  password)
+
 export const MyAccount = () => {
     const { session } = useUserContext();
 

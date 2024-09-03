@@ -58,16 +58,19 @@ export type Database = {
           created_at: string
           drawer_id: string
           driver_id: string | null
+          is_deleted: boolean
         }
         Insert: {
           created_at?: string
           drawer_id?: string
           driver_id?: string | null
+          is_deleted?: boolean
         }
         Update: {
           created_at?: string
           drawer_id?: string
           driver_id?: string | null
+          is_deleted?: boolean
         }
         Relationships: [
           {
@@ -217,30 +220,33 @@ export type Database = {
       Profile: {
         Row: {
           avatar_src: string | null
-          email: string | null
+          email: string
           first_name: string | null
           id: string
           is_admin: boolean
+          is_cashier: boolean
           is_manager: boolean
           last_name: string | null
           phone: string | null
         }
         Insert: {
           avatar_src?: string | null
-          email?: string | null
+          email: string
           first_name?: string | null
-          id: string
+          id?: string
           is_admin?: boolean
+          is_cashier?: boolean
           is_manager?: boolean
           last_name?: string | null
           phone?: string | null
         }
         Update: {
           avatar_src?: string | null
-          email?: string | null
+          email?: string
           first_name?: string | null
           id?: string
           is_admin?: boolean
+          is_cashier?: boolean
           is_manager?: boolean
           last_name?: string | null
           phone?: string | null
@@ -266,6 +272,13 @@ export type Database = {
           p_drawer_id: string
         }
         Returns: Json
+      }
+      handle_employee_update: {
+        Args: {
+          p_profile: unknown
+          p_is_driver: boolean
+        }
+        Returns: undefined
       }
       remove_orders_from_drawer: {
         Args: {

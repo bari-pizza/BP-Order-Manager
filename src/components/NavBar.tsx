@@ -39,7 +39,7 @@ const today = dayjs();
 const iconProps: SvgIconTypeMap['props'] = { color: 'primary', sx: { fontSize: '35px' } };
 
 export function NavBar() {
-    const { session } = useUserContext();
+    const { session, profile } = useUserContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
@@ -56,11 +56,11 @@ export function NavBar() {
             onClick: showBusinessDatePicker,
         },
         { path: '/search', icon: <Search {...iconProps} />, text: 'Search' },
-        { path: '/admin', icon: <AdminIcon {...iconProps} />, text: 'Admin' },
-        { path: '/manager', icon: <ManagerIcon {...iconProps} />, text: 'Manager' },
+        profile?.is_admin && { path: '/admin', icon: <AdminIcon {...iconProps} />, text: 'Admin' },
+        profile?.is_manager && { path: '/manager', icon: <ManagerIcon {...iconProps} />, text: 'Manager' },
         { path: '/orders', icon: <LocalPizzaIcon {...iconProps} />, text: 'Orders' },
         userListItem,
-    ];
+    ].filter(Boolean) as NavBarItem[];
 
     return (
         <Drawer
