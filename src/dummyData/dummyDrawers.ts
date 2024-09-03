@@ -31,12 +31,13 @@ const createDummyDriver: () => DriverDrawer = () => {
         drawer_type: 'driver',
         driver: {
             id: faker.string.uuid(),
-            email: null,
+            email: faker.internet.email(),
             phone: null,
             last_name: fullName.split(' ')[1],
             first_name: fullName.split(' ')[0],
             is_admin: false,
             is_manager: false,
+            is_cashier: false,
             avatar_src: null,
         },
     };

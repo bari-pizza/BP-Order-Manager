@@ -36,6 +36,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
             first_name: 'Jane',
             is_admin: false,
             is_manager: false,
+            is_cashier: false,
             last_name: 'Doe',
             phone: '555-555-5555',
             avatar_src: availableDrivers?.length ? 'https://i.pravatar.cc/300' : '',

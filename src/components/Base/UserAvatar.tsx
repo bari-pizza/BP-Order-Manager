@@ -1,5 +1,5 @@
 import { Avatar, Skeleton } from '@mui/material';
-import { useUserContext } from '../hooks/data/useContextData';
+import { useUserContext } from '../../hooks/data/useContextData';
 
 const avatarSX = {
     height: 35,

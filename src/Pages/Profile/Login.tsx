@@ -1,8 +1,8 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { supaClient } from '../supaClient';
-import { SmartNavigate } from './SmartNavigate';
-import { useUserContext } from '../hooks/data/useContextData';
+import { supaClient } from '../../supaClient';
+import { SmartNavigate } from '../../components/SmartNavigate';
+import { useUserContext } from '../../hooks/data/useContextData';
 
 type LoginProps = {
     authMode: 'sign_in' | 'sign_up';

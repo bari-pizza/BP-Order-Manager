@@ -4,7 +4,7 @@ import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
 import { QuickInfoArea } from './QuickInfoArea';
 import { useOrderEditor } from './OrderEditor/useOrderEditor';
-import { SideBar, SideBarSkeleton } from '../SideBar';
+import { SideBar, SideBarSkeleton } from '../../components/SideBar';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
