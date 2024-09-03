@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { DriverDrawer } from '../../typesAndValidators';
-import { DrawerCardBase } from '../Base/DrawerCardBase';
+import { DrawerCardBase } from '../../components/Base/DrawerCardBase';
 import {
     Dialog,
     Autocomplete,

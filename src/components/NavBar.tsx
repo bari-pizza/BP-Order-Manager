@@ -18,7 +18,7 @@ import {
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { CalendarIcon } from '@mui/x-date-pickers';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
-import { UserAvatar } from './UserAvatar';
+import { UserAvatar } from './Base/UserAvatar';
 import { useUserContext } from '../hooks/data/useContextData';
 import { SmartLink } from './SmartNavigate';
 import dayjs from 'dayjs';

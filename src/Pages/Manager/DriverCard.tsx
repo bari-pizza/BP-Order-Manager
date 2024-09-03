@@ -1,7 +1,7 @@
 import { DriverDrawer } from '../../typesAndValidators';
-import { DrawerCardBase, DrawerCardSlotProps } from '../Base/DrawerCardBase';
+import { DrawerCardBase, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
-import { ContextMenu } from '../Base/ContextMenu';
+import { ContextMenu } from '../../components/Base/ContextMenu';
 import { useNavigate } from 'react-router-dom';
 import {
     OpenInNew as OpenInNewIcon,

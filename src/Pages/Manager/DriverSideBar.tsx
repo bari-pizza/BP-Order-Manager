@@ -1,8 +1,8 @@
 import { Stack, Typography } from '@mui/material';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
-import { SideBar } from '../SideBar';
-import { DrawerCardSlotProps } from '../Base/DrawerCardBase';
-import { ContextMenu } from '../Base/ContextMenu';
+import { SideBar } from '../../components/SideBar';
+import { DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
+import { ContextMenu } from '../../components/Base/ContextMenu';
 import { DriverCard } from './DriverCard';
 
 export const DriverSideBar = () => {

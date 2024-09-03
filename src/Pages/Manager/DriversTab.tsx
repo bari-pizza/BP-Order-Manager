@@ -4,7 +4,7 @@ import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { AddDriverCard } from './AddDriverCard';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import { DriverSideBar } from './DriverSideBar';
-import { ContextMenu } from '../Base/ContextMenu';
+import { ContextMenu } from '../../components/Base/ContextMenu';
 
 /*
    TODO: business_day, driver_id, is_locked

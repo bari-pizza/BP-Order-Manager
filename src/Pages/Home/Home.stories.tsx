@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Home } from './Home';
+import { Home } from '../Pages/Home/Home';
 
 const meta = {
-  component: Home,
+    component: Home,
 } satisfies Meta<typeof Home>;
 
 export default meta;
