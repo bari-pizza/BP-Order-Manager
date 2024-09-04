@@ -3,15 +3,16 @@ import { Button, Divider, Stack } from '@mui/material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
 import { QuickInfoArea } from './QuickInfoArea';
-import { useOrderEditor } from './OrderEditor/useOrderEditor';
+import { OrderEditor } from './OrderEditor/OrderEditor';
 import { SideBar, SideBarSkeleton } from '../../components/SideBar';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
+import { useDialogProps } from '../../hooks/ui/useDialogProps';
 
 export const OrderDashboard = () => {
     const { drivers } = useDrivers();
-    const { orderEditor, addOrderButton } = useOrderEditor();
+    const { open, close, isOpen } = useDialogProps();
     const { ticket, drawer, orders } = useOrdersDrawersTickets();
 
     // TODO: would be cool to have the number of selectedTickets follow the mouse while moving on the page
@@ -66,9 +67,17 @@ export default MouseFollowerComponent;
             </Stack>
             <SideBar width="300px">
                 <Stack alignContent="center" justifyContent="space-between" direction="column" height="100%">
-                    <Stack>{orderEditor}</Stack>
+                    {/* <Stack>{orderEditor}</Stack> */}
+                    <Stack>
+                        <OrderEditor close={close} isOpen={isOpen} />
+                    </Stack>
                     <Stack direction="column" m={2} gap={2}>
-                        {addOrderButton}
+                        {/* {addOrderButton} */}
+                        {!isOpen && (
+                            <Button variant="contained" onClick={open}>
+                                Add Order
+                            </Button>
+                        )}
                     </Stack>
                 </Stack>
             </SideBar>

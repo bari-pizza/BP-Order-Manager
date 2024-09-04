@@ -20,8 +20,12 @@ import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { useEffect } from 'react';
 
 interface OrderEditorProps {
-    open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    // open: boolean;
+    // setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    // order?: Order;
+    // asDialog?: boolean;
+    close: () => void;
+    isOpen: boolean;
     order?: Order;
     asDialog?: boolean;
 }
@@ -30,7 +34,7 @@ type FormValues = Order & {
     is_prepaid?: boolean;
 };
 
-export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps) => {
+export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { origins } = useBariPizzaContext();
     const {
@@ -63,7 +67,7 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
         mutationFn: createNewOrder,
         onSuccess: (data) => {
             console.log({ data });
-            setOpen(false);
+            close();
             queryClient.invalidateQueries({ queryKey: ['orders', data?.business_date] });
         },
 
@@ -77,7 +81,7 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
         mutationFn: updateOrder,
         onSuccess: (data) => {
             console.log({ data });
-            setOpen(false);
+            close();
             queryClient.invalidateQueries({ queryKey: ['orders', data?.business_date] });
         },
         onError: (error) => {
@@ -232,7 +236,7 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
     };
 
     const handleCancel = () => {
-        setOpen(false);
+        close();
         if (order) {
             reset(order);
         } else {
@@ -242,7 +246,7 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
 
     if (asDialog) {
         return (
-            <Dialog open={open} onClose={() => setOpen(false)}>
+            <Dialog open={isOpen} onClose={close}>
                 <DialogTitle>Order Editor</DialogTitle>
                 <DialogContent>{body}</DialogContent>
                 <DialogActions>
@@ -253,7 +257,7 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
         );
     }
 
-    if (open) {
+    if (isOpen) {
         return (
             <Stack direction="column" m={2}>
                 <Typography variant="h5" textAlign={'center'}>

@@ -3,7 +3,8 @@ import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box, BoxPr
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order } from '../../typesAndValidators';
-import { useOrderEditor } from './OrderEditor/useOrderEditor';
+import { OrderEditor } from './OrderEditor/OrderEditor';
+import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import {
     ExpandMore as ExpandMoreIcon,
     OpenInNew as OpenInNewIcon,
@@ -53,10 +54,8 @@ interface OrderTicketProps {
 
 export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected, selected }: OrderTicketProps) => {
     const { origins } = useBariPizzaContext();
-    const { setOpen, orderEditor } = useOrderEditor({
-        order,
-        asDialog: true,
-    });
+    const { open, isOpen, close } = useDialogProps();
+
     const { ticket } = useOrderDashboardContext();
     const theme = useTheme();
     const ticketRef = useRef<SVGSVGElement>(null);
@@ -93,7 +92,7 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
 
     const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        setOpen(true);
+        open();
     };
 
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id)!;
@@ -157,7 +156,7 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                     </Stack>
                 </Stack>
             </CardActionArea>
-            {orderEditor}
+            <OrderEditor order={order} asDialog close={close} isOpen={isOpen} />
         </Card>
     );
 };
