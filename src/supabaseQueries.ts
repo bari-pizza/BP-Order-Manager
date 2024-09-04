@@ -115,20 +115,12 @@ export const getAllOrigins = async () => {
 
 export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
     const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
-    if (validateError) return [] as Order[];
-    // const { data, error } = await supaClient
-    //     .from('Order')
-    //     .select('*, payments:Payment(*)')
-    //     .eq('business_date', `${year}-${month}-${day}`)
-    //     .order('order_number', { ascending: true });
-    // select * from public."OrderPaymentsView" where business_date = '2024-09-03'
+    if (validateError) return [] as Order_Payment[];
     const { data, error } = await supaClient
         .from('OrderPaymentsView')
         .select('*')
         .eq('business_date', `${year}-${month}-${day}`)
         .order('order_number', { ascending: true });
-
-    console.log({ data, error });
 
     return handleResponse<Order_Payment>({ data, error });
 };

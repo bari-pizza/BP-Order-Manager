@@ -12,7 +12,7 @@ import {
     FormControlLabel,
 } from '@mui/material';
 import { createNewOrder, updateOrder } from '../../../supabaseQueries';
-import { Order, validators } from '../../../typesAndValidators';
+import { Order_Payment, validators } from '../../../typesAndValidators';
 import { useForm, Controller, SubmitHandler, SubmitErrorHandler, FieldErrors } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
@@ -26,11 +26,11 @@ interface OrderEditorProps {
     // asDialog?: boolean;
     close: () => void;
     isOpen: boolean;
-    order?: Order;
+    order?: Order_Payment;
     asDialog?: boolean;
 }
 
-type FormValues = Order & {
+type FormValues = Order_Payment & {
     is_prepaid?: boolean;
 };
 

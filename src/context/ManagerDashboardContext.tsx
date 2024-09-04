@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { Drawer, Driver_Drawer, Order, OrderOrigin } from '../typesAndValidators';
+import { Drawer, Driver_Drawer, Order_Payment, OrderOrigin } from '../typesAndValidators';
 
 interface ManagerDashboardProps {
     // all orders, drivers, and origins are already provided by BariPizzaContext
@@ -22,10 +22,9 @@ interface ManagerDashboardProps {
         handleClick: (driver: Driver_Drawer) => void;
     };
     orders: {
-        all: Order[];
-        forCurrentDrawer: Order[];
-        byDrawerID: (drawerID: string) => Order[];
-        // maybe add by date range for reporting?
+        all: Order_Payment[];
+        forCurrentDrawer: Order_Payment[];
+        byDrawerID: (drawerID: string) => Order_Payment[];
     };
 }
 

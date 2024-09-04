@@ -1,5 +1,5 @@
 import { useRef, useState, RefObject } from 'react';
-import type { Drawer, Driver_Drawer, Order } from '../../typesAndValidators';
+import type { Drawer, Driver_Drawer, Order_Payment } from '../../typesAndValidators';
 import { addOrdersToDrawer, getAllDaysOrders, removeOrdersFromDrawer } from '../../supabaseQueries';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useBusinessDate } from '../data/useBusinessDate';
@@ -23,12 +23,7 @@ export const useOrdersDrawersTickets = () => {
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 30,
     });
-    // const { data: allPayments } = useSuspenseQuery({
-    //     queryKey: ['payments', businessDate.format('YYYY-MM-DD')],
-    //     queryFn: () => getAllDaysPayments(businessDate),
-    //     refetchOnWindowFocus: false,
-    //     staleTime: 1000 * 60 * 30,
-    // });
+    const allPayments = allOrders.flatMap((order) => order.payments);
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
     const drawerRefs = useRef<{ [key: string]: RefObject<HTMLDivElement> }>({});
 
@@ -39,7 +34,7 @@ export const useOrdersDrawersTickets = () => {
     const orders = allOrders?.filter(
         (order) => order.drawer_id === (openDrawer.drawer_id === 'unassigned' ? null : openDrawer.drawer_id),
     );
-    const ordersByDrawer = allOrders?.reduce((acc: { [key: string]: Order[] }, order) => {
+    const ordersByDrawer = allOrders?.reduce((acc: { [key: string]: Order_Payment[] }, order) => {
         const key = order.drawer_id ?? 'unassigned';
         if (!acc[key]) {
             acc[key] = [];
@@ -62,7 +57,7 @@ export const useOrdersDrawersTickets = () => {
     const noneCollapsed = collapsedTickets.length === 0;
     const noneSelected = selectedTickets.length === 0;
 
-    const toggleCollapsedTicket = (order: Order) => {
+    const toggleCollapsedTicket = (order: Order_Payment) => {
         setCollapsedTickets((prev) => {
             if (prev.includes(order.order_id)) {
                 return prev.filter((id) => id !== order.order_id);
@@ -71,7 +66,7 @@ export const useOrdersDrawersTickets = () => {
         });
     };
 
-    const toggleSelectedTicket = (order: Order) => {
+    const toggleSelectedTicket = (order: Order_Payment) => {
         setSelectedTickets((prev) => {
             if (prev.includes(order.order_id)) {
                 return prev.filter((id) => id !== order.order_id);
@@ -246,7 +241,7 @@ export const useOrdersDrawersTickets = () => {
         }) => {
             console.log({ updatedOrderIDs, errors, drawerID });
             const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
-            const handleOutcome = toastRef.current['add'];
+            const handleOutcome = toastRef.current['add_tickets'];
             handleOutcome({
                 data: updatedOrderIDs.length ? { payload: { orderIDs: updatedOrderIDs } } : null,
                 errors,
@@ -275,7 +270,7 @@ export const useOrdersDrawersTickets = () => {
             // TODO: refactor this eventually so that success accepts {update_order_ids, errors}
             // TODO: would require updating supabase function
             const orderIDs = orders.map((order) => order.order_id); // test this
-            const handleOutcome = toastRef.current['remove'];
+            const handleOutcome = toastRef.current['remove_tickets'];
             const errors: (DataWithError & { order_id: string })[] = [];
             const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
             handleOutcome({
@@ -300,14 +295,14 @@ export const useOrdersDrawersTickets = () => {
 
     const putTicketsInDrawer = (drawer: Drawer | Driver_Drawer) => {
         const drawerID = drawer.drawer_id;
-        toastRef.current['add'] = addOrdersToast(selectedTickets, drawer);
+        toastRef.current['add_tickets'] = addOrdersToast(selectedTickets, drawer);
         console.log({ allOrders });
         assignOrdersToDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 
     const removeTicketsFromDrawer = () => {
         const drawerID = openDrawer.drawer_id;
-        toastRef.current['remove'] = removeOrdersToast(selectedTickets, openDrawer);
+        toastRef.current['remove_tickets'] = removeOrdersToast(selectedTickets, openDrawer);
         unassignOrdersFromDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 
@@ -391,8 +386,8 @@ export const useOrdersDrawersTickets = () => {
         ticket: {
             select: toggleSelectedTicket,
             collapse: toggleCollapsedTicket,
-            isCollapsed: (order: Order) => collapsedTickets.includes(order.order_id),
-            isSelected: (order: Order) => selectedTickets.includes(order.order_id),
+            isCollapsed: (order: Order_Payment) => collapsedTickets.includes(order.order_id),
+            isSelected: (order: Order_Payment) => selectedTickets.includes(order.order_id),
             all: {
                 select: toggleSelectAllTickets,
                 collapse: toggleCollapseAllTickets,
@@ -424,9 +419,8 @@ export const useOrdersDrawersTickets = () => {
             byDrawerID: getOrdersByDrawerID,
         },
         payments: {
-            // all: allPayments,
-            byDrawerID: () => [], //TODO
-            // create: (details: NewPayment, drawerID: string) => {}, //TODO
+            all: allPayments,
+            // only useful for admin / manager pages
         },
     };
 };

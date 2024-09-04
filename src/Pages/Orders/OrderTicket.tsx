@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box, BoxProps } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
-import { Order } from '../../typesAndValidators';
+import { Order_Payment } from '../../typesAndValidators';
 import { OrderEditor } from './OrderEditor/OrderEditor';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import {
@@ -45,10 +45,10 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 interface OrderTicketProps {
-    order: Order;
-    toggleCollapsed: (order: Order) => void;
+    order: Order_Payment;
+    toggleCollapsed: (order: Order_Payment) => void;
     collapsed: boolean;
-    toggleSelected: (order: Order) => void;
+    toggleSelected: (order: Order_Payment) => void;
     selected: boolean;
 }
 
