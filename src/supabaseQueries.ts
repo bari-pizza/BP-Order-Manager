@@ -4,7 +4,7 @@ import {
     Drawer,
     Profile,
     Driver_Drawer,
-    Order,
+    Order, // only used to interact directly with supabase db
     NewOrder,
     OrderOrigin,
     Order_Payment,
@@ -218,7 +218,10 @@ export const createNewOrder = async (newOrder: NewOrder) => {
     return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
-export const updateOrder = async (order: Order) => {
+export const updateOrder = async (orderWithPayments: Order_Payment) => {
+    // remove .payments from order
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { payments, ...order } = orderWithPayments;
     const { data, error } = await supaClient.from('Order').update(order).eq('order_id', order.order_id).select();
     return handleResponse<Order>({ data, error, shouldThrow: true });
 };
@@ -242,7 +245,7 @@ export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs:
         p_drawer_id: drawerID,
         p_order_ids: orderIDs,
     });
-    return handleResponse<Order>({ data, error, shouldThrow: true });
+    return handleResponse<Order_Payment>({ data, error, shouldThrow: true });
 };
 
 export const getAllEmployees = async () => {

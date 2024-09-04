@@ -80,7 +80,6 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
     const updateOrderMutation = useMutation({
         mutationFn: updateOrder,
         onSuccess: (data) => {
-            console.log({ data });
             close();
             queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },

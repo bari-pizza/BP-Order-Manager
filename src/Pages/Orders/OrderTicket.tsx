@@ -98,6 +98,9 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id)!;
     const originLogo = orderOrigin.icon || '';
 
+    const totalPayments = order.payments.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
+    const isPaid = totalPayments === order.total_in_cents;
+
     return (
         <Card variant="elevation" sx={cardSX} raised>
             <CardActionArea onClick={handleSelect}>
@@ -130,7 +133,9 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                         <Stack direction="row" justifyContent="space-between" pl={1} pr={1}>
                             <Stack direction="column">
                                 <Typography variant="body1">{order.phone}</Typography>
-                                <Typography variant="body1">${(order.total_in_cents / 100).toFixed(2)}</Typography>
+                                <Typography variant="body1" color={isPaid ? 'primary' : 'error'}>
+                                    ${(order.total_in_cents / 100).toFixed(2)}
+                                </Typography>
                             </Stack>
                             <Box component="span" sx={{ cursor: 'pointer' }} onClick={handleEditClick}>
                                 <OpenInNewIcon />
