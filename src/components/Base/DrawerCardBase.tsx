@@ -15,7 +15,7 @@ import {
     Typography,
     TypographyProps,
 } from '@mui/material';
-import type { Drawer, DriverDrawer } from '../../typesAndValidators';
+import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import {
     PointOfSale as PointOfSaleIcon,
     DeliveryDining as DeliveryDiningIcon,
@@ -35,7 +35,7 @@ export interface DrawerCardSlotProps {
 }
 
 interface DrawerCardBaseProps {
-    drawer: Drawer | DriverDrawer;
+    drawer: Drawer | Driver_Drawer;
     drawerRef?: React.RefObject<HTMLDivElement>;
     isOpen?: boolean;
     badgeCount?: number;

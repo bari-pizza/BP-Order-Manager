@@ -1,9 +1,9 @@
-import { Drawer, DriverDrawer } from '../../typesAndValidators';
+import { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
     tab?: string;
-    driver?: Drawer | DriverDrawer;
+    driver?: Drawer | Driver_Drawer;
 }
 
 const useNavigateToManagerDashboard = () => {

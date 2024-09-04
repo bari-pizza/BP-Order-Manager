@@ -1,9 +1,9 @@
 import { createContext } from 'react';
-import type { Drawer, DriverDrawer, OrderOrigin } from '../typesAndValidators';
+import type { Drawer, Driver_Drawer, OrderOrigin } from '../typesAndValidators';
 
 interface BariPizzaContextProps {
     drawers: Drawer[];
-    drivers: DriverDrawer[];
+    drivers: Driver_Drawer[];
     origins: OrderOrigin[];
 }
 

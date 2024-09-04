@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Tooltip, Typography } from '@mui/material';
-import type { Drawer, DriverDrawer } from '../../typesAndValidators';
+import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { getDrawerFullName } from '../../utils';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { DrawerCardBase, DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 
 interface DrawerCardProps {
-    drawer: Drawer | DriverDrawer;
+    drawer: Drawer | Driver_Drawer;
     sx?: {
         avatar?: React.CSSProperties;
         badge?: React.CSSProperties;
@@ -69,7 +69,7 @@ export const DrawerAvatarSkeleton = () => {
     return <DrawerCardBaseSkeleton />;
 };
 
-const DriverContextMenu = ({ driver }: { driver: DriverDrawer }) => {
+const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
     const { setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>('managerDashboardTabName');
     const { setValue: setDriver } = useLocalStorage<'openDrawer'>('openDrawer');
     const navigate = useNavigate();

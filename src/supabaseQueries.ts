@@ -1,13 +1,64 @@
 import { supaClient } from './supaClient';
-import { BusinessDayDriver, Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
+import {
+    BusinessDayDriver,
+    Drawer,
+    Profile,
+    Driver_Drawer,
+    Order,
+    NewOrder,
+    OrderOrigin,
+    Order_Payment,
+    Driver,
+} from './typesAndValidators';
 import { z } from 'zod';
 import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
+import { PostgrestError } from '@supabase/supabase-js';
 const bariPizzaLogo = new URL('/BP logo.png', import.meta.url).href;
 const doorDashLogo = new URL('/DoorDash logo.png', import.meta.url).href;
 const pizzamicoLogo = new URL('/Pizzamico logo.ico', import.meta.url).href;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
+
+const supabaseDate = z.object({
+    year: z.number().min(2024).max(2100),
+    month: z.number().min(1).max(12),
+    day: z.number().min(1).max(31),
+});
+
+const validateBusinessDate = (businessDate: dayjs.Dayjs) => {
+    const { month, day, year } = dayjsToMDY(businessDate);
+    try {
+        supabaseDate.parse({ year, month, day });
+        return { month, day, year };
+    } catch (error) {
+        console.error(error);
+        return { month, day, year, error };
+    }
+};
+
+const handleResponse = <T>({
+    data,
+    error,
+    shouldThrow,
+}: {
+    data: unknown[] | null;
+    error: PostgrestError | null;
+    shouldThrow?: boolean;
+}) => {
+    if (error) {
+        console.error(error);
+        if (shouldThrow) {
+            throw error;
+        }
+        return [] as T[];
+    }
+    if (!data) {
+        console.error('data is null');
+        return [] as T[];
+    }
+    return data as T[];
+};
 
 export const getAllDrawers = async () => {
     const { data, error } = await supaClient.from('Drawer').select('*').neq('drawer_type', 'driver');
@@ -20,7 +71,7 @@ export const getAllDrawers = async () => {
     return data as unknown as Drawer[];
 };
 
-const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): DriverDrawer => {
+const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): Driver_Drawer => {
     return {
         ...dirtyDriverDrawer.drawer,
         driver: dirtyDriverDrawer.driver,
@@ -35,9 +86,10 @@ export const getAllDrivers = async () => {
 
     if (error) {
         console.error(error);
-        return [] as DriverDrawer[];
+        return [] as Driver_Drawer[];
     }
 
+    // can probably remove this conversion if I change the select
     return data.map((d) => convertToDriverDrawer(d as unknown as DirtyDriverDrawer));
 };
 
@@ -61,57 +113,43 @@ export const getAllOrigins = async () => {
     return data as unknown as OrderOrigin[];
 };
 
-const supabaseDate = z.object({
-    year: z.number().min(2024).max(2100),
-    month: z.number().min(1).max(12),
-    day: z.number().min(1).max(31),
-});
-
 export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
-    const { month, day, year } = dayjsToMDY(businessDate);
-    try {
-        supabaseDate.parse({ month, day, year });
-    } catch (error) {
-        console.error(error);
-        return [] as Order[];
-    }
+    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+    if (validateError) return [] as Order[];
+    // const { data, error } = await supaClient
+    //     .from('Order')
+    //     .select('*, payments:Payment(*)')
+    //     .eq('business_date', `${year}-${month}-${day}`)
+    //     .order('order_number', { ascending: true });
+    // select * from public."OrderPaymentsView" where business_date = '2024-09-03'
     const { data, error } = await supaClient
-        .from('Order')
+        .from('OrderPaymentsView')
         .select('*')
         .eq('business_date', `${year}-${month}-${day}`)
         .order('order_number', { ascending: true });
 
-    if (error) {
-        console.error(error);
-        return [] as Order[];
-    }
+    console.log({ data, error });
 
-    return data as unknown as Order[];
+    return handleResponse<Order_Payment>({ data, error });
 };
 
-export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
-    const { month, day, year } = dayjsToMDY(businessDate);
-    try {
-        supabaseDate.parse({ year, month, day });
-    } catch (error) {
-        console.error(error);
-        return [] as BusinessDayDriver[];
-    }
+// export const getAllDaysPayments = async (businessDate: dayjs.Dayjs) => {
+//     const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+//     if (validateError) return [] as Payment[];
+//     const { data, error } = await supaClient.from('Payment').select('*').eq('business_date', `${year}-${month}-${day}`);
 
+//     return handleResponse<Payment>({ data, error });
+// };
+
+export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
+    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+    if (validateError) return [] as BusinessDayDriver[];
     const { data, error } = await supaClient
         .from('BusinessDayDriver')
         .select('*')
         .eq('business_date', `${year}-${month}-${day}`);
 
-    if (error) console.error(error);
-    else console.log(data);
-
-    if (error) {
-        console.error(error);
-        return [] as BusinessDayDriver[];
-    }
-
-    return data as unknown as BusinessDayDriver[];
+    return handleResponse<BusinessDayDriver>({ data, error });
 };
 
 export const addDriverToBusinessDay = async ({
@@ -121,13 +159,8 @@ export const addDriverToBusinessDay = async ({
     drawerID: string;
     businessDate: dayjs.Dayjs;
 }) => {
-    const { month, day, year } = dayjsToMDY(businessDate);
-    try {
-        supabaseDate.parse({ year, month, day });
-    } catch (error) {
-        console.error(error);
-        return [] as BusinessDayDriver[];
-    }
+    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+    if (validateError) return [] as BusinessDayDriver[];
     const business_date = `${year}-${month}-${day}`;
     const { data, error } = await supaClient
         .from('BusinessDayDriver')
@@ -136,16 +169,7 @@ export const addDriverToBusinessDay = async ({
             drawer_id: drawerID,
         })
         .select();
-    if (error) {
-        console.error(error);
-        throw error;
-    }
-
-    if (!data) {
-        return null;
-    }
-
-    return data[0] as unknown as BusinessDayDriver;
+    return handleResponse<BusinessDayDriver>({ data, error, shouldThrow: true });
 };
 
 export const removeDriverFromBusinessDay = async ({
@@ -155,13 +179,8 @@ export const removeDriverFromBusinessDay = async ({
     drawerID: string;
     businessDate: dayjs.Dayjs;
 }) => {
-    const { month, day, year } = dayjsToMDY(businessDate);
-    try {
-        supabaseDate.parse({ year, month, day });
-    } catch (error) {
-        console.error(error);
-        return [] as BusinessDayDriver[];
-    }
+    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+    if (validateError) return [] as BusinessDayDriver[];
     const business_date = `${year}-${month}-${day}`;
     const { data, error } = await supaClient
         .from('BusinessDayDriver')
@@ -169,15 +188,7 @@ export const removeDriverFromBusinessDay = async ({
         .eq('business_date', business_date)
         .eq('drawer_id', drawerID)
         .select();
-    if (error) {
-        console.error(error);
-        throw error;
-    }
-    if (!data) {
-        console.log('there was no data to delete');
-        return null;
-    }
-    return data[0] as unknown as BusinessDayDriver;
+    return handleResponse<BusinessDayDriver>({ data, error, shouldThrow: true });
 };
 
 interface DummyQueryFnProps<T> {
@@ -212,30 +223,12 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
 export const createNewOrder = async (newOrder: NewOrder) => {
     console.log({ newOrder });
     const { data, error } = await supaClient.from('Order').insert([newOrder]).select();
-    if (error) {
-        console.error(error);
-        throw error;
-    }
-
-    if (!data) {
-        return null;
-    }
-
-    return data[0] as unknown as Order;
+    return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
 export const updateOrder = async (order: Order) => {
     const { data, error } = await supaClient.from('Order').update(order).eq('order_id', order.order_id).select();
-    if (error) {
-        console.error(error);
-        throw error;
-    }
-
-    if (!data) {
-        return null;
-    }
-
-    return data[0] as unknown as Order;
+    return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
 export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
@@ -249,6 +242,7 @@ export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: stri
     } else {
         return data;
     }
+    // return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
 export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
@@ -256,32 +250,23 @@ export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs:
         p_drawer_id: drawerID,
         p_order_ids: orderIDs,
     });
-    if (error) {
-        console.error(error);
-        throw error;
-    } else {
-        return data;
-    }
+    return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
 export const getAllEmployees = async () => {
     const { data, error } = await supaClient.from('Profile').select('*');
-    if (error) {
-        console.error(error);
-        throw error;
-    } else {
-        return data as unknown as Profile[];
-    }
+    return handleResponse<Profile>({ data, error, shouldThrow: true });
 };
+
+interface UpdateEmployeeResponse {
+    profile: Profile;
+    driver: Driver;
+}
 
 export const updateEmployee = async (employee: Profile, is_driver: boolean) => {
     const { data, error } = await supaClient.rpc('handle_employee_update', {
         p_is_driver: is_driver,
         p_profile: employee,
     });
-    if (error) {
-        throw error;
-    } else {
-        return data; // should be null
-    }
+    return handleResponse<UpdateEmployeeResponse>({ data, error, shouldThrow: true });
 };

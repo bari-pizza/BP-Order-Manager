@@ -2,7 +2,7 @@ import { useSuspenseQuery, useQueryClient, useMutation } from '@tanstack/react-q
 import { addDriverToBusinessDay, getAllDaysDrivers, removeDriverFromBusinessDay } from '../../supabaseQueries';
 import { useBusinessDate } from './useBusinessDate';
 import { useBariPizzaContext } from './useContextData';
-import { DriverDrawer } from '../../typesAndValidators';
+import { Driver_Drawer } from '../../typesAndValidators';
 import dayjs from 'dayjs';
 import { useRef, useState } from 'react';
 import { DataWithError, HandleOutcomeProps } from '../../toast/toast';
@@ -24,8 +24,8 @@ export const useDrivers = () => {
         .map(({ drawer_id }) => {
             return drivers.find((driver) => driver.drawer_id === drawer_id);
         })
-        .filter((driver) => driver !== undefined) as DriverDrawer[];
-    const [openDriver, setOpenDriver] = useState<DriverDrawer | null>(todaysDrivers[0] || null);
+        .filter((driver) => driver !== undefined) as Driver_Drawer[];
+    const [openDriver, setOpenDriver] = useState<Driver_Drawer | null>(todaysDrivers[0] || null);
 
     const availableDrivers =
         drivers.filter((driver) => {
@@ -65,19 +65,19 @@ export const useDrivers = () => {
         },
     });
 
-    const addDriver = (driver: DriverDrawer) => {
+    const addDriver = (driver: Driver_Drawer) => {
         const drawerID = driver.drawer_id;
         toastRef.current['add'] = addDriverToBusinessDayToast(driver.name, businessDate);
         addDriverToDayMutation.mutate({ drawerID, businessDate });
     };
 
-    const removeDriver = (driver: DriverDrawer) => {
+    const removeDriver = (driver: Driver_Drawer) => {
         const drawerID = driver.drawer_id;
         toastRef.current['remove'] = removeDriverFromBusinessDayToast(driver.name, businessDate);
         removeDriverFromDayMutation.mutate({ drawerID, businessDate });
     };
 
-    const handleDriverClick = (driver: DriverDrawer) => {
+    const handleDriverClick = (driver: Driver_Drawer) => {
         if (openDriver?.drawer_id === driver.drawer_id) {
             setOpenDriver(null);
         } else {

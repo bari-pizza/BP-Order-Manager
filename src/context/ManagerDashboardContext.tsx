@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { Drawer, DriverDrawer, Order, OrderOrigin } from '../typesAndValidators';
+import { Drawer, Driver_Drawer, Order, OrderOrigin } from '../typesAndValidators';
 
 interface ManagerDashboardProps {
     // all orders, drivers, and origins are already provided by BariPizzaContext
@@ -7,19 +7,19 @@ interface ManagerDashboardProps {
     // drawers and origins from BariPizzaContext
     drawers: {
         all: Drawer[];
-        onClick: (drawer: Drawer | DriverDrawer) => void;
+        onClick: (drawer: Drawer | Driver_Drawer) => void;
     };
     origins: OrderOrigin[];
     drivers: {
-        all: DriverDrawer[];
-        todays: DriverDrawer[];
-        available: DriverDrawer[];
-        current: DriverDrawer | null;
-        add: (driver: DriverDrawer) => void;
-        remove: (driver: DriverDrawer) => void;
-        close: (driver: DriverDrawer) => void;
-        reOpen: (driver: DriverDrawer) => void;
-        handleClick: (driver: DriverDrawer) => void;
+        all: Driver_Drawer[];
+        todays: Driver_Drawer[];
+        available: Driver_Drawer[];
+        current: Driver_Drawer | null;
+        add: (driver: Driver_Drawer) => void;
+        remove: (driver: Driver_Drawer) => void;
+        close: (driver: Driver_Drawer) => void;
+        reOpen: (driver: Driver_Drawer) => void;
+        handleClick: (driver: Driver_Drawer) => void;
     };
     orders: {
         all: Order[];

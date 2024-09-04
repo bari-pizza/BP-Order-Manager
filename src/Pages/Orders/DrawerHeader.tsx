@@ -2,7 +2,7 @@ import { Stack, StackOwnProps } from '@mui/material';
 import { DrawerCard, DrawerAvatarSkeleton, UnassignedDrawerAvatar } from './DrawerCard';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../../components/Base/ContextMenu';
-import { DriverDrawer } from '../../typesAndValidators';
+import { Driver_Drawer } from '../../typesAndValidators';
 
 const stackProps: Partial<StackOwnProps> = {
     direction: 'row',
@@ -31,7 +31,7 @@ export const DrawerHeader = () => {
                                 <DrawerCard key={drawer.drawer_id} drawer={drawer} />
                             </ContextMenu.Base>
                             <ContextMenu.Menu>
-                                <DrawerCard.driverContextMenu driver={drawer as DriverDrawer} />
+                                <DrawerCard.driverContextMenu driver={drawer as Driver_Drawer} />
                             </ContextMenu.Menu>
                         </ContextMenu>
                     );

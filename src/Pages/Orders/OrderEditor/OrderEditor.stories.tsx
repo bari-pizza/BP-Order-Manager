@@ -25,8 +25,8 @@ function Render(args: any) {
 
 export const Default: Story = {
     args: {
-        open: true,
-        setOpen: () => {},
+        isOpen: true,
+        close: () => {},
         order: undefined,
         asDialog: false,
     },
@@ -35,8 +35,8 @@ export const Default: Story = {
 
 export const Dialog: Story = {
     args: {
-        open: true,
-        setOpen: () => {},
+        isOpen: true,
+        close: () => {},
         order: undefined,
         asDialog: true,
     },
@@ -46,8 +46,8 @@ export const Dialog: Story = {
 
 export const Edit: Story = {
     args: {
-        open: true,
-        setOpen: () => {},
+        isOpen: true,
+        close: () => {},
         order: dummyOrders.one.existing(),
         asDialog: false,
     },
@@ -56,8 +56,8 @@ export const Edit: Story = {
 
 export const EditDialog: Story = {
     args: {
-        open: true,
-        setOpen: () => {},
+        isOpen: true,
+        close: () => {},
         order: dummyOrders.one.existing(),
         asDialog: true,
     },

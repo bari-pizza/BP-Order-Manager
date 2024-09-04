@@ -36,7 +36,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             return updateEmployee(profile, is_driver);
         },
         onSuccess: (data) => {
-            const { profile, driver } = data;
+            const { profile, driver } = data[0];
             const updatedRow = {
                 ...profile,
                 is_driver: !driver?.is_deleted,

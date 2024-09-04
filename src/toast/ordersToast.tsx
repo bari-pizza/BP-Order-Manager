@@ -1,7 +1,7 @@
 import { toastPromise, DataWithError, DataWithPayload } from './toast';
-import { Drawer, DriverDrawer } from '../typesAndValidators';
+import { Drawer, Driver_Drawer } from '../typesAndValidators';
 
-export const addOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDrawer) => {
+export const addOrdersToast = (orderIDs: string[], drawer: Drawer | Driver_Drawer) => {
     const { handleOutcome } = toastPromise({
         pending: {
             render: () => `Adding ${orderIDs.length} ticket${orderIDs.length > 1 ? 's' : ''} to ${drawer.name}`,
@@ -30,7 +30,7 @@ export const addOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDrawer
     return handleOutcome;
 };
 
-export const removeOrdersToast = (orderIDs: string[], drawer: Drawer | DriverDrawer) => {
+export const removeOrdersToast = (orderIDs: string[], drawer: Drawer | Driver_Drawer) => {
     const { handleOutcome } = toastPromise({
         pending: {
             render: () => `Removing ${orderIDs.length} ticket${orderIDs.length > 1 ? 's' : ''} from ${drawer.name}`,

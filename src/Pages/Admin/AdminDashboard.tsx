@@ -5,7 +5,7 @@ import { ManagerDashboardContext as AdminDashboardContext } from '../../context/
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
-import { DriverDrawer, AdminDashboardTabName } from '../../typesAndValidators';
+import { Driver_Drawer, AdminDashboardTabName } from '../../typesAndValidators';
 import { EmployeesTab } from './EmployeesTab';
 import { ThirdPartiesTab } from './ThirdPartiesTab';
 import { TODO } from '../../components/Base/TODO';
@@ -96,7 +96,7 @@ export const AdminDashboard = () => {
                     available: drivers.available,
                     add: drivers.add,
                     remove: drivers.remove, // some supabase mutation
-                    close: (driver: DriverDrawer) => {
+                    close: (driver: Driver_Drawer) => {
                         console.log('close driver', driver);
                     }, // some supabase mutation
                     reOpen: () => {}, // some supabase mutation

@@ -68,7 +68,7 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
         onSuccess: (data) => {
             console.log({ data });
             close();
-            queryClient.invalidateQueries({ queryKey: ['orders', data?.business_date] });
+            queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
 
         onError: (error) => {
@@ -82,7 +82,7 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
         onSuccess: (data) => {
             console.log({ data });
             close();
-            queryClient.invalidateQueries({ queryKey: ['orders', data?.business_date] });
+            queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
         onError: (error) => {
             console.error(`Issue updating order: "${order?.order_id}`, error);

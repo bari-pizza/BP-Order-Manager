@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
-import { DriverDrawer } from '../../typesAndValidators';
+import { Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardBase } from '../../components/Base/DrawerCardBase';
 import {
     Dialog,
@@ -23,9 +23,9 @@ interface AddDriverCardProps {
 export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
     const { drivers } = useManagerDashboardContext();
     const { available: availableDrivers, add: addDriver } = drivers;
-    const [selectedDriver, setSelectedDriver] = useState<DriverDrawer | null>(null);
+    const [selectedDriver, setSelectedDriver] = useState<Driver_Drawer | null>(null);
 
-    const dummyDrawer: DriverDrawer = {
+    const dummyDrawer: Driver_Drawer = {
         created_at: '2024-08-27T00:00:00.000Z',
         drawer_id: '3',
         drawer_type: 'driver',
@@ -65,12 +65,12 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
 
     const handleChange = (drawerID: string) => {
         console.log({ drawerID });
-        const driver = availableDrivers.find((d) => d.drawer_id === drawerID) as DriverDrawer;
+        const driver = availableDrivers.find((d) => d.drawer_id === drawerID) as Driver_Drawer;
         setSelectedDriver(driver);
     };
 
     const handleChooseExistingDriver = () => {
-        addDriver(selectedDriver as DriverDrawer);
+        addDriver(selectedDriver as Driver_Drawer);
         setSelectedDriver(null);
         closeDialog();
     };

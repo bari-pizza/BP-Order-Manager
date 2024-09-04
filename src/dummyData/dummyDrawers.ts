@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker/locale/en_US';
-import type { Drawer, DriverDrawer } from '../typesAndValidators';
+import type { Drawer, Driver_Drawer } from '../typesAndValidators';
 
 const drawers: Drawer[] = [
     {
@@ -22,7 +22,7 @@ const drawers: Drawer[] = [
     },
 ];
 
-const createDummyDriver: () => DriverDrawer = () => {
+const createDummyDriver: () => Driver_Drawer = () => {
     const fullName = faker.person.fullName();
     return {
         name: fullName,

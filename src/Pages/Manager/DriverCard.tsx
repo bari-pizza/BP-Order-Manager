@@ -1,4 +1,4 @@
-import { DriverDrawer } from '../../typesAndValidators';
+import { Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardBase, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../../components/Base/ContextMenu';
@@ -11,7 +11,7 @@ import {
 import { deepmerge } from '@mui/utils';
 
 interface DriverCardProps {
-    driver: DriverDrawer;
+    driver: Driver_Drawer;
     sx?: {
         avatar?: React.CSSProperties;
         badge?: React.CSSProperties;
@@ -53,7 +53,7 @@ export const DriverCard = ({ driver, sx, props, canOpen = true }: DriverCardProp
     );
 };
 
-const DriverContextMenu = ({ driver }: { driver: DriverDrawer }) => {
+const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
     const navigate = useNavigate();
     const { orders, drivers, drawers } = useManagerDashboardContext();
     const driversOrders = orders.byDrawerID(driver.drawer_id);

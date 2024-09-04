@@ -1,5 +1,5 @@
 import { useRef, useState, RefObject } from 'react';
-import type { Drawer, DriverDrawer, Order } from '../../typesAndValidators';
+import type { Drawer, Driver_Drawer, Order } from '../../typesAndValidators';
 import { addOrdersToDrawer, getAllDaysOrders, removeOrdersFromDrawer } from '../../supabaseQueries';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useBusinessDate } from '../data/useBusinessDate';
@@ -23,6 +23,12 @@ export const useOrdersDrawersTickets = () => {
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 30,
     });
+    // const { data: allPayments } = useSuspenseQuery({
+    //     queryKey: ['payments', businessDate.format('YYYY-MM-DD')],
+    //     queryFn: () => getAllDaysPayments(businessDate),
+    //     refetchOnWindowFocus: false,
+    //     staleTime: 1000 * 60 * 30,
+    // });
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
     const drawerRefs = useRef<{ [key: string]: RefObject<HTMLDivElement> }>({});
 
@@ -90,7 +96,7 @@ export const useOrdersDrawersTickets = () => {
         }
     };
 
-    const toggleDrawerOpen = (drawer: Drawer | DriverDrawer) => {
+    const toggleDrawerOpen = (drawer: Drawer | Driver_Drawer) => {
         if (openDrawer.drawer_id === drawer.drawer_id) {
             setOpenDrawer(unassignedDrawer);
         } else {
@@ -264,9 +270,11 @@ export const useOrdersDrawersTickets = () => {
     const unassignOrdersFromDrawerMutation = useMutation({
         mutationFn: ({ drawerID, orderIDs }: { drawerID: string; orderIDs: string[] }) =>
             removeOrdersFromDrawer({ drawerID, orderIDs }),
-        onSuccess: (orderIDs) => {
+        onSuccess: (orders) => {
+            // this was OrderIDs
             // TODO: refactor this eventually so that success accepts {update_order_ids, errors}
             // TODO: would require updating supabase function
+            const orderIDs = orders.map((order) => order.order_id); // test this
             const handleOutcome = toastRef.current['remove'];
             const errors: (DataWithError & { order_id: string })[] = [];
             const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
@@ -290,7 +298,7 @@ export const useOrdersDrawersTickets = () => {
         },
     });
 
-    const putTicketsInDrawer = (drawer: Drawer | DriverDrawer) => {
+    const putTicketsInDrawer = (drawer: Drawer | Driver_Drawer) => {
         const drawerID = drawer.drawer_id;
         toastRef.current['add'] = addOrdersToast(selectedTickets, drawer);
         console.log({ allOrders });
@@ -303,7 +311,7 @@ export const useOrdersDrawersTickets = () => {
         unassignOrdersFromDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 
-    const handleDrawerClick = (drawer: Drawer | DriverDrawer) => {
+    const handleDrawerClick = (drawer: Drawer | Driver_Drawer) => {
         if (handlingDrawerClick) {
             return;
         }
@@ -414,6 +422,11 @@ export const useOrdersDrawersTickets = () => {
             forCurrentDrawer: orders,
             all: allOrders,
             byDrawerID: getOrdersByDrawerID,
+        },
+        payments: {
+            // all: allPayments,
+            byDrawerID: () => [], //TODO
+            // create: (details: NewPayment, drawerID: string) => {}, //TODO
         },
     };
 };

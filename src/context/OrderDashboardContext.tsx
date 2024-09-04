@@ -1,5 +1,5 @@
 import { createContext, RefObject } from 'react';
-import type { Drawer, DriverDrawer, Order } from '../typesAndValidators';
+import type { Drawer, Driver_Drawer, Order } from '../typesAndValidators';
 
 interface OrderDashboardContextProps {
     ticket: {
@@ -27,9 +27,9 @@ interface OrderDashboardContextProps {
         };
     };
     drawer: {
-        onClick: (drawer: Drawer | DriverDrawer) => void;
+        onClick: (drawer: Drawer | Driver_Drawer) => void;
         removeOrders: () => void;
-        current: Drawer | DriverDrawer | null;
+        current: Drawer | Driver_Drawer | null;
         unassigned: Drawer;
         isUnassignedDrawer: boolean;
         refs: {
@@ -42,8 +42,8 @@ interface OrderDashboardContextProps {
         byDrawerID: (drawerID: string) => Order[];
     };
     drivers: {
-        all: DriverDrawer[];
-        todays: DriverDrawer[];
+        all: Driver_Drawer[];
+        todays: Driver_Drawer[];
     };
 }
 
