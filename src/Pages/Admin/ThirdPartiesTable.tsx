@@ -8,18 +8,20 @@ import {
     GridRowModes,
     GridRowModesModel,
 } from '@mui/x-data-grid';
-import { Profile } from '../../typesAndValidators';
 import { useState } from 'react';
-import { updateEmployee } from '../../supabaseQueries';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CellEditCheckbox, CellCheckbox } from '../../components/Base/DataGrid/CellCheckbox';
+import { OrderOrigin } from '../../typesAndValidators';
+import { dummyQueryFn } from '../../supabaseQueries';
+import { CellCheckbox, CellEditCheckbox } from '../../components/Base/DataGrid/CellCheckbox';
 import { CellEditTextField } from '../../components/Base/DataGrid/CellTextField';
 import { createCellActions } from '../../components/Base/DataGrid/createCellActions';
 
-type Employee = Profile & { is_driver: boolean };
+type ThirdParty = Omit<OrderOrigin, 'is_third_party'> & {
+    is_third_party: true;
+};
 
-export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
-    const [rows, setRows] = useState<Employee[]>(employees);
+export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[] }) => {
+    const [rows, setRows] = useState<ThirdParty[]>(thirdParties);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -30,19 +32,23 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
 
     const queryClient = useQueryClient();
 
-    const updateEmployeeMutation = useMutation({
-        mutationFn: (employee: Employee) => {
-            const { is_driver, ...profile } = employee;
-            return updateEmployee(profile, is_driver);
+    const updateThirdPartyMutation = useMutation({
+        mutationFn: (thirdParty: ThirdParty) => {
+            // const { is_driver, ...profile } = employee;
+            // return updateEmployee(profile, is_driver);
+            //TODO: return updateThirdParty(thirdParty);
+            console.log('thirdParty', thirdParty);
+            return dummyQueryFn();
         },
         onSuccess: (data) => {
-            const { profile, driver } = data;
-            const updatedRow = {
-                ...profile,
-                is_driver: !driver?.is_deleted,
-            };
-            setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
-            queryClient.invalidateQueries({ queryKey: ['profiles'] });
+            // const { profile, driver } = data;
+            // const updatedRow = {
+            //     ...profile,
+            //     is_driver: !driver?.is_deleted,
+            // };
+            // setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
+            console.log({ data });
+            queryClient.invalidateQueries({ queryKey: ['origins'] });
         },
         onError: (error) => {
             console.log({ error });
@@ -52,12 +58,13 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const processRowUpdate = (newRow: GridRowModel) => {
         console.log('processRowUpdate', newRow);
         const updatedRow = {
-            ...(newRow as Employee),
+            ...(newRow as ThirdParty),
             // isNew: false
         };
-        updateEmployeeMutation.mutate(updatedRow);
+        alert('this should open a dialog with a preview of the changes, allowing admin to accept or reject');
+        updateThirdPartyMutation.mutate(updatedRow);
         // setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-        setRows((prev) => prev.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        setRows((prev) => prev.map((row) => (row.origin_id === newRow.id ? updatedRow : row)));
         return updatedRow;
     };
 
@@ -69,80 +76,84 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'actions',
             type: 'actions',
-            headerName: 'Actions',
+            headerName: 'Edit',
             width: 100,
             cellClassName: 'actions',
-            getActions: ({ id }) => {
-                return createCellActions(id, rowModesModel, setRowModesModel);
-            },
+            getActions: ({ id }) => createCellActions(id, rowModesModel, setRowModesModel),
         },
         {
-            field: 'first_name',
-            headerName: 'First Name',
+            field: 'name',
+            headerName: 'Name',
             width: 150,
             editable: true,
             renderEditCell: (params) => {
-                return <CellEditTextField params={params} field="first_name" />;
+                return <CellEditTextField params={params} field="name" />;
             },
         },
         {
-            field: 'last_name',
-            headerName: 'Last Name',
+            field: 'can_deliver',
+            headerName: 'Can Deliver',
             width: 150,
-            editable: true,
-            renderEditCell: (params) => {
-                return <CellEditTextField params={params} field="last_name" />;
-            },
-        },
-        {
-            field: 'email',
-            headerName: 'Email',
-            width: 200,
-        },
-        {
-            field: 'phone',
-            headerName: 'Phone',
-            width: 150,
-            editable: true,
-            renderEditCell: (params) => {
-                return <CellEditTextField params={params} field="phone" />;
-            },
-        },
-        {
-            field: 'is_admin',
-            headerName: 'Admin',
-            width: 125,
             editable: true,
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
             renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="is_admin" />;
+                return <CellEditCheckbox params={params} field="can_deliver" />;
             },
         },
         {
-            field: 'is_manager',
-            headerName: 'Manager',
-            width: 125,
-            editable: true,
-
-            renderCell: (params) => {
-                return <CellCheckbox params={params} />;
-            },
-            renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="is_manager" />;
-            },
-        },
-        {
-            field: 'is_driver',
-            headerName: 'Driver',
-            width: 125,
+            field: 'can_tip',
+            headerName: 'Can Tip',
+            width: 150,
             editable: true,
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
             renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="is_driver" />;
+                return <CellEditCheckbox params={params} field="can_tip" />;
+            },
+        },
+        {
+            field: 'default_is_prepaid',
+            headerName: 'Default Is Prepaid',
+            width: 150,
+            editable: true,
+            renderCell: (params) => {
+                return <CellCheckbox params={params} />;
+            },
+            renderEditCell: (params) => {
+                return <CellEditCheckbox params={params} field="default_is_prepaid" />;
+            },
+        },
+        {
+            field: 'has_order_number',
+            headerName: 'Has Order Number',
+            width: 150,
+            editable: true,
+            renderCell: (params) => {
+                return <CellCheckbox params={params} />;
+            },
+            renderEditCell: (params) => {
+                return <CellEditCheckbox params={params} field="has_order_number" />;
+            },
+        },
+        {
+            field: 'icon',
+            headerName: 'Icon',
+            width: 150,
+            editable: true,
+        },
+        {
+            field: 'is_prepaid_toggleable',
+            headerName: 'Is Prepaid Toggleable',
+            width: 150,
+            editable: true,
+            renderCell: (params) => {
+                return <CellCheckbox params={params} />;
+            },
+            renderEditCell: (params) => {
+                return <CellEditCheckbox params={params} field="is_prepaid_toggleable" />;
             },
         },
     ];
@@ -164,6 +175,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                     const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
                     return isEditing ? 'row-is-edit' : '';
                 }}
+                getRowId={(row) => row.origin_id}
             />
         </Stack>
     );

@@ -96,7 +96,8 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
         setOpen(true);
     };
 
-    const originLogo = origins.find((origin) => origin.name === order.origin)?.icon || '';
+    const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id)!;
+    const originLogo = orderOrigin.icon || '';
 
     return (
         <Card variant="elevation" sx={cardSX} raised>
@@ -142,7 +143,7 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                             {originLogo && (
                                 <img
                                     src={originLogo}
-                                    alt={order.origin}
+                                    alt={orderOrigin.name}
                                     width="24px"
                                     height="24px"
                                     style={{ borderRadius: '50%' }}

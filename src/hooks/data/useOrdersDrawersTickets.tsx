@@ -238,6 +238,7 @@ export const useOrdersDrawersTickets = () => {
             drawer_id: string;
             // TODO: would be nice if we got the drawer name here
         }) => {
+            console.log({ updatedOrderIDs, errors, drawerID });
             const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
             const handleOutcome = toastRef.current['add'];
             handleOutcome({
@@ -292,6 +293,7 @@ export const useOrdersDrawersTickets = () => {
     const putTicketsInDrawer = (drawer: Drawer | DriverDrawer) => {
         const drawerID = drawer.drawer_id;
         toastRef.current['add'] = addOrdersToast(selectedTickets, drawer);
+        console.log({ allOrders });
         assignOrdersToDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 

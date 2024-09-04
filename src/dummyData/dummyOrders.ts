@@ -33,7 +33,7 @@ function createDummyOrder<
     const order: Partial<Order> = {};
     order.business_date = data.business_date || dayjs(faker.date.recent()).format('YYYY-MM-DD');
     order.drawer_id = data.drawer_id || faker.string.uuid();
-    order.origin = data.origin || origin;
+    order.origin_id = data.origin_id || origin; // missing origin_id for new orders
     order.order_number = data.order_number || faker.number.int({ min: 1, max: 100 });
     order.order_type = data.order_type || orderType;
     order.phone = data.phone || faker.helpers.fromRegExp(/([1-9][0-9]{2}) [0-9]{3}-[0-9]{4}/);

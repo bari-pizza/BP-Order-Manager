@@ -7,6 +7,7 @@ import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { DriverDrawer, AdminDashboardTabName } from '../../typesAndValidators';
 import { EmployeesTab } from './EmployeesTab';
+import { ThirdPartiesTab } from './ThirdPartiesTab';
 
 /*    TODO: About Today
         Sales
@@ -105,9 +106,9 @@ export const AdminDashboard = () => {
             <Stack height="100vh" width="100%">
                 <Stack m={2}>
                     <Typography
-                        variant="h2"
+                        variant="h3"
                         color="primary"
-                        sx={{ textShadow: `0px 3px 0px ${theme.palette.primary.dark}` }}>
+                        sx={{ textShadow: `1px 1px 1px ${theme.palette.primary.dark}` }}>
                         Admin Dashboard
                     </Typography>
                 </Stack>
@@ -123,7 +124,7 @@ export const AdminDashboard = () => {
                     <EmployeesTab />
                 </TabPanel>
                 <TabPanel tabName="third_parties" value={tabName}>
-                    Third Parties go here!
+                    <ThirdPartiesTab />
                 </TabPanel>
                 <TabPanel tabName="orders" value={tabName}>
                     Orders go here!

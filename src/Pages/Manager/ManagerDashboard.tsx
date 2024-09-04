@@ -7,6 +7,7 @@ import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTicket
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { DriverDrawer, ManagerDashboardTabName } from '../../typesAndValidators';
+import { SalesTab } from './SalesTab';
 
 /*    TODO: About Today
         Sales
@@ -105,9 +106,9 @@ export const ManagerDashboard = () => {
             <Stack height="100vh" width="100%">
                 <Stack m={2}>
                     <Typography
-                        variant="h2"
+                        variant="h3"
                         color="primary"
-                        sx={{ textShadow: `0px 3px 0px ${theme.palette.primary.dark}` }}>
+                        sx={{ textShadow: `1px 1px 1px ${theme.palette.primary.dark}` }}>
                         Manager Dashboard
                     </Typography>
                 </Stack>
@@ -120,7 +121,7 @@ export const ManagerDashboard = () => {
                     </Tabs>
                 </Box>
                 <TabPanel tabName="sales" value={tabName}>
-                    Sales go here!
+                    <SalesTab />
                 </TabPanel>
                 <TabPanel tabName="drivers" value={tabName}>
                     <DriversTab />

@@ -127,6 +127,12 @@ export const DrawerCardBase = ({
         ...props?.avatarIcon,
     });
 
+    let drawerName = drawer.name;
+
+    if ('driver' in drawer) {
+        drawerName = drawer.driver.first_name + ' ' + drawer.driver.last_name;
+    }
+
     return (
         <Button
             className={isOpen ? 'open-drawer' : ''}
@@ -154,7 +160,7 @@ export const DrawerCardBase = ({
                 </Badge>
                 <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
                     <Typography pt={1} variant="body2" {...props?.nameTypography}>
-                        {drawer.name}
+                        {drawerName}
                     </Typography>
                 </Stack>
             </Stack>

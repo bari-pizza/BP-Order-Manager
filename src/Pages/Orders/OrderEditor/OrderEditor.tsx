@@ -44,7 +44,7 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
         setValue,
     } = useForm<FormValues>({
         defaultValues: {
-            origin: 'Bari Pizza',
+            origin_id: origins.find((o) => o.name === 'Bari Pizza')!.origin_id,
             order_number: null,
             order_name: null,
             order_type: 'delivery',
@@ -86,7 +86,7 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
         },
     });
 
-    const currentOrigin = origins.find((origin) => origin.name === watch('origin'));
+    const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'));
     const currentOrderName = watch('order_name');
     const currentOrderNumber = watch('order_number');
     const currentIsPrepaid = watch('is_prepaid');
@@ -122,13 +122,13 @@ export const OrderEditor = ({ open, setOpen, order, asDialog }: OrderEditorProps
         <Stack direction="column" spacing={2} mt={2}>
             {errors.root && <Typography color="error">{errors.root.message}</Typography>}
             <Controller
-                name="origin"
+                name="origin_id"
                 control={control}
                 render={({ field }) => {
                     return (
                         <TextField {...field} label="Origin" select value={field.value}>
                             {origins.map((origin) => (
-                                <MenuItem key={origin.name} value={origin.name}>
+                                <MenuItem key={origin.name} value={origin.origin_id}>
                                     {origin.name}
                                 </MenuItem>
                             ))}
