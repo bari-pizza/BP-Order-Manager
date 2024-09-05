@@ -106,7 +106,9 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
             <CardActionArea onClick={handleSelect}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
-                        <Typography variant="h5">{order.order_name ?? `Order #${order.order_number}`}</Typography>
+                        <Typography variant="h5">
+                            {order.order_name ?? `Order #${order.order_number || 'N/A'}`}
+                        </Typography>
                         {selected ? (
                             <>
                                 <LocalPizzaRoundedIcon color={'primary'} ref={ticketRef} />

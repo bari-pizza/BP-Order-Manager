@@ -12,12 +12,31 @@ import {
     FormControlLabel,
 } from '@mui/material';
 import { createNewOrder, updateOrder } from '../../../supabaseQueries';
-import { Order_Payment, validators } from '../../../typesAndValidators';
+import { Drawer, Driver_Drawer, Order_Payment, validators } from '../../../typesAndValidators';
 import { useForm, Controller, SubmitHandler, SubmitErrorHandler, FieldErrors } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { useEffect } from 'react';
+
+const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_type: 'delivery' | 'pickup') => {
+    if (!drawer) return true;
+    const { drawer_type } = drawer;
+
+    let valid = false;
+    if (order_type === 'delivery' && drawer_type === 'driver') {
+        valid = true;
+    }
+    if (order_type === 'pickup') {
+        if (is_third_party && drawer_type === 'third_party') {
+            valid = true;
+        }
+        if (!is_third_party && drawer_type === 'register') {
+            valid = true;
+        }
+    }
+    return valid;
+};
 
 interface OrderEditorProps {
     // open: boolean;
@@ -36,7 +55,7 @@ type FormValues = Order_Payment & {
 
 export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
-    const { origins } = useBariPizzaContext();
+    const { origins, drawers, drivers } = useBariPizzaContext();
     const {
         handleSubmit,
         register,
@@ -55,7 +74,7 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
             is_prepaid: false,
             phone: null,
             total_in_cents: 0,
-            drawer_id: null,
+            drawer_id: '',
         },
         values: order,
         reValidateMode: 'onChange',
@@ -89,21 +108,36 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
         },
     });
 
-    const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'));
+    // TODO: figure out how to include unassigned as an option
+
+    const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...drivers];
+
+    const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'))!;
     const currentOrderName = watch('order_name');
     const currentOrderNumber = watch('order_number');
     const currentIsPrepaid = watch('is_prepaid');
     const currentOrderType = watch('order_type');
+    const currentDrawer = drawersAndDrivers.find((drawer) => drawer.drawer_id === watch('drawer_id')) || null;
 
-    const { can_deliver, has_order_number } = currentOrigin || {};
+    const { can_deliver, has_order_number, is_third_party } = currentOrigin;
 
     const invalidOrderType = currentOrderType === 'delivery' && can_deliver === false;
+
+    const validDrawers = drawersAndDrivers.filter((drawer) => isValidDrawer(drawer, is_third_party, currentOrderType));
+
+    const invalidDrawer = !isValidDrawer(currentDrawer, is_third_party, currentOrderType);
 
     useEffect(() => {
         if (invalidOrderType) {
             setValue('order_type', 'pickup');
         }
-    }, [invalidOrderType, setValue]);
+    }, [invalidOrderType, validDrawers, setValue]);
+
+    useEffect(() => {
+        if (invalidDrawer) {
+            setValue('drawer_id', validDrawers.length === 1 ? validDrawers[0].drawer_id : '');
+        }
+    }, [invalidDrawer, validDrawers, setValue]);
 
     useEffect(() => {
         // if origin changes, reset the is_prepaid checkbox to the origin's default value
@@ -120,6 +154,8 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
             setValue('order_number', null);
         }
     }, [has_order_number, setValue]);
+
+    // TODO: see what this would look like with two rows instead of one
 
     const body = (
         <Stack direction="column" spacing={2} mt={2}>
@@ -217,10 +253,34 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
                 error={!!errors.total_in_cents}
                 helperText={errors.total_in_cents?.message}
             />
+            <Controller
+                name="drawer_id"
+                control={control}
+                render={({ field }) => {
+                    const currentDrawerID =
+                        validDrawers.length === 1
+                            ? validDrawers[0].drawer_id
+                            : validDrawers.some((drawer) => drawer.drawer_id === field.value)
+                              ? field.value
+                              : '';
+                    return (
+                        <TextField {...field} label="Drawer" select value={currentDrawerID}>
+                            {validDrawers.map((drawer) => {
+                                return (
+                                    <MenuItem key={drawer.name} value={drawer.drawer_id}>
+                                        {drawer.name}
+                                    </MenuItem>
+                                );
+                            })}
+                        </TextField>
+                    );
+                }}
+            />
         </Stack>
     );
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
+        data.drawer_id = data.drawer_id || null; // can't be ''
         if (order) {
             updateOrderMutation.mutate(data);
         } else {
