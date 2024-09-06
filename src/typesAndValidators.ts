@@ -77,6 +77,40 @@ const orderValidators = {
     },
 };
 
+const paymentValidators = {
+    amount_in_cents: {
+        validate: (value: number) => {
+            if (isNaN(value)) {
+                return 'Must be a number';
+            }
+            if (!Number.isInteger(value)) {
+                return 'Must be a whole number';
+            }
+            if (value < 1) {
+                return 'Must be greater than 0';
+            }
+            return true;
+        },
+        valueAsNumber: true,
+    },
+    tip_in_cents: {
+        validate: (value: number) => {
+            if (isNaN(value)) {
+                return 'Must be a number';
+            }
+            if (!Number.isInteger(value)) {
+                return 'Must be a whole number';
+            }
+            if (value < 0) {
+                return 'Cannot be negative';
+            }
+            return true;
+        },
+        valueAsNumber: true,
+    },
+};
+
 export const validators = {
     order: orderValidators,
+    payment: paymentValidators,
 };

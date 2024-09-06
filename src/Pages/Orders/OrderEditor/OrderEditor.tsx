@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Dialog,
     DialogTitle,
@@ -9,25 +10,32 @@ import {
     TextField,
     MenuItem,
     Divider,
-    ButtonGroup,
 } from '@mui/material';
 import { createNewOrder, updateOrder } from '../../../supabaseQueries';
 import {
     Drawer,
     Driver_Drawer,
     NewOrder,
-    Order,
     Order_Payment,
     OrderOrigin,
     OrderType,
+    Payment,
     PaymentType,
     validators,
 } from '../../../typesAndValidators';
-import { useForm, Controller, SubmitHandler, SubmitErrorHandler, FieldErrors } from 'react-hook-form';
+import {
+    useForm,
+    Controller,
+    SubmitHandler,
+    SubmitErrorHandler,
+    FieldErrors,
+    UseFormHandleSubmit,
+} from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
-import { useEffect, useMemo } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
 
 const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_type: OrderType) => {
     if (!drawer) return true;
@@ -67,18 +75,10 @@ const isValidInitialPaymentType = (paymentType?: PaymentType, origin?: OrderOrig
     return true;
 };
 
-// interface OrderEditorProps {
-//     close: () => void;
-//     isOpen: boolean;
-//     // order?: Order_Payment;
-//     order?: Order;
-//     asDialog?: boolean;
-// }
-
 type OrderEditorProps = {
     close: () => void;
     isOpen: boolean;
-    order?: Order;
+    order?: Order_Payment;
     asDialog?: boolean;
     forNewOrder?: boolean;
 };
@@ -86,7 +86,7 @@ type OrderEditorProps = {
 type FormValues =
     | Order_Payment
     | (NewOrder & {
-          initial_payment_type?: PaymentType;
+          initial_payment_type: PaymentType;
       });
 
 export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = false }: OrderEditorProps) => {
@@ -115,24 +115,9 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
         watch,
         setValue,
     } = useForm<FormValues>({
-        // defaultValues: {
-        //     origin_id: origins.find((o) => o.name === 'Bari Pizza')!.origin_id,
-        //     order_number: null,
-        //     order_name: null,
-        //     order_type: 'delivery',
-        //     phone: null,
-        //     total_in_cents: 0,
-        //     drawer_id: '',
-        //     initial_payment_type: 'cash',
-        // },
         defaultValues: forNewOrder ? defaultNewOrder : order,
-        // values: order || defaultNewOrder,
         reValidateMode: 'onChange',
     });
-
-    if (isOpen) {
-        console.log({ order });
-    }
 
     const queryClient = useQueryClient();
 
@@ -161,8 +146,6 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
             setError('root', { message: "Couldn't update order" });
         },
     });
-
-    // TODO: figure out how to include unassigned as an option
 
     const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...drivers];
 
@@ -344,46 +327,14 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
         </>
     );
 
-    const initialPaymentSelector = (
-        <Controller
-            name="initial_payment_type"
-            control={control}
-            render={({ field }) => {
-                return (
-                    <ButtonGroup
-                        orientation="horizontal"
-                        fullWidth
-                        color="primary"
-                        sx={{ width: '100%' }}
-                        aria-label="Payment Type"
-                        {...field}>
-                        {validInitialPaymentTypes.map((option) => {
-                            const isSelected = option.value === field.value;
-                            return (
-                                <Button
-                                    key={option.value}
-                                    variant={isSelected ? 'contained' : 'outlined'}
-                                    onClick={() => {
-                                        setValue('initial_payment_type', option.value);
-                                    }}>
-                                    {option.label}
-                                </Button>
-                            );
-                        })}
-                    </ButtonGroup>
-                );
-            }}
-        />
-    );
-
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         data.drawer_id = data.drawer_id || null; // can't be ''
         if ('order_id' in data) {
             console.log({ data });
             updateOrderMutation.mutate(data);
         } else {
-            const { initial_payment_type: initialPaymentType, ...newOrder } = data;
-            createNewOrderMutation.mutate({ newOrder, initialPaymentType });
+            // const { initial_payment_type: initialPaymentType, ...newOrder } = data;
+            createNewOrderMutation.mutate({ newOrder: data });
         }
     };
 
@@ -403,30 +354,19 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
 
     if (asDialog) {
         return (
-            <Dialog open={isOpen} onClose={close}>
-                <DialogTitle>Order Editor</DialogTitle>
-                <DialogContent>
-                    <Stack direction="column" spacing={2} mt={2}>
-                        <Stack direction="row" spacing={2} mt={2} width="100%">
-                            {errors.root && <Typography color="error">{errors.root.message}</Typography>}
-                            <Stack direction="column" width="50%" spacing={2} mt={2}>
-                                {leftSide}
-                            </Stack>
-                            <Stack direction="column" width="50%" spacing={2} mt={2}>
-                                {rightSide}
-                            </Stack>
-                        </Stack>
-                        <Divider />
-                        <Typography variant="h5" textAlign={'center'}>
-                            Payments
-                        </Typography>
-                    </Stack>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
-                    <Button onClick={handleCancel}>Cancel</Button>
-                </DialogActions>
-            </Dialog>
+            <OrderEditorDialog
+                isOpen={isOpen}
+                close={close}
+                handleCancel={handleCancel}
+                handleSubmit={handleSubmit}
+                onSubmit={onSubmit}
+                onError={onError}
+                leftSide={leftSide}
+                rightSide={rightSide}
+                errors={errors}
+                orderID={order?.order_id || ''}
+                payments={order?.payments || []}
+            />
         );
     }
 
@@ -440,11 +380,120 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                     {errors.root && <Typography color="error">{errors.root.message}</Typography>}
                     {leftSide}
                     {rightSide}
-                    {initialPaymentSelector}
+                    <PaymentTypeSelector
+                        control={control}
+                        validPaymentTypes={initialPaymentOptions}
+                        handleChange={(paymentType) => {
+                            setValue('initial_payment_type', paymentType);
+                        }}
+                        name="initial_payment_type"
+                    />
                 </Stack>
                 <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
                 <Button onClick={handleCancel}>Cancel</Button>
             </Stack>
         );
     }
+};
+
+const OrderEditorDialog = ({
+    isOpen,
+    close,
+    leftSide,
+    rightSide,
+    errors,
+    handleSubmit,
+    onSubmit,
+    onError,
+    handleCancel,
+    payments,
+    orderID,
+}: {
+    isOpen: boolean;
+    close: () => void;
+    leftSide: ReactNode;
+    rightSide: ReactNode;
+    errors: FieldErrors;
+    handleSubmit: UseFormHandleSubmit<FormValues>;
+    onSubmit: SubmitHandler<FormValues>;
+    onError: SubmitErrorHandler<FieldErrors>;
+    handleCancel: () => void;
+    payments: Payment[];
+    orderID: string;
+}) => {
+    const [isPaymentsVisible, setIsPaymentsVisible] = useState(false);
+
+    // Define sliding variants
+    const slideVariants = {
+        hidden: { opacity: 0, y: '100%' },
+        visible: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: '100%' },
+    };
+
+    const toggleSection = () => {
+        setIsPaymentsVisible(!isPaymentsVisible);
+    };
+    return (
+        <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
+            <DialogTitle>{isPaymentsVisible ? 'Payments List' : 'Order Editor'}</DialogTitle>
+            <DialogContent sx={{ height: 300, overflowY: 'hidden' }}>
+                {/* TODO: change overflowY back to normal but just hide scrollbar */}
+                <AnimatePresence initial={false} mode="wait">
+                    {!isPaymentsVisible ? (
+                        <motion.div
+                            key="editor"
+                            variants={slideVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit">
+                            <Stack direction="column" spacing={2} mt={2}>
+                                <Stack direction="row" spacing={2} mt={2} width="100%">
+                                    {errors.root && <Typography color="error">{errors.root.message}</Typography>}
+                                    <Stack direction="column" width="50%" spacing={2} mt={2}>
+                                        {leftSide}
+                                    </Stack>
+                                    <Stack direction="column" width="50%" spacing={2} mt={2}>
+                                        {rightSide}
+                                    </Stack>
+                                </Stack>
+                                <Divider />
+                                <Typography
+                                    variant="h5"
+                                    textAlign={'center'}
+                                    onClick={toggleSection}
+                                    style={{ cursor: 'pointer' }}>
+                                    Payments
+                                </Typography>
+                            </Stack>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="payments"
+                            variants={slideVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit">
+                            <Stack direction="column" spacing={2} mt={2}>
+                                {payments.map((payment) => (
+                                    <PaymentEditor key={payment.payment_id} payment={payment} variant="icon" />
+                                ))}
+                                <Divider />
+                                <PaymentEditor forNewPayment orderID={orderID} />
+                            </Stack>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </DialogContent>
+            <DialogActions>
+                {isPaymentsVisible ? (
+                    <Button onClick={toggleSection}>Go Back</Button>
+                ) : (
+                    <>
+                        <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
+                        <Button onClick={handleCancel}>Cancel</Button>
+                    </>
+                )}
+            </DialogActions>
+        </Dialog>
+    );
 };

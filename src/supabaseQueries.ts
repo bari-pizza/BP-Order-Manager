@@ -58,6 +58,9 @@ const handleResponse = <T>({
         console.error('data is null');
         return [] as T[];
     }
+    if (!Array.isArray(data)) {
+        return [data as T];
+    }
     return data as T[];
 };
 
@@ -125,14 +128,6 @@ export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
 
     return handleResponse<Order_Payment>({ data, error });
 };
-
-// export const getAllDaysPayments = async (businessDate: dayjs.Dayjs) => {
-//     const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
-//     if (validateError) return [] as Payment[];
-//     const { data, error } = await supaClient.from('Payment').select('*').eq('business_date', `${year}-${month}-${day}`);
-
-//     return handleResponse<Payment>({ data, error });
-// };
 
 export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
     const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
@@ -213,17 +208,8 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
     };
 };
 
-export const createNewOrder = async ({
-    newOrder,
-    initialPaymentType,
-}: {
-    newOrder: NewOrder;
-    initialPaymentType?: PaymentType;
-}) => {
-    console.log({ newOrder, initialPaymentType });
-    const { data, error } = await supaClient.from('Order').insert([newOrder]).select();
-    // should create a new order and a new payment
-    // probably create an rpc that creates both
+export const createNewOrder = async ({ newOrder }: { newOrder: NewOrder & { initial_payment_type: PaymentType } }) => {
+    const { data, error } = await supaClient.rpc('create_new_order_from_json', { p_order_json: newOrder });
     return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 

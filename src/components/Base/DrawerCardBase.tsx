@@ -137,11 +137,6 @@ export const DrawerCardBase = ({
         drawerName = drawer.driver.first_name + ' ' + drawer.driver.last_name;
     }
 
-    // TODO: create animated badge component
-    // will compare old value to new value and animate between
-
-    console.log({ previousBadgeCount, badgeCount });
-
     return (
         <Button
             className={isOpen ? 'open-drawer' : ''}
