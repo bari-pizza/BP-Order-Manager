@@ -77,7 +77,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
 
     return (
         <>
-            <DrawerCardBase sx={sx} drawer={dummyDrawer} handleClick={handleClick} />
+            <DrawerCardBase sx={sx} drawer={dummyDrawer} handleClick={handleClick} badgeCount={0} />
             <Dialog open={isOpen} onClose={closeDialog}>
                 <DialogTitle sx={{ textAlign: 'center' }}>Choose Driver</DialogTitle>
                 <DialogContent>

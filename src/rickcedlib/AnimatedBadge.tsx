@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Badge, BadgeProps } from '@mui/material';
-// import { useAnimation } from './useAnimation';
 import { useInterval } from 'usehooks-ts';
-import { de } from '@faker-js/faker';
 
 type AnimatedBadgeProps = BadgeProps & {
     badgeCount: {
