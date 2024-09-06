@@ -11,6 +11,7 @@ export type OrderType = Tables<'Order'>['order_type'];
 export type BusinessDayDriver = Tables<'BusinessDayDriver'>;
 export type Payment = Tables<'Payment'>;
 export type Order_Payment = Order & { payments: Payment[] };
+export type PaymentType = Tables<'Payment'>['payment_type'];
 
 export type NewProfile = Omit<Profile, 'id' | 'created_at'>;
 export type NewDrawer = Omit<Drawer, 'drawer_id' | 'created_at'>;

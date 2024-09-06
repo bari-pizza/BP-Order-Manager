@@ -3,7 +3,7 @@ import { deepmerge } from '@mui/utils';
 import {
     Avatar,
     AvatarProps,
-    Badge,
+    // Badge,
     BadgeProps,
     Button,
     ButtonProps,
@@ -23,6 +23,9 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
+// import styles from './DrawerCardBase.module.css';
+import { AnimatedBadge } from '../../rickcedlib/AnimatedBadge';
+import { usePrevious } from '@uidotdev/usehooks';
 
 export interface DrawerCardSlotProps {
     button?: Partial<ButtonProps>;
@@ -38,7 +41,7 @@ interface DrawerCardBaseProps {
     drawer: Drawer | Driver_Drawer;
     drawerRef?: React.RefObject<HTMLDivElement>;
     isOpen?: boolean;
-    badgeCount?: number;
+    badgeCount: number;
     handleClick?: () => void;
     sx?: {
         avatar?: React.CSSProperties;
@@ -59,6 +62,7 @@ export const DrawerCardBase = ({
     props,
 }: DrawerCardBaseProps) => {
     const theme = useTheme();
+    const previousBadgeCount = usePrevious(badgeCount as number);
 
     const baseSX = {
         avatar: {
@@ -133,6 +137,11 @@ export const DrawerCardBase = ({
         drawerName = drawer.driver.first_name + ' ' + drawer.driver.last_name;
     }
 
+    // TODO: create animated badge component
+    // will compare old value to new value and animate between
+
+    console.log({ previousBadgeCount, badgeCount });
+
     return (
         <Button
             className={isOpen ? 'open-drawer' : ''}
@@ -148,7 +157,14 @@ export const DrawerCardBase = ({
                 gap={1}
                 justifyContent="space-between"
                 {...props?.buttonStack}>
-                <Badge badgeContent={badgeCount} sx={overrideSX.badge} overlap="circular" {...props?.badge}>
+                <AnimatedBadge
+                    // classes={{ badge: styles['badge-animation'] }}
+                    // badgeContent={badgeCount}
+                    badgeCount={{ start: previousBadgeCount, end: badgeCount }}
+                    sx={overrideSX.badge}
+                    overlap="circular"
+                    {...props?.badge}
+                    key={badgeCount}>
                     <Avatar
                         className={'drawer-avatar-' + drawer.drawer_id}
                         ref={drawerRef}
@@ -157,7 +173,7 @@ export const DrawerCardBase = ({
                         {...props?.avatar}>
                         {avatarChild}
                     </Avatar>
-                </Badge>
+                </AnimatedBadge>
                 <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
                     <Typography pt={1} variant="body2" {...props?.nameTypography}>
                         {drawerName}

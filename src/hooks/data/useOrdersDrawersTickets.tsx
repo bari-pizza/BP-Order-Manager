@@ -201,6 +201,18 @@ export const useOrdersDrawersTickets = () => {
         const animations = orderIDs.map((id) => {
             const ticketRef = ticketRefs.current[id];
             const drawerRef = drawerRefs.current[drawerID];
+            if (!ticketRef && !drawerRef) {
+                console.log('no ticket and drawer', id, drawerID);
+                return;
+            }
+            if (!ticketRef) {
+                console.log('no ticket', id);
+                return;
+            }
+            if (!drawerRef) {
+                console.log('no drawer', drawerID);
+                return;
+            }
             index++;
             return animateTicketToDrawer(ticketRef, drawerRef, index);
         });
@@ -239,7 +251,7 @@ export const useOrdersDrawersTickets = () => {
             drawer_id: string;
             // TODO: would be nice if we got the drawer name here
         }) => {
-            console.log({ updatedOrderIDs, errors, drawerID });
+            // console.log({ updatedOrderIDs, errors, drawerID });
             const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
             const handleOutcome = toastRef.current['add_tickets'];
             handleOutcome({
@@ -249,10 +261,10 @@ export const useOrdersDrawersTickets = () => {
             });
             if (updatedOrderIDs.length) {
                 // path 5a and 5b
-                setSelectedTickets(unsuccessfulOrderIDs);
                 handleAnimations(updatedOrderIDs, drawerID).then(() => {
                     queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
                 });
+                setSelectedTickets(unsuccessfulOrderIDs);
             }
             // path 5a, 5b, and 5c
             setHandlingDrawerClick(false);
@@ -265,11 +277,9 @@ export const useOrdersDrawersTickets = () => {
     const unassignOrdersFromDrawerMutation = useMutation({
         mutationFn: ({ drawerID, orderIDs }: { drawerID: string; orderIDs: string[] }) =>
             removeOrdersFromDrawer({ drawerID, orderIDs }),
-        onSuccess: (orders) => {
-            // this was OrderIDs
+        onSuccess: (orderIDs) => {
             // TODO: refactor this eventually so that success accepts {update_order_ids, errors}
             // TODO: would require updating supabase function
-            const orderIDs = orders.map((order) => order.order_id); // test this
             const handleOutcome = toastRef.current['remove_tickets'];
             const errors: (DataWithError & { order_id: string })[] = [];
             const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
@@ -296,7 +306,6 @@ export const useOrdersDrawersTickets = () => {
     const putTicketsInDrawer = (drawer: Drawer | Driver_Drawer) => {
         const drawerID = drawer.drawer_id;
         toastRef.current['add_tickets'] = addOrdersToast(selectedTickets, drawer);
-        console.log({ allOrders });
         assignOrdersToDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
     };
 

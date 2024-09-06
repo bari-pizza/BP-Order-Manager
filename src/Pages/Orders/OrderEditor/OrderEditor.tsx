@@ -8,54 +8,103 @@ import {
     Typography,
     TextField,
     MenuItem,
-    Checkbox,
-    FormControlLabel,
+    Divider,
+    ButtonGroup,
 } from '@mui/material';
 import { createNewOrder, updateOrder } from '../../../supabaseQueries';
-import { Drawer, Driver_Drawer, Order_Payment, validators } from '../../../typesAndValidators';
+import {
+    Drawer,
+    Driver_Drawer,
+    NewOrder,
+    Order,
+    Order_Payment,
+    OrderOrigin,
+    OrderType,
+    PaymentType,
+    validators,
+} from '../../../typesAndValidators';
 import { useForm, Controller, SubmitHandler, SubmitErrorHandler, FieldErrors } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
-const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_type: 'delivery' | 'pickup') => {
+const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_type: OrderType) => {
     if (!drawer) return true;
     const { drawer_type } = drawer;
 
-    let valid = false;
     if (order_type === 'delivery' && drawer_type === 'driver') {
-        valid = true;
+        return true;
     }
     if (order_type === 'pickup') {
         if (is_third_party && drawer_type === 'third_party') {
-            valid = true;
+            return true;
         }
         if (!is_third_party && drawer_type === 'register') {
-            valid = true;
+            return true;
         }
     }
-    return valid;
+    return false;
 };
 
-interface OrderEditorProps {
-    // open: boolean;
-    // setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    // order?: Order;
-    // asDialog?: boolean;
+const initialPaymentOptions: { value: PaymentType; label: string }[] = [
+    {
+        value: 'cash',
+        label: 'Cash',
+    },
+    { value: 'card', label: 'Card' },
+    { value: 'third_party', label: '3rd Party' },
+];
+
+const isValidInitialPaymentType = (paymentType?: PaymentType, origin?: OrderOrigin) => {
+    if (!paymentType) return false;
+    if (!origin) return true;
+    const { is_prepaid_toggleable, default_is_prepaid, is_third_party } = origin;
+    if (!is_third_party && paymentType === 'third_party') return false;
+    if (is_third_party && !is_prepaid_toggleable) {
+        if (default_is_prepaid !== (paymentType === 'third_party')) return false;
+    }
+    return true;
+};
+
+// interface OrderEditorProps {
+//     close: () => void;
+//     isOpen: boolean;
+//     // order?: Order_Payment;
+//     order?: Order;
+//     asDialog?: boolean;
+// }
+
+type OrderEditorProps = {
     close: () => void;
     isOpen: boolean;
-    order?: Order_Payment;
+    order?: Order;
     asDialog?: boolean;
-}
-
-type FormValues = Order_Payment & {
-    is_prepaid?: boolean;
+    forNewOrder?: boolean;
 };
 
-export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps) => {
+type FormValues =
+    | Order_Payment
+    | (NewOrder & {
+          initial_payment_type?: PaymentType;
+      });
+
+export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = false }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { origins, drawers, drivers } = useBariPizzaContext();
+    const defaultNewOrder = useMemo(() => {
+        return {
+            business_date: businessDate.format('YYYY-MM-DD'),
+            origin_id: origins.find((o) => o.name === 'Bari Pizza')!.origin_id,
+            order_number: null,
+            order_name: null,
+            order_type: 'delivery' as OrderType,
+            phone: null,
+            total_in_cents: 0,
+            drawer_id: '',
+            initial_payment_type: 'cash' as PaymentType,
+        };
+    }, [businessDate, origins]);
     const {
         handleSubmit,
         register,
@@ -66,19 +115,24 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
         watch,
         setValue,
     } = useForm<FormValues>({
-        defaultValues: {
-            origin_id: origins.find((o) => o.name === 'Bari Pizza')!.origin_id,
-            order_number: null,
-            order_name: null,
-            order_type: 'delivery',
-            is_prepaid: false,
-            phone: null,
-            total_in_cents: 0,
-            drawer_id: '',
-        },
-        values: order,
+        // defaultValues: {
+        //     origin_id: origins.find((o) => o.name === 'Bari Pizza')!.origin_id,
+        //     order_number: null,
+        //     order_name: null,
+        //     order_type: 'delivery',
+        //     phone: null,
+        //     total_in_cents: 0,
+        //     drawer_id: '',
+        //     initial_payment_type: 'cash',
+        // },
+        defaultValues: forNewOrder ? defaultNewOrder : order,
+        // values: order || defaultNewOrder,
         reValidateMode: 'onChange',
     });
+
+    if (isOpen) {
+        console.log({ order });
+    }
 
     const queryClient = useQueryClient();
 
@@ -115,7 +169,6 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
     const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'))!;
     const currentOrderName = watch('order_name');
     const currentOrderNumber = watch('order_number');
-    const currentIsPrepaid = watch('is_prepaid');
     const currentOrderType = watch('order_type');
     const currentDrawer = drawersAndDrivers.find((drawer) => drawer.drawer_id === watch('drawer_id')) || null;
 
@@ -126,6 +179,20 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
     const validDrawers = drawersAndDrivers.filter((drawer) => isValidDrawer(drawer, is_third_party, currentOrderType));
 
     const invalidDrawer = !isValidDrawer(currentDrawer, is_third_party, currentOrderType);
+
+    const validInitialPaymentTypes = initialPaymentOptions.filter(({ value }) =>
+        isValidInitialPaymentType(value, currentOrigin),
+    );
+
+    const invalidInitialPaymentType = !isValidInitialPaymentType(watch('initial_payment_type'), currentOrigin);
+
+    useEffect(() => {
+        if (order) {
+            reset(order);
+        } else {
+            reset(defaultNewOrder);
+        }
+    }, [order, defaultNewOrder, reset]);
 
     useEffect(() => {
         if (invalidOrderType) {
@@ -140,11 +207,19 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
     }, [invalidDrawer, validDrawers, setValue]);
 
     useEffect(() => {
-        // if origin changes, reset the is_prepaid checkbox to the origin's default value
-        if (currentOrigin) {
-            setValue('is_prepaid', currentOrigin.default_is_prepaid);
+        // initial payment type only exists on new orders
+        if (forNewOrder && invalidInitialPaymentType) {
+            setValue('initial_payment_type', validInitialPaymentTypes[0].value);
         }
-    }, [currentOrigin, setValue]);
+    }, [invalidInitialPaymentType, validInitialPaymentTypes, forNewOrder, setValue]);
+
+    useEffect(() => {
+        // initial payment type only exists on new orders
+        if (forNewOrder && currentOrigin) {
+            const defaultPaymentType = currentOrigin.default_is_prepaid ? 'third_party' : 'cash';
+            setValue('initial_payment_type', defaultPaymentType);
+        }
+    }, [currentOrigin, forNewOrder, setValue]);
 
     useEffect(() => {
         // if origin.has_order_number changes, reset the order_name/order_number field to null
@@ -155,11 +230,8 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
         }
     }, [has_order_number, setValue]);
 
-    // TODO: see what this would look like with two rows instead of one
-
-    const body = (
-        <Stack direction="column" spacing={2} mt={2}>
-            {errors.root && <Typography color="error">{errors.root.message}</Typography>}
+    const leftSide = (
+        <>
             <Controller
                 name="origin_id"
                 control={control}
@@ -193,6 +265,42 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
                     );
                 }}
             />
+            <Controller
+                name="drawer_id"
+                control={control}
+                render={({ field }) => {
+                    const currentDrawerID =
+                        validDrawers.length === 1
+                            ? validDrawers[0].drawer_id
+                            : validDrawers.some((drawer) => drawer.drawer_id === field.value)
+                              ? field.value
+                              : '';
+
+                    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (['Delete', 'Backspace', 'Escape'].includes(event.key)) {
+                            // Clear the value if Delete, Backspace, or Esc is pressed
+                            field.onChange(''); // Set the value to empty
+                        }
+                    };
+
+                    return (
+                        <TextField {...field} label="Drawer" select value={currentDrawerID} onKeyDown={handleKeyDown}>
+                            {validDrawers.map((drawer) => {
+                                return (
+                                    <MenuItem key={drawer.name} value={drawer.drawer_id}>
+                                        {drawer.name}
+                                    </MenuItem>
+                                );
+                            })}
+                        </TextField>
+                    );
+                }}
+            />
+        </>
+    );
+
+    const rightSide = (
+        <>
             {currentOrigin?.has_order_number ? (
                 <TextField
                     key="order_number"
@@ -217,7 +325,6 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
                     helperText={errors.order_name?.message}
                 />
             )}
-
             <TextField
                 label="Phone"
                 {...register('phone', {
@@ -226,25 +333,6 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
             />
-            {currentOrigin?.is_prepaid_toggleable && (
-                <Controller
-                    name="is_prepaid"
-                    control={control}
-                    render={({ field }) => {
-                        const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-                            setValue('is_prepaid', event.target.checked);
-                        };
-
-                        return (
-                            <FormControlLabel
-                                sx={{ justifyContent: 'center' }}
-                                control={<Checkbox {...field} checked={!!currentIsPrepaid} onChange={handleChange} />}
-                                label="Is Prepaid"
-                            />
-                        );
-                    }}
-                />
-            )}
             <TextField
                 label="Total"
                 {...register('total_in_cents', {
@@ -253,39 +341,49 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
                 error={!!errors.total_in_cents}
                 helperText={errors.total_in_cents?.message}
             />
-            <Controller
-                name="drawer_id"
-                control={control}
-                render={({ field }) => {
-                    const currentDrawerID =
-                        validDrawers.length === 1
-                            ? validDrawers[0].drawer_id
-                            : validDrawers.some((drawer) => drawer.drawer_id === field.value)
-                              ? field.value
-                              : '';
-                    return (
-                        <TextField {...field} label="Drawer" select value={currentDrawerID}>
-                            {validDrawers.map((drawer) => {
-                                return (
-                                    <MenuItem key={drawer.name} value={drawer.drawer_id}>
-                                        {drawer.name}
-                                    </MenuItem>
-                                );
-                            })}
-                        </TextField>
-                    );
-                }}
-            />
-        </Stack>
+        </>
+    );
+
+    const initialPaymentSelector = (
+        <Controller
+            name="initial_payment_type"
+            control={control}
+            render={({ field }) => {
+                return (
+                    <ButtonGroup
+                        orientation="horizontal"
+                        fullWidth
+                        color="primary"
+                        sx={{ width: '100%' }}
+                        aria-label="Payment Type"
+                        {...field}>
+                        {validInitialPaymentTypes.map((option) => {
+                            const isSelected = option.value === field.value;
+                            return (
+                                <Button
+                                    key={option.value}
+                                    variant={isSelected ? 'contained' : 'outlined'}
+                                    onClick={() => {
+                                        setValue('initial_payment_type', option.value);
+                                    }}>
+                                    {option.label}
+                                </Button>
+                            );
+                        })}
+                    </ButtonGroup>
+                );
+            }}
+        />
     );
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         data.drawer_id = data.drawer_id || null; // can't be ''
-        if (order) {
+        if ('order_id' in data) {
+            console.log({ data });
             updateOrderMutation.mutate(data);
         } else {
-            data.business_date = businessDate.format('YYYY-MM-DD');
-            createNewOrderMutation.mutate(data);
+            const { initial_payment_type: initialPaymentType, ...newOrder } = data;
+            createNewOrderMutation.mutate({ newOrder, initialPaymentType });
         }
     };
 
@@ -307,7 +405,23 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
         return (
             <Dialog open={isOpen} onClose={close}>
                 <DialogTitle>Order Editor</DialogTitle>
-                <DialogContent>{body}</DialogContent>
+                <DialogContent>
+                    <Stack direction="column" spacing={2} mt={2}>
+                        <Stack direction="row" spacing={2} mt={2} width="100%">
+                            {errors.root && <Typography color="error">{errors.root.message}</Typography>}
+                            <Stack direction="column" width="50%" spacing={2} mt={2}>
+                                {leftSide}
+                            </Stack>
+                            <Stack direction="column" width="50%" spacing={2} mt={2}>
+                                {rightSide}
+                            </Stack>
+                        </Stack>
+                        <Divider />
+                        <Typography variant="h5" textAlign={'center'}>
+                            Payments
+                        </Typography>
+                    </Stack>
+                </DialogContent>
                 <DialogActions>
                     <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
                     <Button onClick={handleCancel}>Cancel</Button>
@@ -322,7 +436,12 @@ export const OrderEditor = ({ close, isOpen, order, asDialog }: OrderEditorProps
                 <Typography variant="h5" textAlign={'center'}>
                     Order Editor
                 </Typography>
-                {body}
+                <Stack direction="column" spacing={2} mt={2}>
+                    {errors.root && <Typography color="error">{errors.root.message}</Typography>}
+                    {leftSide}
+                    {rightSide}
+                    {initialPaymentSelector}
+                </Stack>
                 <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
                 <Button onClick={handleCancel}>Cancel</Button>
             </Stack>

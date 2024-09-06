@@ -9,6 +9,7 @@ import {
     OrderOrigin,
     Order_Payment,
     Driver,
+    PaymentType,
 } from './typesAndValidators';
 import { z } from 'zod';
 import dayjs from 'dayjs';
@@ -212,9 +213,17 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
     };
 };
 
-export const createNewOrder = async (newOrder: NewOrder) => {
-    console.log({ newOrder });
+export const createNewOrder = async ({
+    newOrder,
+    initialPaymentType,
+}: {
+    newOrder: NewOrder;
+    initialPaymentType?: PaymentType;
+}) => {
+    console.log({ newOrder, initialPaymentType });
     const { data, error } = await supaClient.from('Order').insert([newOrder]).select();
+    // should create a new order and a new payment
+    // probably create an rpc that creates both
     return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
@@ -245,7 +254,15 @@ export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs:
         p_drawer_id: drawerID,
         p_order_ids: orderIDs,
     });
-    return handleResponse<Order_Payment>({ data, error, shouldThrow: true });
+    console.log({ data });
+    if (error) {
+        console.error(error);
+        throw error;
+    } else {
+        return data;
+    }
+    // can use handleResponse once we update the return type from db
+    // return handleResponse<Order_Payment>({ data, error, shouldThrow: true });
 };
 
 export const getAllEmployees = async () => {

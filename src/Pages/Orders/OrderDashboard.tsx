@@ -69,7 +69,7 @@ export default MouseFollowerComponent;
                 <Stack alignContent="center" justifyContent="space-between" direction="column" height="100%">
                     {/* <Stack>{orderEditor}</Stack> */}
                     <Stack>
-                        <OrderEditor close={close} isOpen={isOpen} />
+                        <OrderEditor close={close} isOpen={isOpen} forNewOrder />
                     </Stack>
                     <Stack direction="column" m={2} gap={2}>
                         {/* {addOrderButton} */}
