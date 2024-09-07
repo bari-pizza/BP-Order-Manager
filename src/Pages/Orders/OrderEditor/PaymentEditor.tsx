@@ -5,6 +5,7 @@ import { Button, ButtonGroup, Stack, StackProps, TextField, Tooltip, Typography 
 import { ReactNode, useState } from 'react';
 import { AnimatePresence, motion, MotionProps } from 'framer-motion';
 import { Money as CashIcon, CreditCard as CardIcon, AccountBalanceWallet as ThirdPartyIcon } from '@mui/icons-material';
+import { useCreateNewPayment } from '../../../api/payment';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -34,7 +35,7 @@ export const PaymentEditor = ({
         payment_type: validPaymentTypes[0].value,
         amount_in_cents: 0,
         tip_in_cents: 0,
-        special_notes: '',
+        special_note: '',
         order_id: orderID,
     };
     const {
@@ -49,10 +50,12 @@ export const PaymentEditor = ({
         defaultValues: forNewPayment ? defaultNewPayment : payment,
         reValidateMode: 'onChange',
     });
+    const mutation = useCreateNewPayment({ queryKey: ['orders'] });
 
     const onSubmit = (data: FormValues) => {
         console.log(data);
         setIsEditing(false);
+        mutation.mutate(data);
     };
 
     const motionProps = {
@@ -83,7 +86,6 @@ export const PaymentEditor = ({
                                 label="Amount"
                                 {...register('amount_in_cents', { ...validators.payment.amount_in_cents })}
                                 error={!!errors.amount_in_cents}
-                                // helperText={errors.amount_in_cents?.message}
                             />
                         </Tooltip>
                         <Tooltip title={errors.tip_in_cents?.message}>
@@ -92,7 +94,6 @@ export const PaymentEditor = ({
                                 label="Tip"
                                 {...register('tip_in_cents', { ...validators.payment.tip_in_cents })}
                                 error={!!errors.tip_in_cents}
-                                // helperText={errors.tip_in_cents?.message}
                             />
                         </Tooltip>
                         <PaymentTypeSelector
@@ -227,3 +228,5 @@ const MotionWrapper = ({ motionProps, stackProps, children, key }: MotionWrapper
         </motion.div>
     );
 };
+
+// TODO: *** get rid of payment view (jsonb for payments) just query normally ***

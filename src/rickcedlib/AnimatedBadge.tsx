@@ -46,3 +46,5 @@ export const AnimatedBadge = ({ badgeCount: { start, end }, ...props }: Animated
 
     return <Badge {...props} badgeContent={currentStep} />;
 };
+
+// USE IN FUTURE PROJECTS

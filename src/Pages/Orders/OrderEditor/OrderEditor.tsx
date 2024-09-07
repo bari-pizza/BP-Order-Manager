@@ -433,10 +433,11 @@ const OrderEditorDialog = ({
     const toggleSection = () => {
         setIsPaymentsVisible(!isPaymentsVisible);
     };
+    console.log({ orderID });
     return (
         <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
             <DialogTitle>{isPaymentsVisible ? 'Payments List' : 'Order Editor'}</DialogTitle>
-            <DialogContent sx={{ height: 300, overflowY: 'hidden' }}>
+            <DialogContent sx={{ minHeight: 250, overflowY: 'hidden' }}>
                 {/* TODO: change overflowY back to normal but just hide scrollbar */}
                 <AnimatePresence initial={false} mode="wait">
                     {!isPaymentsVisible ? (

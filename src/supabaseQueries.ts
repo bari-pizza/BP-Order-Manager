@@ -38,7 +38,7 @@ const validateBusinessDate = (businessDate: dayjs.Dayjs) => {
     }
 };
 
-const handleResponse = <T>({
+export const handleResponse = <T>({
     data,
     error,
     shouldThrow,
