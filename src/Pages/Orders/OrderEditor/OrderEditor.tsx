@@ -19,7 +19,6 @@ import {
     Order_Payment,
     OrderOrigin,
     OrderType,
-    Payment,
     PaymentType,
     validators,
 } from '../../../typesAndValidators';
@@ -55,7 +54,7 @@ const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_typ
     return false;
 };
 
-const initialPaymentOptions: { value: PaymentType; label: string }[] = [
+const paymentTypes: { value: PaymentType; label: string }[] = [
     {
         value: 'cash',
         label: 'Cash',
@@ -64,7 +63,7 @@ const initialPaymentOptions: { value: PaymentType; label: string }[] = [
     { value: 'third_party', label: '3rd Party' },
 ];
 
-const isValidInitialPaymentType = (paymentType?: PaymentType, origin?: OrderOrigin) => {
+const isValidPaymentType = (paymentType?: PaymentType, origin?: OrderOrigin) => {
     if (!paymentType) return false;
     if (!origin) return true;
     const { is_prepaid_toggleable, default_is_prepaid, is_third_party } = origin;
@@ -163,11 +162,9 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
 
     const invalidDrawer = !isValidDrawer(currentDrawer, is_third_party, currentOrderType);
 
-    const validInitialPaymentTypes = initialPaymentOptions.filter(({ value }) =>
-        isValidInitialPaymentType(value, currentOrigin),
-    );
+    const validPaymentTypes = paymentTypes.filter(({ value }) => isValidPaymentType(value, currentOrigin));
 
-    const invalidInitialPaymentType = !isValidInitialPaymentType(watch('initial_payment_type'), currentOrigin);
+    const invalidInitialPaymentType = !isValidPaymentType(watch('initial_payment_type'), currentOrigin);
 
     useEffect(() => {
         if (order) {
@@ -192,9 +189,9 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
     useEffect(() => {
         // initial payment type only exists on new orders
         if (forNewOrder && invalidInitialPaymentType) {
-            setValue('initial_payment_type', validInitialPaymentTypes[0].value);
+            setValue('initial_payment_type', validPaymentTypes[0].value);
         }
-    }, [invalidInitialPaymentType, validInitialPaymentTypes, forNewOrder, setValue]);
+    }, [invalidInitialPaymentType, validPaymentTypes, forNewOrder, setValue]);
 
     useEffect(() => {
         // initial payment type only exists on new orders
@@ -364,8 +361,8 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 leftSide={leftSide}
                 rightSide={rightSide}
                 errors={errors}
-                orderID={order?.order_id || ''}
-                payments={order?.payments || []}
+                order={order!}
+                validPaymentTypes={validPaymentTypes}
             />
         );
     }
@@ -382,7 +379,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                     {rightSide}
                     <PaymentTypeSelector
                         control={control}
-                        validPaymentTypes={initialPaymentOptions}
+                        validPaymentTypes={validPaymentTypes}
                         handleChange={(paymentType) => {
                             setValue('initial_payment_type', paymentType);
                         }}
@@ -406,8 +403,8 @@ const OrderEditorDialog = ({
     onSubmit,
     onError,
     handleCancel,
-    payments,
-    orderID,
+    order,
+    validPaymentTypes,
 }: {
     isOpen: boolean;
     close: () => void;
@@ -418,10 +415,11 @@ const OrderEditorDialog = ({
     onSubmit: SubmitHandler<FormValues>;
     onError: SubmitErrorHandler<FieldErrors>;
     handleCancel: () => void;
-    payments: Payment[];
-    orderID: string;
+    order: Order_Payment;
+    validPaymentTypes: { value: PaymentType; label: string }[];
 }) => {
-    const [isPaymentsVisible, setIsPaymentsVisible] = useState(false);
+    const [isPaymentsVisible, setIsPaymentsVisible] = useState(true);
+    const payments = order.payments.sort((a, b) => b.created_at.localeCompare(a.created_at));
 
     // Define sliding variants
     const slideVariants = {
@@ -433,12 +431,20 @@ const OrderEditorDialog = ({
     const toggleSection = () => {
         setIsPaymentsVisible(!isPaymentsVisible);
     };
-    console.log({ orderID });
+
+    const paymentsTotalInCents = payments.reduce((total, payment) => total + payment.amount_in_cents, 0);
+    const missingPaymentInCents = order.total_in_cents - paymentsTotalInCents;
+
     return (
         <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
-            <DialogTitle>{isPaymentsVisible ? 'Payments List' : 'Order Editor'}</DialogTitle>
+            <DialogTitle>
+                {isPaymentsVisible
+                    ? `Payments: $${paymentsTotalInCents / 100} out of $${order.total_in_cents / 100}`
+                    : 'Order Editor'}
+            </DialogTitle>
             <DialogContent sx={{ minHeight: 250, overflowY: 'hidden' }}>
                 {/* TODO: change overflowY back to normal but just hide scrollbar */}
+
                 <AnimatePresence initial={false} mode="wait">
                     {!isPaymentsVisible ? (
                         <motion.div
@@ -458,13 +464,9 @@ const OrderEditorDialog = ({
                                     </Stack>
                                 </Stack>
                                 <Divider />
-                                <Typography
-                                    variant="h5"
-                                    textAlign={'center'}
-                                    onClick={toggleSection}
-                                    style={{ cursor: 'pointer' }}>
-                                    Payments
-                                </Typography>
+                                <Button onClick={toggleSection} variant="contained">
+                                    View Payments
+                                </Button>
                             </Stack>
                         </motion.div>
                     ) : (
@@ -476,10 +478,21 @@ const OrderEditorDialog = ({
                             exit="exit">
                             <Stack direction="column" spacing={2} mt={2}>
                                 {payments.map((payment) => (
-                                    <PaymentEditor key={payment.payment_id} payment={payment} variant="icon" />
+                                    <PaymentEditor
+                                        key={payment.payment_id}
+                                        payment={payment}
+                                        variant="icon"
+                                        validPaymentTypes={validPaymentTypes}
+                                    />
                                 ))}
                                 <Divider />
-                                <PaymentEditor forNewPayment orderID={orderID} />
+                                <PaymentEditor
+                                    forNewPayment
+                                    orderID={order?.order_id}
+                                    validPaymentTypes={validPaymentTypes}
+                                    variant="icon"
+                                    defaultAmount={missingPaymentInCents}
+                                />
                             </Stack>
                         </motion.div>
                     )}

@@ -1,11 +1,17 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
 import { LabeledStack } from '../../../rickcedlib/LabeledStack';
 import { Payment, PaymentType, validators } from '../../../typesAndValidators';
-import { Button, ButtonGroup, Stack, StackProps, TextField, Tooltip, Typography } from '@mui/material';
-import { ReactNode, useState } from 'react';
-import { AnimatePresence, motion, MotionProps } from 'framer-motion';
+import { Button, ButtonGroup, TextField, Tooltip, Typography, useTheme } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Money as CashIcon, CreditCard as CardIcon, AccountBalanceWallet as ThirdPartyIcon } from '@mui/icons-material';
-import { useCreateNewPayment } from '../../../api/payment';
+import {
+    // useCreateNewPayment, useDeletePayment,
+    usePaymentCRUD,
+    // useUpdatePayment
+} from '../../../api/payment';
+import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
+import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -13,6 +19,7 @@ interface PaymentEditorProps {
     validPaymentTypes?: { value: PaymentType; label: string }[];
     orderID?: string;
     variant?: 'standard' | 'icon';
+    defaultAmount?: number;
 }
 
 const allPaymentTypes: { value: PaymentType; label: string }[] = [
@@ -29,11 +36,14 @@ export const PaymentEditor = ({
     orderID,
     validPaymentTypes = allPaymentTypes,
     variant = 'standard',
+    defaultAmount = 0,
 }: PaymentEditorProps) => {
+    const [businessDate] = useBusinessDate();
     const [isEditing, setIsEditing] = useState(false);
+    const theme = useTheme();
     const defaultNewPayment = {
         payment_type: validPaymentTypes[0].value,
-        amount_in_cents: 0,
+        amount_in_cents: defaultAmount,
         tip_in_cents: 0,
         special_note: '',
         order_id: orderID,
@@ -50,12 +60,27 @@ export const PaymentEditor = ({
         defaultValues: forNewPayment ? defaultNewPayment : payment,
         reValidateMode: 'onChange',
     });
-    const mutation = useCreateNewPayment({ queryKey: ['orders'] });
+
+    useEffect(() => {
+        if (forNewPayment) {
+            setValue('amount_in_cents', defaultAmount);
+        }
+    }, [defaultAmount, forNewPayment, setValue]);
+
+    const { paymentMutations } = usePaymentCRUD({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
 
     const onSubmit = (data: FormValues) => {
         console.log(data);
         setIsEditing(false);
-        mutation.mutate(data);
+        if (forNewPayment) {
+            paymentMutations.create(data);
+        } else {
+            paymentMutations.update(data);
+        }
+    };
+
+    const onDelete = (data: FormValues) => {
+        paymentMutations.delete(data);
     };
 
     const motionProps = {
@@ -73,6 +98,7 @@ export const PaymentEditor = ({
             label={payment ? payment?.payment_type : 'New Payment'}
             direction="row"
             justifyContent="space-between"
+            color={isEditing ? theme.palette.secondary.main : theme.palette.primary.main}
             height={60}
             alignItems="center">
             <AnimatePresence mode="wait" initial={false}>
@@ -114,7 +140,7 @@ export const PaymentEditor = ({
                                 <Typography>${((payment?.amount_in_cents || 0) / 100).toFixed(2)}</Typography>
                             </LabeledStack>
                             <LabeledStack label="Tip" direction="row" width="100%" alignLabel="left">
-                                <Typography>${((payment?.amount_in_cents || 0) / 100).toFixed(2)}</Typography>
+                                <Typography>${((payment?.tip_in_cents || 0) / 100).toFixed(2)}</Typography>
                             </LabeledStack>
                         </MotionWrapper>
                     ) : (
@@ -131,7 +157,16 @@ export const PaymentEditor = ({
             {isEditing ? (
                 <Button onClick={handleSubmit(onSubmit)}>Save</Button>
             ) : (
-                payment && <Button onClick={() => setIsEditing(!isEditing)}>Edit</Button>
+                payment && (
+                    <>
+                        <Button onClick={() => setIsEditing(!isEditing)} variant="contained" color="primary">
+                            Edit
+                        </Button>
+                        <Button onClick={handleSubmit(onDelete)} variant="contained" color="error">
+                            Delete
+                        </Button>
+                    </>
+                )
             )}
         </LabeledStack>
     );
@@ -204,29 +239,3 @@ export const PaymentTypeSelector = <T extends FieldValues>({
         />
     );
 };
-
-interface MotionWrapperProps {
-    children: ReactNode;
-    motionProps?: MotionProps;
-    stackProps?: StackProps;
-    key?: string;
-}
-
-const MotionWrapper = ({ motionProps, stackProps, children, key }: MotionWrapperProps) => {
-    return (
-        <motion.div
-            key={key}
-            {...motionProps}
-            // initial={{ y: -100, opacity: 0 }}
-            // animate={{ y: 0, opacity: 1 }}
-            // exit={{ y: -100, opacity: 0 }}
-        >
-            <Stack {...stackProps}>
-                {/* <Stack direction="row" gap={2}> */}
-                {children}
-            </Stack>
-        </motion.div>
-    );
-};
-
-// TODO: *** get rid of payment view (jsonb for payments) just query normally ***

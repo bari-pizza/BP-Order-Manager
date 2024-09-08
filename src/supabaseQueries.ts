@@ -121,8 +121,15 @@ export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
     const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
     if (validateError) return [] as Order_Payment[];
     const { data, error } = await supaClient
-        .from('OrderPaymentsView')
-        .select('*')
+        .from('Order')
+        .select(
+            `
+        *,
+        payments:Payment (
+          *
+        )
+      `,
+        )
         .eq('business_date', `${year}-${month}-${day}`)
         .order('order_number', { ascending: true });
 

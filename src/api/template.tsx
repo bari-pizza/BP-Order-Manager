@@ -47,4 +47,15 @@ const useTemplateInteraction = ({ queryKey }: { queryKey: string[] }) => {
     });
 };
 
-export default { ONLY_FOR_DEMONSTRATION_PURPOSES: useTemplateInteraction };
+const useTemplateInteractionCRUD = ({ queryKey }: { queryKey: string[] }) => {
+    return {
+        useTemplateMutations: {
+            // should have a separate type of interaction hook for each CRUD operation
+            create: useTemplateInteraction({ queryKey }).mutate,
+            update: useTemplateInteraction({ queryKey }).mutate,
+            delete: useTemplateInteraction({ queryKey }).mutate,
+        },
+    };
+};
+
+export default { ONLY_FOR_DEMONSTRATION_PURPOSES: useTemplateInteractionCRUD };
