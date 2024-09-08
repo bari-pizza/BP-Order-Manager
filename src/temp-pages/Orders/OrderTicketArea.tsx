@@ -1,7 +1,7 @@
 import { Grid, Stack } from '@mui/material';
 import { OrderTicket, OrderTicketSkeleton } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
-import { useOrderDashboardContext } from './../../hooks/data/useContextData';
+import { useOrderDashboardContext } from '../../hooks/data/useContextData';
 
 export const OrderTicketArea = () => {
     const { orders, ticket } = useOrderDashboardContext();

@@ -14,18 +14,18 @@ import './App.css';
 import { LayoutContext } from './context/LayoutContext.tsx';
 import { UserContext } from './context/UserContext.tsx';
 import { useSession } from './hooks/data/useSession.ts';
-import { OrderDashboard, OrderDashboardSkeleton } from './pages/Orders/OrderDashboard.tsx';
+import { OrderDashboard, OrderDashboardSkeleton } from './temp-pages/Orders/OrderDashboard.tsx';
 import { PageMissing } from './components/PageMissing.tsx';
-import { Home } from './pages/Home/Home.tsx';
-import { MyAccount } from './pages/Profile/MyAccount';
-import { Login } from './pages/Profile/Login.tsx';
+import { Home } from './temp-pages/Home/Home.tsx';
+import { MyAccount } from './temp-pages/Profile/MyAccount.tsx';
+import { Login } from './temp-pages/Profile/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
 import { BariPizzaContext } from './context/BariPizzaContext.tsx';
-import { AdminDashboard, AdminDashboardSkeleton } from './pages/Admin/AdminDashboard.tsx';
+import { AdminDashboard, AdminDashboardSkeleton } from './temp-pages/Admin/AdminDashboard.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ManagerDashboard, ManagerDashboardSkeleton } from './pages/Manager/ManagerDashboard.tsx';
+import { ManagerDashboard, ManagerDashboardSkeleton } from './temp-pages/Manager/ManagerDashboard.tsx';
 import { UnderConstruction } from './UnderConstruction.tsx';
 
 const router = createBrowserRouter([
