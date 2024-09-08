@@ -1,10 +1,10 @@
 import { Box, Tooltip } from '@mui/material';
-import styles from './ToDo.module.css';
+import styles from './devTodo.module.css';
 
-export const TODO = ({ children }: { children: React.ReactNode }) => {
+export const devTodo = ({ children }: { children: React.ReactNode }) => {
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Tooltip title="TODO">
+            <Tooltip title="Todo">
                 <Box
                     className={styles['crawl-border']}
                     sx={{

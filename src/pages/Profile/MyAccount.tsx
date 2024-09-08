@@ -2,7 +2,7 @@ import { Stack, Button } from '@mui/material';
 import { supaClient } from '../../supaClient';
 import { useUserContext } from '../../hooks/data/useContextData';
 import { SmartNavigate } from '../../components/SmartNavigate';
-import { TODO } from '../../components/Base/TODO';
+import { devTodo } from '../../components/Base/devTodo';
 
 // TODO: Add a way to edit profile (avatar_src, first_name, last_name,  password)
 
@@ -19,7 +19,7 @@ export const MyAccount = () => {
 
     return (
         <Stack direction="column" alignItems="center" justifyContent="center" height="100vh">
-            <TODO>Add a way to edit profile</TODO>
+            <devTodo>Add a way to edit profile</devTodo>
             <Button onClick={handleLogout}>Logout</Button>
         </Stack>
     );
