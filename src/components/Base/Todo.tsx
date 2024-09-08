@@ -1,7 +1,7 @@
 import { Box, Tooltip } from '@mui/material';
-import styles from './devTodo.module.css';
+import styles from './Todo.module.css';
 
-export const devTodo = ({ children }: { children: React.ReactNode }) => {
+export const Todo = ({ children }: { children: React.ReactNode }) => {
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Tooltip title="Todo">

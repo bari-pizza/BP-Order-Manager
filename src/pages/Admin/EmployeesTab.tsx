@@ -4,7 +4,7 @@ import { getAllEmployees } from '../../supabaseQueries';
 import { EmployeesTable } from './EmployeesTable';
 import { Profile } from '../../typesAndValidators';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
-import { devTodo } from '../../components/Base/devTodo';
+import { Todo } from '../../components/Base/Todo';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';
@@ -49,7 +49,7 @@ export const EmployeesTab = () => {
     return (
         <Stack direction="column">
             <EmployeesTable employees={employees} />
-            <devTodo>Add a button to add an employee</devTodo>
+            <Todo>Add a button to add an employee</Todo>
         </Stack>
     );
 };

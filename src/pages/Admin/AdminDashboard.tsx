@@ -8,7 +8,7 @@ import { useDrivers } from '../../hooks/data/useDrivers';
 import { Driver_Drawer, AdminDashboardTabName } from '../../typesAndValidators';
 import { EmployeesTab } from './EmployeesTab';
 import { ThirdPartiesTab } from './ThirdPartiesTab';
-import { devTodo } from '../../components/Base/devTodo';
+import { Todo } from '../../components/Base/Todo';
 
 /*    TODO: About Today
         Sales
@@ -128,10 +128,10 @@ export const AdminDashboard = () => {
                     <ThirdPartiesTab />
                 </TabPanel>
                 <TabPanel tabName="orders" value={tabName}>
-                    <devTodo>Create orders tab</devTodo>
+                    <Todo>Create orders tab</Todo>
                 </TabPanel>
                 <TabPanel tabName="settings" value={tabName}>
-                    <devTodo>Create settings tab</devTodo>
+                    <Todo>Create settings tab</Todo>
                 </TabPanel>
             </Stack>
         </AdminDashboardContext.Provider>
