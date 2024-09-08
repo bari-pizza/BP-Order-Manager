@@ -18,7 +18,7 @@ import {
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { CalendarIcon } from '@mui/x-date-pickers';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
-import { UserAvatar } from './UserAvatar';
+import { UserAvatar } from './Base/UserAvatar';
 import { useUserContext } from '../hooks/data/useContextData';
 import { SmartLink } from './SmartNavigate';
 import dayjs from 'dayjs';
@@ -32,22 +32,14 @@ interface NavBarItem {
     text: string;
     onClick?: () => void;
 }
-
-// TODO: Add a way to choose drivers for the day
 // TODO: Handle order deletion
-
-/* TODO: create BusinessDay.Drivers table
-   TODO: business_day, driver_id, is_locked
-
-   TODO: add is_locked to Order and Payment tables
-*/
 
 const today = dayjs();
 
 const iconProps: SvgIconTypeMap['props'] = { color: 'primary', sx: { fontSize: '35px' } };
 
 export function NavBar() {
-    const { session } = useUserContext();
+    const { session, profile } = useUserContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
@@ -64,11 +56,11 @@ export function NavBar() {
             onClick: showBusinessDatePicker,
         },
         { path: '/search', icon: <Search {...iconProps} />, text: 'Search' },
-        { path: '/admin', icon: <AdminIcon {...iconProps} />, text: 'Admin' },
-        { path: '/manager', icon: <ManagerIcon {...iconProps} />, text: 'Manager' },
+        profile?.is_admin && { path: '/admin', icon: <AdminIcon {...iconProps} />, text: 'Admin' },
+        profile?.is_manager && { path: '/manager', icon: <ManagerIcon {...iconProps} />, text: 'Manager' },
         { path: '/orders', icon: <LocalPizzaIcon {...iconProps} />, text: 'Orders' },
         userListItem,
-    ];
+    ].filter(Boolean) as NavBarItem[];
 
     return (
         <Drawer

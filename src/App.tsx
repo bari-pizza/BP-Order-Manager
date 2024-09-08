@@ -14,20 +14,19 @@ import './App.css';
 import { LayoutContext } from './context/LayoutContext.tsx';
 import { UserContext } from './context/UserContext.tsx';
 import { useSession } from './hooks/data/useSession.ts';
-import { OrderDashboard, OrderDashboardSkeleton } from './components/OrderDashboard/OrderDashboard.tsx';
+import { OrderDashboard, OrderDashboardSkeleton } from './pages/Orders/OrderDashboard.tsx';
 import { PageMissing } from './components/PageMissing.tsx';
-import { Home } from './components/Home.tsx';
-import { MyAccount } from './components/MyAccount.tsx';
-import { Login } from './components/Login.tsx';
+import { Home } from './pages/Home/Home.tsx';
+import { MyAccount } from './pages/Profile/MyAccount';
+import { Login } from './pages/Profile/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
-import { BusinessDayContext } from './context/BusinessDayContext.tsx';
-import { AdminDashboard, AdminDashboardSkeleton } from './components/Admin/AdminDashboard.tsx';
+import { BariPizzaContext } from './context/BariPizzaContext.tsx';
+import { AdminDashboard, AdminDashboardSkeleton } from './pages/Admin/AdminDashboard.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ManagerDashboard, ManagerDashboardSkeleton } from './components/Manager/ManagerDashboard.tsx';
-
-// TODO: add admin page - protected - only by admins
+import { ManagerDashboard, ManagerDashboardSkeleton } from './pages/Manager/ManagerDashboard.tsx';
+import { UnderConstruction } from './UnderConstruction.tsx';
 
 const router = createBrowserRouter([
     {
@@ -41,6 +40,10 @@ const router = createBrowserRouter([
             {
                 path: '/',
                 element: <Home />,
+            },
+            {
+                path: '/search',
+                element: <UnderConstruction />,
             },
             {
                 path: '/orders',
@@ -122,7 +125,7 @@ function Layout() {
             {
                 queryKey: ['drivers'],
                 queryFn: getAllDrivers,
-                staleTime: 1000 * 60 * 1,
+                staleTime: 1000 * 60 * 30,
                 refetchOnWindowFocus: false,
             },
             {
@@ -141,7 +144,8 @@ function Layout() {
         //     version="beta">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <ThemeProvider theme={theme}>
-                <BusinessDayContext.Provider value={{ drawers, drivers, origins }}>
+                <BariPizzaContext.Provider
+                    value={{ drawers, drivers: drivers.sort((a, b) => a.name.localeCompare(b.name)), origins }}>
                     <LayoutContext.Provider
                         value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
@@ -195,7 +199,7 @@ function Layout() {
                             </Stack>
                         </UserContext.Provider>
                     </LayoutContext.Provider>
-                </BusinessDayContext.Provider>
+                </BariPizzaContext.Provider>
             </ThemeProvider>
         </LocalizationProvider>
         // </APIProvider>

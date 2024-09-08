@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker/locale/en_US';
-import type { Drawer, DriverDrawer } from '../typesAndValidators';
+import type { Drawer, Driver_Drawer } from '../typesAndValidators';
 
 const drawers: Drawer[] = [
     {
@@ -22,7 +22,7 @@ const drawers: Drawer[] = [
     },
 ];
 
-const createDummyDriver: () => DriverDrawer = () => {
+const createDummyDriver: () => Driver_Drawer = () => {
     const fullName = faker.person.fullName();
     return {
         name: fullName,
@@ -31,12 +31,14 @@ const createDummyDriver: () => DriverDrawer = () => {
         drawer_type: 'driver',
         driver: {
             id: faker.string.uuid(),
-            email: null,
+            email: faker.internet.email(),
             phone: null,
             last_name: fullName.split(' ')[1],
             first_name: fullName.split(' ')[0],
             is_admin: false,
             is_manager: false,
+            is_cashier: false,
+            avatar_src: null,
         },
     };
 };

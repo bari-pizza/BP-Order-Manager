@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useLayoutContext } from '../hooks/data/useContextData';
 import { Portal } from '@mui/base';
 
@@ -9,7 +9,7 @@ type SideBarProps = {
 
 export const SideBar = ({ width, children }: SideBarProps) => {
     const { sideBarRef, setSideBarWidth } = useLayoutContext();
-    useEffect(() => {
+    useLayoutEffect(() => {
         setSideBarWidth(width);
         return () => setSideBarWidth('0px');
     }, [setSideBarWidth, width]);
@@ -18,7 +18,7 @@ export const SideBar = ({ width, children }: SideBarProps) => {
 
 export const SideBarSkeleton = ({ width, children }: SideBarProps) => {
     const { sideBarSkeletonRef, setSideBarSkeletonWidth } = useLayoutContext();
-    useEffect(() => {
+    useLayoutEffect(() => {
         setSideBarSkeletonWidth(width);
         return () => setSideBarSkeletonWidth('0px');
     }, [setSideBarSkeletonWidth, width]);

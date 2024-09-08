@@ -1,12 +1,12 @@
 import { createContext, RefObject } from 'react';
-import type { Drawer, DriverDrawer, Order } from '../typesAndValidators';
+import type { Drawer, Driver_Drawer, Order_Payment } from '../typesAndValidators';
 
 interface OrderDashboardContextProps {
     ticket: {
-        select: (order: Order) => void;
-        collapse: (order: Order) => void;
-        isCollapsed: (order: Order) => boolean;
-        isSelected: (order: Order) => boolean;
+        select: (order: Order_Payment) => void;
+        collapse: (order: Order_Payment) => void;
+        isCollapsed: (order: Order_Payment) => boolean;
+        isSelected: (order: Order_Payment) => boolean;
         all: {
             select: () => void;
             collapse: () => void;
@@ -27,9 +27,9 @@ interface OrderDashboardContextProps {
         };
     };
     drawer: {
-        onClick: (drawer: Drawer | DriverDrawer) => void;
+        onClick: (drawer: Drawer | Driver_Drawer) => void;
         removeOrders: () => void;
-        current: Drawer | DriverDrawer | null;
+        current: Drawer | Driver_Drawer | null;
         unassigned: Drawer;
         isUnassignedDrawer: boolean;
         refs: {
@@ -37,9 +37,13 @@ interface OrderDashboardContextProps {
         };
     };
     orders: {
-        forCurrentDrawer: Order[];
-        all: Order[];
-        byDrawerID: (drawerID: string) => Order[];
+        forCurrentDrawer: Order_Payment[];
+        all: Order_Payment[];
+        byDrawerID: (drawerID: string) => Order_Payment[];
+    };
+    drivers: {
+        all: Driver_Drawer[];
+        todays: Driver_Drawer[];
     };
 }
 
@@ -84,4 +88,10 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
         all: [],
         byDrawerID: () => [],
     },
+    drivers: {
+        all: [],
+        todays: [],
+    },
 });
+
+// For current business day's orders, drawers, tickets, and their interactions

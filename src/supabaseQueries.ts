@@ -1,11 +1,68 @@
 import { supaClient } from './supaClient';
-import { Drawer, Profile, DriverDrawer, Order, NewOrder, OrderOrigin } from './typesAndValidators';
+import {
+    BusinessDayDriver,
+    Drawer,
+    Profile,
+    Driver_Drawer,
+    Order, // only used to interact directly with supabase db
+    NewOrder,
+    OrderOrigin,
+    Order_Payment,
+    Driver,
+    PaymentType,
+} from './typesAndValidators';
 import { z } from 'zod';
-import doorDashLogo from '../public/DoorDash logo.png';
-import bariPizzaLogo from '../public/BP logo.png';
-import pizzamicoLogo from '../public/Pizzamico logo.ico';
+import dayjs from 'dayjs';
+import { dayjsToMDY } from './utils';
+import { PostgrestError } from '@supabase/supabase-js';
+const bariPizzaLogo = new URL('/BP logo.png', import.meta.url).href;
+const doorDashLogo = new URL('/DoorDash logo.png', import.meta.url).href;
+const pizzamicoLogo = new URL('/Pizzamico logo.ico', import.meta.url).href;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
+
+const supabaseDate = z.object({
+    year: z.number().min(2024).max(2100),
+    month: z.number().min(1).max(12),
+    day: z.number().min(1).max(31),
+});
+
+const validateBusinessDate = (businessDate: dayjs.Dayjs) => {
+    const { month, day, year } = dayjsToMDY(businessDate);
+    try {
+        supabaseDate.parse({ year, month, day });
+        return { month, day, year };
+    } catch (error) {
+        console.error(error);
+        return { month, day, year, error };
+    }
+};
+
+export const handleResponse = <T>({
+    data,
+    error,
+    shouldThrow,
+}: {
+    data: unknown[] | null;
+    error: PostgrestError | null;
+    shouldThrow?: boolean;
+}) => {
+    if (error) {
+        console.error(error);
+        if (shouldThrow) {
+            throw error;
+        }
+        return [] as T[];
+    }
+    if (!data) {
+        console.error('data is null');
+        return [] as T[];
+    }
+    if (!Array.isArray(data)) {
+        return [data as T];
+    }
+    return data as T[];
+};
 
 export const getAllDrawers = async () => {
     const { data, error } = await supaClient.from('Drawer').select('*').neq('drawer_type', 'driver');
@@ -18,7 +75,7 @@ export const getAllDrawers = async () => {
     return data as unknown as Drawer[];
 };
 
-const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): DriverDrawer => {
+const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): Driver_Drawer => {
     return {
         ...dirtyDriverDrawer.drawer,
         driver: dirtyDriverDrawer.driver,
@@ -26,13 +83,17 @@ const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): DriverDraw
 };
 
 export const getAllDrivers = async () => {
-    const { data, error } = await supaClient.from('Driver').select('drawer:Drawer(*), driver:Profile(*)');
+    const { data, error } = await supaClient
+        .from('Driver')
+        .select('drawer:Drawer(*), driver:Profile(*)')
+        .eq('is_deleted', false);
 
     if (error) {
         console.error(error);
-        return [] as DriverDrawer[];
+        return [] as Driver_Drawer[];
     }
 
+    // can probably remove this conversion if I change the select
     return data.map((d) => convertToDriverDrawer(d as unknown as DirtyDriverDrawer));
 };
 
@@ -56,37 +117,73 @@ export const getAllOrigins = async () => {
     return data as unknown as OrderOrigin[];
 };
 
-interface GetAllDaysOrdersProps {
-    year: number;
-    month: number;
-    day: number;
-}
-
-const supabaseDate = z.object({
-    year: z.number().min(2024).max(2100),
-    month: z.number().min(1).max(12),
-    day: z.number().min(1).max(31),
-});
-
-export const getAllDaysOrders = async ({ year, month, day }: GetAllDaysOrdersProps) => {
-    try {
-        supabaseDate.parse({ year, month, day });
-    } catch (error) {
-        console.error(error);
-        return [] as Order[];
-    }
+export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
+    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+    if (validateError) return [] as Order_Payment[];
     const { data, error } = await supaClient
         .from('Order')
-        .select('*')
+        .select(
+            `
+        *,
+        payments:Payment (
+          *
+        )
+      `,
+        )
         .eq('business_date', `${year}-${month}-${day}`)
         .order('order_number', { ascending: true });
 
-    if (error) {
-        console.error(error);
-        return [] as Order[];
-    }
+    return handleResponse<Order_Payment>({ data, error });
+};
 
-    return data as unknown as Order[];
+export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
+    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+    if (validateError) return [] as BusinessDayDriver[];
+    const { data, error } = await supaClient
+        .from('BusinessDayDriver')
+        .select('*')
+        .eq('business_date', `${year}-${month}-${day}`);
+
+    return handleResponse<BusinessDayDriver>({ data, error });
+};
+
+export const addDriverToBusinessDay = async ({
+    drawerID,
+    businessDate,
+}: {
+    drawerID: string;
+    businessDate: dayjs.Dayjs;
+}) => {
+    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+    if (validateError) return [] as BusinessDayDriver[];
+    const business_date = `${year}-${month}-${day}`;
+    const { data, error } = await supaClient
+        .from('BusinessDayDriver')
+        .insert({
+            business_date,
+            drawer_id: drawerID,
+        })
+        .select();
+    return handleResponse<BusinessDayDriver>({ data, error, shouldThrow: true });
+};
+
+export const removeDriverFromBusinessDay = async ({
+    drawerID,
+    businessDate,
+}: {
+    drawerID: string;
+    businessDate: dayjs.Dayjs;
+}) => {
+    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
+    if (validateError) return [] as BusinessDayDriver[];
+    const business_date = `${year}-${month}-${day}`;
+    const { data, error } = await supaClient
+        .from('BusinessDayDriver')
+        .delete()
+        .eq('business_date', business_date)
+        .eq('drawer_id', drawerID)
+        .select();
+    return handleResponse<BusinessDayDriver>({ data, error, shouldThrow: true });
 };
 
 interface DummyQueryFnProps<T> {
@@ -118,33 +215,17 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
     };
 };
 
-export const createNewOrder = async (newOrder: NewOrder) => {
-    console.log({ newOrder });
-    const { data, error } = await supaClient.from('Order').insert([newOrder]).select();
-    if (error) {
-        console.error(error);
-        throw error;
-    }
-
-    if (!data) {
-        return null;
-    }
-
-    return data[0] as unknown as Order;
+export const createNewOrder = async ({ newOrder }: { newOrder: NewOrder & { initial_payment_type: PaymentType } }) => {
+    const { data, error } = await supaClient.rpc('create_new_order_from_json', { p_order_json: newOrder });
+    return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
-export const updateOrder = async (order: Order) => {
+export const updateOrder = async (orderWithPayments: Order_Payment) => {
+    // remove .payments from order
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { payments, ...order } = orderWithPayments;
     const { data, error } = await supaClient.from('Order').update(order).eq('order_id', order.order_id).select();
-    if (error) {
-        console.error(error);
-        throw error;
-    }
-
-    if (!data) {
-        return null;
-    }
-
-    return data[0] as unknown as Order;
+    return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
 export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
@@ -158,6 +239,7 @@ export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: stri
     } else {
         return data;
     }
+    // return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
 export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
@@ -165,9 +247,31 @@ export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs:
         p_drawer_id: drawerID,
         p_order_ids: orderIDs,
     });
+    console.log({ data });
     if (error) {
         console.error(error);
+        throw error;
     } else {
         return data;
     }
+    // can use handleResponse once we update the return type from db
+    // return handleResponse<Order_Payment>({ data, error, shouldThrow: true });
+};
+
+export const getAllEmployees = async () => {
+    const { data, error } = await supaClient.from('Profile').select('*');
+    return handleResponse<Profile>({ data, error, shouldThrow: true });
+};
+
+interface UpdateEmployeeResponse {
+    profile: Profile;
+    driver: Driver;
+}
+
+export const updateEmployee = async (employee: Profile, is_driver: boolean) => {
+    const { data, error } = await supaClient.rpc('handle_employee_update', {
+        p_is_driver: is_driver,
+        p_profile: employee,
+    });
+    return handleResponse<UpdateEmployeeResponse>({ data, error, shouldThrow: true });
 };

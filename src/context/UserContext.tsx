@@ -6,3 +6,5 @@ export const UserContext = createContext<SupashipUserInfo>({
     profile: null,
     loading: true,
 });
+
+// for dealing with user session and profile
