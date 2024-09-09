@@ -75,6 +75,21 @@ const orderValidators = {
         },
         valueAsNumber: true,
     },
+    delivery_fee_in_cents: {
+        validate: (value: number) => {
+            if (isNaN(value)) {
+                return 'Must be a number';
+            }
+            if (!Number.isInteger(value)) {
+                return 'Must be a whole number';
+            }
+            if (value < 0) {
+                return 'Cannot be negative';
+            }
+            return true;
+        },
+        valueAsNumber: true,
+    },
 };
 
 const paymentValidators = {

@@ -90,7 +90,8 @@ type FormValues =
 
 export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = false }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
-    const { origins, drawers, drivers } = useBariPizzaContext();
+    const { origins, drawers, drivers, constants } = useBariPizzaContext();
+    const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
         return {
             business_date: businessDate.format('YYYY-MM-DD'),
@@ -101,9 +102,10 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
             phone: null,
             total_in_cents: 0,
             drawer_id: '',
+            delivery_fee_in_cents: defaultDeliveryFee,
             initial_payment_type: 'cash' as PaymentType,
         };
-    }, [businessDate, origins]);
+    }, [businessDate, origins, defaultDeliveryFee]);
     const {
         handleSubmit,
         register,
@@ -305,14 +307,24 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                     helperText={errors.order_name?.message}
                 />
             )}
-            <TextField
+            {asDialog && (
+                <TextField
+                    label="Delivery Fee"
+                    {...register('delivery_fee_in_cents', {
+                        ...validators.order.delivery_fee_in_cents,
+                    })}
+                    error={!!errors.delivery_fee_in_cents}
+                    helperText={errors.delivery_fee_in_cents?.message}
+                />
+            )}
+            {/* <TextField
                 label="Phone"
                 {...register('phone', {
                     ...validators.order.phone,
                 })}
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
-            />
+            /> */}
             <TextField
                 label="Total"
                 {...register('total_in_cents', {
@@ -326,11 +338,11 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         data.drawer_id = data.drawer_id || null; // can't be ''
+        console.log({ data });
         if ('order_id' in data) {
             console.log({ data });
             updateOrderMutation.mutate(data);
         } else {
-            // const { initial_payment_type: initialPaymentType, ...newOrder } = data;
             createNewOrderMutation.mutate({ newOrder: data });
         }
     };
@@ -354,7 +366,6 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
             <OrderEditorDialog
                 isOpen={isOpen}
                 close={close}
-                handleCancel={handleCancel}
                 handleSubmit={handleSubmit}
                 onSubmit={onSubmit}
                 onError={onError}
@@ -402,7 +413,6 @@ const OrderEditorDialog = ({
     handleSubmit,
     onSubmit,
     onError,
-    handleCancel,
     order,
     validPaymentTypes,
 }: {
@@ -414,7 +424,6 @@ const OrderEditorDialog = ({
     handleSubmit: UseFormHandleSubmit<FormValues>;
     onSubmit: SubmitHandler<FormValues>;
     onError: SubmitErrorHandler<FieldErrors>;
-    handleCancel: () => void;
     order: Order_Payment;
     validPaymentTypes: { value: PaymentType; label: string }[];
 }) => {
@@ -437,14 +446,8 @@ const OrderEditorDialog = ({
 
     return (
         <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
-            <DialogTitle>
-                {isPaymentsVisible
-                    ? `Payments: $${paymentsTotalInCents / 100} out of $${order.total_in_cents / 100}`
-                    : 'Order Editor'}
-            </DialogTitle>
+            <DialogTitle>{isPaymentsVisible ? 'Payments Editor' : 'Order Editor'}</DialogTitle>
             <DialogContent sx={{ minHeight: 250, overflowY: 'hidden' }}>
-                {/* TODO: change overflowY back to normal but just hide scrollbar */}
-
                 <AnimatePresence initial={false} mode="wait">
                     {!isPaymentsVisible ? (
                         <motion.div
@@ -484,8 +487,7 @@ const OrderEditorDialog = ({
                                         variant="icon"
                                         validPaymentTypes={validPaymentTypes}
                                     />
-                                ))}
-                                <Divider />
+                                ))}{' '}
                                 <PaymentEditor
                                     forNewPayment
                                     orderID={order?.order_id}
@@ -493,20 +495,17 @@ const OrderEditorDialog = ({
                                     variant="icon"
                                     defaultAmount={missingPaymentInCents}
                                 />
+                                <Divider />
+                                <Button onClick={toggleSection} variant="contained">
+                                    Edit Order
+                                </Button>
                             </Stack>
                         </motion.div>
                     )}
                 </AnimatePresence>
             </DialogContent>
-            <DialogActions>
-                {isPaymentsVisible ? (
-                    <Button onClick={toggleSection}>Go Back</Button>
-                ) : (
-                    <>
-                        <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
-                        <Button onClick={handleCancel}>Cancel</Button>
-                    </>
-                )}
+            <DialogActions sx={{ justifyContent: 'end' }}>
+                {!isPaymentsVisible && <Button onClick={handleSubmit(onSubmit, onError)}>Save Changes</Button>}
             </DialogActions>
         </Dialog>
     );

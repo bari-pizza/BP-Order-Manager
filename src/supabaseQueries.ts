@@ -217,6 +217,7 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
 
 export const createNewOrder = async ({ newOrder }: { newOrder: NewOrder & { initial_payment_type: PaymentType } }) => {
     const { data, error } = await supaClient.rpc('create_new_order_from_json', { p_order_json: newOrder });
+    console.log({ data });
     return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 

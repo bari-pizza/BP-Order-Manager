@@ -136,6 +136,13 @@ function Layout() {
             },
         ],
     });
+
+    // TODO: make this a supabase query eventually
+    const constants = {
+        default: {
+            delivery_fee_in_cents: 300,
+        },
+    };
     return (
         // <APIProvider
         //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
@@ -145,7 +152,12 @@ function Layout() {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <ThemeProvider theme={theme}>
                 <BariPizzaContext.Provider
-                    value={{ drawers, drivers: drivers.sort((a, b) => a.name.localeCompare(b.name)), origins }}>
+                    value={{
+                        drawers,
+                        drivers: drivers.sort((a, b) => a.name.localeCompare(b.name)),
+                        origins,
+                        constants,
+                    }}>
                     <LayoutContext.Provider
                         value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth }}>
                         <UserContext.Provider value={{ session, profile, loading }}>

@@ -106,9 +106,10 @@ export const PaymentEditor = ({
                     <MotionWrapper
                         key="amount_in_cents_editing"
                         motionProps={motionProps}
-                        stackProps={{ direction: 'row', gap: 2 }}>
+                        stackProps={{ direction: 'row', gap: 2, justifyContent: 'space-between' }}>
                         <Tooltip title={errors.amount_in_cents?.message}>
                             <TextField
+                                sx={{ minWidth: 80 }}
                                 label="Amount"
                                 {...register('amount_in_cents', { ...validators.payment.amount_in_cents })}
                                 error={!!errors.amount_in_cents}
@@ -116,6 +117,7 @@ export const PaymentEditor = ({
                         </Tooltip>
                         <Tooltip title={errors.tip_in_cents?.message}>
                             <TextField
+                                sx={{ minWidth: 80 }}
                                 key="tip_in_cents"
                                 label="Tip"
                                 {...register('tip_in_cents', { ...validators.payment.tip_in_cents })}
@@ -128,20 +130,32 @@ export const PaymentEditor = ({
                             handleChange={handlePaymentTypeChange}
                             variant={variant}
                         />
+                        <ButtonGroup orientation="horizontal" fullWidth color="primary" sx={{ width: '100%' }}>
+                            <Button onClick={handleSubmit(onSubmit)}>Save</Button>
+                            <Button onClick={() => setIsEditing(!isEditing)}>Cancel</Button>
+                        </ButtonGroup>
                     </MotionWrapper>
                 )}
                 {!isEditing &&
                     (payment ? (
                         <MotionWrapper
                             key="amount_in_cents_viewing"
-                            motionProps={motionProps}
-                            stackProps={{ direction: 'row', gap: 2, justifyContent: 'space-between' }}>
+                            motionProps={{ ...motionProps, style: { justifyContent: 'space-between', width: '100%' } }}
+                            stackProps={{ direction: 'row', gap: 2, width: '100%' }}>
                             <LabeledStack label="Amount" direction="row" width="100%" alignLabel="left">
                                 <Typography>${((payment?.amount_in_cents || 0) / 100).toFixed(2)}</Typography>
                             </LabeledStack>
                             <LabeledStack label="Tip" direction="row" width="100%" alignLabel="left">
                                 <Typography>${((payment?.tip_in_cents || 0) / 100).toFixed(2)}</Typography>
                             </LabeledStack>
+                            <ButtonGroup orientation="horizontal" fullWidth color="primary" sx={{ width: '100%' }}>
+                                <Button onClick={() => setIsEditing(!isEditing)} variant="contained" color="primary">
+                                    Edit
+                                </Button>
+                                <Button onClick={handleSubmit(onDelete)} variant="contained" color="error">
+                                    Delete
+                                </Button>
+                            </ButtonGroup>
                         </MotionWrapper>
                     ) : (
                         <MotionWrapper
@@ -154,20 +168,31 @@ export const PaymentEditor = ({
                         </MotionWrapper>
                     ))}
             </AnimatePresence>
-            {isEditing ? (
-                <Button onClick={handleSubmit(onSubmit)}>Save</Button>
+            {/* {isEditing ? (
+                <ButtonGroup>
+                    <Button onClick={handleSubmit(onSubmit)}>Save</Button>
+                    <Button onClick={() => setIsEditing(!isEditing)}>Cancel</Button>
+                </ButtonGroup>
             ) : (
                 payment && (
-                    <>
+                    <ButtonGroup>
                         <Button onClick={() => setIsEditing(!isEditing)} variant="contained" color="primary">
                             Edit
                         </Button>
                         <Button onClick={handleSubmit(onDelete)} variant="contained" color="error">
                             Delete
                         </Button>
-                    </>
+                    </ButtonGroup>
+                    // <>
+                    //     <Button onClick={() => setIsEditing(!isEditing)} variant="contained" color="primary">
+                    //         Edit
+                    //     </Button>
+                    //     <Button onClick={handleSubmit(onDelete)} variant="contained" color="error">
+                    //         Delete
+                    //     </Button>
+                    // </>
                 )
-            )}
+            )} */}
         </LabeledStack>
     );
 };

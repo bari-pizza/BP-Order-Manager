@@ -4,6 +4,7 @@ import { SideBar } from '../../components/SideBar';
 import { DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { ContextMenu } from '../../components/Base/ContextMenu';
 import { DriverCard } from './DriverCard';
+import { Todo } from '../../components/Base/Todo';
 
 export const DriverSideBar = () => {
     const { orders, drivers } = useManagerDashboardContext();
@@ -61,6 +62,9 @@ export const DriverSideBar = () => {
                     </ContextMenu>
                     <Typography variant="h6">ORDERS: {driverSummary.orders}</Typography>
                     <Typography variant="h6">TOTAL: ${(driverSummary.total_in_cents / 100).toFixed(2)}</Typography>
+                    <Todo>Add Bank Textfield</Todo>
+                    <Todo>Add Hours Textfield</Todo>
+                    <Todo>Add Other Textfield</Todo>
                 </Stack>
             </Stack>
         </SideBar>

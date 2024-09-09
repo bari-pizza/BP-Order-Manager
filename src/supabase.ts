@@ -93,6 +93,7 @@ export type Database = {
         Row: {
           business_date: string
           created_at: string
+          delivery_fee_in_cents: number
           drawer_id: string | null
           order_id: string
           order_name: string | null
@@ -105,6 +106,7 @@ export type Database = {
         Insert: {
           business_date: string
           created_at?: string
+          delivery_fee_in_cents?: number
           drawer_id?: string | null
           order_id?: string
           order_name?: string | null
@@ -117,6 +119,7 @@ export type Database = {
         Update: {
           business_date?: string
           created_at?: string
+          delivery_fee_in_cents?: number
           drawer_id?: string | null
           order_id?: string
           order_name?: string | null
@@ -215,13 +218,6 @@ export type Database = {
             referencedRelation: "Order"
             referencedColumns: ["order_id"]
           },
-          {
-            foreignKeyName: "payments_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "OrderPaymentsView"
-            referencedColumns: ["order_id"]
-          },
         ]
       }
       Profile: {
@@ -270,43 +266,19 @@ export type Database = {
       }
     }
     Views: {
-      OrderPaymentsView: {
-        Row: {
-          business_date: string | null
-          created_at: string | null
-          drawer_id: string | null
-          order_id: string | null
-          order_name: string | null
-          order_number: number | null
-          order_type: Database["public"]["Enums"]["order_type"] | null
-          origin_id: string | null
-          payments: Json | null
-          phone: string | null
-          total_in_cents: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Order_origin_id_fkey"
-            columns: ["origin_id"]
-            isOneToOne: false
-            referencedRelation: "OrderOrigin"
-            referencedColumns: ["origin_id"]
-          },
-          {
-            foreignKeyName: "orders_drawer_id_fkey"
-            columns: ["drawer_id"]
-            isOneToOne: false
-            referencedRelation: "Drawer"
-            referencedColumns: ["drawer_id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       add_orders_to_drawer: {
         Args: {
           p_order_ids: Json
           p_drawer_id: string
+        }
+        Returns: Json
+      }
+      create_new_order_from_json: {
+        Args: {
+          p_order_json: Json
         }
         Returns: Json
       }
