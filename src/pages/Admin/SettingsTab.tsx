@@ -1,13 +1,7 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { LabeledStack } from '../../rickcedlib/LabeledStack';
-// import { NumericFormatCustom } from '../../rickcedlib/MaskedTextField';
-// import { NumericFormat, PatternFormat } from 'react-number-format';
-// import { NumericFormatCustom } from '../../rickcedlib/MaskedTextField';
-// import { useState } from 'react';
-// import InputMask from 'react-input-mask';
-import { TextFieldWithMask } from '../../rickcedlib/MaskedTextField';
-import { useRef } from 'react';
+import { TextFieldWithMask } from '../../rickcedlib/TextFieldWithMask';
 import { Button } from '@mui/material';
 
 type FormValues = {
@@ -21,7 +15,6 @@ export const SettingsTab = () => {
             default_delivery_fee_in_cents: constants.default.delivery_fee_in_cents,
         },
     });
-    const inputRef = useRef<HTMLInputElement>(null);
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
         console.log(data);
@@ -33,11 +26,11 @@ export const SettingsTab = () => {
                 control={control}
                 render={({ field: { onChange, value } }) => (
                     <TextFieldWithMask
-                        label="Default Delivery Fee"
+                        label="Default Delivery"
                         maskVariant="currency"
                         value={value}
                         onChange={onChange}
-                        inputRef={inputRef}
+                        keepMask={true}
                     />
                 )}
             />

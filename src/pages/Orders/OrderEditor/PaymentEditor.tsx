@@ -1,17 +1,14 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
 import { LabeledStack } from '../../../rickcedlib/LabeledStack';
 import { Payment, PaymentType, validators } from '../../../typesAndValidators';
-import { Button, ButtonGroup, TextField, Tooltip, Typography, useTheme } from '@mui/material';
+import { Button, ButtonGroup, Tooltip, Typography, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Money as CashIcon, CreditCard as CardIcon, AccountBalanceWallet as ThirdPartyIcon } from '@mui/icons-material';
-import {
-    // useCreateNewPayment, useDeletePayment,
-    usePaymentCRUD,
-    // useUpdatePayment
-} from '../../../api/payment';
+import { usePaymentCRUD } from '../../../api/payment';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
+import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -49,7 +46,6 @@ export const PaymentEditor = ({
         order_id: orderID,
     };
     const {
-        register,
         control,
         // setError,
         formState: { errors },
@@ -104,24 +100,44 @@ export const PaymentEditor = ({
             <AnimatePresence mode="wait" initial={false}>
                 {isEditing && (
                     <MotionWrapper
-                        key="amount_in_cents_editing"
+                        motionKey="amount_in_cents_editing"
                         motionProps={motionProps}
                         stackProps={{ direction: 'row', gap: 2, justifyContent: 'space-between' }}>
                         <Tooltip title={errors.amount_in_cents?.message}>
-                            <TextField
-                                sx={{ minWidth: 80 }}
-                                label="Amount"
-                                {...register('amount_in_cents', { ...validators.payment.amount_in_cents })}
-                                error={!!errors.amount_in_cents}
+                            <Controller
+                                name="amount_in_cents"
+                                control={control}
+                                rules={validators.payment.amount_in_cents}
+                                render={({ field: { onChange, value } }) => {
+                                    return (
+                                        <TextFieldWithMask
+                                            sx={{ minWidth: 100 }}
+                                            label="Amount"
+                                            maskVariant="currency"
+                                            error={!!errors.amount_in_cents}
+                                            value={value}
+                                            onChange={onChange}
+                                        />
+                                    );
+                                }}
                             />
                         </Tooltip>
                         <Tooltip title={errors.tip_in_cents?.message}>
-                            <TextField
-                                sx={{ minWidth: 80 }}
-                                key="tip_in_cents"
-                                label="Tip"
-                                {...register('tip_in_cents', { ...validators.payment.tip_in_cents })}
-                                error={!!errors.tip_in_cents}
+                            <Controller
+                                name="tip_in_cents"
+                                control={control}
+                                render={({ field: { onChange, value } }) => {
+                                    return (
+                                        <TextFieldWithMask
+                                            sx={{ minWidth: 100 }}
+                                            label="Tip"
+                                            maskVariant="currency"
+                                            error={!!errors.tip_in_cents}
+                                            value={value}
+                                            onChange={onChange}
+                                        />
+                                    );
+                                }}
                             />
                         </Tooltip>
                         <PaymentTypeSelector
@@ -139,7 +155,7 @@ export const PaymentEditor = ({
                 {!isEditing &&
                     (payment ? (
                         <MotionWrapper
-                            key="amount_in_cents_viewing"
+                            motionKey="amount_in_cents_viewing"
                             motionProps={{ ...motionProps, style: { justifyContent: 'space-between', width: '100%' } }}
                             stackProps={{ direction: 'row', gap: 2, width: '100%' }}>
                             <LabeledStack label="Amount" direction="row" width="100%" alignLabel="left">
@@ -159,7 +175,7 @@ export const PaymentEditor = ({
                         </MotionWrapper>
                     ) : (
                         <MotionWrapper
-                            key="amount_in_cents_viewing"
+                            motionKey="amount_in_cents_viewing"
                             motionProps={{ ...motionProps, style: { width: '100%' } }}
                             stackProps={{ direction: 'row', gap: 2, justifyContent: 'space-between' }}>
                             <Button onClick={() => setIsEditing(!isEditing)} sx={{ width: '100%' }}>

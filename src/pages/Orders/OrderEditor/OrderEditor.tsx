@@ -35,6 +35,7 @@ import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
+import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 
 const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_type: OrderType) => {
     if (!drawer) return true;
@@ -308,30 +309,39 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 />
             )}
             {asDialog && (
-                <TextField
-                    label="Delivery Fee"
-                    {...register('delivery_fee_in_cents', {
-                        ...validators.order.delivery_fee_in_cents,
-                    })}
-                    error={!!errors.delivery_fee_in_cents}
-                    helperText={errors.delivery_fee_in_cents?.message}
+                <Controller
+                    name="delivery_fee_in_cents"
+                    control={control}
+                    render={({ field: { onChange, value } }) => {
+                        return (
+                            <TextFieldWithMask
+                                label="Delivery Fee"
+                                maskVariant="currency"
+                                error={!!errors.delivery_fee_in_cents}
+                                helperText={errors.delivery_fee_in_cents?.message}
+                                value={value}
+                                onChange={onChange}
+                            />
+                        );
+                    }}
                 />
             )}
-            {/* <TextField
-                label="Phone"
-                {...register('phone', {
-                    ...validators.order.phone,
-                })}
-                error={!!errors.phone}
-                helperText={errors.phone?.message}
-            /> */}
-            <TextField
-                label="Total"
-                {...register('total_in_cents', {
-                    ...validators.order.total_in_cents,
-                })}
-                error={!!errors.total_in_cents}
-                helperText={errors.total_in_cents?.message}
+            <Controller
+                name="total_in_cents"
+                control={control}
+                rules={validators.order.total_in_cents}
+                render={({ field: { onChange, value } }) => {
+                    return (
+                        <TextFieldWithMask
+                            label="Total"
+                            maskVariant="currency"
+                            error={!!errors.total_in_cents}
+                            helperText={errors.total_in_cents?.message}
+                            value={value}
+                            onChange={onChange}
+                        />
+                    );
+                }}
             />
         </>
     );

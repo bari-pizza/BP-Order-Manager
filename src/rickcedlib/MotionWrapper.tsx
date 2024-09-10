@@ -6,12 +6,12 @@ interface MotionWrapperProps {
     children: ReactNode;
     motionProps?: MotionProps;
     stackProps?: StackProps;
-    key?: string;
+    motionKey?: string;
 }
 
-export const MotionWrapper = ({ motionProps, stackProps, children, key }: MotionWrapperProps) => {
+export const MotionWrapper = ({ motionProps, stackProps, children, motionKey }: MotionWrapperProps) => {
     return (
-        <motion.div key={key} {...motionProps}>
+        <motion.div key={motionKey} {...motionProps}>
             <Stack {...stackProps}>{children}</Stack>
         </motion.div>
     );

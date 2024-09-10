@@ -14,6 +14,7 @@ type TextFieldWithMaskProps = TextFieldProps & {
     onChange: (value: string) => void;
     keepMask?: boolean;
     inputRef?: React.RefObject<HTMLInputElement>;
+    // optional ref used for things like focusing the input
 };
 
 export const TextFieldWithMask = ({

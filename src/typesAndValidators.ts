@@ -65,9 +65,6 @@ const orderValidators = {
             if (isNaN(value)) {
                 return 'Must be a number';
             }
-            if (!Number.isInteger(value)) {
-                return 'Must be a whole number';
-            }
             if (value < 1) {
                 return 'Must be greater than 0';
             }
@@ -79,9 +76,6 @@ const orderValidators = {
         validate: (value: number) => {
             if (isNaN(value)) {
                 return 'Must be a number';
-            }
-            if (!Number.isInteger(value)) {
-                return 'Must be a whole number';
             }
             if (value < 0) {
                 return 'Cannot be negative';
@@ -98,9 +92,6 @@ const paymentValidators = {
             if (isNaN(value)) {
                 return 'Must be a number';
             }
-            if (!Number.isInteger(value)) {
-                return 'Must be a whole number';
-            }
             if (value < 1) {
                 return 'Must be greater than 0';
             }
@@ -112,9 +103,6 @@ const paymentValidators = {
         validate: (value: number) => {
             if (isNaN(value)) {
                 return 'Must be a number';
-            }
-            if (!Number.isInteger(value)) {
-                return 'Must be a whole number';
             }
             if (value < 0) {
                 return 'Cannot be negative';
