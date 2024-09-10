@@ -1,3 +1,4 @@
+// DEPRECATED - USE src/api/helpers.tsx instead
 import { toast, UpdateOptions } from 'react-toastify';
 
 // TODO: add a way to undo changes
@@ -63,6 +64,3 @@ export type DataWithError = {
     message?: string;
     [key: string]: string | undefined;
 };
-
-// TODO: create a simple toast.error wrapper that uses a sad pizza icon
-// TODO: create a simple toast.success wrapper that uses a happy pizza icon

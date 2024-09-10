@@ -6,8 +6,8 @@ import { useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { DrawerCardBase, DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { ContextMenu } from '../../components/Base/ContextMenu';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
-import { useNavigate } from 'react-router-dom';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import { useSmartNavigate } from '../../components/useSmartNavigate';
 
 interface DrawerCardProps {
     drawer: Drawer | Driver_Drawer;
@@ -72,12 +72,12 @@ export const DrawerAvatarSkeleton = () => {
 const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
     const { setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>('managerDashboardTabName');
     const { setValue: setDriver } = useLocalStorage<'openDrawer'>('openDrawer');
-    const navigate = useNavigate();
+    const smartNavigate = useSmartNavigate();
 
     const navigateToManagerDashboard = () => {
         setTabName('drivers');
         setDriver(driver);
-        navigate('/manager');
+        smartNavigate({ to: '/manager', keepSearchParams: true });
     };
 
     return (

@@ -197,6 +197,14 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
     }, [invalidInitialPaymentType, validPaymentTypes, forNewOrder, setValue]);
 
     useEffect(() => {
+        if (currentOrderType === 'delivery') {
+            setValue('delivery_fee_in_cents', defaultDeliveryFee);
+        } else {
+            setValue('delivery_fee_in_cents', 0);
+        }
+    }, [currentOrderType, defaultDeliveryFee, setValue]);
+
+    useEffect(() => {
         // initial payment type only exists on new orders
         if (forNewOrder && currentOrigin) {
             const defaultPaymentType = currentOrigin.default_is_prepaid ? 'third_party' : 'cash';
@@ -288,12 +296,10 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 <TextField
                     key="order_number"
                     label="Order Number"
-                    {...register(
-                        'order_number',
-                        currentOrigin?.has_order_number && {
-                            ...validators.order.order_number,
-                        },
-                    )}
+                    {...register('order_number', {
+                        ...validators.order.order_number,
+                        shouldUnregister: true,
+                    })}
                     error={!!errors.order_number}
                     helperText={errors.order_number?.message}
                 />
@@ -319,7 +325,9 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                                 maskVariant="currency"
                                 error={!!errors.delivery_fee_in_cents}
                                 helperText={errors.delivery_fee_in_cents?.message}
+                                keepMask={true}
                                 value={value}
+                                disabled={currentOrderType !== 'delivery'}
                                 onChange={onChange}
                             />
                         );

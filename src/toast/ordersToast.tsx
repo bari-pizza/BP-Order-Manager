@@ -1,3 +1,5 @@
+// DEPRECATED - USE src/api/helpers.tsx instead
+
 import { toastPromise, DataWithError, DataWithPayload } from './toast';
 import { Drawer, Driver_Drawer } from '../typesAndValidators';
 

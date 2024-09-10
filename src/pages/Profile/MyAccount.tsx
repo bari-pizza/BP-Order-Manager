@@ -19,7 +19,7 @@ export const MyAccount = () => {
 
     return (
         <Stack direction="column" alignItems="center" justifyContent="center" height="100vh">
-            <Todo>Add a way to edit profile</Todo>
+            <Todo message="Should include avatar, first_name, last_name, & phone">Add a way to edit profile</Todo>
             <Button onClick={handleLogout}>Logout</Button>
         </Stack>
     );

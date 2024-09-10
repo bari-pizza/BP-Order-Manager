@@ -9,6 +9,7 @@ import { usePaymentCRUD } from '../../../api/payment';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
+import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -78,6 +79,19 @@ export const PaymentEditor = ({
     const onDelete = (data: FormValues) => {
         paymentMutations.delete(data);
     };
+
+    const { handleConfirmation: handleDeletionConfirmation } = useConfirmationToast({
+        message: 'Are you sure you want to delete this payment?',
+        confirmProps: {
+            handler: handleSubmit(onDelete),
+            buttonText: 'Delete',
+            color: 'error',
+        },
+        cancelProps: {
+            buttonText: 'Cancel',
+            color: 'info',
+        },
+    });
 
     const motionProps = {
         initial: { y: 100, opacity: 0 },
@@ -168,7 +182,7 @@ export const PaymentEditor = ({
                                 <Button onClick={() => setIsEditing(!isEditing)} variant="contained" color="primary">
                                     Edit
                                 </Button>
-                                <Button onClick={handleSubmit(onDelete)} variant="contained" color="error">
+                                <Button onClick={handleDeletionConfirmation} variant="contained" color="error">
                                     Delete
                                 </Button>
                             </ButtonGroup>

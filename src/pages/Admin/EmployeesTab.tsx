@@ -49,7 +49,7 @@ export const EmployeesTab = () => {
     return (
         <Stack direction="column">
             <EmployeesTable employees={employees} />
-            <Todo>Add a button to add an employee</Todo>
+            <Todo message="This may not be necessary">Add a button to add an employee</Todo>
         </Stack>
     );
 };

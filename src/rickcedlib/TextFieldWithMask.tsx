@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { useRefMask, getCurrencyMaskGenerator } from 'react-hook-mask'; // Assuming you're using react-hook-mask
 
@@ -34,6 +34,12 @@ export const TextFieldWithMask = ({
             el.setSelectionRange(cursorPosition, cursorPosition);
         }
     }, []);
+
+    useEffect(() => {
+        if (value !== initialValue + '') {
+            setValue(initialValue + '');
+        }
+    }, [initialValue, value]);
 
     const maskGenerator = maskVariant === 'currency' ? currencyMaskGenerator : undefined;
 

@@ -30,7 +30,7 @@ const orderValidators = {
     order_number: {
         validate: (value: number | null) => {
             if (value === null) {
-                return true;
+                return 'Must be a number';
             }
             if (isNaN(value)) {
                 return 'Must be a number';

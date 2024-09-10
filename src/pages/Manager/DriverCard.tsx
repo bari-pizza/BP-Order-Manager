@@ -2,7 +2,7 @@ import { Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardBase, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../../components/Base/ContextMenu';
-import { useNavigate } from 'react-router-dom';
+import { useSmartNavigate } from '../../components/useSmartNavigate';
 import {
     OpenInNew as OpenInNewIcon,
     AccountBalanceWallet as WalletIcon,
@@ -54,12 +54,16 @@ export const DriverCard = ({ driver, sx, props, canOpen = true }: DriverCardProp
 };
 
 const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
-    const navigate = useNavigate();
+    const smartNavigate = useSmartNavigate();
     const { orders, drivers, drawers } = useManagerDashboardContext();
     const driversOrders = orders.byDrawerID(driver.drawer_id);
 
     const navigateToDrawerOrders = () => {
-        navigate('/orders');
+        smartNavigate({
+            to: '/orders',
+            keepSearchParams: true,
+        });
+
         drawers.onClick(driver);
     };
 
