@@ -18,6 +18,12 @@ export type NewDrawer = Omit<Drawer, 'drawer_id' | 'created_at'>;
 export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 export type NewPayment = Omit<Payment, 'payment_id' | 'created_at'>;
 
+export type OrderWithFullDetails = Order_Payment & {
+    drawer?: Drawer;
+    driver?: Driver_Drawer;
+    origin?: OrderOrigin;
+};
+
 export type AdminDashboardTabName = 'employees' | 'third_parties' | 'orders' | 'settings';
 export type ManagerDashboardTabName = 'sales' | 'drivers' | 'orders' | 'settings';
 export type LocalStorageField = {

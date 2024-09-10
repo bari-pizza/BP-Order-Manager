@@ -1,17 +1,44 @@
-import { Stack, Typography } from '@mui/material';
-import { useManagerDashboardContext } from '../../hooks/data/useContextData';
+import { Button, Stack, TextField, Typography } from '@mui/material';
+import { useBariPizzaContext, useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { SideBar } from '../../components/SideBar';
 import { DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { ContextMenu } from '../../components/Base/ContextMenu';
 import { DriverCard } from './DriverCard';
 import { Todo } from '../../components/Base/Todo';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import TextFieldWithMask from '../../rickcedlib/TextFieldWithMask';
+
+// TODO: create new BusinessDayDrawer table
+// pk (drawer_id, business_date), bank, hours, other, is_locked, is_closed, special_note
+
+type FormValues = {
+    bank: number;
+    hours: number;
+    other: number;
+};
 
 export const DriverSideBar = () => {
+    const { constants } = useBariPizzaContext();
     const { orders, drivers } = useManagerDashboardContext();
     const currentDriver = drivers.current;
+
+    const { control, handleSubmit, register } = useForm<FormValues>({
+        defaultValues: {
+            // eventually get this from BusinessDayDriver table
+            bank: constants.default.starting_cash_in_cents,
+            hours: 0,
+            other: 0,
+        },
+    });
+
     if (!currentDriver) {
         return null;
     }
+
+    const onSubmit: SubmitHandler<FormValues> = (data) => {
+        console.log(data);
+    };
+
     const driversOrders = orders.byDrawerID(currentDriver.drawer_id);
     const driverSummary = {
         total_in_cents: 0,
@@ -62,9 +89,35 @@ export const DriverSideBar = () => {
                     </ContextMenu>
                     <Typography variant="h6">ORDERS: {driverSummary.orders}</Typography>
                     <Typography variant="h6">TOTAL: ${(driverSummary.total_in_cents / 100).toFixed(2)}</Typography>
-                    <Todo>Add Bank Textfield</Todo>
-                    <Todo>Add Hours Textfield</Todo>
-                    <Todo>Add Other Textfield</Todo>
+                    <Controller
+                        name="bank"
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                            <TextFieldWithMask
+                                label="Bank"
+                                maskVariant="currency"
+                                value={value}
+                                onChange={onChange}
+                                keepMask={true}
+                            />
+                        )}
+                    />
+                    <TextField label="Hours" {...register('hours')} />
+                    <Controller
+                        name="other"
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                            <TextFieldWithMask
+                                label="Other"
+                                maskVariant="currency"
+                                value={value}
+                                onChange={onChange}
+                                keepMask={true}
+                            />
+                        )}
+                    />
+                    <Button onClick={handleSubmit(onSubmit)}>Save</Button>
+                    <Button>Close Driver</Button>
                 </Stack>
             </Stack>
         </SideBar>

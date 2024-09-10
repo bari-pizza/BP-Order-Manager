@@ -8,6 +8,7 @@ import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { Driver_Drawer, ManagerDashboardTabName } from '../../typesAndValidators';
 import { SalesTab } from './SalesTab';
+import { OrdersTab } from './OrdersTab';
 
 /*    TODO: About Today
         Sales
@@ -127,7 +128,7 @@ export const ManagerDashboard = () => {
                     <DriversTab />
                 </TabPanel>
                 <TabPanel tabName="orders" value={tabName}>
-                    Orders go here!
+                    <OrdersTab />
                 </TabPanel>
                 <TabPanel tabName="settings" value={tabName}>
                     Settings go here!
