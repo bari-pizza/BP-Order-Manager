@@ -1,8 +1,8 @@
 import { Stack } from '@mui/material';
-import { useBariPizzaContext, useManagerDashboardContext } from '../../hooks/data/useContextData';
-import { OrdersTable } from './OrdersTable';
-import { Todo } from '../../components/Base/Todo';
-import { OrderWithFullDetails } from '../../typesAndValidators';
+import { useBariPizzaContext, useManagerDashboardContext } from '../../../hooks/data/useContextData';
+import { OrdersTable } from '../Tables/OrdersTable';
+import { Todo } from '../../../components/Base/Todo';
+import { OrderWithFullDetails } from '../../../typesAndValidators';
 
 export const OrdersTab = () => {
     const { origins, drawers } = useBariPizzaContext();

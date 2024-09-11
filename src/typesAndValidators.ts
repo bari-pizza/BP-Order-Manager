@@ -21,7 +21,7 @@ export type NewPayment = Omit<Payment, 'payment_id' | 'created_at'>;
 export type OrderWithFullDetails = Order_Payment & {
     drawer?: Drawer;
     driver?: Driver_Drawer;
-    origin?: OrderOrigin;
+    origin: OrderOrigin;
 };
 
 export type AdminDashboardTabName = 'employees' | 'third_parties' | 'orders' | 'settings';

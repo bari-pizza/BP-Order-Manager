@@ -5,15 +5,12 @@ import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order_Payment } from '../../typesAndValidators';
 import { OrderEditor } from './OrderEditor/OrderEditor';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
-import {
-    ExpandMore as ExpandMoreIcon,
-    OpenInNew as OpenInNewIcon,
-    TwoWheeler as DeliveryIcon,
-    Restaurant as PickupIcon,
-} from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import pizzaSrc from '/pizza slice.png';
+import { OrderTypeIcon } from '../../components/Order/OrderTypeIcon';
+import { OriginLogo } from '../../components/Order/OriginLogo';
 
 interface ExpandMoreProps extends BoxProps {
     expand: boolean;
@@ -96,7 +93,7 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
     };
 
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id)!;
-    const originLogo = orderOrigin.icon || '';
+    // const originLogo = orderOrigin.icon || '';
 
     const totalPayments = order.payments.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
     const isPaid = totalPayments === order.total_in_cents;
@@ -146,16 +143,8 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                     </Collapse>
                     <Stack direction="row" justifyContent="space-between" m={1} mt={0} alignItems="center">
                         <Stack direction="row" alignItems="center" gap={1}>
-                            {originLogo && (
-                                <img
-                                    src={originLogo}
-                                    alt={orderOrigin.name}
-                                    width="24px"
-                                    height="24px"
-                                    style={{ borderRadius: '50%' }}
-                                />
-                            )}
-                            {order.order_type === 'pickup' ? <PickupIcon /> : <DeliveryIcon />}
+                            <OriginLogo orderOrigin={orderOrigin} />
+                            <OrderTypeIcon orderType={order.order_type} />
                         </Stack>
                         <ExpandMore expand={!collapsed}>
                             <ExpandMoreIcon />

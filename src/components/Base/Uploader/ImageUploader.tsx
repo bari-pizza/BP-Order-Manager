@@ -1,7 +1,8 @@
-import { ImgHTMLAttributes, useRef } from 'react';
+import { useRef } from 'react';
 import { useImageUpload } from '../../../hooks/upload/useImageUpload';
 import { BucketName } from '../../../typesAndValidators';
-import { Stack, useTheme } from '@mui/material';
+import { Stack } from '@mui/material';
+import { RoundImage } from '../RoundImage';
 export const ImageUploader = ({
     bucketName,
     basePath,
@@ -11,7 +12,8 @@ export const ImageUploader = ({
     onSuccess,
     originalURL,
     disabled,
-    imgProps = {},
+    size,
+    style,
 }: {
     bucketName: BucketName;
     basePath: string;
@@ -21,9 +23,9 @@ export const ImageUploader = ({
     onError?: (error: Error) => void;
     onUpload?: () => void;
     disabled?: boolean;
-    imgProps?: ImgHTMLAttributes<HTMLImageElement>;
+    size?: 'small' | 'medium' | 'large' | 'xlarge';
+    style?: React.CSSProperties;
 }) => {
-    const theme = useTheme();
     const inputRef = useRef<HTMLInputElement>(null);
     const { handleFileChange, uploadedImagePath } = useImageUpload({
         bucketName,
@@ -42,13 +44,12 @@ export const ImageUploader = ({
             height="100%"
             sx={{ cursor: 'pointer' }}>
             <input type="file" onChange={handleFileChange} hidden ref={inputRef} />
-            <img
-                src={uploadedImagePath || originalURL}
+            <RoundImage
+                src={uploadedImagePath || originalURL || ''}
                 alt="uploaded image"
-                width="35px"
-                height="35px"
-                style={{ border: `2px solid ${theme.palette.primary.main}`, borderRadius: '50%' }}
-                {...(imgProps || {})}
+                style={style}
+                size={size}
+                variant="border"
             />
         </Stack>
     );

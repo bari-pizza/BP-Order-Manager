@@ -52,5 +52,5 @@ export const AvatarUploader = ({ profile, onUpload, onSuccess, onError, disabled
         },
     };
 
-    return <ImageUploader {...imageUploaderProps} disabled={disabled} />;
+    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="xlarge" />;
 };

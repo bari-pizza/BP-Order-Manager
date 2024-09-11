@@ -1,14 +1,14 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
 import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
-import { DriversTab } from './DriversTab';
+import { DriversTab } from './Tabs/DriversTab';
 import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { Driver_Drawer, ManagerDashboardTabName } from '../../typesAndValidators';
-import { SalesTab } from './SalesTab';
-import { OrdersTab } from './OrdersTab';
+import { SalesTab } from './Tabs/SalesTab';
+import { OrdersTab } from './Tabs/OrdersTab';
 
 /*    TODO: About Today
         Sales
