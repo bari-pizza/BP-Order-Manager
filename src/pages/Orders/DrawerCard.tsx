@@ -7,7 +7,7 @@ import { DrawerCardBase, DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../
 import { ContextMenu } from '../../components/Base/ContextMenu';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
-import { useSmartNavigate } from '../../components/useSmartNavigate';
+import { useSmartNavigate } from '../../hooks/navigation/useSmartNavigate';
 
 interface DrawerCardProps {
     drawer: Drawer | Driver_Drawer;

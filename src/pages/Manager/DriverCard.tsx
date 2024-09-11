@@ -2,7 +2,7 @@ import { Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardBase, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../../components/Base/ContextMenu';
-import { useSmartNavigate } from '../../components/useSmartNavigate';
+import { useSmartNavigate } from '../../hooks/navigation/useSmartNavigate';
 import {
     OpenInNew as OpenInNewIcon,
     AccountBalanceWallet as WalletIcon,

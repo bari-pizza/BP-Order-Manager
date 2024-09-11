@@ -32,6 +32,8 @@ export type LocalStorageField = {
     openDrawer: Drawer | Driver_Drawer;
 };
 
+export type BucketName = 'avatars' | 'order_origins';
+
 const orderValidators = {
     order_number: {
         validate: (value: number | null) => {

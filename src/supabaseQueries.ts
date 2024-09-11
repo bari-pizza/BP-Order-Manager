@@ -15,9 +15,9 @@ import { z } from 'zod';
 import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
 import { PostgrestError } from '@supabase/supabase-js';
-const bariPizzaLogo = new URL('/BP logo.png', import.meta.url).href;
-const doorDashLogo = new URL('/DoorDash logo.png', import.meta.url).href;
-const pizzamicoLogo = new URL('/Pizzamico logo.ico', import.meta.url).href;
+// const bariPizzaLogo = new URL('/BP logo.png', import.meta.url).href;
+// const doorDashLogo = new URL('/DoorDash logo.png', import.meta.url).href;
+// const pizzamicoLogo = new URL('/Pizzamico logo.ico', import.meta.url).href;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -104,15 +104,15 @@ export const getAllOrigins = async () => {
         return [] as OrderOrigin[];
     }
     // TODO: remove this hack once the logos are added to supabase
-    const icons: Record<string, string> = {
-        DoorDash: doorDashLogo,
-        'Bari Pizza': bariPizzaLogo,
-        Pizzamico: pizzamicoLogo,
-    };
+    // const icons: Record<string, string> = {
+    //     DoorDash: doorDashLogo,
+    //     'Bari Pizza': bariPizzaLogo,
+    //     Pizzamico: pizzamicoLogo,
+    // };
 
-    data.forEach((origin: OrderOrigin) => {
-        origin.icon = origin.icon || icons[origin.name] || '';
-    });
+    // data.forEach((origin: OrderOrigin) => {
+    //     origin.icon = origin.icon || icons[origin.name] || '';
+    // });
 
     return data as unknown as OrderOrigin[];
 };

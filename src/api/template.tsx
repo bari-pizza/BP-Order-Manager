@@ -49,7 +49,7 @@ const useTemplateInteraction = ({ queryKey }: { queryKey: string[] }) => {
 
 const useTemplateInteractionCRUD = ({ queryKey }: { queryKey: string[] }) => {
     return {
-        useTemplateMutations: {
+        templateMutations: {
             // should have a separate type of interaction hook for each CRUD operation
             create: useTemplateInteraction({ queryKey }).mutate,
             update: useTemplateInteraction({ queryKey }).mutate,
