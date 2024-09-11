@@ -7,13 +7,13 @@ import {
     GridRowModel,
     GridRowModesModel,
 } from '@mui/x-data-grid';
-import { OrderOrigin } from '../../typesAndValidators';
-import { CellCheckbox, CellEditCheckbox } from '../../components/Base/DataGrid/CellCheckbox';
-import { CellEditTextField } from '../../components/Base/DataGrid/CellTextField';
-import { createCellActions } from '../../components/Base/DataGrid/createCellActions';
-import { useDataGrid } from '../../hooks/ui/useDataGrid';
-import { LogoUploader } from './LogoUploader';
-import { useOrderOriginCRUD } from '../../api/order_origin';
+import { OrderOrigin } from '../../../typesAndValidators';
+import { CellCheckbox, CellEditCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
+import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
+import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
+import { useDataGrid } from '../../../hooks/ui/useDataGrid';
+import { LogoUploader } from '../LogoUploader';
+import { useOrderOriginCRUD } from '../../../api/order_origin';
 
 export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<OrderOrigin>({ data: origins });
@@ -61,11 +61,11 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             field: 'icon',
             headerName: 'Icon',
             width: 100,
-            editable: true,
+            editable: false,
+            // renderCell: (params) => {
+            //     return <LogoUploader origin={params.row} disabled />;
+            // },
             renderCell: (params) => {
-                return <LogoUploader origin={params.row} disabled />;
-            },
-            renderEditCell: (params) => {
                 const onSuccess = (downloadURL: string) => {
                     console.log(`saving ${downloadURL}`);
                     params.api.setEditCellValue({ id: params.id, field: 'icon', value: downloadURL });

@@ -63,5 +63,3 @@ export const Default: Story = {
     },
     render: Template,
 };
-
-//TODO: finish fixing controls and rendering (missing icons and doesnt collapse or select)

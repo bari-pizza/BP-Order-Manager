@@ -47,5 +47,5 @@ export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }:
         originalURL: origin.icon || '',
     };
 
-    return <ImageUploader {...imageUploaderProps} disabled={disabled} />;
+    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="medium" />;
 };

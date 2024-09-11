@@ -6,10 +6,10 @@ import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTicket
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { Driver_Drawer, AdminDashboardTabName } from '../../typesAndValidators';
-import { EmployeesTab } from './EmployeesTab';
-import { ThirdPartiesTab } from './ThirdPartiesTab';
+import { EmployeesTab } from './Tabs/EmployeesTab';
+import { OriginsTab } from './Tabs/OriginsTab';
 import { Todo } from '../../components/Base/Todo';
-import { SettingsTab } from './SettingsTab';
+import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
 
 /*    TODO: About Today
@@ -118,7 +118,7 @@ export const AdminDashboard = () => {
                 <Box>
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
                         <Tab value="employees" label="Employees" icon={<SalesIcon />} iconPosition="start" />
-                        <Tab value="third_parties" label="Third Parties" icon={<DriversIcon />} iconPosition="start" />
+                        <Tab value="origins" label="Origins" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />
                     </Tabs>
@@ -127,8 +127,8 @@ export const AdminDashboard = () => {
                     <TabPanel tabName="employees" value={tabName}>
                         <EmployeesTab />
                     </TabPanel>
-                    <TabPanel tabName="third_parties" value={tabName}>
-                        <ThirdPartiesTab />
+                    <TabPanel tabName="origins" value={tabName}>
+                        <OriginsTab />
                     </TabPanel>
                     <TabPanel tabName="orders" value={tabName}>
                         <Todo>Create orders tab</Todo>
@@ -144,20 +144,10 @@ export const AdminDashboard = () => {
 
 /* TODO: ADMIN DASHBOARD
 
-
-TODO: should show workers (profiles)
-    firstName, lastName, phone, email, is_admin, is_manager, is_driver
-    is_driver is not a field - it would be determined if a DriverDrawer with .driver_id === profile.id
-    allows admin to create new workers or rename existing ones
-
     
 
 TODO: should show registers (Drawers.drawer_type === "register")
     allows admin to create new registers or rename existing ones
-
-TODO: should show order origins
-    Bari Pizza should be disabled
-    allows you to create new origins or rename existing ones
     
 TODO: allow us to create reports
     allows to choose day / date-range

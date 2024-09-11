@@ -103,16 +103,6 @@ export const getAllOrigins = async () => {
         console.error(error);
         return [] as OrderOrigin[];
     }
-    // TODO: remove this hack once the logos are added to supabase
-    // const icons: Record<string, string> = {
-    //     DoorDash: doorDashLogo,
-    //     'Bari Pizza': bariPizzaLogo,
-    //     Pizzamico: pizzamicoLogo,
-    // };
-
-    // data.forEach((origin: OrderOrigin) => {
-    //     origin.icon = origin.icon || icons[origin.name] || '';
-    // });
 
     return data as unknown as OrderOrigin[];
 };

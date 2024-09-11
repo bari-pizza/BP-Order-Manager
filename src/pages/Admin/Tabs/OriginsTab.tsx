@@ -1,8 +1,8 @@
 import { Stack } from '@mui/material';
-import { useBariPizzaContext } from '../../hooks/data/useContextData';
-import { OriginsTable } from './ThirdPartiesTable';
+import { useBariPizzaContext } from '../../../hooks/data/useContextData';
+import { OriginsTable } from '../Tables/OriginsTable';
 
-export const ThirdPartiesTab = () => {
+export const OriginsTab = () => {
     const { origins } = useBariPizzaContext();
 
     return (

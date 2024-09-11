@@ -24,7 +24,7 @@ export type OrderWithFullDetails = Order_Payment & {
     origin: OrderOrigin;
 };
 
-export type AdminDashboardTabName = 'employees' | 'third_parties' | 'orders' | 'settings';
+export type AdminDashboardTabName = 'employees' | 'origins' | 'orders' | 'settings';
 export type ManagerDashboardTabName = 'sales' | 'drivers' | 'orders' | 'settings';
 export type LocalStorageField = {
     adminDashboardTabName: AdminDashboardTabName;
