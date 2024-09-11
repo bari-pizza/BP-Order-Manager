@@ -5,7 +5,6 @@ import {
     GridEventListener,
     GridRowEditStopReasons,
     GridRowModel,
-    GridRowModes,
     GridRowModesModel,
 } from '@mui/x-data-grid';
 import { OrderOrigin } from '../../typesAndValidators';
@@ -13,12 +12,13 @@ import { CellCheckbox, CellEditCheckbox } from '../../components/Base/DataGrid/C
 import { CellEditTextField } from '../../components/Base/DataGrid/CellTextField';
 import { createCellActions } from '../../components/Base/DataGrid/createCellActions';
 import { useDataGrid } from '../../hooks/ui/useDataGrid';
-import { LogoUploader } from '../../components/LogoUploader';
+import { LogoUploader } from './LogoUploader';
 import { useOrderOriginCRUD } from '../../api/order_origin';
 
 export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<OrderOrigin>({ data: origins });
     const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['origins'] });
+
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
             event.defaultMuiPrevented = true;
@@ -28,12 +28,9 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     const processRowUpdate = (newRow: GridRowModel) => {
         const updatedRow = {
             ...(newRow as OrderOrigin),
-            // isNew: false
         };
         // alert('this should open a dialog with a preview of the changes, allowing admin to accept or reject');
-
         orderOriginMutations.update(updatedRow as OrderOrigin);
-        // setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         setRows((prev) => prev.map((row) => (row.origin_id === newRow.id ? updatedRow : row)));
         return updatedRow;
     };
@@ -142,6 +139,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             <DataGrid
                 sx={{
                     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
+                    '& .MuiDataGrid-cell--editing': { padding: 0 },
                 }}
                 rows={rows}
                 columns={columns}
@@ -151,10 +149,6 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
-                getRowClassName={(params) => {
-                    const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-                    return isEditing ? 'row-is-edit' : '';
-                }}
                 getRowId={(row) => row.origin_id}
             />
         </Stack>

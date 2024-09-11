@@ -10,7 +10,6 @@ const createNewOrderOrigin: SupabaseInteractor<NewOrderOrigin, OrderOrigin> = as
 };
 
 const updateOrderOrigin: SupabaseInteractor<OrderOrigin, OrderOrigin> = async (orderOrigin) => {
-    console.log('updating', orderOrigin);
     const payload = (await supaClient
         .from('OrderOrigin')
         .update([orderOrigin])

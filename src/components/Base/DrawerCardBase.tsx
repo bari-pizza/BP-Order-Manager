@@ -164,7 +164,7 @@ export const DrawerCardBase = ({
                         className={'drawer-avatar-' + drawer.drawer_id}
                         ref={drawerRef}
                         sx={overrideSX.avatar}
-                        src={drawer.drawer_type === 'driver' ? 'https://mui.com/static/images/avatar/2.jpg' : ''}
+                        src={('driver' in drawer && drawer.driver.avatar_src) || ''}
                         {...props?.avatar}>
                         {avatarChild}
                     </Avatar>

@@ -4,8 +4,9 @@ import { BucketName } from '../../typesAndValidators';
 
 type UseImageUploadProps = {
     bucketName: BucketName;
-    basePath: string;
+    basePath?: string;
     fileName?: string;
+    originalPath?: string;
     onSuccess?: (downloadURL: string) => void;
     onError?: (error: Error) => void;
     onUpload?: () => void;
@@ -14,6 +15,7 @@ export const useImageUpload = ({
     bucketName,
     basePath,
     fileName,
+    originalPath,
     onUpload,
     onError,
     onSuccess,
@@ -32,12 +34,20 @@ export const useImageUpload = ({
         const fileExt = file.name.split('.').pop();
         const timestamp = Date.now().toString();
         const finalFileName = fileName ? `${fileName}.${fileExt}` : `${Math.random()}.${fileExt}`;
-        const filePath = `${basePath}/${timestamp}/${finalFileName}`;
+        const filePath = `${basePath ? `${basePath}/` : ''}${timestamp}-${finalFileName}`;
 
         try {
+            if (originalPath) {
+                console.log(` delete this: ${basePath ? `${basePath}/` : ''}${originalPath}`);
+                console.log({ originalPath });
+                const { error: removeError, data } = await supaClient.storage
+                    .from(bucketName)
+                    .remove([`${basePath ? `${basePath}/` : ''}${originalPath}`]);
+                console.log({ removeError, data });
+            }
             const { error: uploadError } = await supaClient.storage.from(bucketName).upload(filePath, file, {
                 cacheControl: '3600',
-                upsert: true,
+                upsert: false,
             });
 
             if (uploadError) {

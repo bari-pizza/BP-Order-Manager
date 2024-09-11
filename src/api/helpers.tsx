@@ -90,6 +90,14 @@ export const useInteractionHandler = <T, U>({
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: T) => {
+            // I'd like to check for changes here
+            // no changes -> don't do anything
+
+            // const hasChanges = data !== queryClient.getQueryData(queryKey);
+            // if (!hasChanges) {
+            //     return;
+            // }
+
             return interactor(data);
             // I can't normalize here because it's a promise
         },

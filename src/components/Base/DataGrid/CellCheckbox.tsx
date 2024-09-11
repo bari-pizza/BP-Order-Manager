@@ -4,7 +4,17 @@ import { Checkbox, Box } from '@mui/material';
 import { GridRenderCellParams, GridRenderEditCellParams } from '@mui/x-data-grid';
 
 export const CellCheckbox = ({ params }: { params: GridRenderCellParams }) => {
-    return <Checkbox checked={!!params.value} />;
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: 0,
+                height: '100%',
+            }}>
+            <Checkbox checked={!!params.value} />
+        </Box>
+    );
 };
 
 export const CellEditCheckbox = <T,>({ field, params }: { field: keyof T; params: GridRenderEditCellParams }) => {
@@ -22,6 +32,8 @@ export const CellEditCheckbox = <T,>({ field, params }: { field: keyof T; params
             sx={{
                 display: 'flex',
                 alignItems: 'center',
+                padding: 0,
+                height: '100%',
                 '& .MuiSvgIcon-root': {
                     color: isDirty ? theme.palette.secondary.main : '',
                 },

@@ -1,6 +1,7 @@
-import { useUploadToast } from '../hooks/upload/useUploadToast';
-import { BucketName, OrderOrigin } from '../typesAndValidators';
-import { ImageUploader } from './Base/Uploader/ImageUploader';
+import { useUploadToast } from '../../hooks/upload/useUploadToast';
+import { BucketName, OrderOrigin } from '../../typesAndValidators';
+import { ImageUploader } from '../../components/Base/Uploader/ImageUploader';
+import { useOrderOriginCRUD } from '../../api/order_origin';
 
 type LogoUploaderProps = {
     origin: OrderOrigin;
@@ -11,10 +12,11 @@ type LogoUploaderProps = {
 };
 
 export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }: LogoUploaderProps) => {
+    const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['profile'] });
     const { startToast, successToast, errorToast } = useUploadToast({
         messages: {
             onUpload: () => 'Uploading new logo...',
-            onSuccess: () => "Logo uploaded successfully, don't forget to save your changes!",
+            onSuccess: () => 'Logo uploaded successfully',
             onError: () => 'Failed to upload logo',
         },
     });
@@ -27,6 +29,7 @@ export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }:
     const handleSuccess = (downloadURL: string) => {
         onSuccess?.(downloadURL);
         successToast(downloadURL);
+        orderOriginMutations.update({ ...origin, icon: downloadURL });
     };
 
     const handleError = (error: Error) => {
