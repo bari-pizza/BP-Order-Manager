@@ -10,6 +10,7 @@ import { EmployeesTab } from './EmployeesTab';
 import { ThirdPartiesTab } from './ThirdPartiesTab';
 import { Todo } from '../../components/Base/Todo';
 import { SettingsTab } from './SettingsTab';
+import { Suspense } from 'react';
 
 /*    TODO: About Today
         Sales
@@ -122,18 +123,20 @@ export const AdminDashboard = () => {
                         <Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />
                     </Tabs>
                 </Box>
-                <TabPanel tabName="employees" value={tabName}>
-                    <EmployeesTab />
-                </TabPanel>
-                <TabPanel tabName="third_parties" value={tabName}>
-                    <ThirdPartiesTab />
-                </TabPanel>
-                <TabPanel tabName="orders" value={tabName}>
-                    <Todo>Create orders tab</Todo>
-                </TabPanel>
-                <TabPanel tabName="settings" value={tabName}>
-                    <SettingsTab />
-                </TabPanel>
+                <Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
+                    <TabPanel tabName="employees" value={tabName}>
+                        <EmployeesTab />
+                    </TabPanel>
+                    <TabPanel tabName="third_parties" value={tabName}>
+                        <ThirdPartiesTab />
+                    </TabPanel>
+                    <TabPanel tabName="orders" value={tabName}>
+                        <Todo>Create orders tab</Todo>
+                    </TabPanel>
+                    <TabPanel tabName="settings" value={tabName}>
+                        <SettingsTab />
+                    </TabPanel>
+                </Suspense>
             </Stack>
         </AdminDashboardContext.Provider>
     );

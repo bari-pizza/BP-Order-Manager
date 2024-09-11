@@ -20,18 +20,18 @@ export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }:
     });
 
     const handleUpload = () => {
-        startToast();
         onUpload?.();
+        startToast();
     };
 
     const handleSuccess = (downloadURL: string) => {
-        successToast(downloadURL);
         onSuccess?.(downloadURL);
+        successToast(downloadURL);
     };
 
     const handleError = (error: Error) => {
-        errorToast(error);
         onError?.(error);
+        errorToast(error);
     };
 
     const imageUploaderProps = {
