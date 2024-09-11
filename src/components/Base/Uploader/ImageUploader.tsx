@@ -1,7 +1,7 @@
 import { ImgHTMLAttributes, useRef } from 'react';
 import { useImageUpload } from '../../../hooks/upload/useImageUpload';
 import { BucketName } from '../../../typesAndValidators';
-import { Stack } from '@mui/material';
+import { Stack, useTheme } from '@mui/material';
 export const ImageUploader = ({
     bucketName,
     basePath,
@@ -23,6 +23,7 @@ export const ImageUploader = ({
     disabled?: boolean;
     imgProps?: ImgHTMLAttributes<HTMLImageElement>;
 }) => {
+    const theme = useTheme();
     const inputRef = useRef<HTMLInputElement>(null);
     const { handleFileChange, uploadedImagePath } = useImageUpload({
         bucketName,
@@ -46,6 +47,7 @@ export const ImageUploader = ({
                 alt="uploaded image"
                 width="35px"
                 height="35px"
+                style={{ border: `2px solid ${theme.palette.primary.main}`, borderRadius: '50%' }}
                 {...(imgProps || {})}
             />
         </Stack>

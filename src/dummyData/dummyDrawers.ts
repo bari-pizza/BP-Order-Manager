@@ -38,7 +38,7 @@ const createDummyDriver: () => Driver_Drawer = () => {
             is_admin: false,
             is_manager: false,
             is_cashier: false,
-            avatar_src: null,
+            avatar_src: 'https://i.pravatar.cc/300',
         },
     };
 };

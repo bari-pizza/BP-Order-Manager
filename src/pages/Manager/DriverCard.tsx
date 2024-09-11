@@ -72,7 +72,6 @@ const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
     if (driversOrders.length === 0) {
         handleRemoveDriverClick = () => {
             drivers.remove(driver);
-            drivers.handleClick(driver);
         };
     }
 

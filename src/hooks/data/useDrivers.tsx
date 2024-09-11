@@ -75,6 +75,9 @@ export const useDrivers = () => {
         const drawerID = driver.drawer_id;
         toastRef.current['remove'] = removeDriverFromBusinessDayToast(driver.name, businessDate);
         removeDriverFromDayMutation.mutate({ drawerID, businessDate });
+        if (openDriver?.drawer_id === driver.drawer_id) {
+            setOpenDriver(null);
+        }
     };
 
     const handleDriverClick = (driver: Driver_Drawer) => {
