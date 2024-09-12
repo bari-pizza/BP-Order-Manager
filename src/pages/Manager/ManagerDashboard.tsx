@@ -1,12 +1,12 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
 import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
-import { DriversTab } from './Tabs/DriversTab';
+import { DrawersTab } from './Tabs/DriversTab';
 import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
-import { Driver_Drawer, ManagerDashboardTabName } from '../../typesAndValidators';
+import { ManagerDashboardTabName } from '../../typesAndValidators';
 import { SalesTab } from './Tabs/SalesTab';
 import { OrdersTab } from './Tabs/OrdersTab';
 
@@ -55,7 +55,7 @@ export const ManagerDashboard = () => {
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>(
         'managerDashboardTabName',
-        'drivers',
+        'drawers',
     );
     const theme = useTheme();
 
@@ -87,6 +87,12 @@ export const ManagerDashboard = () => {
                 drawers: {
                     all: drawers,
                     onClick: drawer.onClick,
+                    current: drawer.current,
+                    close: () => {
+                        console.log('close drawer');
+                        // TODO: complete this
+                    },
+                    reOpen: () => {}, // some supabase mutation
                 },
                 origins,
                 drivers: {
@@ -96,10 +102,6 @@ export const ManagerDashboard = () => {
                     available: drivers.available,
                     add: drivers.add,
                     remove: drivers.remove, // some supabase mutation
-                    close: (driver: Driver_Drawer) => {
-                        console.log('close driver', driver);
-                    }, // some supabase mutation
-                    reOpen: () => {}, // some supabase mutation
                     handleClick: drivers.handleClick,
                 },
                 // all these properties should eventually come from useDrivers
@@ -116,7 +118,7 @@ export const ManagerDashboard = () => {
                 <Box>
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
                         <Tab value="sales" label="Sales" icon={<SalesIcon />} iconPosition="start" />
-                        <Tab value="drivers" label="Drivers" icon={<DriversIcon />} iconPosition="start" />
+                        <Tab value="drawers" label="Drawers" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />
                     </Tabs>
@@ -124,8 +126,8 @@ export const ManagerDashboard = () => {
                 <TabPanel tabName="sales" value={tabName}>
                     <SalesTab />
                 </TabPanel>
-                <TabPanel tabName="drivers" value={tabName}>
-                    <DriversTab />
+                <TabPanel tabName="drawers" value={tabName}>
+                    <DrawersTab />
                 </TabPanel>
                 <TabPanel tabName="orders" value={tabName}>
                     <OrdersTab />

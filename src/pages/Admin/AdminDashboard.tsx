@@ -5,7 +5,7 @@ import { ManagerDashboardContext as AdminDashboardContext } from '../../context/
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
-import { Driver_Drawer, AdminDashboardTabName } from '../../typesAndValidators';
+import { Driver_Drawer, AdminDashboardTabName, Drawer } from '../../typesAndValidators';
 import { EmployeesTab } from './Tabs/EmployeesTab';
 import { OriginsTab } from './Tabs/OriginsTab';
 import { Todo } from '../../components/Base/Todo';
@@ -89,6 +89,11 @@ export const AdminDashboard = () => {
                 drawers: {
                     all: drawers,
                     onClick: drawer.onClick,
+                    current: drawer.current,
+                    close: (drawer: Drawer | Driver_Drawer) => {
+                        console.log('close drawer', drawer);
+                    }, // some supabase mutation
+                    reOpen: () => {}, // some supabase mutation
                 },
                 origins,
                 drivers: {
@@ -98,10 +103,6 @@ export const AdminDashboard = () => {
                     available: drivers.available,
                     add: drivers.add,
                     remove: drivers.remove, // some supabase mutation
-                    close: (driver: Driver_Drawer) => {
-                        console.log('close driver', driver);
-                    }, // some supabase mutation
-                    reOpen: () => {}, // some supabase mutation
                     handleClick: drivers.handleClick,
                 },
                 // all these properties should eventually come from useDrivers

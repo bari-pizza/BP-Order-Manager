@@ -8,6 +8,9 @@ interface ManagerDashboardProps {
     drawers: {
         all: Drawer[];
         onClick: (drawer: Drawer | Driver_Drawer) => void;
+        current: Drawer | Driver_Drawer | null;
+        close: (drawer: Drawer | Driver_Drawer) => void;
+        reOpen: (driver: Driver_Drawer) => void;
     };
     origins: OrderOrigin[];
     drivers: {
@@ -17,8 +20,6 @@ interface ManagerDashboardProps {
         current: Driver_Drawer | null;
         add: (driver: Driver_Drawer) => void;
         remove: (driver: Driver_Drawer) => void;
-        close: (driver: Driver_Drawer) => void;
-        reOpen: (driver: Driver_Drawer) => void;
         handleClick: (driver: Driver_Drawer) => void;
     };
     orders: {
@@ -32,6 +33,9 @@ export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
     drawers: {
         all: [],
         onClick: () => {},
+        current: null,
+        close: () => {},
+        reOpen: () => {},
     },
     origins: [],
     drivers: {
@@ -41,8 +45,6 @@ export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
         current: null,
         add: () => {},
         remove: () => {},
-        close: () => {},
-        reOpen: () => {},
         handleClick: () => {},
     },
     orders: {

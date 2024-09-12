@@ -25,7 +25,7 @@ export type OrderWithFullDetails = Order_Payment & {
 };
 
 export type AdminDashboardTabName = 'employees' | 'origins' | 'orders' | 'settings';
-export type ManagerDashboardTabName = 'sales' | 'drivers' | 'orders' | 'settings';
+export type ManagerDashboardTabName = 'sales' | 'drawers' | 'orders' | 'settings';
 export type LocalStorageField = {
     adminDashboardTabName: AdminDashboardTabName;
     managerDashboardTabName: ManagerDashboardTabName;

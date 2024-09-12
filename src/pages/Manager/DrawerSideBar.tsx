@@ -3,7 +3,7 @@ import { useBariPizzaContext, useManagerDashboardContext } from '../../hooks/dat
 import { SideBar } from '../../components/SideBar';
 import { DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { ContextMenu } from '../../components/Base/ContextMenu';
-import { DriverCard } from './DriverCard';
+import { DrawerCard } from './DrawerCard';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import TextFieldWithMask from '../../rickcedlib/TextFieldWithMask';
 
@@ -16,10 +16,10 @@ type FormValues = {
     other: number;
 };
 
-export const DriverSideBar = () => {
+export const DrawerSideBar = () => {
     const { constants } = useBariPizzaContext();
-    const { orders, drivers } = useManagerDashboardContext();
-    const currentDriver = drivers.current;
+    const { orders, drawers } = useManagerDashboardContext();
+    const currentDrawer = drawers.current;
 
     const { control, handleSubmit, register } = useForm<FormValues>({
         defaultValues: {
@@ -30,7 +30,7 @@ export const DriverSideBar = () => {
         },
     });
 
-    if (!currentDriver) {
+    if (!currentDrawer || currentDrawer.name === 'Unassigned') {
         return null;
     }
 
@@ -38,16 +38,16 @@ export const DriverSideBar = () => {
         console.log(data);
     };
 
-    const driversOrders = orders.byDrawerID(currentDriver.drawer_id);
-    const driverSummary = {
+    const drawersOrders = orders.byDrawerID(currentDrawer.drawer_id);
+    const drawerSummary = {
         total_in_cents: 0,
         orders: 0,
         cash: 0,
         credit: 0,
     };
-    driversOrders.forEach((order) => {
-        driverSummary.total_in_cents += order.total_in_cents;
-        driverSummary.orders += 1;
+    drawersOrders.forEach((order) => {
+        drawerSummary.total_in_cents += order.total_in_cents;
+        drawerSummary.orders += 1;
         // driverSummary.cash += order.cash;
         // driverSummary.credit += order.credit;
     });
@@ -82,12 +82,12 @@ export const DriverSideBar = () => {
                 <Stack direction="column" alignItems="center" gap={2}>
                     <ContextMenu openOnType="click">
                         <ContextMenu.Base>
-                            <DriverCard driver={currentDriver} sx={sx} props={props} canOpen={false} />
+                            <DrawerCard drawer={currentDrawer} sx={sx} props={props} canOpen={false} />
                         </ContextMenu.Base>
-                        <DriverCard.contextMenu driver={currentDriver} />
+                        <DrawerCard.contextMenu drawer={currentDrawer} />
                     </ContextMenu>
-                    <Typography variant="h6">ORDERS: {driverSummary.orders}</Typography>
-                    <Typography variant="h6">TOTAL: ${(driverSummary.total_in_cents / 100).toFixed(2)}</Typography>
+                    <Typography variant="h6">ORDERS: {drawerSummary.orders}</Typography>
+                    <Typography variant="h6">TOTAL: ${(drawerSummary.total_in_cents / 100).toFixed(2)}</Typography>
                     <Controller
                         name="bank"
                         control={control}

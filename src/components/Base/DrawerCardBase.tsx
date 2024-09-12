@@ -153,8 +153,6 @@ export const DrawerCardBase = ({
                 justifyContent="space-between"
                 {...props?.buttonStack}>
                 <AnimatedBadge
-                    // classes={{ badge: styles['badge-animation'] }}
-                    // badgeContent={badgeCount}
                     badgeCount={{ start: previousBadgeCount, end: badgeCount }}
                     sx={overrideSX.badge}
                     overlap="circular"

@@ -42,26 +42,19 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
     const columns: GridColDef<OrderWithFullDetails>[] = [
         {
             field: 'number/name',
-            headerName: '#',
-            width: 125,
+            headerName: 'Order #',
+            width: 175,
             renderCell: (params) => {
                 const { row } = params;
                 const { order_number, order_name } = row;
-                return order_number ?? order_name;
-            },
-        },
-        {
-            field: 'origin',
-            headerName: 'Origin',
-            width: 125,
-            sortable: false,
-            renderCell: (params) => {
                 return (
                     <Stack direction="row" alignItems="center" height="100%" spacing={1}>
-                        <OriginLogo orderOrigin={params.row.origin} size="medium" variant="border" />
+                        <OriginLogo orderOrigin={params.row.origin} size="small" variant="border" />
                         <OrderTypeIcon orderType={params.row.order_type} />
+                        <span>{order_number ?? order_name}</span>
                     </Stack>
                 );
+                return order_number ?? order_name;
             },
         },
         {

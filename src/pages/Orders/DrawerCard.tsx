@@ -69,14 +69,14 @@ export const DrawerAvatarSkeleton = () => {
     return <DrawerCardBaseSkeleton />;
 };
 
-const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
+const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {
     const { setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>('managerDashboardTabName');
-    const { setValue: setDriver } = useLocalStorage<'openDrawer'>('openDrawer');
+    const { setValue: setDrawer } = useLocalStorage<'openDrawer'>('openDrawer');
     const smartNavigate = useSmartNavigate();
 
     const navigateToManagerDashboard = () => {
-        setTabName('drivers');
-        setDriver(driver);
+        setTabName('drawers');
+        setDrawer(drawer);
         smartNavigate({ to: '/manager', keepSearchParams: true });
     };
 
@@ -90,4 +90,4 @@ const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
     );
 };
 
-DrawerCard.driverContextMenu = DriverContextMenu;
+DrawerCard.drawerContextMenu = DrawerContextMenu;
