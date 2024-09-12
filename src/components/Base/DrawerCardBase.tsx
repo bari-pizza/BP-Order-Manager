@@ -1,9 +1,7 @@
-import { createElement } from 'react';
 import { deepmerge } from '@mui/utils';
 import {
     Avatar,
     AvatarProps,
-    // Badge,
     BadgeProps,
     Button,
     ButtonProps,
@@ -11,21 +9,14 @@ import {
     Stack,
     StackProps,
     SvgIconProps,
-    SvgIconTypeMap,
     Typography,
     TypographyProps,
 } from '@mui/material';
 import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
-import {
-    PointOfSale as PointOfSaleIcon,
-    DeliveryDining as DeliveryDiningIcon,
-    Face as FaceIcon,
-} from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
-import { OverridableComponent } from '@mui/material/OverridableComponent';
-// import styles from './DrawerCardBase.module.css';
+import { SxProps, useTheme } from '@mui/material/styles';
 import { AnimatedBadge } from '../../rickcedlib/AnimatedBadge';
 import { usePrevious } from '@uidotdev/usehooks';
+import { DrawerAvatar } from './DrawerAvatar';
 
 export interface DrawerCardSlotProps {
     button?: Partial<ButtonProps>;
@@ -37,18 +28,22 @@ export interface DrawerCardSlotProps {
     nameTypography?: Partial<TypographyProps>;
 }
 
+export type DrawerCardOverrideSX = {
+    avatar?: SxProps;
+    badge?: SxProps;
+    avatarIcon?: SxProps;
+    button?: SxProps;
+    buttonStack?: SxProps;
+    text?: SxProps;
+};
+
 interface DrawerCardBaseProps {
     drawer: Drawer | Driver_Drawer;
     drawerRef?: React.RefObject<HTMLDivElement>;
     isOpen?: boolean;
     badgeCount: number;
     handleClick?: () => void;
-    sx?: {
-        avatar?: React.CSSProperties;
-        badge?: React.CSSProperties;
-        avatarIcon?: React.CSSProperties;
-        button?: React.CSSProperties;
-    };
+    sx?: DrawerCardOverrideSX;
     props?: DrawerCardSlotProps;
 }
 
@@ -64,7 +59,7 @@ export const DrawerCardBase = ({
     const theme = useTheme();
     const previousBadgeCount = usePrevious(badgeCount as number);
 
-    const baseSX = {
+    const baseSX: DrawerCardOverrideSX = {
         avatar: {
             height: '4em',
             width: '4em',
@@ -119,18 +114,6 @@ export const DrawerCardBase = ({
 
     const overrideSX = deepmerge(baseSX, sx);
 
-    const iconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
-        register: PointOfSaleIcon,
-        third_party: DeliveryDiningIcon,
-        driver: FaceIcon,
-        unassigned: FaceIcon,
-    };
-
-    const avatarChild = createElement(iconMap[drawer.drawer_type], {
-        sx: overrideSX.avatarIcon,
-        ...props?.avatarIcon,
-    });
-
     let drawerName = drawer.name;
 
     if ('driver' in drawer) {
@@ -158,14 +141,7 @@ export const DrawerCardBase = ({
                     overlap="circular"
                     {...props?.badge}
                     key={badgeCount}>
-                    <Avatar
-                        className={'drawer-avatar-' + drawer.drawer_id}
-                        ref={drawerRef}
-                        sx={overrideSX.avatar}
-                        src={('driver' in drawer && drawer.driver.avatar_src) || ''}
-                        {...props?.avatar}>
-                        {avatarChild}
-                    </Avatar>
+                    <DrawerAvatar drawer={drawer} drawerRef={drawerRef} sx={overrideSX} props={props} />
                 </AnimatedBadge>
                 <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
                     <Typography pt={1} variant="body2" {...props?.nameTypography}>

@@ -1,5 +1,4 @@
-// import { useState } from 'react';
-import { Stack } from '@mui/material';
+import { Stack, Tooltip } from '@mui/material';
 import {
     DataGrid,
     GridColDef,
@@ -13,6 +12,7 @@ import { OrderWithFullDetails } from '../../../typesAndValidators';
 import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { OrderTypeIcon } from '../../../components/Order/OrderTypeIcon';
 import { OriginLogo } from '../../../components/Order/OriginLogo';
+import { DrawerAvatar } from '../../../components/Base/DrawerAvatar';
 
 export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid({ data: orders });
@@ -46,15 +46,16 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
             width: 175,
             renderCell: (params) => {
                 const { row } = params;
-                const { order_number, order_name } = row;
+                const { order_number, order_name, origin, order_type } = row;
                 return (
-                    <Stack direction="row" alignItems="center" height="100%" spacing={1}>
-                        <OriginLogo orderOrigin={params.row.origin} size="small" variant="border" />
-                        <OrderTypeIcon orderType={params.row.order_type} />
-                        <span>{order_number ?? order_name}</span>
-                    </Stack>
+                    <Tooltip title={`${origin.name} ${order_type}`}>
+                        <Stack direction="row" alignItems="center" height="100%" spacing={1}>
+                            <OriginLogo orderOrigin={origin} size="medium" variant="border" />
+                            <OrderTypeIcon orderType={order_type} />
+                            <span>{order_number ?? order_name}</span>
+                        </Stack>
+                    </Tooltip>
                 );
-                return order_number ?? order_name;
             },
         },
         {
@@ -64,7 +65,13 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
             renderCell: (params) => {
                 const { row } = params;
                 const { drawer, driver } = row;
-                return drawer?.name ?? driver?.name ?? 'Unassigned';
+                return (
+                    <Tooltip title={driver?.name ?? drawer?.name ?? 'Unassigned'}>
+                        <Stack direction="row" alignItems="center" height="100%" spacing={1}>
+                            <DrawerAvatar drawer={driver ?? drawer} variant="border" />
+                        </Stack>
+                    </Tooltip>
+                );
             },
         },
         {

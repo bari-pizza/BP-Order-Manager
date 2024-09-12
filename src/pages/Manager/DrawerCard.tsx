@@ -56,10 +56,6 @@ export const DrawerCard = ({
             sx={overrideSX}
             badgeCount={badgeCount}
             props={props}
-            // key={driver.drawer_id}
-            // drawer={driver}
-            // handleClick={() => drivers.handleClick(driver)}
-            // isOpen={drivers.current?.drawer_id === driver.drawer_id && canOpen}
             key={drawer.drawer_id}
             drawer={drawer}
             handleClick={() => drawers.onClick(drawer)}

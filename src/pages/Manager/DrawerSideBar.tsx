@@ -7,9 +7,6 @@ import { DrawerCard } from './DrawerCard';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import TextFieldWithMask from '../../rickcedlib/TextFieldWithMask';
 
-// TODO: ***NEXT*** create new BusinessDayDrawer table
-// pk (drawer_id, business_date), bank, hours, other, is_locked, is_closed, special_note
-
 type FormValues = {
     bank: number;
     hours: number;
