@@ -96,6 +96,7 @@ export const AdminDashboard = () => {
                     reOpen: () => {}, // some supabase mutation
                 },
                 origins,
+                combinedDrawersAndDrivers: [...drawers, ...drivers.todays],
                 drivers: {
                     all: drivers.all,
                     todays: drivers.todays,

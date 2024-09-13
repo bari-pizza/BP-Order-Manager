@@ -37,6 +37,7 @@ function TabPanel(props: TabPanelProps) {
             style={{
                 height: '100%',
             }}
+            className="hover-scroll"
             role="tabpanel"
             hidden={value !== tabName}
             id={`simple-tabpanel-${tabName}`}
@@ -105,8 +106,9 @@ export const ManagerDashboard = () => {
                     handleClick: drivers.handleClick,
                 },
                 // all these properties should eventually come from useDrivers
+                combinedDrawersAndDrivers: drawers.concat(drivers.todays),
             }}>
-            <Stack height="100vh" width="100%">
+            <Stack height="100vh" width="100%" sx={{ overflowY: 'hidden' }}>
                 <Stack m={2}>
                     <Typography
                         variant="h3"

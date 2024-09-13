@@ -4,14 +4,15 @@ import { ReactNode } from 'react';
 
 interface MotionWrapperProps {
     children: ReactNode;
-    motionProps?: MotionProps;
+    motionProps: MotionProps;
     stackProps?: StackProps;
-    motionKey?: string;
+    motionKey: string;
+    layoutID?: string;
 }
 
-export const MotionWrapper = ({ motionProps, stackProps, children, motionKey }: MotionWrapperProps) => {
+export const MotionWrapper = ({ motionProps, stackProps, children, motionKey, layoutID }: MotionWrapperProps) => {
     return (
-        <motion.div key={motionKey} {...motionProps}>
+        <motion.div key={motionKey} {...motionProps} layoutId={layoutID}>
             <Stack {...stackProps}>{children}</Stack>
         </motion.div>
     );

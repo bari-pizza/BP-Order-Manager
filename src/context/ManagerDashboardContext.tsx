@@ -22,6 +22,7 @@ interface ManagerDashboardProps {
         remove: (driver: Driver_Drawer) => void;
         handleClick: (driver: Driver_Drawer) => void;
     };
+    combinedDrawersAndDrivers: (Drawer | Driver_Drawer)[];
     orders: {
         all: Order_Payment[];
         forCurrentDrawer: Order_Payment[];
@@ -47,6 +48,7 @@ export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
         remove: () => {},
         handleClick: () => {},
     },
+    combinedDrawersAndDrivers: [],
     orders: {
         all: [],
         forCurrentDrawer: [],

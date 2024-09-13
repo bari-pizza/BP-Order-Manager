@@ -10,8 +10,7 @@ import {
 } from '@mui/icons-material';
 import { deepmerge } from '@mui/utils';
 
-interface DriverCardProps {
-    // driver: Driver_Drawer;
+interface DrawerCardProps {
     drawer: Drawer | Driver_Drawer;
     sx?: {
         avatar?: React.CSSProperties;
@@ -23,13 +22,7 @@ interface DriverCardProps {
     canOpen?: boolean;
 }
 
-export const DrawerCard = ({
-    // driver,
-    drawer,
-    sx,
-    props,
-    canOpen = true,
-}: DriverCardProps) => {
+export const DrawerCard = ({ drawer, sx, props, canOpen = true }: DrawerCardProps) => {
     const {
         orders,
         // drivers

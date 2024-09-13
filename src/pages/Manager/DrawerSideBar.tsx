@@ -6,6 +6,8 @@ import { ContextMenu } from '../../components/Base/ContextMenu';
 import { DrawerCard } from './DrawerCard';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import TextFieldWithMask from '../../rickcedlib/TextFieldWithMask';
+import { MotionWrapper } from '../../rickcedlib/MotionWrapper';
+import { AnimatePresence } from 'framer-motion';
 
 type FormValues = {
     bank: number;
@@ -73,16 +75,26 @@ export const DrawerSideBar = () => {
         nameTypography: { variant: 'h6' },
     };
 
+    const motionProps = {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+    };
+
     return (
         <SideBar width="350px">
             <Stack direction="column" height="100vh" spacing={2} alignItems="center" mt={2}>
                 <Stack direction="column" alignItems="center" gap={2}>
-                    <ContextMenu openOnType="click">
-                        <ContextMenu.Base>
-                            <DrawerCard drawer={currentDrawer} sx={sx} props={props} canOpen={false} />
-                        </ContextMenu.Base>
-                        <DrawerCard.contextMenu drawer={currentDrawer} />
-                    </ContextMenu>
+                    <AnimatePresence>
+                        <ContextMenu openOnType="click">
+                            <ContextMenu.Base>
+                                <MotionWrapper motionProps={motionProps} motionKey={currentDrawer.drawer_id}>
+                                    <DrawerCard drawer={currentDrawer} sx={sx} props={props} canOpen={false} />
+                                </MotionWrapper>
+                            </ContextMenu.Base>
+                            <DrawerCard.contextMenu drawer={currentDrawer} />
+                        </ContextMenu>
+                    </AnimatePresence>
                     <Typography variant="h6">ORDERS: {drawerSummary.orders}</Typography>
                     <Typography variant="h6">TOTAL: ${(drawerSummary.total_in_cents / 100).toFixed(2)}</Typography>
                     <Controller
@@ -114,6 +126,7 @@ export const DrawerSideBar = () => {
                     />
                     <Button onClick={handleSubmit(onSubmit)}>Save</Button>
                     <Button>Close Driver</Button>
+                    <Button onClick={() => drawers.onClick(drawers.current!)}>Collapse SideBar</Button>
                 </Stack>
             </Stack>
         </SideBar>

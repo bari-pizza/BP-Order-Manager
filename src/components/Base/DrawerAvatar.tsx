@@ -86,7 +86,7 @@ export const DrawerAvatar = ({
             ref={drawerRef}
             sx={finalAvatarSx}
             src={('driver' in drawer && drawer.driver.avatar_src) || ''}
-            {...props}>
+            {...props?.avatar}>
             {avatarChild}
         </Avatar>
     );
