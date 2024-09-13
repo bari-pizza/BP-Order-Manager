@@ -1,4 +1,4 @@
-import { Avatar, SvgIconTypeMap } from '@mui/material';
+import { Avatar, Skeleton, SvgIconTypeMap } from '@mui/material';
 import { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardOverrideSX, DrawerCardSlotProps } from './DrawerCardBase';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
@@ -90,4 +90,23 @@ export const DrawerAvatar = ({
             {avatarChild}
         </Avatar>
     );
+};
+
+export const DrawerAvatarSkeleton = ({
+    sx,
+    size = 'medium',
+    variant = 'standard',
+}: Omit<DrawerAvatarProps, 'drawer' | 'drawerRef' | 'props'>) => {
+    const theme = useTheme();
+
+    const finalAvatarSx = {
+        ...(size === 'small' ? smallStyle : {}),
+        ...(size === 'medium' ? mediumStyle : {}),
+        ...(size === 'large' ? largeStyle : {}),
+        ...(size === 'xlarge' ? xlargeStyle : {}),
+        ...(variant === 'border' ? {} : { border: 'none' }),
+        borderColor: theme.palette.primary.main,
+        ...sx?.avatar,
+    };
+    return <Skeleton sx={finalAvatarSx} />;
 };

@@ -316,7 +316,6 @@ export const useOrdersDrawersTickets = () => {
     };
 
     const handleDrawerClick = (drawer: Drawer | Driver_Drawer) => {
-        console.log('drawer click', drawer);
         if (handlingDrawerClick) {
             return;
         }

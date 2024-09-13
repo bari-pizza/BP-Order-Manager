@@ -1,5 +1,6 @@
 import { Stack, StackOwnProps } from '@mui/material';
-import { DrawerCard, DrawerAvatarSkeleton, UnassignedDrawerAvatar } from './DrawerCard';
+import { DrawerCard, UnassignedDrawerAvatar } from './DrawerCard';
+import { DrawerAvatarSkeleton } from '../../components/Base/DrawerAvatar';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../../components/Base/ContextMenu';
 

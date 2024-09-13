@@ -110,6 +110,7 @@ export const useInteractionHandler = <T, U>({
         onSuccess: (payload: StandardPayload<U> | RPCPayload) => {
             const normalized = isRPC(payload) ? normalizer(payload) : payload;
             const successMessage = getMessages.success(normalized.data[0]);
+            console.log('invalidating', queryKey);
             queryClient.invalidateQueries({ queryKey });
             if (successMessage) {
                 toast.update(toastRef.current, {

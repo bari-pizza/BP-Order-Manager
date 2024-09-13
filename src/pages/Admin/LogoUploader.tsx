@@ -1,7 +1,7 @@
 import { useUploadToast } from '../../hooks/upload/useUploadToast';
 import { BucketName, OrderOrigin } from '../../typesAndValidators';
 import { ImageUploader } from '../../components/Base/Uploader/ImageUploader';
-import { useOrderOriginCRUD } from '../../api/order_origin';
+import { useOrderOriginCRUD } from '../../api/orderOrigin';
 
 type LogoUploaderProps = {
     origin: OrderOrigin;

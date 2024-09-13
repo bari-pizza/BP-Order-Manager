@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      BusinessDayDrawer: {
+        Row: {
+          bank_in_cents: number
+          business_date: string
+          drawer_id: string
+          hours: number
+          hours_in_cents: number
+          is_closed: boolean
+          is_locked: boolean
+          other_in_cents: number
+          special_note: string
+        }
+        Insert: {
+          bank_in_cents?: number
+          business_date: string
+          drawer_id: string
+          hours?: number
+          hours_in_cents?: number
+          is_closed?: boolean
+          is_locked?: boolean
+          other_in_cents?: number
+          special_note?: string
+        }
+        Update: {
+          bank_in_cents?: number
+          business_date?: string
+          drawer_id?: string
+          hours?: number
+          hours_in_cents?: number
+          is_closed?: boolean
+          is_locked?: boolean
+          other_in_cents?: number
+          special_note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "BusinessDayDrawer_drawer_id_fkey"
+            columns: ["drawer_id"]
+            isOneToOne: false
+            referencedRelation: "Drawer"
+            referencedColumns: ["drawer_id"]
+          },
+        ]
+      }
       BusinessDayDriver: {
         Row: {
           business_date: string

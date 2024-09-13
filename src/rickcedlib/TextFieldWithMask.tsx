@@ -3,7 +3,7 @@ import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { useRefMask, getCurrencyMaskGenerator } from 'react-hook-mask'; // Assuming you're using react-hook-mask
 
 const currencyMaskGenerator = getCurrencyMaskGenerator({
-    prefix: '$ ',
+    prefix: '$',
     thousandSeparator: ',',
     centsSeparator: '.',
 });

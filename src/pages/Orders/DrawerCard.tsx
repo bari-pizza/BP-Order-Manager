@@ -3,7 +3,7 @@ import { Tooltip, Typography } from '@mui/material';
 import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { getDrawerFullName } from '../../utils';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
-import { DrawerCardBase, DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
+import { DrawerCardBase, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { ContextMenu } from '../../components/Base/ContextMenu';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
@@ -63,10 +63,6 @@ export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
 export const UnassignedDrawerAvatar = () => {
     const { drawer } = useOrderDashboardContext();
     return <DrawerCard drawer={drawer.unassigned} />;
-};
-
-export const DrawerAvatarSkeleton = () => {
-    return <DrawerCardBaseSkeleton />;
 };
 
 const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {

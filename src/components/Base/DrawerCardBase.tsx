@@ -1,6 +1,5 @@
 import { deepmerge } from '@mui/utils';
 import {
-    Avatar,
     AvatarProps,
     BadgeProps,
     Button,
@@ -16,7 +15,7 @@ import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { SxProps, useTheme } from '@mui/material/styles';
 import { AnimatedBadge } from '../../rickcedlib/AnimatedBadge';
 import { usePrevious } from '@uidotdev/usehooks';
-import { DrawerAvatar } from './DrawerAvatar';
+import { DrawerAvatar, DrawerAvatarSkeleton } from './DrawerAvatar';
 
 export interface DrawerCardSlotProps {
     button?: Partial<ButtonProps>;
@@ -153,16 +152,81 @@ export const DrawerCardBase = ({
     );
 };
 
-export const DrawerCardBaseSkeleton = () => {
+export const DrawerCardBaseSkeleton = ({ sx, props }: { sx?: DrawerCardOverrideSX; props?: DrawerCardSlotProps }) => {
+    const theme = useTheme();
+    const baseSX: DrawerCardOverrideSX = {
+        avatar: {
+            height: '4em',
+            width: '4em',
+            color: theme.palette.primary.main,
+            bgcolor: 'white',
+            border: '4px solid ' + theme.palette.primary.main,
+        },
+        badge: {
+            '& .MuiBadge-badge': {
+                bgcolor: theme.palette.secondary.main,
+                color: '#fff',
+                boxShadow: '1px 1px 5px black',
+            },
+        },
+        avatarIcon: {
+            height: '2em',
+            width: '2em',
+            '& .MuiAvatar-root': {
+                backgroundColor: 'white !important',
+            },
+        },
+        button: {
+            height: '175px',
+            width: '100px',
+            '& .MuiTypography-root': {
+                color: theme.palette.primary.main,
+            },
+            '&.open-drawer': {
+                '& .MuiAvatar-root': {
+                    bgcolor: theme.palette.primary.main,
+                    color: 'white',
+                    borderColor: 'white',
+                },
+                '& .MuiTypography-root': {
+                    color: 'white',
+                },
+                backgroundColor: theme.palette.primary.main,
+            },
+            '&:hover:not(.open-drawer)': {
+                backgroundColor: theme.palette.primary.light,
+                '& .MuiAvatar-root': {
+                    borderColor: theme.palette.primary.main,
+                },
+            },
+        },
+        buttonStack: {
+            height: '100%',
+            // width: '80px',
+        },
+        text: {},
+    };
+
+    const overrideSX = deepmerge(baseSX, sx);
+
     return (
-        <Button variant="contained">
-            <Stack direction="column" sx={{ height: '100%', width: 'min-content' }} alignItems="center">
-                <Skeleton variant="circular">
-                    <Avatar sx={{ height: '4em', width: '4em' }}>Full Name Here</Avatar>
-                </Skeleton>
-                <Skeleton variant="text">
-                    <Typography>Full Name Here</Typography>
-                </Skeleton>
+        <Button variant="outlined" color="primary" sx={overrideSX.button} {...props?.button}>
+            <Stack
+                direction="column"
+                sx={overrideSX.buttonStack}
+                alignItems="center"
+                gap={1}
+                justifyContent="space-between"
+                {...props?.buttonStack}>
+                <DrawerAvatarSkeleton sx={overrideSX} />
+
+                <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
+                    <Skeleton>
+                        <Typography pt={1} variant="body2" {...props?.nameTypography}>
+                            Name goes here!
+                        </Typography>
+                    </Skeleton>
+                </Stack>
             </Stack>
         </Button>
     );

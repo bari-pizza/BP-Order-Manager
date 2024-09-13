@@ -13,7 +13,7 @@ import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextFie
 import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
 import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { LogoUploader } from '../LogoUploader';
-import { useOrderOriginCRUD } from '../../../api/order_origin';
+import { useOrderOriginCRUD } from '../../../api/orderOrigin';
 
 export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<OrderOrigin>({ data: origins });

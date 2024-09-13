@@ -3,10 +3,11 @@ import { DrawerCard } from '../DrawerCard';
 import { useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { AddDriverCard } from '../AddDriverCard';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
-import { DrawerSideBar } from '../DrawerSideBar';
+import { DrawerSideBar, DrawerSideBarSkeleton } from '../SideBar/DrawerSideBar';
 import { ContextMenu } from '../../../components/Base/ContextMenu';
 import { MotionProps } from 'framer-motion';
 import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
+import { Suspense } from 'react';
 
 /*
    TODO: business_day, driver_id, is_locked
@@ -20,7 +21,7 @@ const stackProps: Partial<StackOwnProps> = {
     alignItems: 'center',
     minHeight: '300px',
     height: '300px',
-    overflow: 'hidden',
+    // overflow: 'hidden',
     pb: 1,
 };
 
@@ -35,6 +36,7 @@ export const DrawersTab = () => {
     // TODO: probably fix ContextMenu for Drawer
     const motionProps: MotionProps = {
         whileTap: { scale: 0.95 },
+        whileHover: { scale: 1.05 },
     };
 
     return (
@@ -58,8 +60,12 @@ export const DrawersTab = () => {
                     </ContextMenu>
                 );
             })}
-            <AddDriverCard {...addDriverCardDialogProps} />
-            <DrawerSideBar />
+            <MotionWrapper motionProps={motionProps} motionKey="add-driver-card">
+                <AddDriverCard {...addDriverCardDialogProps} />
+            </MotionWrapper>
+            <Suspense fallback={<DrawerSideBarSkeleton />}>
+                <DrawerSideBar />
+            </Suspense>
         </Stack>
     );
 };
