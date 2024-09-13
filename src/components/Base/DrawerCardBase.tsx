@@ -218,12 +218,18 @@ export const DrawerCardBaseSkeleton = ({ sx, props }: { sx?: DrawerCardOverrideS
                 gap={1}
                 justifyContent="space-between"
                 {...props?.buttonStack}>
-                <DrawerAvatarSkeleton sx={overrideSX} />
+                <AnimatedBadge
+                    badgeCount={{ start: 0, end: 0 }}
+                    sx={overrideSX.badge}
+                    overlap="circular"
+                    {...props?.badge}>
+                    <DrawerAvatarSkeleton size="xlarge" />
+                </AnimatedBadge>
 
                 <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
                     <Skeleton>
                         <Typography pt={1} variant="body2" {...props?.nameTypography}>
-                            Name goes here!
+                            Long name would go here!
                         </Typography>
                     </Skeleton>
                 </Stack>

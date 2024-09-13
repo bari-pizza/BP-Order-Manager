@@ -93,10 +93,9 @@ export const DrawerAvatar = ({
 };
 
 export const DrawerAvatarSkeleton = ({
-    sx,
     size = 'medium',
     variant = 'standard',
-}: Omit<DrawerAvatarProps, 'drawer' | 'drawerRef' | 'props'>) => {
+}: Omit<DrawerAvatarProps, 'drawer' | 'drawerRef' | 'props' | 'sx'>) => {
     const theme = useTheme();
 
     const finalAvatarSx = {
@@ -106,7 +105,8 @@ export const DrawerAvatarSkeleton = ({
         ...(size === 'xlarge' ? xlargeStyle : {}),
         ...(variant === 'border' ? {} : { border: 'none' }),
         borderColor: theme.palette.primary.main,
-        ...sx?.avatar,
+        // ...sx?.avatar,
     };
-    return <Skeleton sx={finalAvatarSx} />;
+    console.log({ finalAvatarSx });
+    return <Skeleton sx={finalAvatarSx} variant="circular" />;
 };
