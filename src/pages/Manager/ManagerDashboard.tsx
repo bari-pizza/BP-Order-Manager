@@ -51,13 +51,14 @@ function TabPanel(props: TabPanelProps) {
 type TabName = ManagerDashboardTabName;
 
 export const ManagerDashboard = () => {
-    const { orders, drawer } = useOrdersDrawersTickets();
+    const { orders, drawer, summaries } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>(
         'managerDashboardTabName',
         'drawers',
     );
+
     const theme = useTheme();
 
     const handleChange = (tab: TabName) => {
@@ -96,6 +97,7 @@ export const ManagerDashboard = () => {
                     reOpen: () => {}, // some supabase mutation
                 },
                 origins,
+                summaries,
                 drivers: {
                     all: drivers.all,
                     todays: drivers.todays,

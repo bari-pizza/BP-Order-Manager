@@ -27,7 +27,7 @@ const stackProps: Partial<StackOwnProps> = {
 
 export const DrawersTab = () => {
     const addDriverCardDialogProps = useDialogProps();
-    const { combinedDrawersAndDrivers } = useManagerDashboardContext();
+    const { combinedDrawersAndDrivers, summaries } = useManagerDashboardContext();
 
     // TODO: add is_locked to database
     // if is_locked is true, only option is to unlock
@@ -49,11 +49,12 @@ export const DrawersTab = () => {
             height="100%"
             flexWrap={'wrap'}>
             {combinedDrawersAndDrivers.map((drawer) => {
+                const isLocked = summaries.byDrawerID(drawer.drawer_id)?.is_locked;
                 return (
                     <ContextMenu openOnType="right-click" key={drawer.drawer_id}>
                         <ContextMenu.Base>
                             <MotionWrapper motionProps={motionProps} motionKey={drawer.drawer_id}>
-                                <DrawerCard drawer={drawer} />
+                                <DrawerCard drawer={drawer} isLocked={isLocked} />
                             </MotionWrapper>
                         </ContextMenu.Base>
                         <DrawerCard.contextMenu drawer={drawer} />

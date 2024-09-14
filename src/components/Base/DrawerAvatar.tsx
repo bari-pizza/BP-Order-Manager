@@ -1,4 +1,4 @@
-import { Avatar, Skeleton, SvgIconTypeMap } from '@mui/material';
+import { Avatar, Badge, Skeleton, SvgIconTypeMap } from '@mui/material';
 import { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardOverrideSX, DrawerCardSlotProps } from './DrawerCardBase';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
@@ -6,6 +6,7 @@ import {
     PointOfSale as PointOfSaleIcon,
     DeliveryDining as DeliveryDiningIcon,
     Face as FaceIcon,
+    Lock as LockIcon,
 } from '@mui/icons-material';
 import { createElement } from 'react';
 import { useTheme } from '@mui/material/styles';
@@ -17,6 +18,7 @@ type DrawerAvatarProps = {
     drawer?: Drawer | Driver_Drawer;
     props?: DrawerCardSlotProps;
     drawerRef?: React.RefObject<HTMLDivElement>;
+    isLocked?: boolean;
 };
 
 const unassignedDrawer: Drawer = {
@@ -57,6 +59,7 @@ export const DrawerAvatar = ({
     sx,
     props,
     drawerRef,
+    isLocked = false,
 }: DrawerAvatarProps) => {
     const theme = useTheme();
     const iconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
@@ -81,14 +84,45 @@ export const DrawerAvatar = ({
         ...props?.avatarIcon,
     });
     return (
-        <Avatar
-            className={'drawer-avatar-' + drawer.drawer_id}
-            ref={drawerRef}
-            sx={finalAvatarSx}
-            src={('driver' in drawer && drawer.driver.avatar_src) || ''}
-            {...props?.avatar}>
-            {avatarChild}
-        </Avatar>
+        <>
+            <Badge
+                badgeContent={isLocked ? <LockIcon /> : 0}
+                sx={{
+                    '& .MuiBadge-badge': {
+                        background: 'transparent',
+                        boxShadow: 'none',
+                        color: 'black',
+                    },
+                    '& .MuiBadge-badge svg': {
+                        fontSize: '3em',
+                    },
+                }}
+                overlap="circular"
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                <Avatar
+                    className={'drawer-avatar-' + drawer.drawer_id}
+                    ref={drawerRef}
+                    sx={finalAvatarSx}
+                    src={('driver' in drawer && drawer.driver.avatar_src) || ''}
+                    {...props?.avatar}>
+                    {avatarChild}
+                </Avatar>
+            </Badge>
+            {/* {isLocked && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        height: '100%',
+                        width: '100%',
+                        color: 'rgb(11 7 7 / 66%)',
+                    }}>
+                    <LockIcon sx={{ fontSize: '8em' }} />
+                </div>
+            )} */}
+        </>
     );
 };
 
@@ -105,8 +139,6 @@ export const DrawerAvatarSkeleton = ({
         ...(size === 'xlarge' ? xlargeStyle : {}),
         ...(variant === 'border' ? {} : { border: 'none' }),
         borderColor: theme.palette.primary.main,
-        // ...sx?.avatar,
     };
-    console.log({ finalAvatarSx });
     return <Skeleton sx={finalAvatarSx} variant="circular" />;
 };

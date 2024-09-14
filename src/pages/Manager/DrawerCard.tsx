@@ -20,9 +20,10 @@ interface DrawerCardProps {
     };
     props?: DrawerCardSlotProps;
     canOpen?: boolean;
+    isLocked?: boolean;
 }
 
-export const DrawerCard = ({ drawer, sx, props, canOpen = true }: DrawerCardProps) => {
+export const DrawerCard = ({ drawer, sx, props, isLocked, canOpen = true }: DrawerCardProps) => {
     const {
         orders,
         // drivers
@@ -53,6 +54,7 @@ export const DrawerCard = ({ drawer, sx, props, canOpen = true }: DrawerCardProp
             drawer={drawer}
             handleClick={() => drawers.onClick(drawer)}
             isOpen={drawers.current?.drawer_id === drawer.drawer_id && canOpen}
+            isLocked={isLocked}
         />
     );
 };

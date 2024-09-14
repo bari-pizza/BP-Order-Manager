@@ -7,6 +7,7 @@ import { DataWithError, HandleOutcomeProps } from '../../toast/toast';
 import { addOrdersToast, removeOrdersToast } from '../../toast/ordersToast';
 import { toast } from 'react-toastify';
 import { useLocalStorage } from './useLocalStorage';
+import { useBusinessDayDrawerSummaryCRUD } from '../../api/businessDayDrawer';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -23,6 +24,11 @@ export const useOrdersDrawersTickets = () => {
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 30,
     });
+    const { businessDayDrawerSummaryMutations } = useBusinessDayDrawerSummaryCRUD({
+        businessDate,
+    });
+    const { data: summaries } = businessDayDrawerSummaryMutations.getAll;
+
     const allPayments = allOrders.flatMap((order) => order.payments);
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
     const drawerRefs = useRef<{ [key: string]: RefObject<HTMLDivElement> }>({});
@@ -391,6 +397,14 @@ export const useOrdersDrawersTickets = () => {
         return [];
     };
 
+    const getSummaryByDrawerID = (drawerID?: string) => {
+        if (!drawerID) {
+            return null;
+        }
+        const summary = summaries.find(({ drawer_id }) => drawer_id === drawerID) || null;
+        return summary;
+    };
+
     return {
         ticket: {
             select: toggleSelectedTicket,
@@ -430,6 +444,12 @@ export const useOrdersDrawersTickets = () => {
         payments: {
             all: allPayments,
             // only useful for admin / manager pages
+        },
+        summaries: {
+            all: summaries,
+            forCurrentDrawer: getSummaryByDrawerID(openDrawer?.drawer_id),
+            byDrawerID: (drawerID: string) => getSummaryByDrawerID(drawerID),
+            update: businessDayDrawerSummaryMutations.upsert,
         },
     };
 };

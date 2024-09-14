@@ -68,3 +68,12 @@ export const drawLine = ({ x, y, height, width, color = 'red' }: DrawLineProps) 
     left.title = `${x.toFixed(2)}, ${y.toFixed(2)}`;
     document.body.appendChild(left);
 };
+
+export const getRunningTotal = (values: number[]) => {
+    const runningTotal = [values[0]];
+    for (let i = 1; i < values.length; i++) {
+        const lastValue = runningTotal[i - 1];
+        runningTotal.push(lastValue + values[i]);
+    }
+    return runningTotal;
+};

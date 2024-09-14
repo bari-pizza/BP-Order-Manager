@@ -52,7 +52,7 @@ function TabPanel(props: TabPanelProps) {
 type TabName = AdminDashboardTabName;
 
 export const AdminDashboard = () => {
-    const { orders, drawer } = useOrdersDrawersTickets();
+    const { orders, drawer, summaries } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'adminDashboardTabName'>(
@@ -96,6 +96,7 @@ export const AdminDashboard = () => {
                     reOpen: () => {}, // some supabase mutation
                 },
                 origins,
+                summaries,
                 combinedDrawersAndDrivers: [...drawers, ...drivers.todays],
                 drivers: {
                     all: drivers.all,

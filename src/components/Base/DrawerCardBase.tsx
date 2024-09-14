@@ -44,6 +44,7 @@ interface DrawerCardBaseProps {
     handleClick?: () => void;
     sx?: DrawerCardOverrideSX;
     props?: DrawerCardSlotProps;
+    isLocked?: boolean;
 }
 
 export const DrawerCardBase = ({
@@ -54,6 +55,7 @@ export const DrawerCardBase = ({
     handleClick,
     sx,
     props,
+    isLocked,
 }: DrawerCardBaseProps) => {
     const theme = useTheme();
     const previousBadgeCount = usePrevious(badgeCount as number);
@@ -140,7 +142,13 @@ export const DrawerCardBase = ({
                     overlap="circular"
                     {...props?.badge}
                     key={badgeCount}>
-                    <DrawerAvatar drawer={drawer} drawerRef={drawerRef} sx={overrideSX} props={props} />
+                    <DrawerAvatar
+                        drawer={drawer}
+                        drawerRef={drawerRef}
+                        sx={overrideSX}
+                        props={props}
+                        isLocked={isLocked}
+                    />
                 </AnimatedBadge>
                 <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
                     <Typography pt={1} variant="body2" {...props?.nameTypography}>
