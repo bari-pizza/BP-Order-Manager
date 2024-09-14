@@ -306,6 +306,12 @@ export const useOrdersDrawersTickets = () => {
         },
         onError: (error) => {
             console.error(`Issue updating order(s): "${error}"`, error);
+            const handleOutcome = toastRef.current['remove_tickets'];
+            handleOutcome({
+                data: null,
+                errors: [{ error: error.message }],
+                forEachError: () => {},
+            });
         },
     });
 

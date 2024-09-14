@@ -4,7 +4,6 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    Divider,
     Skeleton,
     Stack,
     TextField,
@@ -19,12 +18,11 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
 import { AnimatePresence } from 'framer-motion';
-// import { useBusinessDayDrawerSummaryCRUD } from '../../../api/businessDayDrawer';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { BusinessDayDrawerSummary } from '../../../typesAndValidators';
-import { Fragment, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
-import { getRunningTotal } from '../../../utils';
+import { SummaryStack } from './SummaryStack';
 
 type FormValues = BusinessDayDrawerSummary;
 
@@ -83,17 +81,22 @@ export const DrawerSideBar = () => {
             hours_in_cents: data.hours * constants.default.driver_hourly_wage_in_cents,
         };
         summaries.update(cleanedData);
-        // businessDayDrawerSummaryMutations.upsert(cleanedData);
     };
 
     const onClosure: SubmitHandler<FormValues> = (data) => {
         const cleanedData = {
             ...data,
-            is_closed: true,
             is_locked: true,
         };
         summaries.update(cleanedData);
-        // businessDayDrawerSummaryMutations.upsert(cleanedData);
+    };
+
+    const onReopen: SubmitHandler<FormValues> = (data) => {
+        const cleanedData = {
+            ...data,
+            is_locked: false,
+        };
+        summaries.update(cleanedData);
     };
 
     const drawersOrders = orders.byDrawerID(currentDrawer.drawer_id);
@@ -168,6 +171,10 @@ export const DrawerSideBar = () => {
         close();
     };
 
+    const handleReopenDrawerClick = () => {
+        handleSubmit(onReopen)();
+    };
+
     const total = drawerSummary.total_in_cents;
     const bank = watch('bank_in_cents');
     const hours = watch('hours_in_cents');
@@ -200,8 +207,13 @@ export const DrawerSideBar = () => {
             label: '- Deliveries',
             value: -deliveryFees,
         },
+        {
+            label: '- Other',
+            value: -other,
+        },
     ];
-    const runningTotals = getRunningTotal([total, bank, -hours, -card, -thirdParty, -deliveryFees, -other]);
+    // const runningTotals = getRunningTotal([total, bank, -hours, -card, -thirdParty, -deliveryFees, -other]);
+    const isLocked = summary?.is_locked || false;
 
     return (
         <SideBar width="350px">
@@ -223,56 +235,67 @@ export const DrawerSideBar = () => {
                             <DrawerCard.contextMenu drawer={currentDrawer} />
                         </ContextMenu>
                     </AnimatePresence>
-                    <Typography variant="h6">ORDERS: {drawerSummary.orders}</Typography>
-                    <Typography variant="h6">TOTAL: ${(drawerSummary.total_in_cents / 100).toFixed(2)}</Typography>
-                    {isDriver && (
+                    {isLocked ? (
                         <>
-                            <Controller
-                                name="bank_in_cents"
-                                control={control}
-                                render={({ field: { onChange, value } }) => (
-                                    <TextFieldWithMask
-                                        label="Bank"
-                                        maskVariant="currency"
-                                        value={value}
-                                        onChange={onChange}
-                                        error={!!errors.bank_in_cents}
-                                        helperText={errors.bank_in_cents?.message}
+                            <SummaryStack items={items} />
+                            <Button onClick={handleReopenDrawerClick}>Reopen Drawer</Button>
+                        </>
+                    ) : (
+                        <>
+                            <Typography variant="h6">ORDERS: {drawerSummary.orders}</Typography>
+                            <Typography variant="h6">
+                                TOTAL: ${(drawerSummary.total_in_cents / 100).toFixed(2)}
+                            </Typography>
+                            {isDriver && (
+                                <>
+                                    <Controller
+                                        name="bank_in_cents"
+                                        control={control}
+                                        render={({ field: { onChange, value } }) => (
+                                            <TextFieldWithMask
+                                                label="Bank"
+                                                maskVariant="currency"
+                                                value={value}
+                                                onChange={onChange}
+                                                error={!!errors.bank_in_cents}
+                                                helperText={errors.bank_in_cents?.message}
+                                            />
+                                        )}
                                     />
-                                )}
-                            />
-                            <TextField label="Hours" {...register('hours')} />
-                            <Controller
-                                name="other_in_cents"
-                                control={control}
-                                render={({ field: { onChange, value } }) => (
-                                    <TextFieldWithMask
-                                        label="Other"
-                                        maskVariant="currency"
-                                        value={value}
-                                        onChange={onChange}
-                                        error={!!errors.other_in_cents}
-                                        helperText={errors.other_in_cents?.message}
+                                    <TextField label="Hours" {...register('hours')} />
+                                    <Controller
+                                        name="other_in_cents"
+                                        control={control}
+                                        render={({ field: { onChange, value } }) => (
+                                            <TextFieldWithMask
+                                                label="Other"
+                                                maskVariant="currency"
+                                                value={value}
+                                                onChange={onChange}
+                                                error={!!errors.other_in_cents}
+                                                helperText={errors.other_in_cents?.message}
+                                            />
+                                        )}
                                     />
-                                )}
-                            />
-                            {isDirty && (
-                                <AnimatePresence>
-                                    <MotionWrapper motionProps={motionProps} motionKey="save">
-                                        <Button onClick={handleSubmit(onSubmit)} variant="contained">
-                                            Save Changes
-                                        </Button>
-                                    </MotionWrapper>
-                                </AnimatePresence>
+                                    {isDirty && (
+                                        <AnimatePresence>
+                                            <MotionWrapper motionProps={motionProps} motionKey="save">
+                                                <Button onClick={handleSubmit(onSubmit)} variant="contained">
+                                                    Save Changes
+                                                </Button>
+                                            </MotionWrapper>
+                                        </AnimatePresence>
+                                    )}
+                                </>
                             )}
+                            <Button onClick={handleCloseDrawerClick}>Close Drawer</Button>
                         </>
                     )}
-                    <Button onClick={handleCloseDrawerClick}>Close Drawer</Button>
                     <Button onClick={() => drawers.onClick(drawers.current!)}>Collapse SideBar</Button>
-                    <Dialog open={isOpen} onClose={close} fullWidth>
+                    <Dialog open={isOpen} onClose={close}>
                         <DialogTitle>Confirm Drawer Close</DialogTitle>
                         <DialogContent>
-                            <Stack direction="column" spacing={1} width="30%" margin="auto">
+                            {/* <Stack direction="column" spacing={1} width="30%" margin="auto">
                                 {items.map((item, index) => (
                                     <Fragment key={item.label}>
                                         <Stack direction="row" justifyContent="right" spacing={2}>
@@ -297,7 +320,8 @@ export const DrawerSideBar = () => {
                                         )}
                                     </Fragment>
                                 ))}
-                            </Stack>
+                            </Stack> */}
+                            <SummaryStack items={items} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={close} variant="outlined" color="error">
