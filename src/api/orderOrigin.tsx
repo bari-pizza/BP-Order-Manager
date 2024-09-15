@@ -1,5 +1,5 @@
 import { supaClient } from '../supaClient';
-import { handlePayload, Payload, StandardPayload, SupabaseInteractor, useInteractionHandler } from './helpers';
+import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } from './helpers';
 import { OrderOrigin } from '../typesAndValidators';
 
 type NewOrderOrigin = Omit<OrderOrigin, 'origin_id'>;
@@ -27,11 +27,7 @@ const useCreateNewOrderOrigin = ({ queryKey }: { queryKey: string[] }) => {
             pending: () => 'Saving new order origin...',
             success: (data) => `Successfully saved new order origin: ${data.name}`,
             mainError: (error) => error.message,
-            errors: (data) => `Failed to create new order origin: ${data.name}`,
-        },
-        forEachError: (error) => {
-            console.log(error);
-            // thing to do with each error
+            errors: () => `Failed to create new order origin`,
         },
         handleSuccess: (data) => {
             console.log(data);
@@ -40,13 +36,6 @@ const useCreateNewOrderOrigin = ({ queryKey }: { queryKey: string[] }) => {
         handleFailure: (error) => {
             console.log(error);
             // thing to do on failure
-        },
-        normalizer: (payload) => {
-            /* 
-                should take an RPCPayload and return a StandardPayload<OrderOrigin>
-                used for working with supabase rpc functions where the return type isn't standard
-            */
-            return payload as unknown as StandardPayload<OrderOrigin>;
         },
     });
 };
@@ -60,11 +49,7 @@ const useUpdateNewOrderOrigin = ({ queryKey }: { queryKey: string[] }) => {
             pending: () => 'Saving changes...',
             success: (data) => `Successfully saved changes to ${data.name}`,
             mainError: (error) => error.message,
-            errors: (data) => `Failed to save changes to ${data.name}`,
-        },
-        forEachError: (error) => {
-            console.log(error);
-            // thing to do with each error
+            errors: () => `Failed to save changes`,
         },
         handleSuccess: (data) => {
             console.log(data);
@@ -73,13 +58,6 @@ const useUpdateNewOrderOrigin = ({ queryKey }: { queryKey: string[] }) => {
         handleFailure: (error) => {
             console.log(error);
             // thing to do on failure
-        },
-        normalizer: (payload) => {
-            /* 
-                should take an RPCPayload and return a StandardPayload<OrderOrigin>
-                used for working with supabase rpc functions where the return type isn't standard
-            */
-            return payload as unknown as StandardPayload<OrderOrigin>;
         },
     });
 };

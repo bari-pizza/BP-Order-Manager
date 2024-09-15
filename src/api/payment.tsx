@@ -32,9 +32,6 @@ const useCreateNewPayment = ({ queryKey }: { queryKey: string[] }) => {
             mainError: (error) => error.message,
             errors: () => `Failed to create new payment.`,
         },
-        forEachError: (error) => {
-            console.log(error);
-        },
     });
 };
 
@@ -48,9 +45,6 @@ const useUpdatePayment = ({ queryKey }: { queryKey: string[] }) => {
             mainError: (error) => error.message,
             errors: () => `Failed to update payment`,
         },
-        forEachError: (error) => {
-            console.log(error);
-        },
     });
 };
 
@@ -63,9 +57,6 @@ const useDeletePayment = ({ queryKey }: { queryKey: string[] }) => {
             success: () => `Successfully deleted payment`,
             mainError: (error) => error.message,
             errors: () => `Failed to delete payment`,
-        },
-        forEachError: (error) => {
-            console.log(error);
         },
     });
 };

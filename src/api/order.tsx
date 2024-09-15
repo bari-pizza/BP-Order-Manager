@@ -1,44 +1,23 @@
 import dayjs from 'dayjs';
 import { supaClient } from '../supaClient';
 import { NewOrder, Order, Order_Payment } from '../typesAndValidators';
-import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } from './helpers';
+import {
+    handlePayload,
+    // handleRPCPayload,
+    Payload,
+    RPCPayload,
+    SupabaseInteractor,
+    SupabaseRPCInteractor,
+    useInteractionHandler,
+    useRPCInteractionHandler,
+} from './helpers';
 import { useSuspenseQuery } from '@tanstack/react-query';
-
-/*
-
-export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
-    const { data, error } = await supaClient.rpc('add_orders_to_drawer', {
-        p_drawer_id: drawerID,
-        p_order_ids: orderIDs,
-    });
-    if (error) {
-        console.error(error);
-        throw error;
-    } else {
-        return data;
-    }
-    // return handleResponse<Order>({ data, error, shouldThrow: true });
-};
-
-export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs: string[]; drawerID: string }) => {
-    const { data, error } = await supaClient.rpc('remove_orders_from_drawer', {
-        p_drawer_id: drawerID,
-        p_order_ids: orderIDs,
-    });
-    console.log({ data });
-    if (error) {
-        console.error(error);
-        throw error;
-    } else {
-        return data;
-    }
-    // can use handleResponse once we update the return type from db
-    // return handleResponse<Order_Payment>({ data, error, shouldThrow: true });
-};
-*/
+import { useRef } from 'react';
+import { PostgrestError } from '@supabase/supabase-js';
+import { removeOrdersFromDrawer } from '../supabaseQueries';
 
 const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const payload = await supaClient
+    const { data, error } = await supaClient
         .from('Order')
         .select(
             `
@@ -51,7 +30,13 @@ const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs })
         .eq('business_date', businessDate)
         .order('order_number', { ascending: true });
 
-    return handlePayload<Order_Payment>(payload);
+    if (error) {
+        console.error(error);
+        return [];
+    }
+    if (!data || data.length === 0) return [];
+
+    return data as unknown as Order_Payment[];
 };
 
 const createNewOrder: SupabaseInteractor<NewOrder, Order> = async (newOrder) => {
@@ -70,28 +55,24 @@ const updateOrder: SupabaseInteractor<Order_Payment, Order> = async (order) => {
 
 const deleteOrder: SupabaseInteractor<Order_Payment, Order> = async (order) => {
     const payload = await supaClient.from('Order').delete().eq('order_id', order.order_id).select();
-    console.log({ payload });
     return handlePayload<Order>(payload);
 };
 
-const addOrdersToDrawer: SupabaseInteractor<{ orderIDs: string[]; drawerID: string }, Order> = async ({
+const addOrdersToDrawer: SupabaseRPCInteractor<{ orderIDs: string[]; drawerID: string }> = async ({
     orderIDs,
     drawerID,
 }) => {
-    const payload = await supaClient.rpc('add_orders_to_drawer', {
+    const { data } = await supaClient.rpc('add_orders_to_drawer', {
         p_drawer_id: drawerID,
         p_order_ids: orderIDs,
     });
 
-    console.log({ payload });
-    return handlePayload<Order>(payload);
-
-    // return handleResponse<Order>({ data, error, shouldThrow: true });
+    return data as unknown as RPCPayload;
 };
 
 const useGetAllDaysOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
     return useSuspenseQuery({
-        queryKey: [businessDate.format('YYYY-MM-DD')],
+        queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
         queryFn: () => getAllDaysOrders({ businessDate }),
     });
 };
@@ -106,9 +87,6 @@ const useCreateNewOrder = ({ queryKey }: { queryKey: string[] }) => {
             mainError: (error) => error.message,
             errors: () => `Failed to create new order.`,
         },
-        forEachError: (error) => {
-            console.log(error);
-        },
     });
 };
 
@@ -121,9 +99,6 @@ const useUpdateOrder = ({ queryKey }: { queryKey: string[] }) => {
             success: () => `Successfully updated order`,
             mainError: (error) => error.message,
             errors: () => `Failed to update order`,
-        },
-        forEachError: (error) => {
-            console.log(error);
         },
     });
 };
@@ -138,37 +113,155 @@ const useDeleteOrder = ({ queryKey }: { queryKey: string[] }) => {
             mainError: (error) => error.message,
             errors: () => `Failed to delete order`,
         },
-        forEachError: (error) => {
-            console.log(error);
-        },
     });
 };
 
-const useAddOrdersToDrawer = ({ queryKey }: { queryKey: string[] }) => {
-    return useInteractionHandler<{ orderIDs: string[]; drawerID: string }, Order>({
+const useAddOrdersToDrawer = ({
+    queryKey,
+    handleSuccessRef,
+    handleFailureRef,
+}: {
+    queryKey: string[];
+    handleSuccessRef: React.MutableRefObject<{
+        [key: string]: (response: RPCPayload['data']) => void;
+    }>;
+    handleFailureRef: React.MutableRefObject<{
+        [key: string]: (error: PostgrestError | Error) => void;
+    }>;
+}) => {
+    return useRPCInteractionHandler<{ orderIDs: string[]; drawerID: string }>({
         interactor: addOrdersToDrawer,
         queryKey,
         getMessages: {
             pending: () => 'Adding orders to drawer...',
-            success: () => `Successfully added orders to drawer`,
+            success: () => `Successfully added order(s) to drawer`,
             mainError: (error) => error.message,
-            errors: () => `Failed to add orders to drawer`,
+            errors: () => `Failed to add order(s) to drawer`,
         },
         forEachError: (order) => {
             console.error({ order });
         },
+        handleSuccess(response) {
+            const handleSuccess = handleSuccessRef.current['addOrdersToDrawer'];
+            if (handleSuccess) {
+                handleSuccess(response);
+            }
+        },
+        handleFailure(error) {
+            const handleFailure = handleFailureRef.current['addOrdersToDrawer'];
+            if (handleFailure) {
+                handleFailure(error);
+            }
+        },
     });
 };
 
-export const useOrderCRUD = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const queryKey = [businessDate.format('YYYY-MM-DD')];
+const useRemoveOrdersFromDrawer = ({
+    queryKey,
+    handleSuccessRef,
+    handleFailureRef,
+}: {
+    queryKey: string[];
+    handleSuccessRef: React.MutableRefObject<{
+        [key: string]: (response: RPCPayload['data']) => void;
+    }>;
+    handleFailureRef: React.MutableRefObject<{
+        [key: string]: (error: PostgrestError | Error) => void;
+    }>;
+}) => {
+    return useRPCInteractionHandler<{ orderIDs: string[]; drawerID: string }>({
+        interactor: removeOrdersFromDrawer,
+        queryKey,
+        getMessages: {
+            pending: () => 'Removing orders from drawer...',
+            success: () => `Successfully removed order(s) from drawer`,
+            mainError: (error) => error.message,
+            errors: () => `Failed to remove order(s) from drawer`,
+        },
+        forEachError: (order) => {
+            console.error({ order });
+        },
+        handleSuccess(response) {
+            console.log({ response }, 'handleSuccess');
+            const handleSuccess = handleSuccessRef.current['removeOrdersFromDrawer'];
+            if (handleSuccess) {
+                handleSuccess(response);
+            }
+        },
+        handleFailure(error) {
+            console.error({ error }, 'handleFailure');
+            const handleFailure = handleFailureRef.current['removeOrdersFromDrawer'];
+            if (handleFailure) {
+                handleFailure(error);
+            }
+        },
+    });
+};
+
+export const useOrderAPI = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+    const handleSuccessRef = useRef<{
+        [key: string]: (response: RPCPayload['data']) => void;
+    }>({});
+
+    const handleFailureRef = useRef<{
+        [key: string]: (error: PostgrestError | Error) => void;
+    }>({});
+    const queryKey = ['orders', businessDate.format('YYYY-MM-DD')];
+    const addOrdersToDrawerMutation = useAddOrdersToDrawer({
+        queryKey,
+        handleSuccessRef,
+        handleFailureRef,
+    });
+    const removeOrdersFromDrawerMutation = useRemoveOrdersFromDrawer({
+        queryKey,
+        handleSuccessRef,
+        handleFailureRef,
+    });
     return {
-        orderMutations: {
+        orderAPI: {
             getAll: useGetAllDaysOrders({ businessDate }),
             create: useCreateNewOrder({ queryKey }).mutate,
             update: useUpdateOrder({ queryKey }).mutate,
             delete: useDeleteOrder({ queryKey }).mutate,
-            addOrdersToDrawer: useAddOrdersToDrawer({ queryKey }).mutate,
+            addOrdersToDrawer: ({
+                orderIDs,
+                drawerID,
+                handleSuccess,
+                handleFailure,
+            }: {
+                orderIDs: string[];
+                drawerID: string;
+                handleSuccess?: (response: RPCPayload['data']) => void;
+                handleFailure?: (error: PostgrestError | Error) => void;
+            }) => {
+                if (handleSuccess) {
+                    handleSuccessRef.current['addOrdersToDrawer'] = handleSuccess;
+                }
+                if (handleFailure) {
+                    handleFailureRef.current['addOrdersToDrawer'] = handleFailure;
+                }
+                addOrdersToDrawerMutation.mutate({ orderIDs, drawerID });
+            },
+            // removeOrdersFromDrawer: useRemoveOrdersFromDrawer({ queryKey }).mutate,
+            removeOrdersFromDrawer: ({
+                orderIDs,
+                drawerID,
+                handleSuccess,
+                handleFailure,
+            }: {
+                orderIDs: string[];
+                drawerID: string;
+                handleSuccess?: (response: RPCPayload['data']) => void;
+                handleFailure?: (error: PostgrestError | Error) => void;
+            }) => {
+                if (handleSuccess) {
+                    handleSuccessRef.current['removeOrdersFromDrawer'] = handleSuccess;
+                }
+                if (handleFailure) {
+                    handleFailureRef.current['removeOrdersFromDrawer'] = handleFailure;
+                }
+                removeOrdersFromDrawerMutation.mutate({ orderIDs, drawerID });
+            },
         },
     };
 };

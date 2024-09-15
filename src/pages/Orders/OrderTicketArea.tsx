@@ -2,15 +2,27 @@ import { Grid, Stack } from '@mui/material';
 import { OrderTicket, OrderTicketSkeleton } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
+// import { AnimatePresence, MotionProps } from 'framer-motion';
+// import { MotionWrapper } from '../../rickcedlib/MotionWrapper';
+
+// const motionProps: MotionProps = {
+//     initial: { opacity: 0 },
+//     animate: { opacity: 1 },
+//     exit: { opacity: 0 },
+//     whileHover: { scale: 1.05 },
+// };
 
 export const OrderTicketArea = () => {
     const { orders, ticket } = useOrderDashboardContext();
     const drawerOrders = orders.forCurrentDrawer;
+    console.log({ drawerOrders });
     return (
         <Stack className="hover-scroll" p={1} pb="50px">
             <Grid container rowGap={3} columnGap={1} justifyContent="space-between">
+                {/* <AnimatePresence> */}
                 {drawerOrders?.length ? (
                     drawerOrders?.map((order) => (
+                        // <MotionWrapper motionProps={motionProps} motionKey={order.order_id} key={order.order_id}>
                         <OrderTicket
                             order={order}
                             key={order.order_id}
@@ -19,6 +31,7 @@ export const OrderTicketArea = () => {
                             toggleSelected={() => ticket.select(order)}
                             selected={ticket.isSelected(order)}
                         />
+                        /* </MotionWrapper> */
                     ))
                 ) : (
                     <Player
@@ -27,6 +40,7 @@ export const OrderTicketArea = () => {
                         autoplay
                     />
                 )}
+                {/* </AnimatePresence> */}
             </Grid>
         </Stack>
     );

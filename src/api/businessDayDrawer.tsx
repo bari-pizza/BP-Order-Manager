@@ -1,5 +1,5 @@
 import { supaClient } from '../supaClient';
-import { handlePayload, Payload, StandardPayload, SupabaseInteractor, useInteractionHandler } from './helpers';
+import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } from './helpers';
 import { BusinessDayDrawerSummary } from '../typesAndValidators';
 import dayjs from 'dayjs';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -43,10 +43,6 @@ const useUpsertBusinessDayDrawerSummary = ({ queryKey }: { queryKey: string[] })
             mainError: (error) => error.message,
             errors: () => `Failed to save data`,
         },
-        forEachError: (error) => {
-            console.log(error);
-            // thing to do with each error
-        },
         handleSuccess: (data) => {
             console.log(data);
             // thing do to on success
@@ -54,13 +50,6 @@ const useUpsertBusinessDayDrawerSummary = ({ queryKey }: { queryKey: string[] })
         handleFailure: (error) => {
             console.log(error);
             // thing to do on failure
-        },
-        normalizer: (payload) => {
-            /* 
-                should take an RPCPayload and return a StandardPayload<BusinessDayDrawerSummary>
-                used for working with supabase rpc functions where the return type isn't standard
-            */
-            return payload as unknown as StandardPayload<BusinessDayDrawerSummary>;
         },
     });
 };

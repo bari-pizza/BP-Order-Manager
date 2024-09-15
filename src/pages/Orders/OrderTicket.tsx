@@ -95,7 +95,7 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id)!;
     // const originLogo = orderOrigin.icon || '';
 
-    const totalPayments = order.payments.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
+    const totalPayments = order.payments?.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
     const isPaid = totalPayments === order.total_in_cents;
 
     return (

@@ -1,5 +1,10 @@
 import { Tables } from './supabase';
 
+type ValueOf<Obj> = Obj[keyof Obj];
+type OneOnly<Obj, Key extends keyof Obj> = { [key in Exclude<keyof Obj, Key>]: null } & Pick<Obj, Key>;
+type OneOfByKey<Obj> = { [key in keyof Obj]: OneOnly<Obj, key> };
+export type OneOfType<Obj> = ValueOf<OneOfByKey<Obj>>;
+
 export type Profile = Tables<'Profile'>;
 export type Drawer = Tables<'Drawer'>;
 export type DrawerType = Tables<'Drawer'>['drawer_type'];
