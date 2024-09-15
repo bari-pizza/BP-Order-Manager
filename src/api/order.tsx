@@ -135,11 +135,11 @@ const useAddOrdersToDrawer = ({
         getMessages: {
             pending: () => 'Adding orders to drawer...',
             success: () => `Successfully added order(s) to drawer`,
-            mainError: (error) => error.message,
-            errors: () => `Failed to add order(s) to drawer`,
+            mainError: () => `Failed to add order(s) to drawer`,
+            errors: (error) => error.message,
         },
-        forEachError: (order) => {
-            console.error({ order });
+        forEachError: (error) => {
+            console.error({ error }, 'forEachError');
         },
         handleSuccess(response) {
             const handleSuccess = handleSuccessRef.current['addOrdersToDrawer'];
@@ -175,8 +175,8 @@ const useRemoveOrdersFromDrawer = ({
         getMessages: {
             pending: () => 'Removing orders from drawer...',
             success: () => `Successfully removed order(s) from drawer`,
-            mainError: (error) => error.message,
-            errors: () => `Failed to remove order(s) from drawer`,
+            mainError: () => `Failed to remove order(s) from drawer`,
+            errors: (error) => error.message,
         },
         forEachError: (order) => {
             console.error({ order });

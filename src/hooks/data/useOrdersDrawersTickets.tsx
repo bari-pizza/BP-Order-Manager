@@ -320,12 +320,15 @@ export const useOrdersDrawersTickets = () => {
     const putTicketsInDrawer = (drawer: Drawer | Driver_Drawer) => {
         const drawerID = drawer.drawer_id;
         const handleSuccess = (response: RPCPayload['data']) => {
-            const unsuccessfulOrderIDs = Object.keys(response!.failures);
+            const unsuccessfulOrderIDs = response?.failures.flatMap((failure) => Object.keys(failure)) || [];
             console.log({ response, unsuccessfulOrderIDs });
             setSelectedTickets(unsuccessfulOrderIDs);
             setHandlingDrawerClick(false);
         };
-        orderAPI.addOrdersToDrawer({ drawerID, orderIDs: selectedTickets, handleSuccess });
+        const handleFailure = () => {
+            setHandlingDrawerClick(false);
+        };
+        orderAPI.addOrdersToDrawer({ drawerID, orderIDs: selectedTickets, handleSuccess, handleFailure });
     };
 
     const removeTicketsFromDrawer = () => {
@@ -335,7 +338,10 @@ export const useOrdersDrawersTickets = () => {
             setSelectedTickets(unsuccessfulOrderIDs);
             setHandlingDrawerClick(false);
         };
-        orderAPI.removeOrdersFromDrawer({ drawerID, orderIDs: selectedTickets, handleSuccess });
+        const handleFailure = () => {
+            setHandlingDrawerClick(false);
+        };
+        orderAPI.removeOrdersFromDrawer({ drawerID, orderIDs: selectedTickets, handleSuccess, handleFailure });
     };
 
     const handleDrawerClick = (drawer: Drawer | Driver_Drawer) => {

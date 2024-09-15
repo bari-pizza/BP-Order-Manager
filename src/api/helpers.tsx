@@ -78,7 +78,7 @@ type GetMessages<T, U> = {
     pending: (data: T) => string;
     success: (data: U) => string;
     mainError: (error: PostgrestError | Error) => string;
-    errors: (data: PostgrestError | Error) => string;
+    errors: (error: PostgrestError | Error) => string;
 };
 
 // const defaultNormalizer = <T,>(payload: RPCPayload) => {
@@ -150,16 +150,6 @@ export const useInteractionHandler = <T, U>({
                     autoClose: 2000,
                 });
             }
-            // shouldnt have errors here
-            // if (payload.errors) {
-            //     payload.errors.forEach((data) => {
-            //         const errorMessage = getMessages.errors(data);
-            //         if (errorMessage) {
-            //             toast.error(errorMessage);
-            //         }
-            //         forEachError(data);
-            //     });
-            // }
             if (handleSuccess) {
                 handleSuccess(payload.data);
             }
@@ -213,7 +203,7 @@ export const useRPCInteractionHandler = <T,>({
         },
         onSuccess: (payload) => {
             if (payload.data?.successes.length === 0) {
-                throw new Error('Failed');
+                throw new Error('Failed to save changes');
             }
             const successMessage = getMessages.success(payload.data);
             queryClient.invalidateQueries({ queryKey });
@@ -225,6 +215,9 @@ export const useRPCInteractionHandler = <T,>({
                     autoClose: 2000,
                 });
             }
+            // TODO: failures aren't coming through with the right shape
+            // fix for both rpc functions probably
+            console.log({ payload });
             payload.data?.failures.forEach((data) => {
                 const error = Object.values(data)[0];
                 const errorMessage = getMessages.errors(error);
@@ -241,7 +234,7 @@ export const useRPCInteractionHandler = <T,>({
             // I think this only happens when an error is thrown
             // might need to add error throwing in the interactor
             toast.update(toastRef.current, {
-                render: getMessages.errors(error),
+                render: getMessages.mainError(error),
                 type: 'error',
                 isLoading: false,
                 autoClose: 2000,

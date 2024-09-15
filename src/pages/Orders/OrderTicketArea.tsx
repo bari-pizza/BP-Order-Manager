@@ -2,15 +2,21 @@ import { Grid, Stack } from '@mui/material';
 import { OrderTicket, OrderTicketSkeleton } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
-// import { AnimatePresence, MotionProps } from 'framer-motion';
-// import { MotionWrapper } from '../../rickcedlib/MotionWrapper';
+import { AnimatePresence, MotionProps } from 'framer-motion';
+import { MotionWrapper } from '../../rickcedlib/MotionWrapper';
 
-// const motionProps: MotionProps = {
-//     initial: { opacity: 0 },
-//     animate: { opacity: 1 },
-//     exit: { opacity: 0 },
-//     whileHover: { scale: 1.05 },
-// };
+const motionProps: MotionProps = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    whileHover: { scale: 1.05 },
+    transition: {
+        duration: 0.2, // quick initial animation
+        exit: {
+            duration: 1, // slower exit animation
+        },
+    },
+};
 
 export const OrderTicketArea = () => {
     const { orders, ticket } = useOrderDashboardContext();
@@ -19,28 +25,28 @@ export const OrderTicketArea = () => {
     return (
         <Stack className="hover-scroll" p={1} pb="50px">
             <Grid container rowGap={3} columnGap={1} justifyContent="space-between">
-                {/* <AnimatePresence> */}
-                {drawerOrders?.length ? (
-                    drawerOrders?.map((order) => (
-                        // <MotionWrapper motionProps={motionProps} motionKey={order.order_id} key={order.order_id}>
-                        <OrderTicket
-                            order={order}
-                            key={order.order_id}
-                            toggleCollapsed={() => ticket.collapse(order)}
-                            collapsed={ticket.isCollapsed(order)}
-                            toggleSelected={() => ticket.select(order)}
-                            selected={ticket.isSelected(order)}
+                <AnimatePresence>
+                    {drawerOrders?.length ? (
+                        drawerOrders?.map((order) => (
+                            <MotionWrapper motionProps={motionProps} motionKey={order.order_id} key={order.order_id}>
+                                <OrderTicket
+                                    order={order}
+                                    key={order.order_id}
+                                    toggleCollapsed={() => ticket.collapse(order)}
+                                    collapsed={ticket.isCollapsed(order)}
+                                    toggleSelected={() => ticket.select(order)}
+                                    selected={ticket.isSelected(order)}
+                                />
+                            </MotionWrapper>
+                        ))
+                    ) : (
+                        <Player
+                            src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
+                            loop
+                            autoplay
                         />
-                        /* </MotionWrapper> */
-                    ))
-                ) : (
-                    <Player
-                        src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
-                        loop
-                        autoplay
-                    />
-                )}
-                {/* </AnimatePresence> */}
+                    )}
+                </AnimatePresence>
             </Grid>
         </Stack>
     );
