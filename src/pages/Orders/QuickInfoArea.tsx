@@ -19,7 +19,7 @@ export const QuickInfoArea = () => {
                         {ticket.all.areCollapsed ? 'Expand' : 'Collapse'} All
                     </Button>
                     <Button variant="contained" onClick={ticket.all.select}>
-                        {ticket.all.areSelected ? 'Unselect' : 'Select'} All
+                        {ticket.none.areSelected ? 'Select' : 'Unselect'} All
                     </Button>
                 </Stack>
             )}

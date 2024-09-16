@@ -74,6 +74,8 @@ const useGetAllDaysOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) =>
     return useSuspenseQuery({
         queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
         queryFn: () => getAllDaysOrders({ businessDate }),
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 30,
     });
 };
 

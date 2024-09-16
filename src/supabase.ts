@@ -16,7 +16,6 @@ export type Database = {
           drawer_id: string
           hours: number
           hours_in_cents: number
-          is_closed: boolean
           is_locked: boolean
           other_in_cents: number
           special_note: string
@@ -27,7 +26,6 @@ export type Database = {
           drawer_id: string
           hours?: number
           hours_in_cents?: number
-          is_closed?: boolean
           is_locked?: boolean
           other_in_cents?: number
           special_note?: string
@@ -38,7 +36,6 @@ export type Database = {
           drawer_id?: string
           hours?: number
           hours_in_cents?: number
-          is_closed?: boolean
           is_locked?: boolean
           other_in_cents?: number
           special_note?: string

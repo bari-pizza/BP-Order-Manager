@@ -43,7 +43,7 @@ function TabPanel(props: TabPanelProps) {
             id={`simple-tabpanel-${tabName}`}
             aria-labelledby={`simple-tab-${tabName}`}
             {...other}>
-            {value === tabName && <Box sx={{ p: 3 }}>{children}</Box>}
+            <div className="hover-scroll-content">{value === tabName && <Box sx={{ p: 3 }}>{children}</Box>}</div>
         </div>
     );
 }

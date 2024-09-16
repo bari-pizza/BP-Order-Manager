@@ -48,12 +48,24 @@ export const DrawerSideBar = () => {
             other_in_cents: 0,
             business_date: businessDate.format('YYYY-MM-DD'),
             drawer_id: currentDrawer?.drawer_id,
-            is_closed: false,
             is_locked: false,
             special_note: '',
             ...summary,
         };
     }, [constants, currentDrawer, businessDate, summary]);
+
+    // TODO: is locked logic
+
+    // BusinessDaySummary can only be locked if all Drawers are locked
+
+    // If Drawer is locked, set all orders to is_locked: true
+    // if order is locked, set all payments to is_locked: true
+
+    // if Drawer is unlocked, set all orders to is_locked: false
+    // if order is unlocked, set all payments to is_locked: false
+
+    // only drawer is locked state should be toggleable directly
+    // Drawer cannot be unlocked if BusinessDaySummary is locked
 
     const {
         control,

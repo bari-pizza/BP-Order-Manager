@@ -1,5 +1,5 @@
 import { supaClient } from '../supaClient';
-import { handlePayload, Payload, StandardPayload, SupabaseInteractor, useInteractionHandler } from './helpers';
+import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } from './helpers';
 import { Profile } from '../typesAndValidators';
 
 type NewProfile = Omit<Profile, 'id'>;
@@ -28,11 +28,7 @@ const useCreateNewProfile = ({ queryKey }: { queryKey: string[] }) => {
             pending: () => 'Saving new profile...',
             success: (data) => `Successfully saved new profile: ${data.first_name} ${data.last_name}`,
             mainError: (error) => error.message,
-            errors: (data) => `Failed to create new profile: ${data.first_name} ${data.last_name}`,
-        },
-        forEachError: (error) => {
-            console.log(error);
-            // thing to do with each error
+            errors: () => `Failed to create new profile`,
         },
         handleSuccess: (data) => {
             console.log(data);
@@ -41,13 +37,6 @@ const useCreateNewProfile = ({ queryKey }: { queryKey: string[] }) => {
         handleFailure: (error) => {
             console.log(error);
             // thing to do on failure
-        },
-        normalizer: (payload) => {
-            /* 
-                should take an RPCPayload and return a StandardPayload<Profile>
-                used for working with supabase rpc functions where the return type isn't standard
-            */
-            return payload as unknown as StandardPayload<Profile>;
         },
     });
 };
@@ -61,11 +50,7 @@ const useUpdateNewProfile = ({ queryKey }: { queryKey: string[] }) => {
             pending: () => 'Saving changes to profile...',
             success: (data) => `Successfully saved changes to ${data.first_name} ${data.last_name}`,
             mainError: (error) => error.message,
-            errors: (data) => `Failed to save changes to ${data.first_name} ${data.last_name}`,
-        },
-        forEachError: (error) => {
-            console.log(error);
-            // thing to do with each error
+            errors: () => `Failed to save changes to profile`,
         },
         handleSuccess: (data) => {
             console.log(data);
@@ -74,13 +59,6 @@ const useUpdateNewProfile = ({ queryKey }: { queryKey: string[] }) => {
         handleFailure: (error) => {
             console.log(error);
             // thing to do on failure
-        },
-        normalizer: (payload) => {
-            /* 
-                should take an RPCPayload and return a StandardPayload<Profile>
-                used for working with supabase rpc functions where the return type isn't standard
-            */
-            return payload as unknown as StandardPayload<Profile>;
         },
     });
 };

@@ -5,7 +5,6 @@ import {
     GridEventListener,
     GridRowEditStopReasons,
     GridRowModel,
-    GridRowModes,
     GridRowModesModel,
 } from '@mui/x-data-grid';
 import { OrderWithFullDetails } from '../../../typesAndValidators';
@@ -108,9 +107,9 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
     return (
         <Stack direction="column">
             <DataGrid
-                sx={{
-                    '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
-                }}
+                // sx={{
+                //     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
+                // }}
                 rows={rows}
                 columns={columns}
                 editMode="row"
@@ -120,10 +119,10 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 processRowUpdate={processRowUpdate}
                 getRowId={(row) => row.order_id}
                 getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
-                getRowClassName={(params) => {
-                    const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-                    return isEditing ? 'row-is-edit' : '';
-                }}
+                // getRowClassName={(params) => {
+                //     const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
+                //     return isEditing ? 'row-is-edit' : '';
+                // }}
             />
         </Stack>
     );
