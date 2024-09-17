@@ -47,7 +47,7 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 const { row } = params;
                 const { order_number, order_name, origin, order_type } = row;
                 return (
-                    <Tooltip title={`${origin.name} ${order_type}`}>
+                    <Tooltip title={`${origin.name} ${order_type} ${order_number ?? order_name}`}>
                         <Stack direction="row" alignItems="center" height="100%" spacing={1}>
                             <OriginLogo orderOrigin={origin} size="medium" variant="border" />
                             <OrderTypeIcon orderType={order_type} />
@@ -101,6 +101,22 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
             width: 125,
             renderCell: () => {
                 return 'No';
+            },
+        },
+        {
+            field: 'non-cash-tips',
+            headerName: 'Tips',
+            width: 125,
+            renderCell: (params) => {
+                const { row } = params;
+                const { payments } = row;
+                const nonCashTips = payments.reduce((acc: number, curr) => {
+                    if (curr.payment_type !== 'cash') {
+                        return acc + curr.tip_in_cents;
+                    }
+                    return acc;
+                }, 0);
+                return `$${(nonCashTips / 100).toFixed(2)}`;
             },
         },
     ];

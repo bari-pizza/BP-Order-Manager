@@ -21,11 +21,14 @@ interface DrawerCardProps {
 }
 
 export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
-    const { drawer: ctxDrawer, orders, ticket } = useOrderDashboardContext();
+    const { drawer: ctxDrawer, orders, ticket, summaries } = useOrderDashboardContext();
     const fullName = getDrawerFullName(drawer);
     const isOpen = ctxDrawer.current?.drawer_id === drawer?.drawer_id;
     const orderCount = orders.byDrawerID(drawer.drawer_id).length;
     const drawerRef = useRef<HTMLDivElement>(null);
+
+    const summary = summaries.byDrawerID(drawer.drawer_id);
+    const isLocked = summary?.is_locked || false;
 
     if (drawerRef.current) {
         ctxDrawer.refs[drawer.drawer_id] = drawerRef;
@@ -54,6 +57,7 @@ export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
                     handleClick={() => ctxDrawer.onClick(drawer)}
                     sx={sx}
                     props={props}
+                    isLocked={isLocked}
                 />
             </>
         </Tooltip>

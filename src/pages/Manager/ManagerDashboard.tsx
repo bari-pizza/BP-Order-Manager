@@ -90,11 +90,8 @@ export const ManagerDashboard = () => {
                     all: drawers,
                     onClick: drawer.onClick,
                     current: drawer.current,
-                    close: () => {
-                        console.log('close drawer');
-                        // TODO: complete this
-                    },
-                    reOpen: () => {}, // some supabase mutation
+                    close: drawer.close,
+                    reOpen: drawer.reOpen,
                 },
                 origins,
                 summaries,

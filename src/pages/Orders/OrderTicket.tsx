@@ -11,6 +11,8 @@ import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/
 import pizzaSrc from '/pizza slice.png';
 import { OrderTypeIcon } from '../../components/Order/OrderTypeIcon';
 import { OriginLogo } from '../../components/Order/OriginLogo';
+import { Lock as LockIcon } from '@mui/icons-material';
+import { AnimationProps, motion } from 'framer-motion';
 
 interface ExpandMoreProps extends BoxProps {
     expand: boolean;
@@ -63,6 +65,7 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
 
     const cardSX = {
         width: 200,
+        position: 'relative',
         height: 'min-content',
         transition: 'background-color 1s ease',
         '&:not(.toast-error)': {
@@ -93,10 +96,35 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
     };
 
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id)!;
-    // const originLogo = orderOrigin.icon || '';
 
     const totalPayments = order.payments?.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
     const isPaid = totalPayments === order.total_in_cents;
+    const isLocked = order.is_locked;
+
+    const containerVariants: AnimationProps['variants'] = {
+        initial: {
+            opacity: 0,
+        },
+        animate: {
+            opacity: 1,
+        },
+        hover: { opacity: 1 },
+    };
+
+    const iconVariants: AnimationProps['variants'] = {
+        initial: {
+            opacity: 1,
+        },
+        animate: {
+            opacity: 1,
+            scale: 1,
+            transition: { duration: 0.5 },
+        },
+        hover: {
+            scale: 1.25,
+            transition: { duration: 0.5 },
+        },
+    };
 
     return (
         <Card variant="elevation" sx={cardSX} raised>
@@ -152,6 +180,30 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                     </Stack>
                 </Stack>
             </CardActionArea>
+            {isLocked && (
+                <motion.div
+                    variants={containerVariants}
+                    initial="initial"
+                    animate="animate"
+                    whileHover="hover"
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        height: '100%',
+                        width: '100%',
+                        color: 'rgb(11 7 7 / 66%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <motion.div variants={iconVariants}>
+                        <LockIcon sx={{ fontSize: '5em' }} />
+                    </motion.div>
+                </motion.div>
+            )}
+
             <OrderEditor order={order} asDialog close={close} isOpen={isOpen} />
         </Card>
     );

@@ -1,5 +1,5 @@
 import { createContext, RefObject } from 'react';
-import type { Drawer, Driver_Drawer, Order_Payment } from '../typesAndValidators';
+import type { BusinessDayDrawerSummary, Drawer, Driver_Drawer, Order_Payment } from '../typesAndValidators';
 
 interface OrderDashboardContextProps {
     ticket: {
@@ -25,6 +25,12 @@ interface OrderDashboardContextProps {
         refs: {
             [key: string]: RefObject<SVGSVGElement>;
         };
+    };
+    summaries: {
+        all: BusinessDayDrawerSummary[];
+        forCurrentDrawer: BusinessDayDrawerSummary | null;
+        byDrawerID: (drawerID: string) => BusinessDayDrawerSummary | null;
+        update: (summary: BusinessDayDrawerSummary) => void;
     };
     drawer: {
         onClick: (drawer: Drawer | Driver_Drawer) => void;
@@ -69,6 +75,12 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
             collapsed: 0,
         },
         refs: {},
+    },
+    summaries: {
+        all: [],
+        forCurrentDrawer: null,
+        byDrawerID: () => null,
+        update: () => {},
     },
     drawer: {
         onClick: () => {},

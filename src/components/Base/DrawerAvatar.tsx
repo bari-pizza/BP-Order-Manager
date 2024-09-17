@@ -108,20 +108,6 @@ export const DrawerAvatar = ({
                     {avatarChild}
                 </Avatar>
             </Badge>
-            {/* {isLocked && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        height: '100%',
-                        width: '100%',
-                        color: 'rgb(11 7 7 / 66%)',
-                    }}>
-                    <LockIcon sx={{ fontSize: '8em' }} />
-                </div>
-            )} */}
         </>
     );
 };

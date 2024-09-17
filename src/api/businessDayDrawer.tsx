@@ -1,10 +1,20 @@
 import { supaClient } from '../supaClient';
-import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } from './helpers';
+import {
+    handlePayload,
+    Payload,
+    RPCPayload,
+    SupabaseInteractor,
+    SupabaseRPCInteractor,
+    useInteractionHandler,
+    useRPCInteractionHandler,
+} from './helpers';
 import { BusinessDayDrawerSummary } from '../typesAndValidators';
 import dayjs from 'dayjs';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { PostgrestError } from '@supabase/supabase-js';
+import { useRef } from 'react';
 
-const upsertBusinessDayDrawerSummary: SupabaseInteractor<BusinessDayDrawerSummary, BusinessDayDrawerSummary> = async (
+const upsertBusinessDayDrawer: SupabaseInteractor<BusinessDayDrawerSummary, BusinessDayDrawerSummary> = async (
     businessDayDrawerSummary,
 ) => {
     const payload = (await supaClient
@@ -14,7 +24,7 @@ const upsertBusinessDayDrawerSummary: SupabaseInteractor<BusinessDayDrawerSummar
     return handlePayload<BusinessDayDrawerSummary>(payload);
 };
 
-const getAllBusinessDayDrawerSummary = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+const getAllBusinessDayDrawers = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
     const { data, error } = await supaClient.from('BusinessDayDrawer').select('*').eq('business_date', businessDate);
     if (error) {
         console.error(error);
@@ -25,16 +35,41 @@ const getAllBusinessDayDrawerSummary = async ({ businessDate }: { businessDate: 
     return data as unknown as BusinessDayDrawerSummary[];
 };
 
-const useGetAllBusinessDayDrawerSummary = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+const closeBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; businessDate: dayjs.Dayjs }> = async ({
+    drawerID,
+    businessDate,
+}) => {
+    const { data } = await supaClient.rpc('lock_drawer', {
+        p_drawer_id: drawerID,
+        p_business_date: businessDate,
+    });
+
+    return data as unknown as RPCPayload;
+};
+
+const reopenBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; businessDate: dayjs.Dayjs }> = async ({
+    drawerID,
+    businessDate,
+}) => {
+    console.log('calling unlock drawer');
+    const { data } = await supaClient.rpc('unlock_drawer', {
+        p_drawer_id: drawerID,
+        p_business_date: businessDate,
+    });
+
+    return data as unknown as RPCPayload;
+};
+
+const useGetAllBusinessDayDrawers = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
     return useSuspenseQuery({
-        queryKey: [businessDate.format('YYYY-MM-DD')],
-        queryFn: () => getAllBusinessDayDrawerSummary({ businessDate }),
+        queryKey: ['businessDayDrawers', businessDate.format('YYYY-MM-DD')],
+        queryFn: () => getAllBusinessDayDrawers({ businessDate }),
     });
 };
 
-const useUpsertBusinessDayDrawerSummary = ({ queryKey }: { queryKey: string[] }) => {
+const useUpsertBusinessDayDrawer = ({ queryKey }: { queryKey: string[] }) => {
     return useInteractionHandler<BusinessDayDrawerSummary, BusinessDayDrawerSummary>({
-        interactor: upsertBusinessDayDrawerSummary,
+        interactor: upsertBusinessDayDrawer,
         queryKey,
         getMessages: {
             // return '' or null if no message necessary
@@ -54,16 +89,147 @@ const useUpsertBusinessDayDrawerSummary = ({ queryKey }: { queryKey: string[] })
     });
 };
 
-export const useBusinessDayDrawerSummaryCRUD = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const queryKey = [businessDate.format('YYYY-MM-DD')];
+const useCloseBusinessDayDrawer = ({
+    queryKey,
+    handleSuccessRef,
+    handleFailureRef,
+}: {
+    queryKey: string[];
+    handleSuccessRef: React.MutableRefObject<{
+        [key: string]: (response: RPCPayload['data']) => void;
+    }>;
+    handleFailureRef: React.MutableRefObject<{
+        [key: string]: (error: PostgrestError | Error) => void;
+    }>;
+}) => {
+    return useRPCInteractionHandler<{ drawerID: string; businessDate: dayjs.Dayjs }>({
+        interactor: closeBusinessDayDrawer,
+        queryKey,
+        getMessages: {
+            pending: () => 'Closing drawer...',
+            success: () => `Successfully closed drawer`,
+            mainError: () => `Failed to close drawer`,
+            errors: (error) => error.message,
+        },
+        forEachError: (error) => {
+            console.error({ error }, 'forEachError');
+        },
+        handleSuccess(response) {
+            const handleSuccess = handleSuccessRef.current['closeBusinessDayDrawer'];
+            if (handleSuccess) {
+                handleSuccess(response);
+            }
+        },
+        handleFailure(error) {
+            const handleFailure = handleFailureRef.current['closeBusinessDayDrawer'];
+            if (handleFailure) {
+                handleFailure(error);
+            }
+        },
+    });
+};
+
+const useReopenBusinessDayDrawer = ({
+    queryKey,
+    handleSuccessRef,
+    handleFailureRef,
+}: {
+    queryKey: string[];
+    handleSuccessRef: React.MutableRefObject<{
+        [key: string]: (response: RPCPayload['data']) => void;
+    }>;
+    handleFailureRef: React.MutableRefObject<{
+        [key: string]: (error: PostgrestError | Error) => void;
+    }>;
+}) => {
+    return useRPCInteractionHandler<{ drawerID: string; businessDate: dayjs.Dayjs }>({
+        interactor: reopenBusinessDayDrawer,
+        queryKey,
+        getMessages: {
+            pending: () => 'Reopening drawer...',
+            success: () => `Successfully reopened drawer`,
+            mainError: () => `Failed to reopen drawer`,
+            errors: (error) => error.message,
+        },
+        forEachError: (error) => {
+            console.error({ error }, 'forEachError');
+        },
+        handleSuccess(response) {
+            const handleSuccess = handleSuccessRef.current['reopenBusinessDayDrawer'];
+            if (handleSuccess) {
+                handleSuccess(response);
+            }
+        },
+        handleFailure(error) {
+            const handleFailure = handleFailureRef.current['reopenBusinessDayDrawer'];
+            if (handleFailure) {
+                handleFailure(error);
+            }
+        },
+    });
+};
+
+export const useBusinessDayDrawerAPI = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+    const handleSuccessRef = useRef<{
+        [key: string]: (response: RPCPayload['data']) => void;
+    }>({});
+
+    const handleFailureRef = useRef<{
+        [key: string]: (error: PostgrestError | Error) => void;
+    }>({});
+    const queryKey = ['businessDayDrawers', businessDate.format('YYYY-MM-DD')];
+    const closeBusinessDayDrawerMutation = useCloseBusinessDayDrawer({
+        queryKey,
+        handleSuccessRef,
+        handleFailureRef,
+    });
+    const reopenBusinessDayDrawerMutation = useReopenBusinessDayDrawer({
+        queryKey,
+        handleSuccessRef,
+        handleFailureRef,
+    });
     return {
-        businessDayDrawerSummaryMutations: {
+        businessDayDrawerAPI: {
             // should have a separate type of interaction hook for each CRUD operation
             // create: useCreateBusinessDayDrawerSummary({ queryKey }).mutate,
-            getAll: useGetAllBusinessDayDrawerSummary({ businessDate }),
+            getAll: useGetAllBusinessDayDrawers({ businessDate }),
             // getOne: useGetOneBusinessDayDrawerSummary({ businessDate, drawerID }),
-            upsert: useUpsertBusinessDayDrawerSummary({ queryKey }).mutate,
-            // delete: useTemplateInteraction({ queryKey }).mutate,
+            upsert: useUpsertBusinessDayDrawer({ queryKey }).mutate,
+            close: ({
+                drawerID,
+                handleSuccess,
+                handleFailure,
+            }: {
+                drawerID: string;
+                handleSuccess?: (response: RPCPayload['data']) => void;
+                handleFailure?: (error: PostgrestError | Error) => void;
+            }) => {
+                if (handleSuccess) {
+                    handleSuccessRef.current['addOrdersToDrawer'] = handleSuccess;
+                }
+                if (handleFailure) {
+                    handleFailureRef.current['addOrdersToDrawer'] = handleFailure;
+                }
+                closeBusinessDayDrawerMutation.mutate({ drawerID, businessDate });
+            },
+            reOpen: ({
+                drawerID,
+                handleSuccess,
+                handleFailure,
+            }: {
+                drawerID: string;
+                handleSuccess?: (response: RPCPayload['data']) => void;
+                handleFailure?: (error: PostgrestError | Error) => void;
+            }) => {
+                console.log('reopening drawer', drawerID);
+                if (handleSuccess) {
+                    handleSuccessRef.current['reopenBusinessDayDrawer'] = handleSuccess;
+                }
+                if (handleFailure) {
+                    handleFailureRef.current['reopenBusinessDayDrawer'] = handleFailure;
+                }
+                reopenBusinessDayDrawerMutation.mutate({ drawerID, businessDate });
+            },
         },
     };
 };

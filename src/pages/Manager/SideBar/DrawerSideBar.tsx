@@ -54,24 +54,15 @@ export const DrawerSideBar = () => {
         };
     }, [constants, currentDrawer, businessDate, summary]);
 
-    // TODO: is locked logic
+    // TODO: ***is locked logic***
 
-    // BusinessDaySummary can only be locked if all Drawers are locked
-
-    // If Drawer is locked, set all orders to is_locked: true
-    // if order is locked, set all payments to is_locked: true
-
-    // if Drawer is unlocked, set all orders to is_locked: false
-    // if order is unlocked, set all payments to is_locked: false
-
-    // only drawer is locked state should be toggleable directly
-    // Drawer cannot be unlocked if BusinessDaySummary is locked
+    // BusinessDaySummary can only be locked if all Drawers and Orders are locked
 
     const {
         control,
         handleSubmit,
         register,
-        formState: { errors, isDirty },
+        formState: { errors },
         reset,
         watch,
     } = useForm<FormValues>({
@@ -91,22 +82,6 @@ export const DrawerSideBar = () => {
         const cleanedData = {
             ...data,
             hours_in_cents: data.hours * constants.default.driver_hourly_wage_in_cents,
-        };
-        summaries.update(cleanedData);
-    };
-
-    const onClosure: SubmitHandler<FormValues> = (data) => {
-        const cleanedData = {
-            ...data,
-            is_locked: true,
-        };
-        summaries.update(cleanedData);
-    };
-
-    const onReopen: SubmitHandler<FormValues> = (data) => {
-        const cleanedData = {
-            ...data,
-            is_locked: false,
         };
         summaries.update(cleanedData);
     };
@@ -179,12 +154,13 @@ export const DrawerSideBar = () => {
     };
 
     const handleDrawerClosureClick = () => {
-        handleSubmit(onClosure)();
+        drawers.close(currentDrawer);
         close();
     };
 
     const handleReopenDrawerClick = () => {
-        handleSubmit(onReopen)();
+        console.log(`Reopening drawer ${currentDrawer.name}`);
+        drawers.reOpen(currentDrawer);
     };
 
     const total = drawerSummary.total_in_cents;
@@ -289,18 +265,9 @@ export const DrawerSideBar = () => {
                                             />
                                         )}
                                     />
-                                    {isDirty && (
-                                        <AnimatePresence>
-                                            <MotionWrapper motionProps={motionProps} motionKey="save">
-                                                <Button onClick={handleSubmit(onSubmit)} variant="contained">
-                                                    Save Changes
-                                                </Button>
-                                            </MotionWrapper>
-                                        </AnimatePresence>
-                                    )}
                                 </>
                             )}
-                            <Button onClick={handleCloseDrawerClick}>Close Drawer</Button>
+                            <Button onClick={handleCloseDrawerClick}>Save & Close Drawer</Button>
                         </>
                     )}
                     <Button onClick={() => drawers.onClick(drawers.current!)}>Collapse SideBar</Button>

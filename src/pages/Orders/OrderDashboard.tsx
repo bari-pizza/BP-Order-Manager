@@ -13,7 +13,7 @@ import { useDialogProps } from '../../hooks/ui/useDialogProps';
 export const OrderDashboard = () => {
     const { drivers } = useDrivers();
     const { open, close, isOpen } = useDialogProps();
-    const { ticket, drawer, orders } = useOrdersDrawersTickets();
+    const { ticket, drawer, orders, summaries } = useOrdersDrawersTickets();
 
     // TODO: would be cool to have the number of selectedTickets follow the mouse while moving on the page
     /*
@@ -53,7 +53,7 @@ export default MouseFollowerComponent;
     */
 
     return (
-        <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers }}>
+        <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers, summaries }}>
             <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>
                 <Suspense fallback={<DrawerHeaderSkeleton />}>
                     <DrawerHeader />

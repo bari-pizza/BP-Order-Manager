@@ -2,7 +2,7 @@ import { useRef, useState, RefObject } from 'react';
 import type { Drawer, Driver_Drawer, Order_Payment } from '../../typesAndValidators';
 import { useBusinessDate } from '../data/useBusinessDate';
 import { useLocalStorage } from './useLocalStorage';
-import { useBusinessDayDrawerSummaryCRUD } from '../../api/businessDayDrawer';
+import { useBusinessDayDrawerAPI } from '../../api/businessDayDrawer';
 import { useOrderAPI } from '../../api/order';
 import { RPCPayload } from '../../api/helpers';
 
@@ -17,10 +17,10 @@ export const useOrdersDrawersTickets = () => {
     const [businessDate] = useBusinessDate();
     const { orderAPI } = useOrderAPI({ businessDate });
     const { data: allOrders } = orderAPI.getAll;
-    const { businessDayDrawerSummaryMutations } = useBusinessDayDrawerSummaryCRUD({
+    const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
     });
-    const { data: summaries } = businessDayDrawerSummaryMutations.getAll;
+    const { data: summaries } = businessDayDrawerAPI.getAll;
 
     const allPayments = allOrders.flatMap((order) => order.payments);
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
@@ -198,6 +198,16 @@ export const useOrdersDrawersTickets = () => {
         return [];
     };
 
+    // TODO: *** look into subscribing to orders ***
+
+    const closeBusinessDayDrawer = (drawer: Drawer | Driver_Drawer) => {
+        businessDayDrawerAPI.close({ drawerID: drawer.drawer_id });
+    };
+
+    const reOpenBusinessDayDrawer = (drawer: Drawer | Driver_Drawer) => {
+        businessDayDrawerAPI.reOpen({ drawerID: drawer.drawer_id });
+    };
+
     const getSummaryByDrawerID = (drawerID?: string) => {
         if (!drawerID) {
             return null;
@@ -236,6 +246,8 @@ export const useOrdersDrawersTickets = () => {
             unassigned: unassignedDrawer,
             isUnassignedDrawer: openDrawer?.drawer_id === 'unassigned',
             refs: drawerRefs.current,
+            close: closeBusinessDayDrawer,
+            reOpen: reOpenBusinessDayDrawer,
         },
         orders: {
             forCurrentDrawer: orders,
@@ -250,7 +262,7 @@ export const useOrdersDrawersTickets = () => {
             all: summaries,
             forCurrentDrawer: getSummaryByDrawerID(openDrawer?.drawer_id),
             byDrawerID: (drawerID: string) => getSummaryByDrawerID(drawerID),
-            update: businessDayDrawerSummaryMutations.upsert,
+            update: businessDayDrawerAPI.upsert,
         },
     };
 };

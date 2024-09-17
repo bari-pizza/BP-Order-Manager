@@ -10,7 +10,7 @@ interface ManagerDashboardProps {
         onClick: (drawer: Drawer | Driver_Drawer) => void;
         current: Drawer | Driver_Drawer | null;
         close: (drawer: Drawer | Driver_Drawer) => void;
-        reOpen: (driver: Driver_Drawer) => void;
+        reOpen: (drawer: Drawer | Driver_Drawer) => void;
     };
     origins: OrderOrigin[];
     drivers: {
