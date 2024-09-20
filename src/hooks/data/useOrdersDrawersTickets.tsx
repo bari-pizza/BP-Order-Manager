@@ -5,6 +5,7 @@ import { useLocalStorage } from './useLocalStorage';
 import { useBusinessDayDrawerAPI } from '../../api/businessDayDrawer';
 import { useOrderAPI } from '../../api/order';
 import { RPCPayload } from '../../api/helpers';
+import useSubscribeToTable from './useSubscribeToTable';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -16,7 +17,12 @@ const unassignedDrawer: Drawer = {
 export const useOrdersDrawersTickets = () => {
     const [businessDate] = useBusinessDate();
     const { orderAPI } = useOrderAPI({ businessDate });
-    const { data: allOrders } = orderAPI.getAll;
+    // const subscription = orderAPI.subscribe();
+    // console.log({ subscription });
+    const { data: initialData } = orderAPI.getAll;
+    const allOrders = useSubscribeToTable<Order_Payment>({ tableName: 'Order', initialData });
+    console.log({ allOrders });
+    // const { data: allOrders } = orderAPI.getAll;
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
     });

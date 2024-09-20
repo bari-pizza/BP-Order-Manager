@@ -16,6 +16,59 @@ import { useRef } from 'react';
 import { PostgrestError } from '@supabase/supabase-js';
 import { removeOrdersFromDrawer } from '../supabaseQueries';
 
+// const useSubscribeToChanges = <T,>({ fetchInitialData, subscriptions }: { fetchInitialData: () => Promise<T[]> }) => {
+//     const [data, setData] = useState([]);
+
+//     useEffect(() => {
+//         // Fetch initial data using the provided function
+//         const fetchData = async () => {
+//             const initialData = await fetchInitialData();
+//             setData(initialData);
+//         };
+
+//         fetchData();
+
+//         const orderSubscription = supaClient
+//             .channel('custom-all-channel')
+//             .on('postgres_changes', { event: '*', schema: 'public', table: 'Order' }, (payload) => {
+//                 console.log('Change received!', payload);
+//             })
+//             .subscribe();
+
+//         const paymentSubscription = supaClient
+//             .channel('custom-all-channel')
+//             .on('postgres_changes', { event: '*', schema: 'public', table: 'Payment' }, (payload) => {
+//                 console.log('Change received!', payload);
+//             })
+//             .subscribe();
+
+//         // Cleanup subscriptions on component unmount
+//         return () => {
+//             supaClient.removeSubscription(orderSubscription);
+//             supaClient.removeSubscription(paymentSubscription);
+//         };
+//     }, [businessDate, fetchInitialData]);
+
+//     return data;
+// };
+
+const subscribeToOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+    const channel = supaClient
+        .channel('changes')
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'Order',
+                filter: `business_date=eq.${businessDate.format('YYYY-MM-DD')}`,
+            },
+            (payload) => console.log(payload),
+        )
+        .subscribe();
+    return channel;
+};
+
 const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
     const { data, error } = await supaClient
         .from('Order')
@@ -38,6 +91,12 @@ const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs })
 
     return data as unknown as Order_Payment[];
 };
+
+// const useSubscribeToAllDaysOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+//     const tableName = 'Order';
+//     const initialQueryFn = () => getAllDaysOrders({ businessDate });
+//     return useSubscribeToTable({ tableName, initialQueryFn });
+// };
 
 const createNewOrder: SupabaseInteractor<NewOrder, Order> = async (newOrder) => {
     const payload = (await supaClient.from('Order').insert([newOrder]).select('*')) as Payload<Order>;
@@ -221,6 +280,7 @@ export const useOrderAPI = ({ businessDate }: { businessDate: dayjs.Dayjs }) => 
     });
     return {
         orderAPI: {
+            subscribe: () => subscribeToOrders({ businessDate }),
             getAll: useGetAllDaysOrders({ businessDate }),
             create: useCreateNewOrder({ queryKey }).mutate,
             update: useUpdateOrder({ queryKey }).mutate,

@@ -318,6 +318,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 <Controller
                     name="delivery_fee_in_cents"
                     control={control}
+                    // rules={validators.order.delivery_fee_in_cents}
                     render={({ field: { onChange, value } }) => {
                         return (
                             <TextFieldWithMask
@@ -325,7 +326,6 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                                 maskVariant="currency"
                                 error={!!errors.delivery_fee_in_cents}
                                 helperText={errors.delivery_fee_in_cents?.message}
-                                keepMask={true}
                                 value={value}
                                 disabled={currentOrderType !== 'delivery'}
                                 onChange={onChange}
@@ -446,7 +446,7 @@ const OrderEditorDialog = ({
     validPaymentTypes: { value: PaymentType; label: string }[];
 }) => {
     const [isPaymentsVisible, setIsPaymentsVisible] = useState(true);
-    const payments = order.payments.sort((a, b) => b.created_at.localeCompare(a.created_at));
+    const payments = order.payments?.sort((a, b) => b.created_at.localeCompare(a.created_at));
 
     // Define sliding variants
     const slideVariants = {

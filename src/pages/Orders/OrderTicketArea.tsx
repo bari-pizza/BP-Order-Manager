@@ -13,10 +13,9 @@ const motionProps: MotionProps = {
 export const OrderTicketArea = () => {
     const { orders, ticket } = useOrderDashboardContext();
     const drawerOrders = orders.forCurrentDrawer;
-    console.log({ drawerOrders });
 
     return (
-        <Stack className="hover-scroll" p={1} pb="50px">
+        <Stack className="hover-scroll" p={1} pb="50px" m={2}>
             <Stack className="hover-scroll-content">
                 {drawerOrders?.length ? (
                     <AnimatePresence>
@@ -52,7 +51,7 @@ export const OrderTicketArea = () => {
 
 export const OrderTicketAreaSkeleton = () => {
     return (
-        <Grid container p={1} rowGap={1} columnGap={1} justifyContent="space-evenly">
+        <Grid container p={1} rowGap={1} columnGap={1} justifyContent="space-evenly" m={2}>
             {[...Array(8)].map((_, index) => (
                 <OrderTicketSkeleton key={index} />
             ))}

@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Tooltip, Typography } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { getDrawerFullName } from '../../utils';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
@@ -36,19 +36,15 @@ export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
 
     const selectedTicketsCount = ticket.count.selected;
 
-    const tooltip =
-        !isOpen && selectedTicketsCount ? (
-            <Typography variant="body2">
-                Add {selectedTicketsCount} tickets to {fullName}
-            </Typography>
-        ) : (
-            ''
-        );
+    const tooltip = !isOpen
+        ? selectedTicketsCount
+            ? `Add ${selectedTicketsCount} tickets to ${fullName}`
+            : `Show ${fullName}`
+        : `Show Unassigned`;
 
-    // Used React Fragment to stop tooltip from warning that its children can't be passed a ref
     return (
         <Tooltip title={tooltip}>
-            <>
+            <div>
                 <DrawerCardBase
                     drawer={drawer}
                     drawerRef={drawerRef}
@@ -59,7 +55,7 @@ export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
                     props={props}
                     isLocked={isLocked}
                 />
-            </>
+            </div>
         </Tooltip>
     );
 };
