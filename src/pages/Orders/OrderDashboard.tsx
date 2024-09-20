@@ -9,24 +9,15 @@ import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import { UnfoldMore as UnfoldMoreIcon, UnfoldLess as UnfoldLessIcon } from '@mui/icons-material';
-import { MouseFollower } from '../../components/Base/MouseFollower';
-import { TicketStack } from './TicketStack';
 
 export const OrderDashboard = () => {
     const { drivers } = useDrivers();
     const { open, close, isOpen } = useDialogProps();
     const { ticket, drawer, orders, summaries } = useOrdersDrawersTickets();
 
-    const selectedTicketsCount = ticket.count.selected;
-
     return (
         <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers, summaries }}>
             <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>
-                {selectedTicketsCount > 0 && (
-                    <MouseFollower>
-                        <TicketStack count={selectedTicketsCount} />
-                    </MouseFollower>
-                )}
                 <Suspense fallback={<DrawerHeaderSkeleton />}>
                     <DrawerHeader />
                 </Suspense>
