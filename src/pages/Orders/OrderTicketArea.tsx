@@ -28,8 +28,6 @@ export const OrderTicketArea = () => {
                                     <OrderTicket
                                         order={order}
                                         key={order.order_id}
-                                        toggleCollapsed={() => ticket.collapse(order)}
-                                        collapsed={ticket.isCollapsed(order)}
                                         toggleSelected={() => ticket.select(order)}
                                         selected={ticket.isSelected(order)}
                                     />
@@ -42,6 +40,7 @@ export const OrderTicketArea = () => {
                         src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
                         loop
                         autoplay
+                        style={{ width: '100%', height: '100%', maxHeight: '515px' }}
                     />
                 )}
             </Stack>

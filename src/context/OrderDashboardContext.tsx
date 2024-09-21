@@ -4,23 +4,17 @@ import type { BusinessDayDrawerSummary, Drawer, Driver_Drawer, Order_Payment } f
 interface OrderDashboardContextProps {
     ticket: {
         select: (order: Order_Payment) => void;
-        collapse: (order: Order_Payment) => void;
-        isCollapsed: (order: Order_Payment) => boolean;
         isSelected: (order: Order_Payment) => boolean;
         all: {
             select: () => void;
-            collapse: () => void;
-            areCollapsed: boolean;
             areSelected: boolean;
             count: number;
         };
         none: {
             areSelected: boolean;
-            areCollapsed: boolean;
         };
         count: {
             selected: number;
-            collapsed: number;
         };
         refs: {
             [key: string]: RefObject<SVGSVGElement>;
@@ -56,23 +50,17 @@ interface OrderDashboardContextProps {
 export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
     ticket: {
         select: () => {},
-        collapse: () => {},
-        isCollapsed: () => false,
         isSelected: () => false,
         all: {
             select: () => {},
-            collapse: () => {},
-            areCollapsed: false,
             areSelected: false,
             count: 0,
         },
         none: {
             areSelected: true,
-            areCollapsed: true,
         },
         count: {
             selected: 0,
-            collapsed: 0,
         },
         refs: {},
     },

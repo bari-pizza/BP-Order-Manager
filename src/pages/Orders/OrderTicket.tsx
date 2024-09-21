@@ -1,57 +1,27 @@
 import { useRef } from 'react';
-import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box, BoxProps } from '@mui/material';
+import { Card, Typography, CardActionArea, Skeleton, Stack } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order_Payment } from '../../typesAndValidators';
 import { OrderEditor } from './OrderEditor/OrderEditor';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
-import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
-import { styled, useTheme } from '@mui/material/styles';
+import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import pizzaSrc from '/pizza slice.png';
 import { OrderTypeIcon } from '../../components/Order/OrderTypeIcon';
 import { OriginLogo } from '../../components/Order/OriginLogo';
 import { Lock as LockIcon } from '@mui/icons-material';
 import { AnimationProps, motion } from 'framer-motion';
-
-interface ExpandMoreProps extends BoxProps {
-    expand: boolean;
-}
-
-const ExpandMore = styled((props: ExpandMoreProps) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { expand, ...other } = props;
-    return <Box {...other} />;
-})(({ theme }) => ({
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-    }),
-    variants: [
-        {
-            props: ({ expand }) => !expand,
-            style: {
-                transform: 'rotate(0deg)',
-            },
-        },
-        {
-            props: ({ expand }) => !!expand,
-            style: {
-                transform: 'rotate(180deg)',
-            },
-        },
-    ],
-}));
+import { PaymentTypeIcon } from './PaymentTypeIcon';
 
 interface OrderTicketProps {
     order: Order_Payment;
-    toggleCollapsed: (order: Order_Payment) => void;
-    collapsed: boolean;
     toggleSelected: (order: Order_Payment) => void;
     selected: boolean;
 }
 
-export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected, selected }: OrderTicketProps) => {
+export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProps) => {
     const { origins } = useBariPizzaContext();
     const { open, isOpen, close } = useDialogProps();
 
@@ -86,10 +56,6 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
         toggleSelected(order);
     };
 
-    const handleCollapse = () => {
-        toggleCollapsed(order);
-    };
-
     const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         open();
@@ -97,7 +63,11 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
 
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id)!;
 
-    const totalPayments = order.payments?.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
+    const { payments } = order;
+
+    const initialPayment = payments?.[0];
+
+    const totalPayments = payments?.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
     const isPaid = totalPayments === order.total_in_cents;
     const isLocked = order.is_locked;
 
@@ -152,31 +122,22 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                 </Stack>
             </CardActionArea>
             <CardActionArea
-                onClick={handleCollapse}
+                onClick={handleEditClick}
                 sx={{ display: 'flex', justifyContent: 'space-between' }}
                 disableRipple>
                 <Stack direction="column" width="100%">
-                    <Collapse in={!collapsed} timeout="auto">
-                        <Stack direction="row" justifyContent="space-between" pl={1} pr={1}>
-                            <Stack direction="column">
-                                <Typography variant="body1">{order.phone}</Typography>
-                                <Typography variant="body1" color={isPaid ? 'primary' : 'error'}>
-                                    ${(order.total_in_cents / 100).toFixed(2)}
-                                </Typography>
-                            </Stack>
-                            <Box component="span" sx={{ cursor: 'pointer' }} onClick={handleEditClick}>
-                                <OpenInNewIcon />
-                            </Box>
-                        </Stack>
-                    </Collapse>
+                    <Stack direction="row" spacing={1} pl={1} pr={1}>
+                        <Typography variant="body1" color={isPaid ? 'primary' : 'error'}>
+                            ${(order.total_in_cents / 100).toFixed(2)}
+                        </Typography>
+                        <PaymentTypeIcon paymentType={initialPayment?.payment_type} />
+                    </Stack>
                     <Stack direction="row" justifyContent="space-between" m={1} mt={0} alignItems="center">
                         <Stack direction="row" alignItems="center" gap={1}>
                             <OriginLogo orderOrigin={orderOrigin} />
                             <OrderTypeIcon orderType={order.order_type} />
                         </Stack>
-                        <ExpandMore expand={!collapsed}>
-                            <ExpandMoreIcon />
-                        </ExpandMore>
+                        <OpenInNewIcon />
                     </Stack>
                 </Stack>
             </CardActionArea>

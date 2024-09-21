@@ -244,7 +244,7 @@ export const DrawerSideBar = () => {
                                                 label="Bank"
                                                 maskVariant="currency"
                                                 value={value}
-                                                onChange={onChange}
+                                                handleChange={onChange}
                                                 error={!!errors.bank_in_cents}
                                                 helperText={errors.bank_in_cents?.message}
                                             />
@@ -259,7 +259,7 @@ export const DrawerSideBar = () => {
                                                 label="Other"
                                                 maskVariant="currency"
                                                 value={value}
-                                                onChange={onChange}
+                                                handleChange={onChange}
                                                 error={!!errors.other_in_cents}
                                                 helperText={errors.other_in_cents?.message}
                                             />

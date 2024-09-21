@@ -9,12 +9,6 @@ import { MotionProps } from 'framer-motion';
 import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
 import { Suspense } from 'react';
 
-/*
-   TODO: business_day, driver_id, is_locked
-
-   TODO: add is_locked to Order and Payment tables
-*/
-
 const stackProps: Partial<StackOwnProps> = {
     direction: 'row',
     // justifyContent: 'space-between',
@@ -28,10 +22,6 @@ const stackProps: Partial<StackOwnProps> = {
 export const DrawersTab = () => {
     const addDriverCardDialogProps = useDialogProps();
     const { combinedDrawersAndDrivers, summaries } = useManagerDashboardContext();
-
-    // TODO: add is_locked to database
-    // if is_locked is true, only option is to unlock
-    // if unlocked, can close the drawer or remove the driver (if no orders have been assigned)
 
     // TODO: probably fix ContextMenu for Drawer
     const motionProps: MotionProps = {

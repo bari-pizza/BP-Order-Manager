@@ -1,4 +1,4 @@
-import { Stack, Tooltip } from '@mui/material';
+import { Stack, Tooltip, Typography } from '@mui/material';
 import {
     DataGrid,
     GridColDef,
@@ -79,20 +79,16 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
             width: 150,
             renderCell: (params) => {
                 const { row } = params;
-                const { total_in_cents } = row;
-                return `$${(total_in_cents / 100).toFixed(2)}`;
-            },
-        },
-        {
-            field: 'is_paid',
-            headerName: 'Paid',
-            width: 125,
-            renderCell: (params) => {
-                const { row } = params;
-                const { payments, total_in_cents } = row;
+                const { total_in_cents, payments } = row;
                 const totalPaid = payments.reduce((acc: number, curr) => acc + curr.amount_in_cents, 0);
-                const is_paid = totalPaid === total_in_cents;
-                return is_paid ? 'Yes' : 'No';
+                const isPaid = totalPaid === total_in_cents;
+                return (
+                    <Stack direction="row" alignItems="center" height="100%" spacing={1}>
+                        <Typography variant="body1" color={isPaid ? 'primary' : 'error'}>
+                            {`$${(total_in_cents / 100).toFixed(2)}`}
+                        </Typography>
+                    </Stack>
+                );
             },
         },
         {

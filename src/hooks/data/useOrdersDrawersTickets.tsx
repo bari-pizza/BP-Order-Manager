@@ -17,12 +17,8 @@ const unassignedDrawer: Drawer = {
 export const useOrdersDrawersTickets = () => {
     const [businessDate] = useBusinessDate();
     const { orderAPI } = useOrderAPI({ businessDate });
-    // const subscription = orderAPI.subscribe();
-    // console.log({ subscription });
     const { data: initialData } = orderAPI.getAll;
     const allOrders = useSubscribeToTable<Order_Payment>({ tableName: 'Order', initialData });
-    console.log({ allOrders });
-    // const { data: allOrders } = orderAPI.getAll;
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
     });
@@ -47,26 +43,13 @@ export const useOrdersDrawersTickets = () => {
         acc[key].push(order);
         return acc;
     }, {});
-    const [collapsedTickets, setCollapsedTickets] = useState<string[]>([]);
     const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
     const [handlingDrawerClick, setHandlingDrawerClick] = useState(false);
 
     const orderCount = orders?.length ?? 0;
 
-    const allCollapsed = collapsedTickets.length === orderCount;
     const allSelected = selectedTickets.length === orderCount;
-
-    const noneCollapsed = collapsedTickets.length === 0;
     const noneSelected = selectedTickets.length === 0;
-
-    const toggleCollapsedTicket = (order: Order_Payment) => {
-        setCollapsedTickets((prev) => {
-            if (prev.includes(order.order_id)) {
-                return prev.filter((id) => id !== order.order_id);
-            }
-            return [...prev, order.order_id];
-        });
-    };
 
     const toggleSelectedTicket = (order: Order_Payment) => {
         setSelectedTickets((prev) => {
@@ -75,14 +58,6 @@ export const useOrdersDrawersTickets = () => {
             }
             return [...prev, order.order_id];
         });
-    };
-
-    const toggleCollapseAllTickets = () => {
-        if (allCollapsed) {
-            setCollapsedTickets([]);
-        } else {
-            setCollapsedTickets(orders?.map((order) => order.order_id) || []);
-        }
     };
 
     const toggleSelectAllTickets = () => {
@@ -225,23 +200,17 @@ export const useOrdersDrawersTickets = () => {
     return {
         ticket: {
             select: toggleSelectedTicket,
-            collapse: toggleCollapsedTicket,
-            isCollapsed: (order: Order_Payment) => collapsedTickets.includes(order.order_id),
             isSelected: (order: Order_Payment) => selectedTickets.includes(order.order_id),
             all: {
                 select: toggleSelectAllTickets,
-                collapse: toggleCollapseAllTickets,
-                areCollapsed: allCollapsed,
                 areSelected: allSelected,
                 count: orderCount,
             },
             none: {
-                areCollapsed: noneCollapsed,
                 areSelected: noneSelected,
             },
             count: {
                 selected: selectedTickets.length,
-                collapsed: collapsedTickets.length,
             },
             refs: ticketRefs.current,
         },

@@ -1,9 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions,
     Button,
     Stack,
     Typography,
@@ -36,6 +34,7 @@ import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_type: OrderType) => {
     if (!drawer) return true;
@@ -92,6 +91,7 @@ type FormValues =
 export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = false }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { origins, drawers, drivers, constants } = useBariPizzaContext();
+    // TODO: get max order number from orders
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
         return {
@@ -112,7 +112,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
         register,
         control,
         setError,
-        formState: { errors },
+        formState: { errors, isDirty },
         reset,
         watch,
         setValue,
@@ -140,11 +140,13 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
     const updateOrderMutation = useMutation({
         mutationFn: updateOrder,
         onSuccess: (data) => {
-            close();
+            // close();
+            reset(data[0]);
             queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
         onError: (error) => {
             console.error(`Issue updating order: "${order?.order_id}`, error);
+            reset();
             setError('root', { message: "Couldn't update order" });
         },
     });
@@ -319,7 +321,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                     name="delivery_fee_in_cents"
                     control={control}
                     // rules={validators.order.delivery_fee_in_cents}
-                    render={({ field: { onChange, value } }) => {
+                    render={({ field: { value } }) => {
                         return (
                             <TextFieldWithMask
                                 label="Delivery Fee"
@@ -328,7 +330,9 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                                 helperText={errors.delivery_fee_in_cents?.message}
                                 value={value}
                                 disabled={currentOrderType !== 'delivery'}
-                                onChange={onChange}
+                                handleChange={(value, shouldDirty) =>
+                                    setValue('delivery_fee_in_cents', value, { shouldDirty })
+                                }
                             />
                         );
                     }}
@@ -338,7 +342,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 name="total_in_cents"
                 control={control}
                 rules={validators.order.total_in_cents}
-                render={({ field: { onChange, value } }) => {
+                render={({ field: { value } }) => {
                     return (
                         <TextFieldWithMask
                             label="Total"
@@ -346,7 +350,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                             error={!!errors.total_in_cents}
                             helperText={errors.total_in_cents?.message}
                             value={value}
-                            onChange={onChange}
+                            handleChange={(value, shouldDirty) => setValue('total_in_cents', value, { shouldDirty })}
                         />
                     );
                 }}
@@ -356,9 +360,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         data.drawer_id = data.drawer_id || null; // can't be ''
-        console.log({ data });
         if ('order_id' in data) {
-            console.log({ data });
             updateOrderMutation.mutate(data);
         } else {
             createNewOrderMutation.mutate({ newOrder: data });
@@ -391,6 +393,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 rightSide={rightSide}
                 errors={errors}
                 order={order!}
+                isDirty={isDirty}
                 validPaymentTypes={validPaymentTypes}
             />
         );
@@ -428,6 +431,7 @@ const OrderEditorDialog = ({
     leftSide,
     rightSide,
     errors,
+    isDirty,
     handleSubmit,
     onSubmit,
     onError,
@@ -439,13 +443,14 @@ const OrderEditorDialog = ({
     leftSide: ReactNode;
     rightSide: ReactNode;
     errors: FieldErrors;
+    isDirty: boolean;
     handleSubmit: UseFormHandleSubmit<FormValues>;
     onSubmit: SubmitHandler<FormValues>;
     onError: SubmitErrorHandler<FieldErrors>;
     order: Order_Payment;
     validPaymentTypes: { value: PaymentType; label: string }[];
 }) => {
-    const [isPaymentsVisible, setIsPaymentsVisible] = useState(true);
+    const [editablePaymentID, setEditablePaymentID] = useState<string | null>(null);
     const payments = order.payments?.sort((a, b) => b.created_at.localeCompare(a.created_at));
 
     // Define sliding variants
@@ -455,19 +460,53 @@ const OrderEditorDialog = ({
         exit: { opacity: 0, y: '100%' },
     };
 
-    const toggleSection = () => {
-        setIsPaymentsVisible(!isPaymentsVisible);
-    };
+    // const toggleSection = () => {
+    //     setIsPaymentsVisible(!isPaymentsVisible);
+    // };
 
     const paymentsTotalInCents = payments.reduce((total, payment) => total + payment.amount_in_cents, 0);
     const missingPaymentInCents = order.total_in_cents - paymentsTotalInCents;
 
+    /* TODO: change payments to all render on first page
+    clicking on payment will expand it and allow for editing
+    
+    
+    */
+
+    const activePayment = editablePaymentID
+        ? payments?.find((payment) => payment.payment_id === editablePaymentID)
+        : null;
+
+    const activePaymentEditor = editablePaymentID ? (
+        editablePaymentID === 'newPayment' ? (
+            <PaymentEditor
+                forNewPayment
+                key="newPayment"
+                orderID={order.order_id}
+                validPaymentTypes={validPaymentTypes}
+                variant="icon"
+                defaultAmount={missingPaymentInCents}
+                isEditing={true}
+                setIsEditing={(bool) => setEditablePaymentID(bool ? 'newPayment' : null)}
+            />
+        ) : (
+            <PaymentEditor
+                key={activePayment!.payment_id}
+                payment={activePayment!}
+                variant="icon"
+                validPaymentTypes={validPaymentTypes}
+                isEditing={editablePaymentID === activePayment!.payment_id}
+                setIsEditing={(bool) => setEditablePaymentID(bool ? activePayment!.payment_id : null)}
+            />
+        )
+    ) : null;
+
     return (
         <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
-            <DialogTitle>{isPaymentsVisible ? 'Payments Editor' : 'Order Editor'}</DialogTitle>
+            <DialogTitle>Order Editor</DialogTitle>
             <DialogContent sx={{ minHeight: 250, overflowY: 'hidden' }}>
                 <AnimatePresence initial={false} mode="wait">
-                    {!isPaymentsVisible ? (
+                    {!editablePaymentID ? (
                         <motion.div
                             key="editor"
                             variants={slideVariants}
@@ -484,47 +523,47 @@ const OrderEditorDialog = ({
                                         {rightSide}
                                     </Stack>
                                 </Stack>
-                                <Divider />
-                                <Button onClick={toggleSection} variant="contained">
-                                    View Payments
+                                <Button onClick={handleSubmit(onSubmit, onError)} disabled={!isDirty}>
+                                    Save Changes
                                 </Button>
+
+                                <Divider />
+                                {payments
+                                    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+                                    .map((payment) => (
+                                        <PaymentEditor
+                                            key={payment.payment_id}
+                                            payment={payment}
+                                            validPaymentTypes={validPaymentTypes}
+                                            isEditing={editablePaymentID === payment.payment_id}
+                                            setIsEditing={(bool) =>
+                                                setEditablePaymentID(bool ? payment.payment_id : null)
+                                            }
+                                        />
+                                    ))}
+                                <PaymentEditor
+                                    forNewPayment
+                                    key="newPayment"
+                                    orderID={order.order_id}
+                                    validPaymentTypes={validPaymentTypes}
+                                    defaultAmount={missingPaymentInCents}
+                                    isEditing={editablePaymentID === 'newPayment'}
+                                    setIsEditing={(bool) => setEditablePaymentID(bool ? 'newPayment' : null)}
+                                />
                             </Stack>
                         </motion.div>
                     ) : (
                         <motion.div
-                            key="payments"
+                            key="activePaymentEditor"
                             variants={slideVariants}
                             initial="hidden"
                             animate="visible"
                             exit="exit">
-                            <Stack direction="column" spacing={2} mt={2}>
-                                {payments.map((payment) => (
-                                    <PaymentEditor
-                                        key={payment.payment_id}
-                                        payment={payment}
-                                        variant="icon"
-                                        validPaymentTypes={validPaymentTypes}
-                                    />
-                                ))}{' '}
-                                <PaymentEditor
-                                    forNewPayment
-                                    orderID={order?.order_id}
-                                    validPaymentTypes={validPaymentTypes}
-                                    variant="icon"
-                                    defaultAmount={missingPaymentInCents}
-                                />
-                                <Divider />
-                                <Button onClick={toggleSection} variant="contained">
-                                    Edit Order
-                                </Button>
-                            </Stack>
+                            {activePaymentEditor}
                         </motion.div>
                     )}
                 </AnimatePresence>
             </DialogContent>
-            <DialogActions sx={{ justifyContent: 'end' }}>
-                {!isPaymentsVisible && <Button onClick={handleSubmit(onSubmit, onError)}>Save Changes</Button>}
-            </DialogActions>
         </Dialog>
     );
 };

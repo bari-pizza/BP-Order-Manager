@@ -32,6 +32,9 @@ const useCreateNewPayment = ({ queryKey }: { queryKey: string[] }) => {
             mainError: (error) => error.message,
             errors: () => `Failed to create new payment.`,
         },
+        handleSuccess: (data) => {
+            console.log({ data });
+        },
     });
 };
 
@@ -62,6 +65,12 @@ const useDeletePayment = ({ queryKey }: { queryKey: string[] }) => {
 };
 
 export const usePaymentCRUD = ({ queryKey }: { queryKey: string[] }) => {
+    // add handleSuccessRef and handleFailureRef
+    // const createNewPaymentMutation = useCreateNewPayment({
+    //     queryKey,
+    //     handleSuccessRef: {},
+    //     handleFailureRef: {},
+    // }).mutate;
     return {
         paymentMutations: {
             create: useCreateNewPayment({ queryKey }).mutate,

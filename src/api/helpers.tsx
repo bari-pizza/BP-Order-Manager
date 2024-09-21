@@ -107,10 +107,6 @@ type UseRPCInteractionHandlerProps<T> = {
     handleFailure?: (error: PostgrestError | Error) => void;
 };
 
-// export const useRPCInteractionHandler = <T,>({
-
-// })
-
 export const useInteractionHandler = <T, U>({
     interactor,
     queryKey,

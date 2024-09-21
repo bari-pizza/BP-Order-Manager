@@ -1,15 +1,13 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
 import { LabeledStack } from '../../../rickcedlib/LabeledStack';
 import { Payment, PaymentType, validators } from '../../../typesAndValidators';
-import { Button, ButtonGroup, Tooltip, Typography, useTheme } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { Money as CashIcon, CreditCard as CardIcon, AccountBalanceWallet as ThirdPartyIcon } from '@mui/icons-material';
+import { Button, ButtonGroup, Stack, Typography, useTheme } from '@mui/material';
+import { useEffect } from 'react';
 import { usePaymentCRUD } from '../../../api/payment';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
-import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
+import { PaymentTypeIcon } from '../PaymentTypeIcon';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -18,6 +16,8 @@ interface PaymentEditorProps {
     orderID?: string;
     variant?: 'standard' | 'icon';
     defaultAmount?: number;
+    isEditing: boolean;
+    setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const allPaymentTypes: { value: PaymentType; label: string }[] = [
@@ -35,10 +35,10 @@ export const PaymentEditor = ({
     validPaymentTypes = allPaymentTypes,
     variant = 'standard',
     defaultAmount = 0,
+    isEditing = false,
+    setIsEditing,
 }: PaymentEditorProps) => {
     const [businessDate] = useBusinessDate();
-    const [isEditing, setIsEditing] = useState(false);
-    const theme = useTheme();
     const defaultNewPayment = {
         payment_type: validPaymentTypes[0].value,
         amount_in_cents: defaultAmount,
@@ -48,36 +48,36 @@ export const PaymentEditor = ({
     };
     const {
         control,
-        // setError,
-        formState: { errors },
-        // reset,
+        formState: { errors, isDirty, dirtyFields },
         setValue,
         handleSubmit,
+        watch,
     } = useForm<FormValues>({
         defaultValues: forNewPayment ? defaultNewPayment : payment,
         reValidateMode: 'onChange',
     });
+    const theme = useTheme();
 
     useEffect(() => {
         if (forNewPayment) {
-            setValue('amount_in_cents', defaultAmount);
+            setValue('amount_in_cents', defaultAmount, { shouldDirty: false });
         }
     }, [defaultAmount, forNewPayment, setValue]);
 
     const { paymentMutations } = usePaymentCRUD({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
 
     const onSubmit = (data: FormValues) => {
-        console.log(data);
-        setIsEditing(false);
         if (forNewPayment) {
             paymentMutations.create(data);
         } else {
             paymentMutations.update(data);
         }
+        setIsEditing(false);
     };
 
     const onDelete = (data: FormValues) => {
         paymentMutations.delete(data);
+        setIsEditing(false);
     };
 
     const { handleConfirmation: handleDeletionConfirmation } = useConfirmationToast({
@@ -93,137 +93,113 @@ export const PaymentEditor = ({
         },
     });
 
-    const motionProps = {
-        initial: { y: 100, opacity: 0 },
-        animate: { y: 0, opacity: 1 },
-        exit: { y: -100, opacity: 0 },
+    const handlePaymentTypeChange = (paymentType: PaymentType) => {
+        setValue('payment_type', paymentType, { shouldDirty: true });
     };
 
-    const handlePaymentTypeChange = (paymentType: PaymentType) => {
-        setValue('payment_type', paymentType);
-    };
+    if (!isEditing) {
+        if (forNewPayment) {
+            return (
+                <Button onClick={() => setIsEditing(true)} sx={{ width: '100%' }}>
+                    Add Payment
+                </Button>
+            );
+        } else if (payment) {
+            return (
+                <LabeledStack
+                    style={{ cursor: 'pointer' }}
+                    label={payment.payment_type}
+                    direction="row"
+                    spacing={2}
+                    height={60}
+                    alignItems="center"
+                    onClick={() => setIsEditing(true)}>
+                    <PaymentTypeIcon paymentType={payment.payment_type} />
+                    <Typography variant="body1">${payment.amount_in_cents / 100}</Typography>
+                    <Typography variant="body1">${payment.tip_in_cents / 100}</Typography>
+                    <Typography variant="body1">${(payment.amount_in_cents + payment.tip_in_cents) / 100}</Typography>
+                </LabeledStack>
+            );
+        }
+    }
+
+    const paymentTypeName = watch('payment_type').split('_').join(' ');
 
     return (
-        <LabeledStack
-            label={payment ? payment?.payment_type : 'New Payment'}
-            direction="row"
-            justifyContent="space-between"
-            color={isEditing ? theme.palette.secondary.main : theme.palette.primary.main}
-            height={60}
-            alignItems="center">
-            <AnimatePresence mode="wait" initial={false}>
-                {isEditing && (
-                    <MotionWrapper
-                        motionKey="amount_in_cents_editing"
-                        motionProps={motionProps}
-                        stackProps={{ direction: 'row', gap: 2, justifyContent: 'space-between' }}>
-                        <Tooltip title={errors.amount_in_cents?.message}>
-                            <Controller
-                                name="amount_in_cents"
-                                control={control}
-                                rules={validators.payment.amount_in_cents}
-                                render={({ field: { onChange, value } }) => {
-                                    return (
-                                        <TextFieldWithMask
-                                            sx={{ minWidth: 100 }}
-                                            label="Amount"
-                                            maskVariant="currency"
-                                            error={!!errors.amount_in_cents}
-                                            value={value}
-                                            onChange={onChange}
-                                        />
-                                    );
-                                }}
-                            />
-                        </Tooltip>
-                        <Tooltip title={errors.tip_in_cents?.message}>
-                            <Controller
-                                name="tip_in_cents"
-                                control={control}
-                                render={({ field: { onChange, value } }) => {
-                                    return (
-                                        <TextFieldWithMask
-                                            sx={{ minWidth: 100 }}
-                                            label="Tip"
-                                            maskVariant="currency"
-                                            error={!!errors.tip_in_cents}
-                                            value={value}
-                                            onChange={onChange}
-                                        />
-                                    );
-                                }}
-                            />
-                        </Tooltip>
-                        <PaymentTypeSelector
-                            control={control}
-                            validPaymentTypes={validPaymentTypes}
-                            handleChange={handlePaymentTypeChange}
-                            variant={variant}
-                        />
-                        <ButtonGroup orientation="horizontal" fullWidth color="primary" sx={{ width: '100%' }}>
-                            <Button onClick={handleSubmit(onSubmit)}>Save</Button>
-                            <Button onClick={() => setIsEditing(!isEditing)}>Cancel</Button>
-                        </ButtonGroup>
-                    </MotionWrapper>
-                )}
-                {!isEditing &&
-                    (payment ? (
-                        <MotionWrapper
-                            motionKey="amount_in_cents_viewing"
-                            motionProps={{ ...motionProps, style: { justifyContent: 'space-between', width: '100%' } }}
-                            stackProps={{ direction: 'row', gap: 2, width: '100%' }}>
-                            <LabeledStack label="Amount" direction="row" width="100%" alignLabel="left">
-                                <Typography>${((payment?.amount_in_cents || 0) / 100).toFixed(2)}</Typography>
-                            </LabeledStack>
-                            <LabeledStack label="Tip" direction="row" width="100%" alignLabel="left">
-                                <Typography>${((payment?.tip_in_cents || 0) / 100).toFixed(2)}</Typography>
-                            </LabeledStack>
-                            <ButtonGroup orientation="horizontal" fullWidth color="primary" sx={{ width: '100%' }}>
-                                <Button onClick={() => setIsEditing(!isEditing)} variant="contained" color="primary">
-                                    Edit
-                                </Button>
-                                <Button onClick={handleDeletionConfirmation} variant="contained" color="error">
-                                    Delete
-                                </Button>
-                            </ButtonGroup>
-                        </MotionWrapper>
-                    ) : (
-                        <MotionWrapper
-                            motionKey="amount_in_cents_viewing"
-                            motionProps={{ ...motionProps, style: { width: '100%' } }}
-                            stackProps={{ direction: 'row', gap: 2, justifyContent: 'space-between' }}>
-                            <Button onClick={() => setIsEditing(!isEditing)} sx={{ width: '100%' }}>
-                                Add Payment
-                            </Button>
-                        </MotionWrapper>
-                    ))}
-            </AnimatePresence>
-            {/* {isEditing ? (
-                <ButtonGroup>
-                    <Button onClick={handleSubmit(onSubmit)}>Save</Button>
-                    <Button onClick={() => setIsEditing(!isEditing)}>Cancel</Button>
-                </ButtonGroup>
-            ) : (
-                payment && (
-                    <ButtonGroup>
-                        <Button onClick={() => setIsEditing(!isEditing)} variant="contained" color="primary">
-                            Edit
-                        </Button>
-                        <Button onClick={handleSubmit(onDelete)} variant="contained" color="error">
-                            Delete
-                        </Button>
-                    </ButtonGroup>
-                    // <>
-                    //     <Button onClick={() => setIsEditing(!isEditing)} variant="contained" color="primary">
-                    //         Edit
-                    //     </Button>
-                    //     <Button onClick={handleSubmit(onDelete)} variant="contained" color="error">
-                    //         Delete
-                    //     </Button>
-                    // </>
-                )
-            )} */}
-        </LabeledStack>
+        <Stack direction="column" rowGap={2}>
+            <LabeledStack
+                label={paymentTypeName}
+                color={isDirty || forNewPayment ? theme.palette.secondary.main : theme.palette.primary.main}
+                direction="column"
+                justifyContent="space-between"
+                mt={1}
+                rowGap={4}
+                // height={60}
+                alignItems="center">
+                <Stack direction="row" justifyContent="space-between" alignItems="center" gap={2}>
+                    <Controller
+                        name="amount_in_cents"
+                        control={control}
+                        rules={validators.payment.amount_in_cents}
+                        render={({ field: { value } }) => {
+                            return (
+                                <TextFieldWithMask
+                                    sx={{ minWidth: 100 }}
+                                    label="Amount"
+                                    maskVariant="currency"
+                                    error={!!errors.amount_in_cents}
+                                    value={value}
+                                    handleChange={(value, shouldDirty) =>
+                                        setValue('amount_in_cents', value, { shouldDirty })
+                                    }
+                                    color={dirtyFields.amount_in_cents || forNewPayment ? 'secondary' : 'primary'}
+                                    focused
+                                />
+                            );
+                        }}
+                    />
+                    <Controller
+                        name="tip_in_cents"
+                        control={control}
+                        rules={validators.payment.tip_in_cents}
+                        render={({ field: { value } }) => {
+                            return (
+                                <TextFieldWithMask
+                                    sx={{ minWidth: 100 }}
+                                    label="Tip"
+                                    maskVariant="currency"
+                                    error={!!errors.tip_in_cents}
+                                    value={value}
+                                    handleChange={(value, shouldDirty) =>
+                                        setValue('tip_in_cents', value, { shouldDirty })
+                                    }
+                                    color={dirtyFields.tip_in_cents || forNewPayment ? 'secondary' : 'primary'}
+                                    focused
+                                />
+                            );
+                        }}
+                    />
+                </Stack>
+                <PaymentTypeSelector
+                    control={control}
+                    isDirty={dirtyFields.payment_type || forNewPayment}
+                    validPaymentTypes={validPaymentTypes}
+                    handleChange={handlePaymentTypeChange}
+                    variant={variant}
+                />
+            </LabeledStack>
+            <Stack direction="row" justifyContent="flex-end" gap={2}>
+                <Button onClick={() => setIsEditing(false)} color="error" variant="outlined">
+                    Cancel
+                </Button>
+                <Button onClick={handleDeletionConfirmation} color="error" variant="contained">
+                    Delete
+                </Button>
+                <Button onClick={handleSubmit(onSubmit)} disabled={!isDirty && !forNewPayment} variant="contained">
+                    Save
+                </Button>
+            </Stack>
+        </Stack>
     );
 };
 
@@ -231,6 +207,7 @@ interface PaymentTypeSelectorProps<FV extends FieldValues> {
     control: Control<FV>;
     handleChange: (paymentType: PaymentType) => void;
     validPaymentTypes: { value: PaymentType; label: string }[];
+    isDirty?: boolean;
     name?: Path<FV>;
     variant?: 'standard' | 'icon';
 }
@@ -239,6 +216,7 @@ export const PaymentTypeSelector = <T extends FieldValues>({
     control,
     handleChange,
     validPaymentTypes,
+    isDirty = false,
     name = 'payment_type' as Path<T>,
     variant = 'standard',
 }: PaymentTypeSelectorProps<T>) => {
@@ -251,30 +229,23 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                     <ButtonGroup
                         orientation="horizontal"
                         fullWidth
-                        color="primary"
+                        color={isDirty ? 'secondary' : 'primary'}
                         sx={{ width: '100%' }}
                         aria-label="Payment Type"
                         {...field}>
                         {validPaymentTypes.map((option) => {
                             const isSelected = option.value === field.value;
                             if (variant === 'icon') {
-                                let icon = <CashIcon />;
-                                if (option.value === 'card') {
-                                    icon = <CardIcon />;
-                                } else if (option.value === 'third_party') {
-                                    icon = <ThirdPartyIcon />;
-                                }
                                 return (
-                                    <Tooltip key={option.value} title={option.label}>
-                                        <Button
-                                            key={option.value}
-                                            variant={isSelected ? 'contained' : 'outlined'}
-                                            onClick={() => {
-                                                handleChange(option.value);
-                                            }}>
-                                            {icon}
-                                        </Button>
-                                    </Tooltip>
+                                    <Button
+                                        key={option.value}
+                                        variant={isSelected ? 'contained' : 'outlined'}
+                                        onClick={() => {
+                                            handleChange(option.value);
+                                        }}
+                                        startIcon={<PaymentTypeIcon paymentType={option.value} />}>
+                                        {option.label}
+                                    </Button>
                                 );
                             }
                             return (

@@ -8,7 +8,6 @@ import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTicket
 import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
-import { UnfoldMore as UnfoldMoreIcon, UnfoldLess as UnfoldLessIcon } from '@mui/icons-material';
 
 export const OrderDashboard = () => {
     const { drivers } = useDrivers();
@@ -34,14 +33,6 @@ export const OrderDashboard = () => {
                             <>
                                 {ticket.all.count > 0 && (
                                     <>
-                                        <Button
-                                            variant="contained"
-                                            onClick={ticket.all.collapse}
-                                            startIcon={
-                                                ticket.all.areCollapsed ? <UnfoldMoreIcon /> : <UnfoldLessIcon />
-                                            }>
-                                            {ticket.all.areCollapsed ? 'Expand' : 'Collapse'} All
-                                        </Button>
                                         <Button variant="contained" onClick={ticket.all.select}>
                                             {ticket.none.areSelected ? 'Select' : 'Unselect'} All
                                         </Button>
