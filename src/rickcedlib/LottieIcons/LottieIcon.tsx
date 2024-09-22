@@ -4,6 +4,7 @@ import { Player } from '@lottiefiles/react-lottie-player';
 
 // to get the lottie icon
 // const lottieSrc = new URL('/User Profile Icon.json', import.meta.url).href;
+// TODO: *** fix public assets loading slowly (worse on production than local dev)
 
 type LottieIconProps = {
     lottieSrc: string;
