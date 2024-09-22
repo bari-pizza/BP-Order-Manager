@@ -131,10 +131,9 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 processRowUpdate={processRowUpdate}
                 getRowId={(row) => row.order_id}
                 getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
-                // getRowClassName={(params) => {
-                //     const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-                //     return isEditing ? 'row-is-edit' : '';
-                // }}
+                getRowClassName={() => {
+                    return 'lottie-icon-container';
+                }}
             />
         </Stack>
     );

@@ -33,8 +33,7 @@ export const SettingsTab = () => {
                         label="Default Delivery"
                         maskVariant="currency"
                         value={value}
-                        onChange={onChange}
-                        keepMask={true}
+                        handleChange={onChange}
                     />
                 )}
             />
@@ -46,8 +45,7 @@ export const SettingsTab = () => {
                         label="Default Cash"
                         maskVariant="currency"
                         value={value}
-                        onChange={onChange}
-                        keepMask={true}
+                        handleChange={onChange}
                     />
                 )}
             />

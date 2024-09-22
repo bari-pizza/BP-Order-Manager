@@ -6,10 +6,12 @@ import {
     PointOfSale as PointOfSaleIcon,
     DeliveryDining as DeliveryDiningIcon,
     Face as FaceIcon,
-    Lock as LockIcon,
 } from '@mui/icons-material';
 import { createElement } from 'react';
 import { useTheme } from '@mui/material/styles';
+import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
+
+const lockedLottieSrc = new URL('/Lock Icon.json', import.meta.url).href;
 
 type DrawerAvatarProps = {
     size?: 'small' | 'medium' | 'large' | 'xlarge';
@@ -84,31 +86,29 @@ export const DrawerAvatar = ({
         ...props?.avatarIcon,
     });
     return (
-        <>
-            <Badge
-                badgeContent={isLocked ? <LockIcon /> : 0}
-                sx={{
-                    '& .MuiBadge-badge': {
-                        background: 'transparent',
-                        boxShadow: 'none',
-                        color: 'black',
-                    },
-                    '& .MuiBadge-badge svg': {
-                        fontSize: '3em',
-                    },
-                }}
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                <Avatar
-                    className={'drawer-avatar-' + drawer.drawer_id}
-                    ref={drawerRef}
-                    sx={finalAvatarSx}
-                    src={('driver' in drawer && drawer.driver.avatar_src) || ''}
-                    {...props?.avatar}>
-                    {avatarChild}
-                </Avatar>
-            </Badge>
-        </>
+        <Badge
+            badgeContent={isLocked ? <LottieIcon lottieSrc={lockedLottieSrc} /> : 0}
+            sx={{
+                '& .MuiBadge-badge': {
+                    background: 'transparent',
+                    boxShadow: 'none',
+                    color: 'black',
+                },
+                '& .MuiBadge-badge svg': {
+                    fontSize: '3em',
+                },
+            }}
+            overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+            <Avatar
+                className={'drawer-avatar-' + drawer.drawer_id}
+                ref={drawerRef}
+                sx={finalAvatarSx}
+                src={('driver' in drawer && drawer.driver.avatar_src) || ''}
+                {...props?.avatar}>
+                {avatarChild}
+            </Avatar>
+        </Badge>
     );
 };
 

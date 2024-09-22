@@ -123,7 +123,7 @@ export const DrawerCardBase = ({
 
     return (
         <Button
-            className={isOpen ? 'open-drawer' : ''}
+            className={(isOpen ? 'open-drawer' : '') + ' lottie-icon-container'}
             onClick={handleClick}
             variant="outlined"
             color="primary"

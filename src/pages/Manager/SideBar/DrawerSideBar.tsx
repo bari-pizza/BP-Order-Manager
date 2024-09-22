@@ -274,32 +274,6 @@ export const DrawerSideBar = () => {
                     <Dialog open={isOpen} onClose={close}>
                         <DialogTitle>Confirm Drawer Close</DialogTitle>
                         <DialogContent>
-                            {/* <Stack direction="column" spacing={1} width="30%" margin="auto">
-                                {items.map((item, index) => (
-                                    <Fragment key={item.label}>
-                                        <Stack direction="row" justifyContent="right" spacing={2}>
-                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                {item.label}:
-                                            </Typography>
-                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                ${(item.value / 100).toFixed(2)}
-                                            </Typography>
-                                        </Stack>
-                                        {index > 0 && (
-                                            <>
-                                                <Divider />
-                                                <Stack direction="row" justifyContent="right">
-                                                    <Typography
-                                                        variant="body1"
-                                                        sx={{ fontWeight: index === items.length - 1 ? 'bold' : '' }}>
-                                                        ${(runningTotals[index] / 100).toFixed(2)}
-                                                    </Typography>
-                                                </Stack>
-                                            </>
-                                        )}
-                                    </Fragment>
-                                ))}
-                            </Stack> */}
                             <SummaryStack items={items} />
                         </DialogContent>
                         <DialogActions>

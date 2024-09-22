@@ -1,13 +1,14 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
 import { LabeledStack } from '../../../rickcedlib/LabeledStack';
 import { Payment, PaymentType, validators } from '../../../typesAndValidators';
-import { Button, ButtonGroup, Stack, Typography, useTheme } from '@mui/material';
+import { Button, ButtonGroup, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useEffect } from 'react';
 import { usePaymentCRUD } from '../../../api/payment';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { PaymentTypeIcon } from '../PaymentTypeIcon';
+import { formatCurrency } from '../../../utils';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -108,16 +109,22 @@ export const PaymentEditor = ({
             return (
                 <LabeledStack
                     style={{ cursor: 'pointer' }}
-                    label={payment.payment_type}
+                    label={payment.payment_type.split('_').join(' ')}
                     direction="row"
                     spacing={2}
                     height={60}
                     alignItems="center"
+                    justifyContent="space-between"
                     onClick={() => setIsEditing(true)}>
                     <PaymentTypeIcon paymentType={payment.payment_type} />
-                    <Typography variant="body1">${payment.amount_in_cents / 100}</Typography>
-                    <Typography variant="body1">${payment.tip_in_cents / 100}</Typography>
-                    <Typography variant="body1">${(payment.amount_in_cents + payment.tip_in_cents) / 100}</Typography>
+                    <Divider orientation="vertical" />
+                    <Typography variant="body1">{formatCurrency(payment.amount_in_cents)}</Typography>
+                    <Divider orientation="vertical" />
+                    <Typography variant="body1">{formatCurrency(payment.tip_in_cents)}</Typography>
+                    <Divider orientation="vertical" />
+                    <Typography variant="body1">
+                        {formatCurrency(payment.amount_in_cents + payment.tip_in_cents)}
+                    </Typography>
                 </LabeledStack>
             );
         }
