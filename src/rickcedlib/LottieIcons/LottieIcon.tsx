@@ -10,9 +10,16 @@ type LottieIconProps = {
     height?: string;
     width?: string;
     loop?: boolean;
+    autoPlay?: boolean;
 };
 
-export const LottieIcon = ({ lottieSrc, height = '35px', width = '35px', loop = true }: LottieIconProps) => {
+export const LottieIcon = ({
+    lottieSrc,
+    height = '35px',
+    width = '35px',
+    loop = true,
+    autoPlay = false,
+}: LottieIconProps) => {
     const playerRef = useRef<Player | null>(null); // Ref to access Player methods
     const containerRef = useRef<HTMLDivElement | null>(null); // Ref to access DOM methods
 
@@ -46,6 +53,18 @@ export const LottieIcon = ({ lottieSrc, height = '35px', width = '35px', loop = 
         };
     }, []);
 
+    useEffect(() => {
+        if (playerRef.current) {
+            if (autoPlay) {
+                playerRef.current.play(); // Play animation if autoPlay is true
+            } else {
+                setTimeout(() => {
+                    playerRef.current?.stop(); // Stop animation if autoPlay is false
+                }, 150);
+            }
+        }
+    }, [autoPlay]);
+
     return (
         <Stack
             direction="row"
@@ -58,7 +77,7 @@ export const LottieIcon = ({ lottieSrc, height = '35px', width = '35px', loop = 
                 ref={playerRef}
                 src={lottieSrc}
                 loop={loop}
-                autoplay={false}
+                autoplay={autoPlay}
                 style={{ minHeight: height, minWidth: width }}
             />
         </Stack>
