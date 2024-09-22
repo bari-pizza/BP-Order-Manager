@@ -11,6 +11,9 @@ import { OriginsTab } from './Tabs/OriginsTab';
 import { Todo } from '../../components/Base/Todo';
 import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
+import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
+
+const settingsLottieSrc = new URL('/Settings Icon.json', import.meta.url).href;
 
 /*    TODO: About Today
         Sales
@@ -123,7 +126,12 @@ export const AdminDashboard = () => {
                         <Tab value="employees" label="Employees" icon={<SalesIcon />} iconPosition="start" />
                         <Tab value="origins" label="Origins" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
-                        <Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />
+                        <Tab
+                            value="settings"
+                            label="Settings"
+                            icon={<LottieIcon lottieSrc={settingsLottieSrc} autoPlay={tabName === 'settings'} />}
+                            iconPosition="start"
+                        />
                     </Tabs>
                 </Box>
                 <Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
