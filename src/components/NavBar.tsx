@@ -1,28 +1,20 @@
-import {
-    Toolbar,
-    Drawer,
-    List,
-    ListItemButton,
-    ListItemText,
-    ListItem,
-    ListItemIcon,
-    SvgIconTypeMap,
-} from '@mui/material';
-import {
-    Search,
-    Home as HomeIcon,
-    Key as AdminIcon,
-    LocalPizza as LocalPizzaIcon,
-    ManageAccounts as ManagerIcon,
-} from '@mui/icons-material';
+import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon } from '@mui/material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
-import { CalendarIcon } from '@mui/x-date-pickers';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
 import { UserAvatar } from './Base/UserAvatar';
 import { useUserContext } from '../hooks/data/useContextData';
 import { SmartLink } from './SmartNavigate';
 import dayjs from 'dayjs';
 import { useLocation } from 'react-router-dom';
+import { LottieIcon } from '../rickcedlib/LottieIcons/LottieIcon';
+
+const userLottieSrc = new URL('/User Profile Icon.json', import.meta.url).href;
+const homeLottieSrc = new URL('/Home Icon.json', import.meta.url).href;
+const timeLottieSrc = new URL('/Time Icon.json', import.meta.url).href;
+const searchLottieSrc = new URL('/Search Icon.json', import.meta.url).href;
+const adminLottieSrc = new URL('/Admin Shield Icon.json', import.meta.url).href;
+const staffLottieSrc = new URL('/Staff Icon.json', import.meta.url).href;
+const ordersLottieSrc = new URL('/Marketplace Icon.json', import.meta.url).href;
 
 const drawerWidth = 200;
 
@@ -36,8 +28,6 @@ interface NavBarItem {
 
 const today = dayjs();
 
-const iconProps: SvgIconTypeMap['props'] = { color: 'primary', sx: { fontSize: '35px' } };
-
 export function NavBar() {
     const { session, profile } = useUserContext();
     const [businessDate] = useBusinessDate();
@@ -46,19 +36,27 @@ export function NavBar() {
 
     const userListItem: NavBarItem = session
         ? { path: '/myaccount', icon: <UserAvatar />, text: 'Profile' }
-        : { path: '/login', icon: <UserAvatar />, text: 'Login' };
+        : { path: '/login', icon: <LottieIcon lottieSrc={userLottieSrc} />, text: 'Login' };
 
     const listItems: NavBarItem[] = [
-        { path: '/', icon: <HomeIcon {...iconProps} />, text: 'Home' },
+        {
+            path: '/',
+            icon: <LottieIcon lottieSrc={homeLottieSrc} />,
+            text: 'Home',
+        },
         {
             text: today.isSame(businessDate, 'day') ? 'Today' : businessDate.format('MM/DD/YYYY'),
-            icon: <CalendarIcon {...iconProps} />,
+            icon: <LottieIcon lottieSrc={timeLottieSrc} />,
             onClick: showBusinessDatePicker,
         },
-        { path: '/search', icon: <Search {...iconProps} />, text: 'Search' },
-        profile?.is_admin && { path: '/admin', icon: <AdminIcon {...iconProps} />, text: 'Admin' },
-        profile?.is_manager && { path: '/manager', icon: <ManagerIcon {...iconProps} />, text: 'Manager' },
-        { path: '/orders', icon: <LocalPizzaIcon {...iconProps} />, text: 'Orders' },
+        { path: '/search', icon: <LottieIcon lottieSrc={searchLottieSrc} />, text: 'Search' },
+        profile?.is_admin && {
+            path: '/admin',
+            icon: <LottieIcon lottieSrc={adminLottieSrc} />,
+            text: 'Admin',
+        },
+        profile?.is_manager && { path: '/manager', icon: <LottieIcon lottieSrc={staffLottieSrc} />, text: 'Manager' },
+        { path: '/orders', icon: <LottieIcon lottieSrc={ordersLottieSrc} />, text: 'Orders' },
         userListItem,
     ].filter(Boolean) as NavBarItem[];
 
@@ -78,6 +76,7 @@ export function NavBar() {
             <List>
                 {listItems.map((item) => (
                     <ListItem
+                        className="lottie-icon-container"
                         {...(item.path
                             ? {
                                   component: SmartLink,

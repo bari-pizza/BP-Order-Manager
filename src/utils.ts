@@ -11,6 +11,10 @@ export const getDrawerFullName = (drawer: Drawer | Driver_Drawer | null) => {
     return drawer.name;
 };
 
+export const formatCurrency = (cents: number) => {
+    return `$${(cents / 100).toFixed(2)}`;
+};
+
 export const dayjsToMDY = (date: dayjs.Dayjs) => {
     const month = date.month() + 1;
     const day = date.date();
@@ -18,53 +22,11 @@ export const dayjsToMDY = (date: dayjs.Dayjs) => {
     return { month, day, year };
 };
 
-interface DrawCircleProps {
-    x: number;
-    y: number;
-    color?: string;
-    width?: number;
-}
-export const drawCircle = ({ x, y, color = 'red', width = 2 }: DrawCircleProps) => {
-    // Remove any previous circles
-    const className = `circle-${color}`;
-    const previousCircles = document.querySelectorAll(`.${className}`);
-    previousCircles.forEach((circle) => circle.remove());
-    console.log(`drawing ${color} circle at ${x}, ${y}`);
-
-    // Create a new circle
-    const circle = document.createElement('div');
-    circle.className = className;
-    circle.style.position = 'absolute';
-    circle.style.left = `${x - 10}px`;
-    circle.style.top = `${y - 10}px`;
-    circle.style.width = '20px';
-    circle.style.height = '20px';
-    circle.style.borderRadius = '50%';
-    circle.style.border = `${width}px solid ${color}`;
-    circle.title = `${x.toFixed(2)}, ${y.toFixed(2)}`;
-    document.body.appendChild(circle);
-};
-
-interface DrawLineProps {
-    x: number;
-    y: number;
-    height: number;
-    width: number;
-    color?: string;
-}
-
-export const drawLine = ({ x, y, height, width, color = 'red' }: DrawLineProps) => {
-    const className = `line-${color}`;
-    const previousLefts = document.querySelectorAll(`.${className}`);
-    previousLefts.forEach((left) => left.remove());
-    const left = document.createElement('div');
-    left.className = className;
-    left.style.position = 'absolute';
-    left.style.left = `${x}px`;
-    left.style.top = `${y}px`;
-    left.style.height = `${height}px`;
-    left.style.width = `${width}px`;
-    left.style.background = color;
-    left.title = `${x.toFixed(2)}, ${y.toFixed(2)}`;
-    document.body.appendChild(left);
+export const getRunningTotal = (values: number[]) => {
+    const runningTotal = [values[0]];
+    for (let i = 1; i < values.length; i++) {
+        const lastValue = runningTotal[i - 1];
+        runningTotal.push(lastValue + values[i]);
+    }
+    return runningTotal;
 };

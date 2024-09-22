@@ -3,7 +3,7 @@ import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { useRefMask, getCurrencyMaskGenerator } from 'react-hook-mask'; // Assuming you're using react-hook-mask
 
 const currencyMaskGenerator = getCurrencyMaskGenerator({
-    prefix: '$ ',
+    prefix: '$',
     thousandSeparator: ',',
     centsSeparator: '.',
 });
@@ -11,7 +11,7 @@ const currencyMaskGenerator = getCurrencyMaskGenerator({
 type TextFieldWithMaskProps = TextFieldProps & {
     maskVariant: 'currency' | 'phone' | 'text' | 'number';
     value: string | number;
-    onChange: (value: string) => void;
+    handleChange: (value: number, shouldDirty: boolean) => void;
     keepMask?: boolean;
     inputRef?: React.RefObject<HTMLInputElement>;
     // optional ref used for things like focusing the input
@@ -20,7 +20,7 @@ type TextFieldWithMaskProps = TextFieldProps & {
 export const TextFieldWithMask = ({
     maskVariant,
     value: initialValue,
-    onChange: externalOnChange,
+    handleChange,
     keepMask = false,
     inputRef,
     ...props
@@ -50,7 +50,8 @@ export const TextFieldWithMask = ({
         setCursorPosition,
         onChange: (maskedValue) => {
             setValue(maskedValue);
-            externalOnChange(maskedValue); // Call onChange prop passed from outside
+            const shouldDirty = initialValue !== Number(maskedValue);
+            handleChange(Number(maskedValue), shouldDirty);
         },
         keepMask,
         ref: inputRef,

@@ -1,5 +1,5 @@
 import { supaClient } from '../supaClient';
-import { handlePayload, Payload, StandardPayload, SupabaseInteractor, useInteractionHandler } from './helpers';
+import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } from './helpers';
 
 type IncomingDataType = {
     [key: string]: string;
@@ -23,11 +23,7 @@ const useTemplateInteraction = ({ queryKey }: { queryKey: string[] }) => {
             pending: () => 'Loading message goes here...',
             success: (data) => `Successfully updated db: ${data.id}`,
             mainError: (error) => error.message,
-            errors: (data) => `Failed to create new payment: ${data.id}`,
-        },
-        forEachError: (error) => {
-            console.log(error);
-            // thing to do with each error
+            errors: () => `Failed to update db`,
         },
         handleSuccess: (data) => {
             console.log(data);
@@ -37,23 +33,17 @@ const useTemplateInteraction = ({ queryKey }: { queryKey: string[] }) => {
             console.log(error);
             // thing to do on failure
         },
-        normalizer: (payload) => {
-            /* 
-                should take an RPCPayload and return a StandardPayload<OutgoingDataType>
-                used for working with supabase rpc functions where the return type isn't standard
-            */
-            return payload as unknown as StandardPayload<OutgoingDataType>;
-        },
     });
 };
 
 const useTemplateInteractionCRUD = ({ queryKey }: { queryKey: string[] }) => {
     return {
-        useTemplateMutations: {
+        templateMutations: {
             // should have a separate type of interaction hook for each CRUD operation
             create: useTemplateInteraction({ queryKey }).mutate,
             update: useTemplateInteraction({ queryKey }).mutate,
             delete: useTemplateInteraction({ queryKey }).mutate,
+            // callRPC:
         },
     };
 };

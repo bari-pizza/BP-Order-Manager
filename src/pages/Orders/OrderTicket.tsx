@@ -1,58 +1,29 @@
 import { useRef } from 'react';
-import { Card, Typography, CardActionArea, Skeleton, Stack, Collapse, Box, BoxProps } from '@mui/material';
+import { Card, Typography, CardActionArea, Skeleton, Stack, Divider } from '@mui/material';
 import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
 import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order_Payment } from '../../typesAndValidators';
 import { OrderEditor } from './OrderEditor/OrderEditor';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
-import {
-    ExpandMore as ExpandMoreIcon,
-    OpenInNew as OpenInNewIcon,
-    TwoWheeler as DeliveryIcon,
-    Restaurant as PickupIcon,
-} from '@mui/icons-material';
-import { styled, useTheme } from '@mui/material/styles';
+import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import pizzaSrc from '/pizza slice.png';
+import { OrderTypeIcon } from '../../components/Order/OrderTypeIcon';
+import { OriginLogo } from '../../components/Order/OriginLogo';
+import { PaymentTypeIcon } from './PaymentTypeIcon';
+import { formatCurrency } from '../../utils';
+import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
 
-interface ExpandMoreProps extends BoxProps {
-    expand: boolean;
-}
-
-const ExpandMore = styled((props: ExpandMoreProps) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { expand, ...other } = props;
-    return <Box {...other} />;
-})(({ theme }) => ({
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-    }),
-    variants: [
-        {
-            props: ({ expand }) => !expand,
-            style: {
-                transform: 'rotate(0deg)',
-            },
-        },
-        {
-            props: ({ expand }) => !!expand,
-            style: {
-                transform: 'rotate(180deg)',
-            },
-        },
-    ],
-}));
+const lockedLottieSrc = new URL('/Lock Icon.json', import.meta.url).href;
 
 interface OrderTicketProps {
     order: Order_Payment;
-    toggleCollapsed: (order: Order_Payment) => void;
-    collapsed: boolean;
     toggleSelected: (order: Order_Payment) => void;
     selected: boolean;
 }
 
-export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected, selected }: OrderTicketProps) => {
+export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProps) => {
     const { origins } = useBariPizzaContext();
     const { open, isOpen, close } = useDialogProps();
 
@@ -65,9 +36,13 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
     }
 
     const cardSX = {
-        width: 200,
-        height: 'min-content',
+        width: 225,
+        position: 'relative',
+        height: 150,
         transition: 'background-color 1s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         '&:not(.toast-error)': {
             backgroundColor: selected ? theme.palette.primary.light : 'background.paper',
         },
@@ -86,23 +61,24 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
         toggleSelected(order);
     };
 
-    const handleCollapse = () => {
-        toggleCollapsed(order);
-    };
-
     const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         open();
     };
 
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id)!;
-    const originLogo = orderOrigin.icon || '';
 
-    const totalPayments = order.payments.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
-    const isPaid = totalPayments === order.total_in_cents;
+    const { payments } = order;
+
+    const initialPayment = payments?.[0];
+
+    const totalPayments = payments?.reduce((acc, payment) => acc + payment?.amount_in_cents || 0, 0);
+    const totalTips = payments?.reduce((acc, payment) => acc + payment?.tip_in_cents || 0, 0);
+    const isPaidValid = totalPayments === order.total_in_cents;
+    const isLocked = order.is_locked;
 
     return (
-        <Card variant="elevation" sx={cardSX} raised>
+        <Card variant="elevation" sx={cardSX} raised className="lottie-icon-container">
             <CardActionArea onClick={handleSelect}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
@@ -127,42 +103,56 @@ export const OrderTicket = ({ order, toggleCollapsed, collapsed, toggleSelected,
                 </Stack>
             </CardActionArea>
             <CardActionArea
-                onClick={handleCollapse}
-                sx={{ display: 'flex', justifyContent: 'space-between' }}
+                onClick={handleEditClick}
+                sx={{ display: 'flex', justifyContent: 'space-between', height: '-webkit-fill-available' }}
                 disableRipple>
-                <Stack direction="column" width="100%">
-                    <Collapse in={!collapsed} timeout="auto">
-                        <Stack direction="row" justifyContent="space-between" pl={1} pr={1}>
-                            <Stack direction="column">
-                                <Typography variant="body1">{order.phone}</Typography>
-                                <Typography variant="body1" color={isPaid ? 'primary' : 'error'}>
-                                    ${(order.total_in_cents / 100).toFixed(2)}
+                <Stack direction="column" width="100%" justifyContent="space-between" height="100%">
+                    <Stack direction="row" spacing={1} pl={1} pr={1} justifyContent="space-between">
+                        {payments.length > 0 ? (
+                            <>
+                                <PaymentTypeIcon paymentType={initialPayment?.payment_type} />
+                                <Divider orientation="vertical" />
+                                <Typography variant="body1" color={isPaidValid ? 'primary' : 'error'}>
+                                    {formatCurrency(order.total_in_cents)}
                                 </Typography>
-                            </Stack>
-                            <Box component="span" sx={{ cursor: 'pointer' }} onClick={handleEditClick}>
-                                <OpenInNewIcon />
-                            </Box>
-                        </Stack>
-                    </Collapse>
+                                <Divider orientation="vertical" />
+                                <Typography variant="body1" color={totalTips > 0 ? 'primary' : 'error'}>
+                                    {formatCurrency(totalTips)}
+                                </Typography>
+                            </>
+                        ) : (
+                            <Typography variant="body1" color="error">
+                                {formatCurrency(order.total_in_cents)}
+                            </Typography>
+                        )}
+                    </Stack>
                     <Stack direction="row" justifyContent="space-between" m={1} mt={0} alignItems="center">
                         <Stack direction="row" alignItems="center" gap={1}>
-                            {originLogo && (
-                                <img
-                                    src={originLogo}
-                                    alt={orderOrigin.name}
-                                    width="24px"
-                                    height="24px"
-                                    style={{ borderRadius: '50%' }}
-                                />
-                            )}
-                            {order.order_type === 'pickup' ? <PickupIcon /> : <DeliveryIcon />}
+                            <OriginLogo orderOrigin={orderOrigin} />
+                            <OrderTypeIcon orderType={order.order_type} />
                         </Stack>
-                        <ExpandMore expand={!collapsed}>
-                            <ExpandMoreIcon />
-                        </ExpandMore>
+                        <OpenInNewIcon />
                     </Stack>
                 </Stack>
             </CardActionArea>
+            {isLocked && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        height: '100%',
+                        width: '100%',
+                        color: 'rgb(11 7 7 / 66%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <LottieIcon lottieSrc={lockedLottieSrc} height="8em" width="8em" />
+                </div>
+            )}
+
             <OrderEditor order={order} asDialog close={close} isOpen={isOpen} />
         </Card>
     );

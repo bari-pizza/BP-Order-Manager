@@ -5,24 +5,19 @@ import {
     GridEventListener,
     GridRowEditStopReasons,
     GridRowModel,
-    GridRowModes,
     GridRowModesModel,
 } from '@mui/x-data-grid';
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { OrderOrigin } from '../../typesAndValidators';
-import { dummyQueryFn } from '../../supabaseQueries';
-import { CellCheckbox, CellEditCheckbox } from '../../components/Base/DataGrid/CellCheckbox';
-import { CellEditTextField } from '../../components/Base/DataGrid/CellTextField';
-import { createCellActions } from '../../components/Base/DataGrid/createCellActions';
+import { OrderOrigin } from '../../../typesAndValidators';
+import { CellCheckbox, CellEditCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
+import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
+import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
+import { useDataGrid } from '../../../hooks/ui/useDataGrid';
+import { LogoUploader } from '../LogoUploader';
+import { useOrderOriginCRUD } from '../../../api/orderOrigin';
 
-type ThirdParty = Omit<OrderOrigin, 'is_third_party'> & {
-    is_third_party: true;
-};
-
-export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[] }) => {
-    const [rows, setRows] = useState<ThirdParty[]>(thirdParties);
-    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
+    const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<OrderOrigin>({ data: origins });
+    const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['origins'] });
 
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -30,40 +25,12 @@ export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[]
         }
     };
 
-    const queryClient = useQueryClient();
-
-    const updateThirdPartyMutation = useMutation({
-        mutationFn: (thirdParty: ThirdParty) => {
-            // const { is_driver, ...profile } = employee;
-            // return updateEmployee(profile, is_driver);
-            //TODO: return updateThirdParty(thirdParty);
-            console.log('thirdParty', thirdParty);
-            return dummyQueryFn();
-        },
-        onSuccess: (data) => {
-            // const { profile, driver } = data;
-            // const updatedRow = {
-            //     ...profile,
-            //     is_driver: !driver?.is_deleted,
-            // };
-            // setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
-            console.log({ data });
-            queryClient.invalidateQueries({ queryKey: ['origins'] });
-        },
-        onError: (error) => {
-            console.log({ error });
-        },
-    });
-
     const processRowUpdate = (newRow: GridRowModel) => {
-        console.log('processRowUpdate', newRow);
         const updatedRow = {
-            ...(newRow as ThirdParty),
-            // isNew: false
+            ...(newRow as OrderOrigin),
         };
-        alert('this should open a dialog with a preview of the changes, allowing admin to accept or reject');
-        updateThirdPartyMutation.mutate(updatedRow);
-        // setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        // alert('this should open a dialog with a preview of the changes, allowing admin to accept or reject');
+        orderOriginMutations.update(updatedRow as OrderOrigin);
         setRows((prev) => prev.map((row) => (row.origin_id === newRow.id ? updatedRow : row)));
         return updatedRow;
     };
@@ -72,7 +39,7 @@ export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[]
         setRowModesModel(newRowModesModel);
     };
 
-    const columns: GridColDef[] = [
+    const columns: GridColDef<OrderOrigin>[] = [
         {
             field: 'actions',
             type: 'actions',
@@ -88,6 +55,22 @@ export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[]
             editable: true,
             renderEditCell: (params) => {
                 return <CellEditTextField params={params} field="name" />;
+            },
+        },
+        {
+            field: 'icon',
+            headerName: 'Icon',
+            width: 100,
+            editable: false,
+            // renderCell: (params) => {
+            //     return <LogoUploader origin={params.row} disabled />;
+            // },
+            renderCell: (params) => {
+                const onSuccess = (downloadURL: string) => {
+                    console.log(`saving ${downloadURL}`);
+                    params.api.setEditCellValue({ id: params.id, field: 'icon', value: downloadURL });
+                };
+                return <LogoUploader origin={params.row} onSuccess={onSuccess} />;
             },
         },
         {
@@ -115,18 +98,6 @@ export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[]
             },
         },
         {
-            field: 'default_is_prepaid',
-            headerName: 'Default Is Prepaid',
-            width: 150,
-            editable: true,
-            renderCell: (params) => {
-                return <CellCheckbox params={params} />;
-            },
-            renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="default_is_prepaid" />;
-            },
-        },
-        {
             field: 'has_order_number',
             headerName: 'Has Order Number',
             width: 150,
@@ -139,10 +110,16 @@ export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[]
             },
         },
         {
-            field: 'icon',
-            headerName: 'Icon',
+            field: 'default_is_prepaid',
+            headerName: 'Default Is Prepaid',
             width: 150,
             editable: true,
+            renderCell: (params) => {
+                return <CellCheckbox params={params} />;
+            },
+            renderEditCell: (params) => {
+                return <CellEditCheckbox params={params} field="default_is_prepaid" />;
+            },
         },
         {
             field: 'is_prepaid_toggleable',
@@ -162,6 +139,7 @@ export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[]
             <DataGrid
                 sx={{
                     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
+                    '& .MuiDataGrid-cell--editing': { padding: 0 },
                 }}
                 rows={rows}
                 columns={columns}
@@ -171,10 +149,6 @@ export const ThirdPartiesTable = ({ thirdParties }: { thirdParties: ThirdParty[]
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
-                getRowClassName={(params) => {
-                    const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-                    return isEditing ? 'row-is-edit' : '';
-                }}
                 getRowId={(row) => row.origin_id}
             />
         </Stack>

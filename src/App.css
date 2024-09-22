@@ -8,7 +8,7 @@ body {
     visibility: hidden;
 }
 
-.hover-scroll *,
+.hover-scroll-content,
 .hover-scroll:hover,
 .hover-scroll:focus {
     visibility: visible;

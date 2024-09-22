@@ -19,7 +19,7 @@ export const UserAvatar = () => {
             .map((name) => name[0])
             .join('');
         userAvatar = (
-            <Avatar sx={avatarSX} src="https://mui.com/static/images/avatar/2.jpg">
+            <Avatar sx={avatarSX} src={profile.avatar_src || ''}>
                 {initials}
             </Avatar>
         );

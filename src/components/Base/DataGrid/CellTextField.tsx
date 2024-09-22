@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { Box, TextField } from '@mui/material';
+import { Box } from '@mui/material';
 import { GridRenderEditCellParams } from '@mui/x-data-grid';
 
 export const CellEditTextField = <T,>({ field, params }: { field: keyof T; params: GridRenderEditCellParams }) => {
@@ -17,11 +17,19 @@ export const CellEditTextField = <T,>({ field, params }: { field: keyof T; param
             sx={{
                 display: 'flex',
                 alignItems: 'center',
+                padding: 0,
+                height: '100%',
             }}>
-            <TextField
+            <input
                 value={params.value || ''}
                 onChange={handleChange}
-                sx={{ input: { color: isDirty ? theme.palette.secondary.main : '' } }}
+                style={{
+                    color: isDirty ? theme.palette.secondary.main : '',
+                    border: 'none',
+                    outline: 'none',
+                    fontSize: '14px',
+                    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+                }}
             />
         </Box>
     );
