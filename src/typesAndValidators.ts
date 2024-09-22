@@ -1,5 +1,10 @@
 import { Tables } from './supabase';
 
+type ValueOf<Obj> = Obj[keyof Obj];
+type OneOnly<Obj, Key extends keyof Obj> = { [key in Exclude<keyof Obj, Key>]: null } & Pick<Obj, Key>;
+type OneOfByKey<Obj> = { [key in keyof Obj]: OneOnly<Obj, key> };
+export type OneOfType<Obj> = ValueOf<OneOfByKey<Obj>>;
+
 export type Profile = Tables<'Profile'>;
 export type Drawer = Tables<'Drawer'>;
 export type DrawerType = Tables<'Drawer'>['drawer_type'];
@@ -12,19 +17,28 @@ export type BusinessDayDriver = Tables<'BusinessDayDriver'>;
 export type Payment = Tables<'Payment'>;
 export type Order_Payment = Order & { payments: Payment[] };
 export type PaymentType = Tables<'Payment'>['payment_type'];
+export type BusinessDayDrawerSummary = Tables<'BusinessDayDrawer'>;
 
 export type NewProfile = Omit<Profile, 'id' | 'created_at'>;
 export type NewDrawer = Omit<Drawer, 'drawer_id' | 'created_at'>;
 export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 export type NewPayment = Omit<Payment, 'payment_id' | 'created_at'>;
 
-export type AdminDashboardTabName = 'employees' | 'third_parties' | 'orders' | 'settings';
-export type ManagerDashboardTabName = 'sales' | 'drivers' | 'orders' | 'settings';
+export type OrderWithFullDetails = Order_Payment & {
+    drawer?: Drawer;
+    driver?: Driver_Drawer;
+    origin: OrderOrigin;
+};
+
+export type AdminDashboardTabName = 'employees' | 'origins' | 'orders' | 'settings';
+export type ManagerDashboardTabName = 'sales' | 'drawers' | 'orders' | 'settings';
 export type LocalStorageField = {
     adminDashboardTabName: AdminDashboardTabName;
     managerDashboardTabName: ManagerDashboardTabName;
     openDrawer: Drawer | Driver_Drawer;
 };
+
+export type BucketName = 'avatars' | 'order_origins';
 
 const orderValidators = {
     order_number: {

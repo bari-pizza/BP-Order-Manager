@@ -32,8 +32,8 @@ const useCreateNewPayment = ({ queryKey }: { queryKey: string[] }) => {
             mainError: (error) => error.message,
             errors: () => `Failed to create new payment.`,
         },
-        forEachError: (error) => {
-            console.log(error);
+        handleSuccess: (data) => {
+            console.log({ data });
         },
     });
 };
@@ -48,9 +48,6 @@ const useUpdatePayment = ({ queryKey }: { queryKey: string[] }) => {
             mainError: (error) => error.message,
             errors: () => `Failed to update payment`,
         },
-        forEachError: (error) => {
-            console.log(error);
-        },
     });
 };
 
@@ -64,13 +61,16 @@ const useDeletePayment = ({ queryKey }: { queryKey: string[] }) => {
             mainError: (error) => error.message,
             errors: () => `Failed to delete payment`,
         },
-        forEachError: (error) => {
-            console.log(error);
-        },
     });
 };
 
 export const usePaymentCRUD = ({ queryKey }: { queryKey: string[] }) => {
+    // add handleSuccessRef and handleFailureRef
+    // const createNewPaymentMutation = useCreateNewPayment({
+    //     queryKey,
+    //     handleSuccessRef: {},
+    //     handleFailureRef: {},
+    // }).mutate;
     return {
         paymentMutations: {
             create: useCreateNewPayment({ queryKey }).mutate,

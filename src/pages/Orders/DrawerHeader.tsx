@@ -1,8 +1,8 @@
 import { Stack, StackOwnProps } from '@mui/material';
-import { DrawerCard, DrawerAvatarSkeleton, UnassignedDrawerAvatar } from './DrawerCard';
+import { DrawerCard, UnassignedDrawerAvatar } from './DrawerCard';
+import { DrawerAvatarSkeleton } from '../../components/Base/DrawerAvatar';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../../components/Base/ContextMenu';
-import { Driver_Drawer } from '../../typesAndValidators';
 
 const stackProps: Partial<StackOwnProps> = {
     direction: 'row',
@@ -24,20 +24,16 @@ export const DrawerHeader = () => {
         <Stack {...stackProps}>
             <UnassignedDrawerAvatar />
             {combinedData?.map((drawer) => {
-                if ('driver' in drawer) {
-                    return (
-                        <ContextMenu openOnType="right-click" key={drawer.drawer_id}>
-                            <ContextMenu.Base>
-                                <DrawerCard key={drawer.drawer_id} drawer={drawer} />
-                            </ContextMenu.Base>
-                            <ContextMenu.Menu>
-                                <DrawerCard.driverContextMenu driver={drawer as Driver_Drawer} />
-                            </ContextMenu.Menu>
-                        </ContextMenu>
-                    );
-                }
-
-                return <DrawerCard key={drawer.drawer_id} drawer={drawer} />;
+                return (
+                    <ContextMenu openOnType="right-click" key={drawer.drawer_id}>
+                        <ContextMenu.Base>
+                            <DrawerCard key={drawer.drawer_id} drawer={drawer} />
+                        </ContextMenu.Base>
+                        <ContextMenu.Menu>
+                            <DrawerCard.drawerContextMenu drawer={drawer} />
+                        </ContextMenu.Menu>
+                    </ContextMenu>
+                );
             })}
         </Stack>
     );

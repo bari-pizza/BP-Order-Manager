@@ -1,13 +1,14 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
 import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
-import { DriversTab } from './DriversTab';
 import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 import { useDrivers } from '../../hooks/data/useDrivers';
-import { Driver_Drawer, ManagerDashboardTabName } from '../../typesAndValidators';
-import { SalesTab } from './SalesTab';
+import { ManagerDashboardTabName } from '../../typesAndValidators';
+import { DrawersTab } from './Tabs/DrawersTab';
+import { SalesTab } from './Tabs/SalesTab';
+import { OrdersTab } from './Tabs/OrdersTab';
 
 /*    TODO: About Today
         Sales
@@ -36,12 +37,13 @@ function TabPanel(props: TabPanelProps) {
             style={{
                 height: '100%',
             }}
+            className="hover-scroll"
             role="tabpanel"
             hidden={value !== tabName}
             id={`simple-tabpanel-${tabName}`}
             aria-labelledby={`simple-tab-${tabName}`}
             {...other}>
-            {value === tabName && <Box sx={{ p: 3 }}>{children}</Box>}
+            <div className="hover-scroll-content">{value === tabName && <Box sx={{ p: 3 }}>{children}</Box>}</div>
         </div>
     );
 }
@@ -49,13 +51,14 @@ function TabPanel(props: TabPanelProps) {
 type TabName = ManagerDashboardTabName;
 
 export const ManagerDashboard = () => {
-    const { orders, drawer } = useOrdersDrawersTickets();
+    const { orders, drawer, summaries } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>(
         'managerDashboardTabName',
-        'drivers',
+        'drawers',
     );
+
     const theme = useTheme();
 
     const handleChange = (tab: TabName) => {
@@ -86,8 +89,12 @@ export const ManagerDashboard = () => {
                 drawers: {
                     all: drawers,
                     onClick: drawer.onClick,
+                    current: drawer.current,
+                    close: drawer.close,
+                    reOpen: drawer.reOpen,
                 },
                 origins,
+                summaries,
                 drivers: {
                     all: drivers.all,
                     todays: drivers.todays,
@@ -95,15 +102,12 @@ export const ManagerDashboard = () => {
                     available: drivers.available,
                     add: drivers.add,
                     remove: drivers.remove, // some supabase mutation
-                    close: (driver: Driver_Drawer) => {
-                        console.log('close driver', driver);
-                    }, // some supabase mutation
-                    reOpen: () => {}, // some supabase mutation
                     handleClick: drivers.handleClick,
                 },
                 // all these properties should eventually come from useDrivers
+                combinedDrawersAndDrivers: drawers.concat(drivers.todays),
             }}>
-            <Stack height="100vh" width="100%">
+            <Stack height="100vh" width="100%" sx={{ overflowY: 'hidden' }}>
                 <Stack m={2}>
                     <Typography
                         variant="h3"
@@ -115,7 +119,7 @@ export const ManagerDashboard = () => {
                 <Box>
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
                         <Tab value="sales" label="Sales" icon={<SalesIcon />} iconPosition="start" />
-                        <Tab value="drivers" label="Drivers" icon={<DriversIcon />} iconPosition="start" />
+                        <Tab value="drawers" label="Drawers" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />
                     </Tabs>
@@ -123,11 +127,11 @@ export const ManagerDashboard = () => {
                 <TabPanel tabName="sales" value={tabName}>
                     <SalesTab />
                 </TabPanel>
-                <TabPanel tabName="drivers" value={tabName}>
-                    <DriversTab />
+                <TabPanel tabName="drawers" value={tabName}>
+                    <DrawersTab />
                 </TabPanel>
                 <TabPanel tabName="orders" value={tabName}>
-                    Orders go here!
+                    <OrdersTab />
                 </TabPanel>
                 <TabPanel tabName="settings" value={tabName}>
                     Settings go here!

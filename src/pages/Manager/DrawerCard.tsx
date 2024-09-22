@@ -1,8 +1,8 @@
-import { Driver_Drawer } from '../../typesAndValidators';
+import { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardBase, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../../components/Base/ContextMenu';
-import { useSmartNavigate } from '../../components/useSmartNavigate';
+import { useSmartNavigate } from '../../hooks/navigation/useSmartNavigate';
 import {
     OpenInNew as OpenInNewIcon,
     AccountBalanceWallet as WalletIcon,
@@ -10,8 +10,8 @@ import {
 } from '@mui/icons-material';
 import { deepmerge } from '@mui/utils';
 
-interface DriverCardProps {
-    driver: Driver_Drawer;
+interface DrawerCardProps {
+    drawer: Drawer | Driver_Drawer;
     sx?: {
         avatar?: React.CSSProperties;
         badge?: React.CSSProperties;
@@ -20,12 +20,17 @@ interface DriverCardProps {
     };
     props?: DrawerCardSlotProps;
     canOpen?: boolean;
+    isLocked?: boolean;
 }
 
-export const DriverCard = ({ driver, sx, props, canOpen = true }: DriverCardProps) => {
-    const { orders, drivers } = useManagerDashboardContext();
+export const DrawerCard = ({ drawer, sx, props, isLocked, canOpen = true }: DrawerCardProps) => {
+    const {
+        orders,
+        // drivers
+        drawers,
+    } = useManagerDashboardContext();
 
-    const badgeCount = orders.byDrawerID(driver.drawer_id).length;
+    const badgeCount = orders.byDrawerID(drawer.drawer_id).length;
 
     const baseSX = {
         avatar: {
@@ -43,20 +48,22 @@ export const DriverCard = ({ driver, sx, props, canOpen = true }: DriverCardProp
     return (
         <DrawerCardBase
             sx={overrideSX}
-            key={driver.drawer_id}
-            drawer={driver}
-            handleClick={() => drivers.handleClick(driver)}
             badgeCount={badgeCount}
-            isOpen={drivers.current?.drawer_id === driver.drawer_id && canOpen}
             props={props}
+            key={drawer.drawer_id}
+            drawer={drawer}
+            handleClick={() => drawers.onClick(drawer)}
+            isOpen={drawers.current?.drawer_id === drawer.drawer_id && canOpen}
+            isLocked={isLocked}
         />
     );
 };
 
-const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
+const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {
     const smartNavigate = useSmartNavigate();
     const { orders, drivers, drawers } = useManagerDashboardContext();
-    const driversOrders = orders.byDrawerID(driver.drawer_id);
+    const drawerOrders = orders.byDrawerID(drawer.drawer_id);
+    const currentDrawer = drawers.current;
 
     const navigateToDrawerOrders = () => {
         smartNavigate({
@@ -64,20 +71,21 @@ const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
             keepSearchParams: true,
         });
 
-        drawers.onClick(driver);
+        if (currentDrawer?.drawer_id !== drawer.drawer_id) {
+            drawers.onClick(drawer);
+        }
     };
 
     let handleRemoveDriverClick;
 
-    if (driversOrders.length === 0) {
+    if (drawerOrders.length === 0 && 'driver' in drawer) {
         handleRemoveDriverClick = () => {
-            drivers.remove(driver);
-            drivers.handleClick(driver);
+            drivers.remove(drawer);
         };
     }
 
     const closeDriver = () => {
-        drivers.close(driver);
+        drawers.close(drawer);
     };
 
     return (
@@ -95,4 +103,4 @@ const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
     );
 };
 
-DriverCard.contextMenu = DriverContextMenu;
+DrawerCard.contextMenu = DrawerContextMenu;

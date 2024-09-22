@@ -1,12 +1,11 @@
 import { useRef, useState, RefObject } from 'react';
 import type { Drawer, Driver_Drawer, Order_Payment } from '../../typesAndValidators';
-import { addOrdersToDrawer, getAllDaysOrders, removeOrdersFromDrawer } from '../../supabaseQueries';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useBusinessDate } from '../data/useBusinessDate';
-import { DataWithError, HandleOutcomeProps } from '../../toast/toast';
-import { addOrdersToast, removeOrdersToast } from '../../toast/ordersToast';
-import { toast } from 'react-toastify';
 import { useLocalStorage } from './useLocalStorage';
+import { useBusinessDayDrawerAPI } from '../../api/businessDayDrawer';
+import { useOrderAPI } from '../../api/order';
+import { RPCPayload } from '../../api/helpers';
+import useSubscribeToTable from './useSubscribeToTable';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -17,12 +16,14 @@ const unassignedDrawer: Drawer = {
 
 export const useOrdersDrawersTickets = () => {
     const [businessDate] = useBusinessDate();
-    const { data: allOrders } = useSuspenseQuery({
-        queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
-        queryFn: () => getAllDaysOrders(businessDate),
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 30,
+    const { orderAPI } = useOrderAPI({ businessDate });
+    const { data: initialData } = orderAPI.getAll;
+    const allOrders = useSubscribeToTable<Order_Payment>({ tableName: 'Order', initialData });
+    const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
+        businessDate,
     });
+    const { data: summaries } = businessDayDrawerAPI.getAll;
+
     const allPayments = allOrders.flatMap((order) => order.payments);
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
     const drawerRefs = useRef<{ [key: string]: RefObject<HTMLDivElement> }>({});
@@ -42,29 +43,13 @@ export const useOrdersDrawersTickets = () => {
         acc[key].push(order);
         return acc;
     }, {});
-    const [collapsedTickets, setCollapsedTickets] = useState<string[]>([]);
     const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
     const [handlingDrawerClick, setHandlingDrawerClick] = useState(false);
-    const toastRef = useRef<{
-        [orderID: string]: ({ data, errors, forEachError }: HandleOutcomeProps) => void;
-    }>({});
 
     const orderCount = orders?.length ?? 0;
 
-    const allCollapsed = collapsedTickets.length === orderCount;
     const allSelected = selectedTickets.length === orderCount;
-
-    const noneCollapsed = collapsedTickets.length === 0;
     const noneSelected = selectedTickets.length === 0;
-
-    const toggleCollapsedTicket = (order: Order_Payment) => {
-        setCollapsedTickets((prev) => {
-            if (prev.includes(order.order_id)) {
-                return prev.filter((id) => id !== order.order_id);
-            }
-            return [...prev, order.order_id];
-        });
-    };
 
     const toggleSelectedTicket = (order: Order_Payment) => {
         setSelectedTickets((prev) => {
@@ -75,19 +60,11 @@ export const useOrdersDrawersTickets = () => {
         });
     };
 
-    const toggleCollapseAllTickets = () => {
-        if (allCollapsed) {
-            setCollapsedTickets([]);
-        } else {
-            setCollapsedTickets(orders?.map((order) => order.order_id) || []);
-        }
-    };
-
     const toggleSelectAllTickets = () => {
-        if (allSelected) {
-            setSelectedTickets([]);
-        } else {
+        if (noneSelected) {
             setSelectedTickets(orders?.map((order) => order.order_id) || []);
+        } else {
+            setSelectedTickets([]);
         }
     };
 
@@ -99,220 +76,31 @@ export const useOrdersDrawersTickets = () => {
         }
     };
 
-    const animateTicketToDrawer = (
-        ticketRef: RefObject<SVGSVGElement>,
-        drawerRef: RefObject<HTMLDivElement>,
-        index: number = 0,
-    ): Promise<void> => {
-        return new Promise((resolve) => {
-            const originalTicket = ticketRef.current;
-            if (!originalTicket || !drawerRef.current) {
-                resolve();
-                return;
-            }
-
-            const drawer = drawerRef.current;
-            const card = originalTicket.closest('.MuiPaper-root') as HTMLDivElement;
-            card.classList.add('ticket-animating');
-            card.classList.remove('toast-error'); // remove any previous errors
-            // make a copy so that the animation can finish even if the original ticket is removed
-            const ticket = originalTicket.cloneNode() as SVGSVGElement;
-            const pizzaImg = originalTicket.nextSibling?.cloneNode() as HTMLImageElement;
-            const root = document.querySelector('#root') as HTMLBodyElement;
-            root.append(ticket);
-            root.append(pizzaImg);
-            // document.body.appendChild(ticket); bad idea
-            // document.body.appendChild(pizzaImg); bad idea
-
-            // Calculate the position differences
-            const ticketRect = originalTicket.getBoundingClientRect();
-            const drawerRect = drawer.getBoundingClientRect();
-
-            const drawerWidth = (drawer.computedStyleMap().get('width') as CSSUnitValue).value;
-            // const drawerWidth = drawerRect.width;
-            const scale = drawerRect.height / ticketRect.height / 2;
-            const scalePizza = drawerWidth / pizzaImg.width / 2;
-
-            const ticketCenterX = ticketRect.left + ticketRect.width / 2;
-            const ticketCenterY = ticketRect.top + ticketRect.height / 2;
-
-            const drawerCenterX = drawerRect.left + drawerRect.width / 2;
-            const drawerCenterY = drawerRect.top + drawerRect.height / 2;
-
-            // Set the ticket to fixed position to allow it to move freely
-            ticket.style.position = 'fixed';
-            ticket.style.top = `${ticketRect.top}px`;
-            ticket.style.left = `${ticketRect.left}px`;
-
-            pizzaImg.style.position = 'fixed';
-            pizzaImg.style.top = `${ticketRect.top}px`;
-            pizzaImg.style.left = `${ticketRect.left}px`;
-
-            // each ticket is 45 degrees
-            const angle = ((45 * Math.PI) / 180) * index;
-
-            const deltaX = drawerCenterX - ticketCenterX + (Math.sin(angle) * drawerRect.width) / 4;
-            const deltaY = drawerCenterY - ticketCenterY - (Math.cos(angle) * drawerRect.height) / 4;
-
-            const delay = index * 100;
-
-            // Trigger the animation
-            ticket.style.transition = 'all .6s ease-in-out';
-            ticket.style.transform = `
-            translate(${deltaX}px, ${deltaY}px)
-            scale(${scale})
-            rotate(${angle}rad)
-            `;
-            ticket.style.opacity = '0';
-            originalTicket.style.opacity = '0';
-
-            pizzaImg.style.transition = 'transform .6s ease-in-out';
-            pizzaImg.style.transform = `
-            translate(${deltaX}px, ${deltaY}px)
-            scale(${scalePizza})
-            rotate(${angle}rad)
-            `;
-            pizzaImg.style.opacity = '1';
-
-            ticket.style.transitionDelay = `${delay}ms`;
-            pizzaImg.style.transitionDelay = `${delay}ms`;
-
-            setTimeout(async () => {
-                // Put everything back the way it was
-                // both were copies so we have to remove them
-
-                ticket.style.display = 'none';
-                ticket.style.transition = 'none';
-                ticket.remove();
-
-                pizzaImg.style.opacity = '0';
-                pizzaImg.style.transition = 'opacity .25s ease-in-out';
-                pizzaImg.remove();
-
-                resolve();
-            }, 1000 + delay); // Adjust to match your transition duration
-        });
-    };
-
-    const queryClient = useQueryClient();
-
-    const handleAnimations = async (orderIDs: string[], drawerID: string) => {
-        let index = -1;
-        const animations = orderIDs.map((id) => {
-            const ticketRef = ticketRefs.current[id];
-            const drawerRef = drawerRefs.current[drawerID];
-            if (!ticketRef && !drawerRef) {
-                console.log('no ticket and drawer', id, drawerID);
-                return;
-            }
-            if (!ticketRef) {
-                console.log('no ticket', id);
-                return;
-            }
-            if (!drawerRef) {
-                console.log('no drawer', drawerID);
-                return;
-            }
-            index++;
-            return animateTicketToDrawer(ticketRef, drawerRef, index);
-        });
-        return await Promise.all(animations);
-    };
-
-    const handleEachError = (data: DataWithError) => {
-        const { order_id } = data;
-        const order = allOrders.find((order) => order.order_id === order_id);
-        if (!order) {
-            return;
-        }
-        const orderTitle = order?.order_name ?? `Order ${order?.order_number}`;
-        const body = `Error adding ${orderTitle} to drawer`;
-        const ticketRef = ticketRefs.current[order?.order_id];
-        const cardWithError = ticketRef?.current?.closest('.MuiPaper-root') as HTMLElement;
-        cardWithError.classList.add('toast-error');
-        const autoClose = 1500;
-        setTimeout(() => {
-            cardWithError.classList.remove('toast-error');
-        }, autoClose);
-
-        toast.error(body, { autoClose });
-    };
-
-    const assignOrdersToDrawerMutation = useMutation({
-        mutationFn: ({ drawerID, orderIDs }: { drawerID: string; orderIDs: string[] }) =>
-            addOrdersToDrawer({ drawerID, orderIDs }),
-        onSuccess: ({
-            updated_order_ids: updatedOrderIDs,
-            errors,
-            drawer_id: drawerID,
-        }: {
-            updated_order_ids: string[];
-            errors: DataWithError & { order_id: string }[];
-            drawer_id: string;
-            // TODO: would be nice if we got the drawer name here
-        }) => {
-            // console.log({ updatedOrderIDs, errors, drawerID });
-            const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
-            const handleOutcome = toastRef.current['add_tickets'];
-            handleOutcome({
-                data: updatedOrderIDs.length ? { payload: { orderIDs: updatedOrderIDs } } : null,
-                errors,
-                forEachError: handleEachError,
-            });
-            if (updatedOrderIDs.length) {
-                // path 5a and 5b
-                handleAnimations(updatedOrderIDs, drawerID).then(() => {
-                    queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
-                });
-                setSelectedTickets(unsuccessfulOrderIDs);
-            }
-            // path 5a, 5b, and 5c
-            setHandlingDrawerClick(false);
-        },
-        onError: (error) => {
-            console.error(`Issue updating order(s): "${error}"`, error);
-        },
-    });
-
-    const unassignOrdersFromDrawerMutation = useMutation({
-        mutationFn: ({ drawerID, orderIDs }: { drawerID: string; orderIDs: string[] }) =>
-            removeOrdersFromDrawer({ drawerID, orderIDs }),
-        onSuccess: (orderIDs) => {
-            // TODO: refactor this eventually so that success accepts {update_order_ids, errors}
-            // TODO: would require updating supabase function
-            const handleOutcome = toastRef.current['remove_tickets'];
-            const errors: (DataWithError & { order_id: string })[] = [];
-            const unsuccessfulOrderIDs = errors.map(({ order_id }) => order_id);
-            handleOutcome({
-                data: orderIDs.length ? { payload: { orderIDs } } : null,
-                errors,
-                forEachError: handleEachError,
-            });
-            if (orderIDs.length) {
-                // path 3a and 3b
-                setSelectedTickets(unsuccessfulOrderIDs);
-                handleAnimations(orderIDs, 'unassigned').then(() => {
-                    queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
-                });
-            }
-            // path 3a, 3b, and 3c
-            setHandlingDrawerClick(false);
-        },
-        onError: (error) => {
-            console.error(`Issue updating order(s): "${error}"`, error);
-        },
-    });
-
     const putTicketsInDrawer = (drawer: Drawer | Driver_Drawer) => {
         const drawerID = drawer.drawer_id;
-        toastRef.current['add_tickets'] = addOrdersToast(selectedTickets, drawer);
-        assignOrdersToDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
+        const handleSuccess = (response: RPCPayload['data']) => {
+            const unsuccessfulOrderIDs = response?.failures.flatMap((failure) => Object.keys(failure)) || [];
+            console.log({ response, unsuccessfulOrderIDs });
+            setSelectedTickets(unsuccessfulOrderIDs);
+            setHandlingDrawerClick(false);
+        };
+        const handleFailure = () => {
+            setHandlingDrawerClick(false);
+        };
+        orderAPI.addOrdersToDrawer({ drawerID, orderIDs: selectedTickets, handleSuccess, handleFailure });
     };
 
     const removeTicketsFromDrawer = () => {
         const drawerID = openDrawer.drawer_id;
-        toastRef.current['remove_tickets'] = removeOrdersToast(selectedTickets, openDrawer);
-        unassignOrdersFromDrawerMutation.mutate({ drawerID, orderIDs: selectedTickets });
+        const handleSuccess = (response: RPCPayload['data']) => {
+            const unsuccessfulOrderIDs = Object.keys(response!.failures);
+            setSelectedTickets(unsuccessfulOrderIDs);
+            setHandlingDrawerClick(false);
+        };
+        const handleFailure = () => {
+            setHandlingDrawerClick(false);
+        };
+        orderAPI.removeOrdersFromDrawer({ drawerID, orderIDs: selectedTickets, handleSuccess, handleFailure });
     };
 
     const handleDrawerClick = (drawer: Drawer | Driver_Drawer) => {
@@ -391,26 +179,38 @@ export const useOrdersDrawersTickets = () => {
         return [];
     };
 
+    // TODO: *** look into subscribing to orders ***
+
+    const closeBusinessDayDrawer = (drawer: Drawer | Driver_Drawer) => {
+        businessDayDrawerAPI.close({ drawerID: drawer.drawer_id });
+    };
+
+    const reOpenBusinessDayDrawer = (drawer: Drawer | Driver_Drawer) => {
+        businessDayDrawerAPI.reOpen({ drawerID: drawer.drawer_id });
+    };
+
+    const getSummaryByDrawerID = (drawerID?: string) => {
+        if (!drawerID) {
+            return null;
+        }
+        const summary = summaries.find(({ drawer_id }) => drawer_id === drawerID) || null;
+        return summary;
+    };
+
     return {
         ticket: {
             select: toggleSelectedTicket,
-            collapse: toggleCollapsedTicket,
-            isCollapsed: (order: Order_Payment) => collapsedTickets.includes(order.order_id),
             isSelected: (order: Order_Payment) => selectedTickets.includes(order.order_id),
             all: {
                 select: toggleSelectAllTickets,
-                collapse: toggleCollapseAllTickets,
-                areCollapsed: allCollapsed,
                 areSelected: allSelected,
                 count: orderCount,
             },
             none: {
-                areCollapsed: noneCollapsed,
                 areSelected: noneSelected,
             },
             count: {
                 selected: selectedTickets.length,
-                collapsed: collapsedTickets.length,
             },
             refs: ticketRefs.current,
         },
@@ -421,6 +221,8 @@ export const useOrdersDrawersTickets = () => {
             unassigned: unassignedDrawer,
             isUnassignedDrawer: openDrawer?.drawer_id === 'unassigned',
             refs: drawerRefs.current,
+            close: closeBusinessDayDrawer,
+            reOpen: reOpenBusinessDayDrawer,
         },
         orders: {
             forCurrentDrawer: orders,
@@ -430,6 +232,12 @@ export const useOrdersDrawersTickets = () => {
         payments: {
             all: allPayments,
             // only useful for admin / manager pages
+        },
+        summaries: {
+            all: summaries,
+            forCurrentDrawer: getSummaryByDrawerID(openDrawer?.drawer_id),
+            byDrawerID: (drawerID: string) => getSummaryByDrawerID(drawerID),
+            update: businessDayDrawerAPI.upsert,
         },
     };
 };

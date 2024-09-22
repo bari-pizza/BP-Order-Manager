@@ -1,8 +1,8 @@
 import { Button, Stack } from '@mui/material';
 import { useRef, useState } from 'react';
-import { SideBar } from '../../components/SideBar';
+import { SideBar } from '../../../components/SideBar';
 
-import { SalesVsTimeChart as Table1 } from './Charts/SalesVsTime';
+import { SalesVsTimeChart as Table1 } from '../Charts/SalesVsTime';
 
 export const SalesTab = () => {
     const portalContainer = useRef<HTMLDivElement | null>(null);

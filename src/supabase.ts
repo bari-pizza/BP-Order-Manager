@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      BusinessDayDrawer: {
+        Row: {
+          bank_in_cents: number
+          business_date: string
+          drawer_id: string
+          hours: number
+          hours_in_cents: number
+          is_locked: boolean
+          other_in_cents: number
+          special_note: string
+        }
+        Insert: {
+          bank_in_cents?: number
+          business_date: string
+          drawer_id: string
+          hours?: number
+          hours_in_cents?: number
+          is_locked?: boolean
+          other_in_cents?: number
+          special_note?: string
+        }
+        Update: {
+          bank_in_cents?: number
+          business_date?: string
+          drawer_id?: string
+          hours?: number
+          hours_in_cents?: number
+          is_locked?: boolean
+          other_in_cents?: number
+          special_note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "BusinessDayDrawer_drawer_id_fkey"
+            columns: ["drawer_id"]
+            isOneToOne: false
+            referencedRelation: "Drawer"
+            referencedColumns: ["drawer_id"]
+          },
+        ]
+      }
       BusinessDayDriver: {
         Row: {
           business_date: string
@@ -31,6 +72,21 @@ export type Database = {
             referencedColumns: ["drawer_id"]
           },
         ]
+      }
+      BusinessDaySummary: {
+        Row: {
+          business_date: string
+          is_locked: boolean
+        }
+        Insert: {
+          business_date: string
+          is_locked?: boolean
+        }
+        Update: {
+          business_date?: string
+          is_locked?: boolean
+        }
+        Relationships: []
       }
       Drawer: {
         Row: {
@@ -89,12 +145,37 @@ export type Database = {
           },
         ]
       }
+      error_logs: {
+        Row: {
+          context: string | null
+          created_at: string | null
+          error_message: string
+          id: number
+          order_id: string | null
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string | null
+          error_message: string
+          id?: never
+          order_id?: string | null
+        }
+        Update: {
+          context?: string | null
+          created_at?: string | null
+          error_message?: string
+          id?: never
+          order_id?: string | null
+        }
+        Relationships: []
+      }
       Order: {
         Row: {
           business_date: string
           created_at: string
           delivery_fee_in_cents: number
           drawer_id: string | null
+          is_locked: boolean
           order_id: string
           order_name: string | null
           order_number: number | null
@@ -108,6 +189,7 @@ export type Database = {
           created_at?: string
           delivery_fee_in_cents?: number
           drawer_id?: string | null
+          is_locked?: boolean
           order_id?: string
           order_name?: string | null
           order_number?: number | null
@@ -121,6 +203,7 @@ export type Database = {
           created_at?: string
           delivery_fee_in_cents?: number
           drawer_id?: string | null
+          is_locked?: boolean
           order_id?: string
           order_name?: string | null
           order_number?: number | null
@@ -186,6 +269,7 @@ export type Database = {
         Row: {
           amount_in_cents: number
           created_at: string
+          is_locked: boolean
           order_id: string
           payment_id: string
           payment_type: Database["public"]["Enums"]["payment_type"]
@@ -195,6 +279,7 @@ export type Database = {
         Insert: {
           amount_in_cents?: number
           created_at?: string
+          is_locked?: boolean
           order_id: string
           payment_id?: string
           payment_type: Database["public"]["Enums"]["payment_type"]
@@ -204,6 +289,7 @@ export type Database = {
         Update: {
           amount_in_cents?: number
           created_at?: string
+          is_locked?: boolean
           order_id?: string
           payment_id?: string
           payment_type?: Database["public"]["Enums"]["payment_type"]
@@ -289,10 +375,24 @@ export type Database = {
         }
         Returns: Json
       }
+      lock_drawer: {
+        Args: {
+          p_drawer_id: string
+          p_business_date: string
+        }
+        Returns: Json
+      }
       remove_orders_from_drawer: {
         Args: {
           p_order_ids: Json
           p_drawer_id: string
+        }
+        Returns: Json
+      }
+      unlock_drawer: {
+        Args: {
+          p_drawer_id: string
+          p_business_date: string
         }
         Returns: Json
       }

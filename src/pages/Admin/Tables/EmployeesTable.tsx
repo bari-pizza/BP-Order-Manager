@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import { IconButton, Stack } from '@mui/material';
 import {
     DataGrid,
     GridColDef,
@@ -8,13 +8,15 @@ import {
     GridRowModes,
     GridRowModesModel,
 } from '@mui/x-data-grid';
-import { Profile } from '../../typesAndValidators';
+import { Profile } from '../../../typesAndValidators';
 import { useState } from 'react';
-import { updateEmployee } from '../../supabaseQueries';
+import { updateEmployee } from '../../../supabaseQueries';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CellEditCheckbox, CellCheckbox } from '../../components/Base/DataGrid/CellCheckbox';
-import { CellEditTextField } from '../../components/Base/DataGrid/CellTextField';
-import { createCellActions } from '../../components/Base/DataGrid/createCellActions';
+import { CellEditCheckbox, CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
+import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
+import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
+import { Email as EmailIcon } from '@mui/icons-material';
+import { toast } from 'react-toastify';
 
 type Employee = Profile & { is_driver: boolean };
 
@@ -111,7 +113,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'is_admin',
             headerName: 'Admin',
-            width: 125,
+            width: 100,
             editable: true,
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
@@ -123,7 +125,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'is_manager',
             headerName: 'Manager',
-            width: 125,
+            width: 100,
             editable: true,
 
             renderCell: (params) => {
@@ -136,13 +138,30 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'is_driver',
             headerName: 'Driver',
-            width: 125,
+            width: 100,
             editable: true,
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
             renderEditCell: (params) => {
                 return <CellEditCheckbox params={params} field="is_driver" />;
+            },
+        },
+        {
+            field: 'send_email',
+            headerName: 'Send PW Reset Email',
+            width: 175,
+            editable: false,
+            renderCell: (params) => {
+                const handleClick = () => {
+                    toast.info('This feature is not yet implemented');
+                    toast.success(`Sent password reset email to ${params.row.email}`);
+                };
+                return (
+                    <IconButton onClick={handleClick}>
+                        <EmailIcon />
+                    </IconButton>
+                );
             },
         },
     ];

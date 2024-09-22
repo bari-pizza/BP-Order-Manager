@@ -141,6 +141,8 @@ function Layout() {
     const constants = {
         default: {
             delivery_fee_in_cents: 300,
+            starting_cash_in_cents: 2000,
+            driver_hourly_wage_in_cents: 500,
         },
     };
     return (

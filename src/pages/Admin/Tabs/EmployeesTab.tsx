@@ -1,10 +1,10 @@
 import { Stack } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { getAllEmployees } from '../../supabaseQueries';
-import { EmployeesTable } from './EmployeesTable';
-import { Profile } from '../../typesAndValidators';
-import { useBariPizzaContext } from '../../hooks/data/useContextData';
-import { Todo } from '../../components/Base/Todo';
+import { getAllEmployees } from '../../../supabaseQueries';
+import { EmployeesTable } from '../Tables/EmployeesTable';
+import { Profile } from '../../../typesAndValidators';
+import { useBariPizzaContext } from '../../../hooks/data/useContextData';
+import { Todo } from '../../../components/Base/Todo';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';

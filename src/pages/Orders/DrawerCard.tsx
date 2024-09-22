@@ -1,13 +1,13 @@
 import { useRef } from 'react';
-import { Tooltip, Typography } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { getDrawerFullName } from '../../utils';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
-import { DrawerCardBase, DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
+import { DrawerCardBase, DrawerCardSlotProps } from '../../components/Base/DrawerCardBase';
 import { ContextMenu } from '../../components/Base/ContextMenu';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
-import { useSmartNavigate } from '../../components/useSmartNavigate';
+import { useSmartNavigate } from '../../hooks/navigation/useSmartNavigate';
 
 interface DrawerCardProps {
     drawer: Drawer | Driver_Drawer;
@@ -21,11 +21,14 @@ interface DrawerCardProps {
 }
 
 export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
-    const { drawer: ctxDrawer, orders, ticket } = useOrderDashboardContext();
+    const { drawer: ctxDrawer, orders, ticket, summaries } = useOrderDashboardContext();
     const fullName = getDrawerFullName(drawer);
     const isOpen = ctxDrawer.current?.drawer_id === drawer?.drawer_id;
     const orderCount = orders.byDrawerID(drawer.drawer_id).length;
     const drawerRef = useRef<HTMLDivElement>(null);
+
+    const summary = summaries.byDrawerID(drawer.drawer_id);
+    const isLocked = summary?.is_locked || false;
 
     if (drawerRef.current) {
         ctxDrawer.refs[drawer.drawer_id] = drawerRef;
@@ -33,19 +36,15 @@ export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
 
     const selectedTicketsCount = ticket.count.selected;
 
-    const tooltip =
-        !isOpen && selectedTicketsCount ? (
-            <Typography variant="body2">
-                Add {selectedTicketsCount} tickets to {fullName}
-            </Typography>
-        ) : (
-            ''
-        );
+    const tooltip = !isOpen
+        ? selectedTicketsCount
+            ? `Add ${selectedTicketsCount} tickets to ${fullName}`
+            : `Show ${fullName}`
+        : `Show Unassigned`;
 
-    // Used React Fragment to stop tooltip from warning that its children can't be passed a ref
     return (
         <Tooltip title={tooltip}>
-            <>
+            <div>
                 <DrawerCardBase
                     drawer={drawer}
                     drawerRef={drawerRef}
@@ -54,8 +53,9 @@ export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
                     handleClick={() => ctxDrawer.onClick(drawer)}
                     sx={sx}
                     props={props}
+                    isLocked={isLocked}
                 />
-            </>
+            </div>
         </Tooltip>
     );
 };
@@ -65,18 +65,14 @@ export const UnassignedDrawerAvatar = () => {
     return <DrawerCard drawer={drawer.unassigned} />;
 };
 
-export const DrawerAvatarSkeleton = () => {
-    return <DrawerCardBaseSkeleton />;
-};
-
-const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
+const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {
     const { setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>('managerDashboardTabName');
-    const { setValue: setDriver } = useLocalStorage<'openDrawer'>('openDrawer');
+    const { setValue: setDrawer } = useLocalStorage<'openDrawer'>('openDrawer');
     const smartNavigate = useSmartNavigate();
 
     const navigateToManagerDashboard = () => {
-        setTabName('drivers');
-        setDriver(driver);
+        setTabName('drawers');
+        setDrawer(drawer);
         smartNavigate({ to: '/manager', keepSearchParams: true });
     };
 
@@ -90,4 +86,4 @@ const DriverContextMenu = ({ driver }: { driver: Driver_Drawer }) => {
     );
 };
 
-DrawerCard.driverContextMenu = DriverContextMenu;
+DrawerCard.drawerContextMenu = DrawerContextMenu;
