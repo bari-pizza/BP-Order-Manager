@@ -11,9 +11,7 @@ import { OriginsTab } from './Tabs/OriginsTab';
 import { Todo } from '../../components/Base/Todo';
 import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
-import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
-
-const settingsLottieSrc = new URL('/Settings Icon.json', import.meta.url).href;
+import { SettingsLottieIcon } from '../../rickcedlib/LottieIcons';
 
 /*    TODO: About Today
         Sales
@@ -129,7 +127,7 @@ export const AdminDashboard = () => {
                         <Tab
                             value="settings"
                             label="Settings"
-                            icon={<LottieIcon lottieSrc={settingsLottieSrc} autoPlay={tabName === 'settings'} />}
+                            icon={<SettingsLottieIcon autoPlay={tabName === 'settings'} />}
                             iconPosition="start"
                         />
                     </Tabs>

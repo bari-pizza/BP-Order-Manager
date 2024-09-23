@@ -6,15 +6,16 @@ import { useUserContext } from '../hooks/data/useContextData';
 import { SmartLink } from './SmartNavigate';
 import dayjs from 'dayjs';
 import { useLocation } from 'react-router-dom';
-import { LottieIcon } from '../rickcedlib/LottieIcons/LottieIcon';
 
-const userLottieSrc = new URL('/User Profile Icon.json', import.meta.url).href;
-const homeLottieSrc = new URL('/Home Icon.json', import.meta.url).href;
-const timeLottieSrc = new URL('/Time Icon.json', import.meta.url).href;
-const searchLottieSrc = new URL('/Search Icon.json', import.meta.url).href;
-const adminLottieSrc = new URL('/Admin Shield Icon.json', import.meta.url).href;
-const staffLottieSrc = new URL('/Staff Icon.json', import.meta.url).href;
-const ordersLottieSrc = new URL('/Marketplace Icon.json', import.meta.url).href;
+import {
+    AdminShieldLottieIcon,
+    HomeLottieIcon,
+    MarketPlaceLottieIcon,
+    SearchLottieIcon,
+    StaffLottieIcon,
+    TimeLottieIcon,
+    UserProfileLottieIcon,
+} from '../rickcedlib/LottieIcons';
 
 const drawerWidth = 200;
 
@@ -36,27 +37,27 @@ export function NavBar() {
 
     const userListItem: NavBarItem = session
         ? { path: '/myaccount', icon: <UserAvatar />, text: 'Profile' }
-        : { path: '/login', icon: <LottieIcon lottieSrc={userLottieSrc} />, text: 'Login' };
+        : { path: '/login', icon: <UserProfileLottieIcon />, text: 'Login' };
 
     const listItems: NavBarItem[] = [
         {
             path: '/',
-            icon: <LottieIcon lottieSrc={homeLottieSrc} />,
+            icon: <HomeLottieIcon />,
             text: 'Home',
         },
         {
             text: today.isSame(businessDate, 'day') ? 'Today' : businessDate.format('MM/DD/YYYY'),
-            icon: <LottieIcon lottieSrc={timeLottieSrc} />,
+            icon: <TimeLottieIcon />,
             onClick: showBusinessDatePicker,
         },
-        { path: '/search', icon: <LottieIcon lottieSrc={searchLottieSrc} />, text: 'Search' },
+        { path: '/search', icon: <SearchLottieIcon />, text: 'Search' },
         profile?.is_admin && {
             path: '/admin',
-            icon: <LottieIcon lottieSrc={adminLottieSrc} />,
+            icon: <AdminShieldLottieIcon />,
             text: 'Admin',
         },
-        profile?.is_manager && { path: '/manager', icon: <LottieIcon lottieSrc={staffLottieSrc} />, text: 'Manager' },
-        { path: '/orders', icon: <LottieIcon lottieSrc={ordersLottieSrc} />, text: 'Orders' },
+        profile?.is_manager && { path: '/manager', icon: <StaffLottieIcon />, text: 'Manager' },
+        { path: '/orders', icon: <MarketPlaceLottieIcon />, text: 'Orders' },
         userListItem,
     ].filter(Boolean) as NavBarItem[];
 

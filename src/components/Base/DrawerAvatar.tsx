@@ -9,9 +9,7 @@ import {
 } from '@mui/icons-material';
 import { createElement } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
-
-const lockedLottieSrc = new URL('/Lock Icon.json', import.meta.url).href;
+import { LockLottieIcon } from '../../rickcedlib/LottieIcons';
 
 type DrawerAvatarProps = {
     size?: 'small' | 'medium' | 'large' | 'xlarge';
@@ -87,7 +85,7 @@ export const DrawerAvatar = ({
     });
     return (
         <Badge
-            badgeContent={isLocked ? <LottieIcon lottieSrc={lockedLottieSrc} /> : 0}
+            badgeContent={isLocked ? <LockLottieIcon /> : 0}
             sx={{
                 '& .MuiBadge-badge': {
                     background: 'transparent',
