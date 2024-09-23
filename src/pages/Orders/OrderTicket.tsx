@@ -13,9 +13,10 @@ import { OrderTypeIcon } from '../../components/Order/OrderTypeIcon';
 import { OriginLogo } from '../../components/Order/OriginLogo';
 import { PaymentTypeIcon } from './PaymentTypeIcon';
 import { formatCurrency } from '../../utils';
-import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
+// import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
+import { LockLottieIcon } from '../../rickcedlib/LottieIcons';
 
-const lockedLottieSrc = new URL('/Lock Icon.json', import.meta.url).href;
+// const lockedLottieSrc = new URL('/Lock Icon.json', import.meta.url).href;
 
 interface OrderTicketProps {
     order: Order_Payment;
@@ -149,7 +150,8 @@ export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProp
                         justifyContent: 'center',
                         alignItems: 'center',
                     }}>
-                    <LottieIcon lottieSrc={lockedLottieSrc} height="8em" width="8em" />
+                    <LockLottieIcon height="8em" width="8em" />
+                    {/* <LottieIcon lottieSrc={lockedLottieSrc} height="8em" width="8em" /> */}
                 </div>
             )}
 
