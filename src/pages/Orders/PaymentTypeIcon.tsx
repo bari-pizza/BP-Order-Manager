@@ -1,18 +1,16 @@
 import { Tooltip } from '@mui/material';
 import { PaymentType } from '../../typesAndValidators';
 import { Money as CashIcon } from '@mui/icons-material';
-import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
-const cardLottieSrc = new URL('/Credit Card Icon.json', import.meta.url).href;
-const thirdPartyLottieSrc = new URL('/Third Party Icon.json', import.meta.url).href;
+import { CreditCardLottieIcon, ThirdPartyLottieIcon } from '../../rickcedlib/LottieIcons';
 
 export const PaymentTypeIcon = ({ paymentType }: { paymentType?: PaymentType }) => {
     if (!paymentType) return null;
     let icon = <CashIcon />;
     if (paymentType === 'card') {
-        icon = <LottieIcon lottieSrc={cardLottieSrc} />;
+        icon = <CreditCardLottieIcon />;
     } else if (paymentType === 'third_party') {
         // icon = <ThirdPartyIcon />;
-        icon = <LottieIcon lottieSrc={thirdPartyLottieSrc} />;
+        icon = <ThirdPartyLottieIcon />;
     }
     return (
         <Tooltip

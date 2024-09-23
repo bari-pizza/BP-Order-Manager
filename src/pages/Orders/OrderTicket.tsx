@@ -8,15 +8,11 @@ import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
-import pizzaSrc from '/pizza slice.png';
 import { OrderTypeIcon } from '../../components/Order/OrderTypeIcon';
 import { OriginLogo } from '../../components/Order/OriginLogo';
 import { PaymentTypeIcon } from './PaymentTypeIcon';
 import { formatCurrency } from '../../utils';
-// import { LottieIcon } from '../../rickcedlib/LottieIcons/LottieIcon';
 import { LockLottieIcon } from '../../rickcedlib/LottieIcons';
-
-// const lockedLottieSrc = new URL('/Lock Icon.json', import.meta.url).href;
 
 interface OrderTicketProps {
     order: Order_Payment;
@@ -90,7 +86,7 @@ export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProp
                             <>
                                 <LocalPizzaRoundedIcon color={'primary'} ref={ticketRef} />
                                 <img
-                                    src={pizzaSrc}
+                                    src="../../assets/pizza slice.png"
                                     alt="pizza"
                                     width="24px"
                                     height="24px"
@@ -151,7 +147,6 @@ export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProp
                         alignItems: 'center',
                     }}>
                     <LockLottieIcon height="8em" width="8em" />
-                    {/* <LottieIcon lottieSrc={lockedLottieSrc} height="8em" width="8em" /> */}
                 </div>
             )}
 
