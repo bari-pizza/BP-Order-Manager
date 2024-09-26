@@ -30,19 +30,42 @@ export const DrawerSideBar = () => {
     const { open, close, isOpen } = useDialogProps();
     const [businessDate] = useBusinessDate();
     const { constants } = useBariPizzaContext();
-    const { orders, drawers, summaries } = useManagerDashboardContext();
+    const { orders, drawers, summaries, cashTransfers } = useManagerDashboardContext();
+
     const currentDrawer = drawers.current;
     const currentDrawerID = currentDrawer?.drawer_id || '';
-    // const { businessDayDrawerSummaryMutations } = useBusinessDayDrawerSummaryCRUD({
-    //     businessDate,
-    //     drawerID: currentDrawerID,
-    // });
-    // const { data: summary } = businessDayDrawerSummaryMutations.getOne;
     const summary = summaries.byDrawerID(currentDrawerID);
+
+    const transfers = cashTransfers.forCurrentDrawer;
+    console.log({ transfers });
+
+    /*TODO: ***Cash Transfer ****
+        get all cash transfers in context (figure out if I need them in any other screens)
+
+        find bank cash transfer for drawer
+        if doesnt exist, use default value
+        if exists, use value
+
+        on save, create new cash transfer with bank_in_cents value
+        or update cash transfer with bank_in_cents value
+
+        allow user to change bank source 
+
+        implement a way to create other cash transfers
+
+        determine payment to be created
+
+        clicking on mark as paid should create payment cash transfer
+
+        backend - if source or destination is_locked, don't allow changes
+
+    
+    */
 
     const defaultValues = useMemo(() => {
         return {
-            bank_in_cents: constants.default.starting_cash_in_cents,
+            bank_in_cents: constants.default.driver_starting_cash_in_cents,
+            register_in_cents: constants.default.register_starting_cash_in_cents,
             hours: 0,
             hours_in_cents: 0,
             other_in_cents: 0,
@@ -170,37 +193,65 @@ export const DrawerSideBar = () => {
     const thirdParty = drawerSummary.third_party_in_cents + drawerSummary.third_party_tips_in_cents;
     const deliveryFees = drawerSummary.delivery_fees_in_cents;
     const other = watch('other_in_cents');
-    const items = [
-        {
-            label: 'Total',
-            value: total,
-        },
-        {
-            label: '+ Bank',
-            value: bank,
-        },
-        {
-            label: '- Hours',
-            value: -hours,
-        },
-        {
-            label: '- Cards',
-            value: -card,
-        },
-        {
-            label: '- 3rd Party',
-            value: -thirdParty,
-        },
-        {
-            label: '- Deliveries',
-            value: -deliveryFees,
-        },
-        {
-            label: '- Other',
-            value: -other,
-        },
-    ];
-    // const runningTotals = getRunningTotal([total, bank, -hours, -card, -thirdParty, -deliveryFees, -other]);
+    const items = [];
+    switch (currentDrawer.drawer_type) {
+        case 'driver':
+            items.push(
+                {
+                    label: 'Total',
+                    value: total,
+                },
+                {
+                    label: '+ Bank',
+                    value: bank,
+                },
+                {
+                    label: '- Hours',
+                    value: -hours,
+                },
+                {
+                    label: '- Cards',
+                    value: -card,
+                },
+                {
+                    label: '- 3rd Party',
+                    value: -thirdParty,
+                },
+                {
+                    label: '- Deliveries',
+                    value: -deliveryFees,
+                },
+                {
+                    label: '- Other',
+                    value: -other,
+                },
+            );
+            break;
+        case 'register':
+            items.push(
+                {
+                    label: 'Total',
+                    value: total,
+                },
+                {
+                    label: '- Cards',
+                    value: -card,
+                },
+            );
+            break;
+        case 'third_party':
+            items.push(
+                {
+                    label: 'DoorDash',
+                    value: total,
+                },
+                {
+                    label: 'GrubHub',
+                    value: other,
+                },
+            );
+            break;
+    }
     const isLocked = summary?.is_locked || false;
 
     return (

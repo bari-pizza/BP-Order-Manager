@@ -6,8 +6,9 @@ import { Button } from '@mui/material';
 
 type FormValues = {
     default_delivery_fee_in_cents: number;
-    default_starting_cash: number;
+    default_driver_starting_cash: number;
     default_driver_hourly_wage: number;
+    default_register_starting_cash: number;
 };
 
 export const SettingsTab = () => {
@@ -15,8 +16,9 @@ export const SettingsTab = () => {
     const { control, handleSubmit } = useForm<FormValues>({
         defaultValues: {
             default_delivery_fee_in_cents: constants.default.delivery_fee_in_cents,
-            default_starting_cash: constants.default.starting_cash_in_cents,
+            default_driver_starting_cash: constants.default.driver_starting_cash_in_cents,
             default_driver_hourly_wage: constants.default.driver_hourly_wage_in_cents,
+            default_register_starting_cash: constants.default.register_starting_cash_in_cents,
         },
     });
 
@@ -38,11 +40,35 @@ export const SettingsTab = () => {
                 )}
             />
             <Controller
-                name="default_starting_cash"
+                name="default_driver_starting_cash"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                     <TextFieldWithMask
-                        label="Default Cash"
+                        label="Default Driver Starting Cash"
+                        maskVariant="currency"
+                        value={value}
+                        handleChange={onChange}
+                    />
+                )}
+            />
+            <Controller
+                name="default_driver_hourly_wage"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                    <TextFieldWithMask
+                        label="Default Wage"
+                        maskVariant="currency"
+                        value={value}
+                        handleChange={onChange}
+                    />
+                )}
+            />
+            <Controller
+                name="default_register_starting_cash"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                    <TextFieldWithMask
+                        label="Default Register Starting Cash"
                         maskVariant="currency"
                         value={value}
                         handleChange={onChange}

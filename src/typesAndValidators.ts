@@ -18,11 +18,13 @@ export type Payment = Tables<'Payment'>;
 export type Order_Payment = Order & { payments: Payment[] };
 export type PaymentType = Tables<'Payment'>['payment_type'];
 export type BusinessDayDrawerSummary = Tables<'BusinessDayDrawer'>;
+export type CashTransfer = Tables<'CashTransfer'>;
 
 export type NewProfile = Omit<Profile, 'id' | 'created_at'>;
 export type NewDrawer = Omit<Drawer, 'drawer_id' | 'created_at'>;
 export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 export type NewPayment = Omit<Payment, 'payment_id' | 'created_at'>;
+export type NewCashTransfer = Omit<CashTransfer, 'cash_transfer_id' | 'created_at'>;
 
 export type OrderWithFullDetails = Order_Payment & {
     drawer?: Drawer;

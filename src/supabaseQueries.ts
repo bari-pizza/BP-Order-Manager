@@ -15,9 +15,6 @@ import { z } from 'zod';
 import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
 import { PostgrestError } from '@supabase/supabase-js';
-// const bariPizzaLogo = new URL('/BP logo.png', import.meta.url).href;
-// const doorDashLogo = new URL('/DoorDash logo.png', import.meta.url).href;
-// const pizzamicoLogo = new URL('/Pizzamico logo.ico', import.meta.url).href;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 

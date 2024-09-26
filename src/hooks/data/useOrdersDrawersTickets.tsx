@@ -1,11 +1,12 @@
 import { useRef, useState, RefObject } from 'react';
-import type { Drawer, Driver_Drawer, Order_Payment } from '../../typesAndValidators';
+import type { CashTransfer, Drawer, Driver_Drawer, Order_Payment } from '../../typesAndValidators';
 import { useBusinessDate } from '../data/useBusinessDate';
 import { useLocalStorage } from './useLocalStorage';
 import { useBusinessDayDrawerAPI } from '../../api/businessDayDrawer';
 import { useOrderAPI } from '../../api/order';
 import { RPCPayload } from '../../api/helpers';
 import useSubscribeToTable from './useSubscribeToTable';
+import { useCashTransferAPI } from '../../api/cashTransfer';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -22,7 +23,9 @@ export const useOrdersDrawersTickets = () => {
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
     });
+    const { cashTransferAPI } = useCashTransferAPI({ businessDate });
     const { data: summaries } = businessDayDrawerAPI.getAll;
+    const { data: cashTransfers } = cashTransferAPI.getAll;
 
     const allPayments = allOrders.flatMap((order) => order.payments);
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
@@ -179,8 +182,6 @@ export const useOrdersDrawersTickets = () => {
         return [];
     };
 
-    // TODO: *** look into subscribing to orders ***
-
     const closeBusinessDayDrawer = (drawer: Drawer | Driver_Drawer) => {
         businessDayDrawerAPI.close({ drawerID: drawer.drawer_id });
     };
@@ -195,6 +196,31 @@ export const useOrdersDrawersTickets = () => {
         }
         const summary = summaries.find(({ drawer_id }) => drawer_id === drawerID) || null;
         return summary;
+    };
+
+    const getCashTransferByDrawerID = (drawerID?: string) => {
+        const byType: { bank: CashTransfer | null; payment: CashTransfer | null; other: CashTransfer[] } = {
+            bank: null,
+            payment: null,
+            other: [],
+        };
+        if (!drawerID) {
+            return byType;
+        }
+        cashTransfers.forEach((transfer) => {
+            const { source, destination, transfer_type } = transfer;
+            if (source !== drawerID && destination !== drawerID) {
+                return;
+            }
+            if (transfer_type === 'bank') {
+                byType.bank = transfer;
+            } else if (transfer_type === 'payment') {
+                byType.payment = transfer;
+            } else {
+                byType.other.push(transfer);
+            }
+        });
+        return byType;
     };
 
     return {
@@ -238,6 +264,12 @@ export const useOrdersDrawersTickets = () => {
             forCurrentDrawer: getSummaryByDrawerID(openDrawer?.drawer_id),
             byDrawerID: (drawerID: string) => getSummaryByDrawerID(drawerID),
             update: businessDayDrawerAPI.upsert,
+        },
+        cashTransfers: {
+            all: cashTransfers,
+            forCurrentDrawer: getCashTransferByDrawerID(openDrawer?.drawer_id),
+            byDrawerID: (drawerID: string) => getCashTransferByDrawerID(drawerID),
+            update: cashTransferAPI.update,
         },
     };
 };

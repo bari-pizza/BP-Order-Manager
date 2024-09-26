@@ -1,5 +1,12 @@
 import { createContext } from 'react';
-import { BusinessDayDrawerSummary, Drawer, Driver_Drawer, Order_Payment, OrderOrigin } from '../typesAndValidators';
+import {
+    BusinessDayDrawerSummary,
+    CashTransfer,
+    Drawer,
+    Driver_Drawer,
+    Order_Payment,
+    OrderOrigin,
+} from '../typesAndValidators';
 
 interface ManagerDashboardProps {
     // all orders, drivers, and origins are already provided by BariPizzaContext
@@ -27,6 +34,20 @@ interface ManagerDashboardProps {
         forCurrentDrawer: BusinessDayDrawerSummary | null;
         byDrawerID: (drawerID: string) => BusinessDayDrawerSummary | null;
         update: (summary: BusinessDayDrawerSummary) => void;
+    };
+    cashTransfers: {
+        all: CashTransfer[];
+        forCurrentDrawer: {
+            bank: CashTransfer | null;
+            payment: CashTransfer | null;
+            other: CashTransfer[];
+        };
+        byDrawerID: (drawerID: string) => {
+            bank: CashTransfer | null;
+            payment: CashTransfer | null;
+            other: CashTransfer[];
+        };
+        update: (cashTransfer: CashTransfer) => void;
     };
     combinedDrawersAndDrivers: (Drawer | Driver_Drawer)[];
     orders: {
@@ -58,6 +79,22 @@ export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
         all: [],
         forCurrentDrawer: null,
         byDrawerID: () => null,
+        update: () => {},
+    },
+    cashTransfers: {
+        all: [],
+        forCurrentDrawer: {
+            bank: null,
+            payment: null,
+            other: [],
+        },
+        byDrawerID: () => {
+            return {
+                bank: null,
+                payment: null,
+                other: [],
+            };
+        },
         update: () => {},
     },
     combinedDrawersAndDrivers: [],

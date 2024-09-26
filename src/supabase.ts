@@ -88,6 +88,57 @@ export type Database = {
         }
         Relationships: []
       }
+      CashTransfer: {
+        Row: {
+          amount_in_cents: number
+          business_date: string
+          cash_transfer_id: string
+          created_at: string
+          destination: string | null
+          source: string | null
+          special_note: string
+          title: string
+          transfer_type: Database["public"]["Enums"]["transfer_type"]
+        }
+        Insert: {
+          amount_in_cents?: number
+          business_date: string
+          cash_transfer_id?: string
+          created_at?: string
+          destination?: string | null
+          source?: string | null
+          special_note?: string
+          title?: string
+          transfer_type: Database["public"]["Enums"]["transfer_type"]
+        }
+        Update: {
+          amount_in_cents?: number
+          business_date?: string
+          cash_transfer_id?: string
+          created_at?: string
+          destination?: string | null
+          source?: string | null
+          special_note?: string
+          title?: string
+          transfer_type?: Database["public"]["Enums"]["transfer_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "CashTransfer_destination_fkey"
+            columns: ["destination"]
+            isOneToOne: false
+            referencedRelation: "Drawer"
+            referencedColumns: ["drawer_id"]
+          },
+          {
+            foreignKeyName: "CashTransfer_source_fkey"
+            columns: ["source"]
+            isOneToOne: false
+            referencedRelation: "Drawer"
+            referencedColumns: ["drawer_id"]
+          },
+        ]
+      }
       Drawer: {
         Row: {
           created_at: string
@@ -401,6 +452,7 @@ export type Database = {
       drawer_type: "driver" | "register" | "third_party" | "unassigned"
       order_type: "delivery" | "pickup"
       payment_type: "cash" | "card" | "third_party"
+      transfer_type: "bank" | "payment" | "other"
     }
     CompositeTypes: {
       [_ in never]: never

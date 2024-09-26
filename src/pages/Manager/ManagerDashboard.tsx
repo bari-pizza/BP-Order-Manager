@@ -51,7 +51,7 @@ function TabPanel(props: TabPanelProps) {
 type TabName = ManagerDashboardTabName;
 
 export const ManagerDashboard = () => {
-    const { orders, drawer, summaries } = useOrdersDrawersTickets();
+    const { orders, drawer, summaries, cashTransfers } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>(
@@ -86,6 +86,7 @@ export const ManagerDashboard = () => {
         <ManagerDashboardContext.Provider
             value={{
                 orders,
+                cashTransfers,
                 drawers: {
                     all: drawers,
                     onClick: drawer.onClick,
