@@ -23,6 +23,7 @@ import { BusinessDayDrawerSummary } from '../../../typesAndValidators';
 import { useEffect, useMemo } from 'react';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { SummaryStack } from './SummaryStack';
+import { formatCurrency } from '../../../utils';
 
 type FormValues = BusinessDayDrawerSummary;
 
@@ -37,7 +38,7 @@ export const DrawerSideBar = () => {
     const summary = summaries.byDrawerID(currentDrawerID);
 
     const transfers = cashTransfers.forCurrentDrawer;
-    console.log({ transfers });
+    const bankTransfer = transfers.bank;
 
     /*TODO: ***Cash Transfer ****
         get all cash transfers in context (figure out if I need them in any other screens)
@@ -64,7 +65,7 @@ export const DrawerSideBar = () => {
 
     const defaultValues = useMemo(() => {
         return {
-            bank_in_cents: constants.default.driver_starting_cash_in_cents,
+            bank_in_cents: bankTransfer?.amount_in_cents || constants.default.driver_starting_cash_in_cents,
             register_in_cents: constants.default.register_starting_cash_in_cents,
             hours: 0,
             hours_in_cents: 0,
@@ -75,7 +76,7 @@ export const DrawerSideBar = () => {
             special_note: '',
             ...summary,
         };
-    }, [constants, currentDrawer, businessDate, summary]);
+    }, [constants, currentDrawer, businessDate, summary, bankTransfer]);
 
     // TODO: ***is locked logic***
 
@@ -111,6 +112,7 @@ export const DrawerSideBar = () => {
 
     const drawersOrders = orders.byDrawerID(currentDrawer.drawer_id);
     const drawerSummary = {
+        bank_in_cents: 0,
         total_in_cents: 0,
         orders: 0,
         cash_in_cents: 0,
@@ -282,9 +284,10 @@ export const DrawerSideBar = () => {
                     ) : (
                         <>
                             <Typography variant="h6">ORDERS: {drawerSummary.orders}</Typography>
-                            <Typography variant="h6">
-                                TOTAL: ${(drawerSummary.total_in_cents / 100).toFixed(2)}
-                            </Typography>
+                            <Typography variant="h6">TOTAL: {formatCurrency(drawerSummary.total_in_cents)}</Typography>
+
+                            <Typography variant="h6">BANK: {formatCurrency(drawerSummary.bank_in_cents)}</Typography>
+                            <Button>Cash Transfers</Button>
                             {isDriver && (
                                 <>
                                     <Controller

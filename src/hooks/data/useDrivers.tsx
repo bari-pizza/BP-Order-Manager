@@ -66,12 +66,14 @@ export const useDrivers = () => {
     });
 
     const addDriver = (driver: Driver_Drawer) => {
+        // should create a bank transfer as well
         const drawerID = driver.drawer_id;
         toastRef.current['add'] = addDriverToBusinessDayToast(driver.name, businessDate);
         addDriverToDayMutation.mutate({ drawerID, businessDate });
     };
 
     const removeDriver = (driver: Driver_Drawer) => {
+        // should delete a bank transfer as well
         const drawerID = driver.drawer_id;
         toastRef.current['remove'] = removeDriverFromBusinessDayToast(driver.name, businessDate);
         removeDriverFromDayMutation.mutate({ drawerID, businessDate });
