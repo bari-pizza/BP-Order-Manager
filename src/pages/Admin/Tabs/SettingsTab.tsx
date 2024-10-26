@@ -30,7 +30,7 @@ export const SettingsTab = () => {
         console.log(data);
     };
     return (
-        <LabeledStack label="Settings" spacing={2}>
+        <LabeledStack label="Settings" spacing={2} alignItems="center">
             <Controller
                 name="default_delivery_fee_in_cents"
                 control={control}
@@ -90,7 +90,7 @@ export const SettingsTab = () => {
                         value={value}
                         sx={{ width: 225 }}
                         onChange={(_, drawerID) => onChange(drawerID || '')}
-                        renderInput={(params) => <TextField {...params} label="Register" />}
+                        renderInput={(params) => <TextField {...params} label="Default Bank Register" />}
                         getOptionLabel={(option) => drawers.find((d) => d.drawer_id === option)?.name || ''}
                     />
                 )}
