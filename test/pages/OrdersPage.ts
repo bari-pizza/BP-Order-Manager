@@ -1,12 +1,17 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { AddOrderProcess } from '../utils/processes';
+import { OrderData } from '../utils/data';
 
 type DrawerIndentifier = string | number;
 type OrderIdentifier = string | number;
 
 export class OrdersPage extends BasePage {
+    private addOrderProcess: AddOrderProcess;
+
     constructor(page: Page) {
         super(page);
+        this.addOrderProcess = new AddOrderProcess(this.page);
     }
 
     // Get drawer by name or index (starting from 1)
@@ -35,8 +40,14 @@ export class OrdersPage extends BasePage {
         if (!drawerLocator) {
             throw new Error('Drawer locator is null');
         }
+        const originallyOpen = (await drawerLocator.getAttribute('class'))?.includes('open-drawer');
         await drawerLocator.click();
-        await this.page.waitForTimeout(1000);
+
+        if (originallyOpen) {
+            await expect(drawerLocator).not.toHaveClass(/open-drawer/);
+        } else {
+            await expect(drawerLocator).toHaveClass(/open-drawer/);
+        }
     }
 
     async rightClickDrawer(drawerLocator: Locator | null) {
@@ -44,51 +55,29 @@ export class OrdersPage extends BasePage {
             throw new Error('Drawer locator is null');
         }
         await drawerLocator.click({ button: 'right' });
-        await this.page.waitForTimeout(1000);
     }
 
     // Select or unselect an OrderTicket
     async selectOrderTicket(orderIdentifier: OrderIdentifier) {
         await this.page.click(`text=${orderIdentifier}`);
-        await this.page.waitForTimeout(1000);
     }
 
     async unselectOrderTicket(orderIdentifier: OrderIdentifier) {
         await this.page.click(`text=${orderIdentifier}`);
-        await this.page.waitForTimeout(1000);
     }
 
     // Open an OrderTicket for details
     async openOrderTicket(orderIdentifier: OrderIdentifier) {
         await this.page.click(`text=${orderIdentifier} >> .open-button-selector`);
-        await this.page.waitForTimeout(1000);
     }
 
     // Select all OrderTickets
     async selectAllTickets() {
         await this.page.click('text=SELECT ALL');
-        await this.page.waitForTimeout(1000);
     }
 
     // Add new order
-    async addOrder() {
-        await this.page.click('text=ADD ORDER');
-        await this.page.waitForTimeout(1000);
-    }
-
-    // Assertion Methods
-    async assertDrawerIsSelected(identifier: DrawerIndentifier) {
-        const drawer = await this.getDrawer(identifier);
-        expect(drawer).toHaveClass(/open-drawer/);
-    }
-
-    async assertOrderTicketSelected(orderNumber: string) {
-        const ticket = this.page.locator(`text=${orderNumber}`);
-        await expect(ticket).toHaveClass(/selected/);
-    }
-
-    async assertOrderAdded(orderNumber: string) {
-        const addedOrder = this.page.locator(`text=${orderNumber}`);
-        await expect(addedOrder).toBeVisible();
+    async addOrder(orderData?: Omit<OrderData, 'orderNumber' | 'orderName'>) {
+        await this.addOrderProcess.completeAddOrder(orderData || null);
     }
 }

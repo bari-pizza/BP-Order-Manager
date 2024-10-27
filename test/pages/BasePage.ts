@@ -1,9 +1,8 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 export class BasePage {
     constructor(protected page: Page) {
         this.page = page;
-        page.goto('/');
     }
 
     async waitForTimeout(timeout: number) {
@@ -12,10 +11,14 @@ export class BasePage {
 
     async login() {
         await this.page.goto('/login');
+        await expect(this.page.locator('input[name="email"]')).toBeVisible();
         await this.page.fill('input[name="email"]', 'ccata002@gmail.com');
+
+        await expect(this.page.locator('input[name="password"]')).toBeVisible();
         await this.page.fill('input[name="password"]', 'Password1234!');
+
+        await expect(this.page.locator('button[type="submit"]')).toBeVisible();
         await this.page.click('button[type="submit"]');
-        await this.page.waitForTimeout(1000);
     }
 
     // Common navigation methods
@@ -24,10 +27,12 @@ export class BasePage {
     }
 
     async navigateToOrders() {
-        (await this.page.waitForSelector('text=Orders', { state: 'attached' })).click();
+        await expect(this.page.locator('text=Orders')).toBeVisible();
+        await this.page.click('text=Orders');
     }
 
     async navigateToManager() {
+        await expect(this.page.locator('text=Manager')).toBeVisible();
         await this.page.click('text=Manager');
     }
 
