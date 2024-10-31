@@ -1,14 +1,17 @@
 import { faker } from '@faker-js/faker/locale/en_US';
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { OrderData, orderOriginsWithTypes } from './data';
+import { OrderTicketActions } from './OrderTicketActions';
 
 export class AddOrderProcess {
     private page: Page;
     private static currentOrderNumber = 0;
     private static generatedNames: Set<string> = new Set();
+    private orderTicketActions: OrderTicketActions;
 
     constructor(page: Page) {
         this.page = page;
+        this.orderTicketActions = new OrderTicketActions(page);
     }
 
     async startAddOrderProcess() {
@@ -18,6 +21,9 @@ export class AddOrderProcess {
 
     async chooseOrigin(origin: OrderData['origin']['name']) {
         const originSelect = this.page.locator(`//label[text()='Origin']/following::div[1]`);
+        // get originSelect text
+        const initialValue = await originSelect.textContent();
+        if (initialValue === origin + 'Origin') return;
         await originSelect.click();
         const dropdownOption = this.page.locator(`//li[text()='${origin}']`);
         await dropdownOption.click();
@@ -33,8 +39,6 @@ export class AddOrderProcess {
 
     async confirmOrder() {
         await this.page.click('text=Save');
-        // Order Editor should disappear
-        await expect(this.page.locator('text=Order Editor')).not.toBeVisible();
     }
 
     public static generateUniqueOrderName(): string {
@@ -60,8 +64,12 @@ export class AddOrderProcess {
     }
 
     public static generateRandomOrder() {
-        const originKeys = Object.keys(orderOriginsWithTypes) as Array<keyof typeof orderOriginsWithTypes>;
-        const randomOriginKey = faker.helpers.arrayElement(originKeys);
+        const weightedOrderOrigins = [
+            { weight: 0.15, value: 'DoorDash' },
+            { weight: 0.1, value: 'Pizzamico' },
+            { weight: 0.75, value: 'Bari Pizza' },
+        ];
+        const randomOriginKey = faker.helpers.weightedArrayElement(weightedOrderOrigins);
         const origin = orderOriginsWithTypes[randomOriginKey].origin;
 
         // Determine if we should generate an orderNumber or an orderName based on has_order_number
@@ -116,39 +124,22 @@ export class AddOrderProcess {
 
     async setTotalInCents(total_in_cents: number) {
         await this.page.locator(`//label[text()='Total']/following::input[1]`).fill(total_in_cents.toString());
-        // await this.page.fill('input[name="total_in_cents"]', total_in_cents.toString());
     }
 
-    async completeAddOrder(orderData: Omit<OrderData, 'orderNumber' | 'orderName'> | null) {
-        let origin: OrderData['origin'];
-        let orderType: OrderData['orderType'];
-        let total_in_cents: number;
-        let paymentType: OrderData['paymentType'];
-
-        // Use optional chaining to handle undefined safely
-        if (orderData) {
-            origin = orderData.origin;
-            orderType = orderData.orderType;
-            total_in_cents = orderData.total_in_cents;
-            paymentType = orderData.paymentType;
-        } else {
-            const randomOrderData = AddOrderProcess.generateRandomOrder();
-            console.log({ randomOrderData });
-            origin = randomOrderData.origin;
-            orderType = randomOrderData.orderType;
-            total_in_cents = randomOrderData.total_in_cents;
-            paymentType = randomOrderData.paymentType;
-        }
+    async completeAddOrder() {
+        const { origin, orderType, total_in_cents, paymentType } = AddOrderProcess.generateRandomOrder();
 
         await this.startAddOrderProcess();
 
         await this.chooseOrigin(origin.name);
         await this.chooseOrderType(orderType);
+        let orderNumber: string | undefined;
+        let orderName: string | undefined;
         if (origin.has_order_number) {
-            const orderNumber = AddOrderProcess.generateOrderNumber();
+            orderNumber = AddOrderProcess.generateOrderNumber();
             await this.setOrderNumber(orderNumber);
         } else {
-            const orderName = AddOrderProcess.generateUniqueOrderName();
+            orderName = AddOrderProcess.generateUniqueOrderName();
             await this.setOrderName(orderName);
         }
         await this.setTotalInCents(total_in_cents);

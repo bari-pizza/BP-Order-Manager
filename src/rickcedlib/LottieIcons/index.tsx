@@ -22,6 +22,7 @@ type LottieIconProps = {
     width?: string;
     loop?: boolean;
     autoPlay?: boolean;
+    className?: string;
 };
 
 export const AdminShieldLottieIcon = ({ ...props }: LottieIconProps) => {

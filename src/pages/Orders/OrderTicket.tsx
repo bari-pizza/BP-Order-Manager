@@ -75,11 +75,11 @@ export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProp
     const isLocked = order.is_locked;
 
     return (
-        <Card variant="elevation" sx={cardSX} raised className="lottie-icon-container">
+        <Card variant="elevation" sx={cardSX} raised className="lottie-icon-container order-ticket">
             <CardActionArea onClick={handleSelect}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
-                        <Typography variant="h5">
+                        <Typography variant="h5" className={order.order_name ? 'order-name' : 'order-number'}>
                             {order.order_name ?? `Order #${order.order_number || 'N/A'}`}
                         </Typography>
                         {selected ? (
@@ -109,16 +109,22 @@ export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProp
                             <>
                                 <PaymentTypeIcon paymentType={initialPayment?.payment_type} />
                                 <Divider orientation="vertical" />
-                                <Typography variant="body1" color={isPaidValid ? 'primary' : 'error'}>
+                                <Typography
+                                    variant="body1"
+                                    color={isPaidValid ? 'primary' : 'error'}
+                                    className="order-total">
                                     {formatCurrency(order.total_in_cents)}
                                 </Typography>
                                 <Divider orientation="vertical" />
-                                <Typography variant="body1" color={totalTips > 0 ? 'primary' : 'error'}>
+                                <Typography
+                                    variant="body1"
+                                    color={totalTips > 0 ? 'primary' : 'error'}
+                                    className="order-tips">
                                     {formatCurrency(totalTips)}
                                 </Typography>
                             </>
                         ) : (
-                            <Typography variant="body1" color="error">
+                            <Typography variant="body1" color="error" className="order-total">
                                 {formatCurrency(order.total_in_cents)}
                             </Typography>
                         )}

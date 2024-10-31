@@ -23,17 +23,20 @@ export class BasePage {
 
     // Common navigation methods
     async navigateToHome() {
-        await this.page.click('text=Home');
+        await expect(this.page.locator('.MuiDrawer-docked >> text=Home')).toBeVisible();
+        await this.page.locator('.MuiDrawer-docked >> text=Home').click();
     }
 
     async navigateToOrders() {
-        await expect(this.page.locator('text=Orders')).toBeVisible();
-        await this.page.click('text=Orders');
+        const ordersLink = this.page.locator('.MuiDrawer-docked >> text=Orders');
+        await expect(ordersLink).toBeVisible();
+        console.log({ ordersLink });
+        await ordersLink.click();
     }
 
     async navigateToManager() {
-        await expect(this.page.locator('text=Manager')).toBeVisible();
-        await this.page.click('text=Manager');
+        await expect(this.page.locator('.MuiDrawer-docked >> text=Manager')).toBeVisible();
+        await this.page.locator('.MuiDrawer-docked >> text=Manager').click();
     }
 
     // Common page methods (like waiting for elements)

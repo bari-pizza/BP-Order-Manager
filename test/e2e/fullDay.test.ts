@@ -1,7 +1,6 @@
 import { test, chromium, Browser, BrowserContext } from '@playwright/test';
 import { ManagerPage } from '../pages/ManagerPage';
 import { OrdersPage } from '../pages/OrdersPage';
-import { orderOriginsWithTypes } from '../utils/data';
 
 let browser: Browser;
 let context: BrowserContext;
@@ -28,7 +27,7 @@ test.afterAll(async () => {
     await browser.close();
 });
 
-test.only('should add drivers to the day', async () => {
+test('should add drivers to the day', async () => {
     // const managerPage = new ManagerPage(page);
     // await managerPage.login();
     await managerPage.navigateToManager();
@@ -36,26 +35,25 @@ test.only('should add drivers to the day', async () => {
     await managerPage.addDriver('Cedrick Catalan');
     await managerPage.addDriver('Julia Catalan');
 });
-test('should add about 80 mock orders to the day', async () => {
+
+test('should add mock orders to the day', async () => {
+    test.setTimeout(1000 * 60 * 5);
     await ordersPage.navigateToOrders();
-    // const doordash = orderOriginsWithTypes['DoorDash'].origin;
-    // await ordersPage.addOrder({
-    //     origin: doordash,
-    //     total_in_cents: 1523,
-    //     paymentType: 'third_party',
-    //     orderType: 'pickup',
-    // });
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
-    await ordersPage.addOrder();
+    await ordersPage.createRandomOrders(10, 15);
 });
-//     test('should assign orders to drivers', async ({ page }) => {});
+
+test('should add orders to random drawers', async () => {
+    test.setTimeout(1000 * 60 * 5);
+    await ordersPage.navigateToOrders();
+    // make sure its loaded
+    console.log('Navigated to orders');
+    let hasUnassignedOrders = await ordersPage.hasUnassignedOrders();
+    // go through every ticket (reverse order) and add it to a random drawer
+    while (hasUnassignedOrders) {
+        await ordersPage.assignOrderToRandomDrawer();
+        hasUnassignedOrders = await ordersPage.hasUnassignedOrders();
+        console.log(hasUnassignedOrders);
+    }
+});
 //     test('should close out each driver', async ({ page }) => {});
 //     test('should close out the day', async ({ page }) => {});

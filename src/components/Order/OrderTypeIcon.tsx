@@ -3,9 +3,9 @@ import { CarLottieIcon } from '../../rickcedlib/LottieIcons';
 
 export const OrderTypeIcon = ({ orderType }: { orderType: string }) => {
     if (orderType === 'pickup') {
-        return <PickupIcon />;
+        return <PickupIcon className="order-type-pickup-icon" />;
     } else if (orderType === 'delivery') {
-        return <CarLottieIcon />;
+        return <CarLottieIcon className="order-type-delivery-icon" />;
     }
     return null;
 };

@@ -7,9 +7,16 @@ type LottieIconProps = {
     height?: string;
     width?: string;
     autoPlay?: boolean;
+    className?: string;
 };
 
-export const LottieIcon = ({ lottieSrc, height = '35px', width = '35px', autoPlay = false }: LottieIconProps) => {
+export const LottieIcon = ({
+    lottieSrc,
+    height = '35px',
+    width = '35px',
+    autoPlay = false,
+    className,
+}: LottieIconProps) => {
     const playerRef = useRef<Player | null>(null); // Ref to access Player methods
     const containerRef = useRef<HTMLDivElement | null>(null); // Ref to access DOM methods
 
@@ -61,6 +68,7 @@ export const LottieIcon = ({ lottieSrc, height = '35px', width = '35px', autoPla
             justifyContent="center"
             ref={containerRef}>
             <Player
+                className={className}
                 ref={playerRef}
                 src={lottieSrc}
                 loop
