@@ -9,6 +9,7 @@ import {
     RemoveCircleOutline as RemoveDriverIcon,
 } from '@mui/icons-material';
 import { deepmerge } from '@mui/utils';
+import { toast } from 'react-toastify';
 
 interface DrawerCardProps {
     drawer: Drawer | Driver_Drawer;
@@ -61,7 +62,7 @@ export const DrawerCard = ({ drawer, sx, props, isLocked, canOpen = true }: Draw
 
 const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {
     const smartNavigate = useSmartNavigate();
-    const { orders, drivers, drawers } = useManagerDashboardContext();
+    const { orders, drivers, drawers, cashTransfers } = useManagerDashboardContext();
     const drawerOrders = orders.byDrawerID(drawer.drawer_id);
     const currentDrawer = drawers.current;
 
@@ -76,13 +77,26 @@ const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {
         }
     };
 
-    let handleRemoveDriverClick;
-
-    if (drawerOrders.length === 0 && 'driver' in drawer) {
-        handleRemoveDriverClick = () => {
+    const handleRemoveDriverClick = () => {
+        if (drawerOrders.length === 0 && 'driver' in drawer) {
             drivers.remove(drawer);
-        };
-    }
+            const { bank, payment, other } = cashTransfers.byDrawerID(drawer.drawer_id);
+            console.log({ bank, payment, other });
+            if (bank) {
+                cashTransfers.delete(bank);
+            }
+            if (payment) {
+                cashTransfers.delete(payment);
+            }
+            if (other.length) {
+                other.forEach((transfer) => {
+                    cashTransfers.delete(transfer);
+                });
+            }
+        } else {
+            toast.error('Cannot remove driver unless all orders are removed first');
+        }
+    };
 
     const closeDriver = () => {
         drawers.close(drawer);

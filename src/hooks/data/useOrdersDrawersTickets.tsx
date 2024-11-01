@@ -267,6 +267,8 @@ export const useOrdersDrawersTickets = () => {
         },
         cashTransfers: {
             all: cashTransfers,
+            create: cashTransferAPI.create,
+            delete: cashTransferAPI.delete,
             forCurrentDrawer: getCashTransferByDrawerID(openDrawer?.drawer_id),
             byDrawerID: (drawerID: string) => getCashTransferByDrawerID(drawerID),
             update: cashTransferAPI.update,

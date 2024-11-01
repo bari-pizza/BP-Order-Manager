@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import TextFieldWithMask from '../../rickcedlib/TextFieldWithMask';
+import dayjs from 'dayjs';
 
 interface AddDriverCardProps {
     open: () => void;
@@ -25,7 +26,7 @@ const now = new Date();
 const dateAndHour = `${now.getDate()}-${now.getHours()}`;
 
 export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
-    const { drivers } = useManagerDashboardContext();
+    const { drivers, cashTransfers } = useManagerDashboardContext();
     const { constants, drawers } = useBariPizzaContext();
     const { available: availableDrivers, add: addDriver } = drivers;
     const {
@@ -81,9 +82,28 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
 
     const driverID = watch('driverID');
 
-    const onSubmit = () => {
+    const onSubmit = ({
+        driverID,
+        bank_in_cents,
+        bank_register,
+    }: {
+        driverID: string;
+        bank_in_cents: number;
+        bank_register: string;
+    }) => {
         const selectedDriver = availableDrivers.find((d) => d.drawer_id === driverID) as Driver_Drawer;
         addDriver(selectedDriver);
+        if (bank_in_cents > 0) {
+            cashTransfers.create({
+                amount_in_cents: bank_in_cents,
+                business_date: dayjs().format('YYYY-MM-DD'),
+                destination: selectedDriver.drawer_id,
+                source: bank_register,
+                special_note: '',
+                title: 'Bank Transfer',
+                transfer_type: 'bank',
+            });
+        }
         closeDialog();
     };
 

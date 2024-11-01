@@ -5,7 +5,10 @@ import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } fro
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 const getAllDaysCashTransfers = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const { data, error } = await supaClient.from('CashTransfer').select('*').eq('business_date', businessDate);
+    const { data, error } = await supaClient
+        .from('CashTransfer')
+        .select('*')
+        .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
     if (error) {
         console.error(error);
@@ -58,7 +61,7 @@ const useCreateNewCashTransfer = ({ queryKey }: { queryKey: string[] }) => {
         queryKey,
         getMessages: {
             pending: () => 'Creating new cash transfer',
-            success: () => `Successfully created new cas transfer.`,
+            success: () => `Successfully created new cash transfer.`,
             mainError: (error) => error.message,
             errors: () => `Failed to create new cash transfer.`,
         },
@@ -95,7 +98,7 @@ const useDeleteCashTransfer = ({ queryKey }: { queryKey: string[] }) => {
 };
 
 export const useCashTransferAPI = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const queryKey = ['orders', businessDate.format('YYYY-MM-DD')];
+    const queryKey = ['cashTransfers', businessDate.format('YYYY-MM-DD')];
     return {
         cashTransferAPI: {
             getAll: useGetAllDaysCashTransfers({ businessDate }),
