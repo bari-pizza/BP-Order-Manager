@@ -17,28 +17,39 @@ import { DrawerCard } from '../DrawerCard';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { BusinessDayDrawerSummary } from '../../../typesAndValidators';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { SummaryStack } from './SummaryStack';
 import { formatCurrency } from '../../../utils';
+import { CashTransferEditor } from './CashTransferEditor';
 
 type FormValues = BusinessDayDrawerSummary;
 
 export const DrawerSideBar = () => {
     const { open, close, isOpen } = useDialogProps();
+    const { open: openCashTransfers, close: closeCashTransfers, isOpen: isOpenCashTransfers } = useDialogProps();
     const [businessDate] = useBusinessDate();
     const { constants } = useBariPizzaContext();
-    const { orders, drawers, summaries, cashTransfers } = useManagerDashboardContext();
+    const { orders, drawers, summaries, cashTransfers, drivers } = useManagerDashboardContext();
 
-    const currentDrawer = drawers.current;
+    const [editableCashTransferID, setEditableCashTransferID] = useState<string | null>(null);
+
+    // KEEP: if a driver is saved in localstorage, make sure they're currently working
+    const currentDrawerExists =
+        drawers.current?.drawer_type !== 'driver' ||
+        drivers.todays.some((driver) => driver.drawer_id === drawers.current?.drawer_id);
+
+    const currentDrawer = currentDrawerExists ? drawers.current : null;
     const currentDrawerID = currentDrawer?.drawer_id || '';
     const summary = summaries.byDrawerID(currentDrawerID);
 
     const transfers = cashTransfers.forCurrentDrawer;
     const bankTransfer = transfers.bank;
+    const pmtTransfer = transfers.payment;
+    const otherTransfers = transfers.other;
 
     /*TODO: ***Cash Transfer ****
         get all cash transfers in context (figure out if I need them in any other screens)
@@ -59,6 +70,8 @@ export const DrawerSideBar = () => {
         clicking on mark as paid should create payment cash transfer
 
         backend - if source or destination is_locked, don't allow changes
+
+        create popup to show all cash transfers and edit/delete them
 
     
     */
@@ -287,7 +300,7 @@ export const DrawerSideBar = () => {
                             <Typography variant="h6">TOTAL: {formatCurrency(drawerSummary.total_in_cents)}</Typography>
 
                             <Typography variant="h6">BANK: {formatCurrency(drawerSummary.bank_in_cents)}</Typography>
-                            <Button>Cash Transfers</Button>
+                            <Button onClick={openCashTransfers}>Cash Transfers</Button>
                             {isDriver && (
                                 <>
                                     <Controller
@@ -338,6 +351,48 @@ export const DrawerSideBar = () => {
                                 Confirm Drawer Closure
                             </Button>
                         </DialogActions>
+                    </Dialog>
+                    <Dialog open={isOpenCashTransfers} onClose={closeCashTransfers} fullWidth maxWidth="sm">
+                        <DialogTitle>Cash Transfers</DialogTitle>
+                        <DialogContent>
+                            {/* title, source, destination,  */}
+                            {bankTransfer && (
+                                <CashTransferEditor
+                                    key="bank"
+                                    isEditing={editableCashTransferID === 'bank'}
+                                    setIsEditing={(bool) => setEditableCashTransferID(bool ? 'bank' : null)}
+                                    cashTransfer={bankTransfer}
+                                />
+                            )}
+                            {pmtTransfer && (
+                                <CashTransferEditor
+                                    key="payment"
+                                    isEditing={editableCashTransferID === 'payment'}
+                                    setIsEditing={(bool) => setEditableCashTransferID(bool ? 'payment' : null)}
+                                    cashTransfer={pmtTransfer}
+                                />
+                            )}
+                            {otherTransfers
+                                .sort((a, b) => a.created_at.localeCompare(b.created_at))
+                                .map((cashTransfer) => (
+                                    <motion.div key={cashTransfer.cash_transfer_id} whileHover={{ scale: 1.05 }}>
+                                        <CashTransferEditor
+                                            key={cashTransfer.cash_transfer_id}
+                                            isEditing={editableCashTransferID === cashTransfer.cash_transfer_id}
+                                            setIsEditing={(bool) =>
+                                                setEditableCashTransferID(bool ? cashTransfer.cash_transfer_id : null)
+                                            }
+                                            cashTransfer={cashTransfer}
+                                        />
+                                    </motion.div>
+                                ))}
+                            <CashTransferEditor
+                                forNewCashTransfer
+                                key="newCashTransfer"
+                                isEditing={editableCashTransferID === 'newCashTransfer'}
+                                setIsEditing={(bool) => setEditableCashTransferID(bool ? 'newCashTransfer' : null)}
+                            />
+                        </DialogContent>
                     </Dialog>
                 </Stack>
             </Stack>

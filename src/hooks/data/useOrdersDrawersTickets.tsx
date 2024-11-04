@@ -35,6 +35,7 @@ export const useOrdersDrawersTickets = () => {
         'openDrawer',
         unassignedDrawer,
     );
+
     const orders = allOrders?.filter(
         (order) => order.drawer_id === (openDrawer.drawer_id === 'unassigned' ? null : openDrawer.drawer_id),
     );

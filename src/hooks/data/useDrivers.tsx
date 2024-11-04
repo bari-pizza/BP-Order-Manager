@@ -7,10 +7,12 @@ import dayjs from 'dayjs';
 import { useRef, useState } from 'react';
 import { DataWithError, HandleOutcomeProps } from '../../toast/toast';
 import { addDriverToBusinessDayToast, removeDriverFromBusinessDayToast } from '../../toast/driversToast';
+import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
 
 export const useDrivers = () => {
     const [businessDate] = useBusinessDate();
     const { drivers } = useBariPizzaContext();
+    const { drawer } = useOrdersDrawersTickets();
     const toastRef = useRef<{
         [orderID: string]: ({ data, errors, forEachError }: HandleOutcomeProps) => void;
     }>({});
@@ -57,6 +59,9 @@ export const useDrivers = () => {
             queryClient.invalidateQueries({ queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')] });
             const handleOutcome = toastRef.current['remove'];
             handleOutcome({ data: data as unknown as DataWithError });
+            if (drawer.current?.drawer_id === data[0].drawer_id) {
+                drawer.onClick(drawer.current);
+            }
         },
         onError: (error) => {
             const handleOutcome = toastRef.current['remove'];
@@ -77,9 +82,6 @@ export const useDrivers = () => {
         const drawerID = driver.drawer_id;
         toastRef.current['remove'] = removeDriverFromBusinessDayToast(driver.name, businessDate);
         removeDriverFromDayMutation.mutate({ drawerID, businessDate });
-        if (openDriver?.drawer_id === driver.drawer_id) {
-            setOpenDriver(null);
-        }
     };
 
     const handleDriverClick = (driver: Driver_Drawer) => {
