@@ -1,6 +1,6 @@
 import { Divider, Stack, Typography } from '@mui/material';
 import { Fragment } from 'react';
-import { getRunningTotal } from '../../../utils';
+import { formatCurrency, getRunningTotal } from '../../../utils';
 
 export const SummaryStack = ({ items }: { items: { label: string; value: number }[] }) => {
     const values = items.map((item) => item.value);
@@ -14,17 +14,19 @@ export const SummaryStack = ({ items }: { items: { label: string; value: number 
                             {item.label}:
                         </Typography>
                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                            ${(item.value / 100).toFixed(2)}
+                            {formatCurrency(item.value, index > 0)}
+                            {/* ${(item.value / 100).toFixed(2)} */}
                         </Typography>
                     </Stack>
-                    {index > 0 && (
+                    {index > 0 && (item.value !== 0 || index === items.length - 1) && (
                         <>
                             <Divider />
                             <Stack direction="row" justifyContent="right">
                                 <Typography
                                     variant="body1"
                                     sx={{ fontWeight: index === items.length - 1 ? 'bold' : '' }}>
-                                    ${(runningTotals[index] / 100).toFixed(2)}
+                                    {formatCurrency(runningTotals[index])}
+                                    {/* ${(runningTotals[index] / 100).toFixed(2)} */}
                                 </Typography>
                             </Stack>
                         </>

@@ -40,13 +40,13 @@ interface ManagerDashboardProps {
         create: (cashTransfer: Omit<CashTransfer, 'cash_transfer_id' | 'created_at'>) => void;
         delete: (cashTransfer: CashTransfer) => void;
         forCurrentDrawer: {
-            bank: CashTransfer | null;
-            payment: CashTransfer | null;
+            bank: CashTransfer[];
+            payment: CashTransfer[];
             other: CashTransfer[];
         };
         byDrawerID: (drawerID: string) => {
-            bank: CashTransfer | null;
-            payment: CashTransfer | null;
+            bank: CashTransfer[];
+            payment: CashTransfer[];
             other: CashTransfer[];
         };
         update: (cashTransfer: CashTransfer) => void;
@@ -88,14 +88,14 @@ export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
         create: () => {},
         delete: () => {},
         forCurrentDrawer: {
-            bank: null,
-            payment: null,
+            bank: [],
+            payment: [],
             other: [],
         },
         byDrawerID: () => {
             return {
-                bank: null,
-                payment: null,
+                bank: [],
+                payment: [],
                 other: [],
             };
         },

@@ -7,10 +7,11 @@ interface LabeledStackProps extends StackProps {
     labelProps?: TypographyProps;
     alignLabel?: 'left' | 'center' | 'right';
     color?: string;
+    fixed?: boolean;
 }
 
 export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
-    ({ children, label, labelProps, alignLabel = 'center', color, ...props }, ref) => {
+    ({ children, label, labelProps, alignLabel = 'center', color, fixed, ...props }, ref) => {
         const theme = useTheme();
 
         const { sx: labelSx, ...labelPropsRest } = labelProps || {};
@@ -40,8 +41,34 @@ export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
             typographySx.transform = 'translateX(-50%)';
         }
 
+        if (fixed) {
+            return (
+                <Stack
+                    className="labeled-stack"
+                    {...stackPropsRest}
+                    ref={ref}
+                    sx={{
+                        position: 'relative',
+                        border: `2px solid ${color || theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                        padding: theme.spacing(2),
+                        marginTop: theme.spacing(1.5),
+                        ...stackSx,
+                    }}>
+                    <Typography
+                        component="span"
+                        sx={typographySx as SxProps}
+                        {...labelPropsRest} // Spread any additional label props passed by the user
+                    >
+                        {label}
+                    </Typography>
+                    {children}
+                </Stack>
+            );
+        }
         return (
             <Stack
+                className="labeled-stack"
                 {...stackPropsRest}
                 ref={ref}
                 sx={{

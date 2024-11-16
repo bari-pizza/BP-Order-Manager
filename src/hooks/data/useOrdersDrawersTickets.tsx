@@ -25,6 +25,11 @@ export const useOrdersDrawersTickets = () => {
     });
     const { cashTransferAPI } = useCashTransferAPI({ businessDate });
     const { data: summaries } = businessDayDrawerAPI.getAll;
+    // const summaries = useSubscribeToTable<BusinessDayDrawerSummary>({
+    //     tableName: 'BusinessDayDrawer',
+    //     initialData: initialSummaries,
+    // });
+
     const { data: cashTransfers } = cashTransferAPI.getAll;
 
     const allPayments = allOrders.flatMap((order) => order.payments);
@@ -200,9 +205,9 @@ export const useOrdersDrawersTickets = () => {
     };
 
     const getCashTransferByDrawerID = (drawerID?: string) => {
-        const byType: { bank: CashTransfer | null; payment: CashTransfer | null; other: CashTransfer[] } = {
-            bank: null,
-            payment: null,
+        const byType: { bank: CashTransfer[]; payment: CashTransfer[]; other: CashTransfer[] } = {
+            bank: [],
+            payment: [],
             other: [],
         };
         if (!drawerID) {
@@ -213,13 +218,7 @@ export const useOrdersDrawersTickets = () => {
             if (source !== drawerID && destination !== drawerID) {
                 return;
             }
-            if (transfer_type === 'bank') {
-                byType.bank = transfer;
-            } else if (transfer_type === 'payment') {
-                byType.payment = transfer;
-            } else {
-                byType.other.push(transfer);
-            }
+            byType[transfer_type].push(transfer);
         });
         return byType;
     };

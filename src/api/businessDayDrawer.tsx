@@ -25,7 +25,11 @@ const upsertBusinessDayDrawer: SupabaseInteractor<BusinessDayDrawerSummary, Busi
 };
 
 const getAllBusinessDayDrawers = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const { data, error } = await supaClient.from('BusinessDayDrawer').select('*').eq('business_date', businessDate);
+    const { data, error } = await supaClient
+        .from('BusinessDayDrawer')
+        .select('*')
+        .eq('business_date', businessDate.format('YYYY-MM-DD'));
+    console.log({ data, error, businessDate });
     if (error) {
         console.error(error);
         return [];
@@ -41,7 +45,7 @@ const closeBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; business
 }) => {
     const { data } = await supaClient.rpc('lock_drawer', {
         p_drawer_id: drawerID,
-        p_business_date: businessDate,
+        p_business_date: businessDate.format('YYYY-MM-DD'),
     });
 
     return data as unknown as RPCPayload;
@@ -54,7 +58,7 @@ const reopenBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; busines
     console.log('calling unlock drawer');
     const { data } = await supaClient.rpc('unlock_drawer', {
         p_drawer_id: drawerID,
-        p_business_date: businessDate,
+        p_business_date: businessDate.format('YYYY-MM-DD'),
     });
 
     return data as unknown as RPCPayload;

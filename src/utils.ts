@@ -11,8 +11,9 @@ export const getDrawerFullName = (drawer: Drawer | Driver_Drawer | null) => {
     return drawer.name;
 };
 
-export const formatCurrency = (cents: number) => {
-    return `$${(cents / 100).toFixed(2)}`;
+export const formatCurrency = (cents: number, includePositiveSign = false) => {
+    const sign = cents < 0 ? '-' : includePositiveSign ? '+' : '';
+    return `${sign}$${(Math.abs(cents) / 100).toFixed(2)}`;
 };
 
 export const dayjsToMDY = (date: dayjs.Dayjs) => {
