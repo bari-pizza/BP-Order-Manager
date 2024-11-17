@@ -1,13 +1,16 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { CloseDrawerProcess } from '../utils/CloseDrawerProcess';
 
 type DrawerIdentifier = string | number;
 
 type DriverIdentifier = string | number | null;
 
 export class ManagerPage extends BasePage {
+    private closeDrawerProcess: CloseDrawerProcess;
     constructor(page: Page) {
         super(page);
+        this.closeDrawerProcess = new CloseDrawerProcess(page);
     }
 
     async navigateToTab(tabName: string) {
@@ -92,6 +95,7 @@ export class ManagerPage extends BasePage {
         } else if (typeof driver === 'string') {
             // Select driver by name
             await driverList.fill(driver);
+            await new Promise((resolve) => setTimeout(resolve, 500));
             await driverList.press('ArrowDown');
             await driverList.press('Enter');
         } else if (typeof driver === 'number') {
@@ -112,6 +116,42 @@ export class ManagerPage extends BasePage {
 
         const newCount = await this.page.locator('.MuiButton-outlined.drawer-card-button').count();
         expect(newCount).toBe(originalCount + 1);
+    }
+
+    async closeDriver(drawerLocator: Locator) {
+        await this.clickDrawer(drawerLocator);
+        await this.closeDrawerProcess.completeCloseDriver(5);
+    }
+
+    async closeDrivers() {
+        const drivers = await this.page
+            .locator('#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-driver')
+            .all();
+        console.log('found drivers', drivers.length);
+        for (const driver of drivers) {
+            console.log('closing driver:', await driver.allTextContents());
+            await this.closeDriver(driver);
+        }
+    }
+
+    async closeOtherDrawers() {
+        const registers = await this.page
+            .locator('#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-register')
+            .all();
+        for (const drawer of registers) {
+            await this.clickDrawer(drawer);
+            await this.closeDrawerProcess.completeCloseRegister();
+        }
+        const thirdPartyDrawer = this.page.locator(
+            '#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-third_party',
+        );
+        await this.clickDrawer(thirdPartyDrawer);
+        await this.closeDrawerProcess.completeCloseThirdParty();
+    }
+
+    async closeDrawers() {
+        await this.closeDrivers();
+        // await this.closeOtherDrawers();
     }
 
     async assertDrawerOpen(drawerLocator: Locator | null) {

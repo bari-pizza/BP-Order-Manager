@@ -46,6 +46,7 @@ export const DrawerSideBar = () => {
 
     const currentDrawer = currentDrawerExists ? drawers.current : null;
     const currentDrawerID = currentDrawer?.drawer_id || '';
+    const drawer1ID = drawers.all[0].drawer_id;
     const summary = summaries.byDrawerID(currentDrawerID);
 
     const transfers = cashTransfers.forCurrentDrawer;
@@ -87,29 +88,6 @@ export const DrawerSideBar = () => {
         is_locked: summary?.is_locked || false,
         special_note: summary?.special_note || '',
     };
-
-    console.log({ summary, defaultValues });
-
-    // const defaultValues = useMemo(() => {
-    //     return {
-    //         bank_in_cents: bankTransfer?.amount_in_cents || constants.default.driver_starting_cash_in_cents,
-    //         register_in_cents: constants.default.register_starting_cash_in_cents,
-    //         hours: 0,
-    //         hours_in_cents: 0,
-    //         other_in_cents: 0,
-    //         business_date: businessDate.format('YYYY-MM-DD'),
-    //         drawer_id: currentDrawer?.drawer_id,
-    //         is_locked: false,
-    //         special_note: '',
-    //         ...summary,
-    //     };
-    // }, [constants, currentDrawer, businessDate, summary, bankTransfer]);
-
-    // TODO: ***is locked logic***
-
-    // BusinessDaySummary can only be locked if all Drawers and Orders are locked
-
-    // TODO: ***CONTINUE*** only need make hours editable
 
     const { handleSubmit, register } = useForm<FormValues>({
         defaultValues: summary || defaultValues,
@@ -326,6 +304,7 @@ export const DrawerSideBar = () => {
                     </AnimatePresence>
                     {isLocked ? (
                         <>
+                            {/* TODO: *** CONTINUE ***  Replace SummaryStack with SummaryDetails for Register and ThirdParty*/}
                             <SummaryStack items={items} />
                             <Button onClick={handleReopenDrawerClick}>Reopen Drawer</Button>
                         </>
@@ -366,8 +345,9 @@ export const DrawerSideBar = () => {
                                                 cashTransfer={{
                                                     ...closingPmtTransfer,
                                                     amount_in_cents: Math.abs(closingPmtAmount),
-                                                    source: closingPmtAmount > 0 ? currentDrawer.drawer_id : '',
-                                                    destination: closingPmtAmount < 0 ? currentDrawer.drawer_id : '',
+                                                    source: closingPmtAmount > 0 ? currentDrawer.drawer_id : drawer1ID,
+                                                    destination:
+                                                        closingPmtAmount < 0 ? currentDrawer.drawer_id : drawer1ID,
                                                 }}
                                             />
                                         ) : (
@@ -383,9 +363,10 @@ export const DrawerSideBar = () => {
                                                 definedValues={{
                                                     cashTransfer: {
                                                         amount_in_cents: Math.abs(outstandingAmount),
-                                                        source: outstandingAmount > 0 ? currentDrawer.drawer_id : '',
+                                                        source:
+                                                            outstandingAmount > 0 ? currentDrawer.drawer_id : drawer1ID,
                                                         destination:
-                                                            outstandingAmount < 0 ? currentDrawer.drawer_id : '',
+                                                            outstandingAmount < 0 ? currentDrawer.drawer_id : drawer1ID,
                                                         title: 'Closing Payment',
                                                     },
                                                     completedFirstStep: true,

@@ -44,7 +44,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
 
     const dummyDrawer: Driver_Drawer = {
         created_at: '2024-08-27T00:00:00.000Z',
-        drawer_id: '3',
+        drawer_id: 'add-driver',
         drawer_type: 'driver',
         name: 'Add Driver',
         driver: {

@@ -7,6 +7,8 @@ let context: BrowserContext;
 let managerPage: ManagerPage;
 let ordersPage: OrdersPage;
 
+// npx playwright test
+
 test.beforeAll(async () => {
     // Start a single browser instance and context
     browser = await chromium.launch(); // or `chromium.launch({ headless: false })` for a visible browser
@@ -55,5 +57,9 @@ test('should add orders to random drawers', async () => {
         console.log(hasUnassignedOrders);
     }
 });
-//     test('should close out each driver', async ({ page }) => {});
+test('should close out each driver', async () => {
+    await managerPage.navigateToManager();
+    await managerPage.navigateToTab('Drawers');
+    await managerPage.closeDrawers();
+});
 //     test('should close out the day', async ({ page }) => {});

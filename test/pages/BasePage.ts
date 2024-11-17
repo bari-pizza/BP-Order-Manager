@@ -11,14 +11,18 @@ export class BasePage {
 
     async login() {
         await this.page.goto('/login');
-        await expect(this.page.locator('input[name="email"]')).toBeVisible();
-        await this.page.fill('input[name="email"]', 'ccata002@gmail.com');
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await this.page.locator('input[name="email"]').fill('ccata002@gmail.com');
+        await this.page.locator('input[name="password"]').fill('Password1234!');
+        await this.page.locator('button[type="submit"]').click();
+        // await expect(this.page.locator('input[name="email"]')).toBeVisible();
+        // await this.page.fill('input[name="email"]', 'ccata002@gmail.com');
 
-        await expect(this.page.locator('input[name="password"]')).toBeVisible();
-        await this.page.fill('input[name="password"]', 'Password1234!');
+        // await expect(this.page.locator('input[name="password"]')).toBeVisible();
+        // await this.page.fill('input[name="password"]', 'Password1234!');
 
-        await expect(this.page.locator('button[type="submit"]')).toBeVisible();
-        await this.page.click('button[type="submit"]');
+        // await expect(this.page.locator('button[type="submit"]')).toBeVisible();
+        // await this.page.click('button[type="submit"]');
     }
 
     // Common navigation methods
