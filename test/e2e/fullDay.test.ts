@@ -49,13 +49,7 @@ test('should add orders to random drawers', async () => {
     await ordersPage.navigateToOrders();
     // make sure its loaded
     console.log('Navigated to orders');
-    let hasUnassignedOrders = await ordersPage.hasUnassignedOrders();
-    // go through every ticket (reverse order) and add it to a random drawer
-    while (hasUnassignedOrders) {
-        await ordersPage.assignOrderToRandomDrawer();
-        hasUnassignedOrders = await ordersPage.hasUnassignedOrders();
-        console.log(hasUnassignedOrders);
-    }
+    await ordersPage.assignAllOrdersToRandomDrawers();
 });
 test('should close out each driver', async () => {
     await managerPage.navigateToManager();

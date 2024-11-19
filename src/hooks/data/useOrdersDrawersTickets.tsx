@@ -1,5 +1,11 @@
 import { useRef, useState, RefObject } from 'react';
-import type { CashTransfer, Drawer, Driver_Drawer, Order_Payment } from '../../typesAndValidators';
+import {
+    BusinessDayDrawerSummary,
+    type CashTransfer,
+    type Drawer,
+    type Driver_Drawer,
+    type Order_Payment,
+} from '../../typesAndValidators';
 import { useBusinessDate } from '../data/useBusinessDate';
 import { useLocalStorage } from './useLocalStorage';
 import { useBusinessDayDrawerAPI } from '../../api/businessDayDrawer';
@@ -17,20 +23,30 @@ const unassignedDrawer: Drawer = {
 
 export const useOrdersDrawersTickets = () => {
     const [businessDate] = useBusinessDate();
+
     const { orderAPI } = useOrderAPI({ businessDate });
-    const { data: initialData } = orderAPI.getAll;
-    const allOrders = useSubscribeToTable<Order_Payment>({ tableName: 'Order', initialData });
+    const { data: initialOrderData } = orderAPI.getAll;
+    const allOrders = useSubscribeToTable<Order_Payment>({
+        tableName: 'Order',
+        initialData: initialOrderData,
+        showToast: ['delete', 'update', 'insert'],
+    });
+
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
     });
-    const { cashTransferAPI } = useCashTransferAPI({ businessDate });
-    const { data: summaries } = businessDayDrawerAPI.getAll;
-    // const summaries = useSubscribeToTable<BusinessDayDrawerSummary>({
-    //     tableName: 'BusinessDayDrawer',
-    //     initialData: initialSummaries,
-    // });
+    const { data: initialBusinessDayDrawerData } = businessDayDrawerAPI.getAll;
+    const summaries = useSubscribeToTable<BusinessDayDrawerSummary>({
+        tableName: 'BusinessDayDrawer',
+        initialData: initialBusinessDayDrawerData,
+    });
 
-    const { data: cashTransfers } = cashTransferAPI.getAll;
+    const { cashTransferAPI } = useCashTransferAPI({ businessDate });
+    const { data: initialCashTransferData } = cashTransferAPI.getAll;
+    const cashTransfers = useSubscribeToTable<CashTransfer>({
+        tableName: 'CashTransfer',
+        initialData: initialCashTransferData,
+    });
 
     const allPayments = allOrders.flatMap((order) => order.payments);
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});

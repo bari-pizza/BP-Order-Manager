@@ -83,10 +83,10 @@ const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {
             const { bank, payment, other } = cashTransfers.byDrawerID(drawer.drawer_id);
             console.log({ bank, payment, other });
             if (bank) {
-                cashTransfers.delete(bank);
+                cashTransfers.delete(bank[0]);
             }
             if (payment) {
-                cashTransfers.delete(payment);
+                payment.forEach((payment) => cashTransfers.delete(payment));
             }
             if (other.length) {
                 other.forEach((transfer) => {

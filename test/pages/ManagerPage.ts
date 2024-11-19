@@ -15,7 +15,7 @@ export class ManagerPage extends BasePage {
 
     async navigateToTab(tabName: string) {
         // check if tab is already selected
-        const tab = this.page.locator(`text=${tabName}`);
+        const tab = this.page.locator(`.MuiTab-root >> text=${tabName}`);
         await expect(tab).toBeVisible();
         if ((await tab.getAttribute('class'))?.includes('Mui-selected')) {
             return;
@@ -87,7 +87,6 @@ export class ManagerPage extends BasePage {
             await driverList.click();
             const allDrivers = await this.page.locator('.MuiAutocomplete-popper li').count(); // Assuming each driver is listed in a <li> element
             const randomIndex = Math.ceil(Math.random() * allDrivers);
-            console.log('Random index:', randomIndex, 'All drivers:', allDrivers);
             for (let i = 0; i < randomIndex; i++) {
                 await driverList.press('ArrowDown');
             }
@@ -127,7 +126,6 @@ export class ManagerPage extends BasePage {
         const drivers = await this.page
             .locator('#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-driver')
             .all();
-        console.log('found drivers', drivers.length);
         for (const driver of drivers) {
             console.log('closing driver:', await driver.allTextContents());
             await this.closeDriver(driver);
@@ -151,40 +149,6 @@ export class ManagerPage extends BasePage {
 
     async closeDrawers() {
         await this.closeDrivers();
-        // await this.closeOtherDrawers();
-    }
-
-    async assertDrawerOpen(drawerLocator: Locator | null) {
-        if (!drawerLocator) {
-            throw new Error('Drawer locator is null');
-        }
-        await expect(drawerLocator).toHaveClass(/open-drawer/);
-        this.assertSidebarOpen();
-    }
-
-    async assertDrawerClosed(drawerLocator: Locator | null) {
-        if (!drawerLocator) {
-            throw new Error('Drawer locator is null');
-        }
-        await expect(drawerLocator).not.toHaveClass(/open-drawer/);
-        this.assertSidebarClosed();
-    }
-
-    async assertSidebarOpen() {
-        await expect(this.page.locator('#sidebar-drawer .drawer-card-button')).toBeVisible();
-    }
-
-    async assertSidebarClosed() {
-        await expect(this.page.locator('#sidebar-drawer .drawer-card-button')).not.toBeVisible();
-    }
-
-    /*************  ✨ Codeium Command ⭐  *************/
-    /**
-     * Asserts that a driver with the given name is visible on the page
-     * @param driverName The name of the driver to look for
-     */
-    /******  d96a7823-117a-4dff-863b-da464f22efc2  *******/
-    async assertDriverIsAdded(driverName: string) {
-        await expect(this.page.locator(`text=${driverName}`)).toBeVisible();
+        await this.closeOtherDrawers();
     }
 }

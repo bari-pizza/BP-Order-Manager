@@ -18,8 +18,8 @@ export class OrdersPage extends BasePage {
         this.orderTicketActions = new OrderTicketActions(this.page);
     }
 
-    async getDrawerCount() {
-        return await this.page.locator('.MuiButton-outlined.drawer-card-button').count();
+    async getDriverCount() {
+        return await this.page.locator('.MuiButton-outlined.drawer-card-button-driver').count();
     }
 
     // Get drawer by name or index (starting from 1)
@@ -36,7 +36,7 @@ export class OrdersPage extends BasePage {
         } else if (typeof identifier === 'number') {
             // If identifier is an index, return the locator for the drawer by index
             // return this.page.locator('.drawer-card-button').nth(identifier - 1);
-            drawerLocator = this.page.locator('//button[contains(@class, "drawer-card-button")]').nth(identifier - 1);
+            drawerLocator = this.page.locator('//button[contains(@class, "drawer-card-button")]').nth(identifier);
         } else {
             throw new Error('Cannot get drawer by identifier: ' + identifier);
         }
@@ -102,27 +102,42 @@ export class OrdersPage extends BasePage {
         return hasUnassignedOrders;
     }
 
-    async assignOrderToRandomDrawer() {
-        const { lastTicket, orderData } = await this.orderTicketActions.getLastTicketAndOrder();
-        console.log({ lastTicket, orderData });
-        if (!lastTicket) return false;
-        const { orderType, origin } = orderData;
-        await this.orderTicketActions.toggleTicketSelection(lastTicket);
-        if (orderType === 'pickup') {
-            if (origin.is_third_party) {
-                await this.clickDrawer(await this.getDrawer('Third Party Pickup'));
-            } else {
-                const randomDrawer = faker.number.int({ min: 1, max: 2 });
-                await this.clickDrawer(await this.getDrawer(`Drawer ${randomDrawer}`));
-            }
-        } else {
-            const drawerCount = await this.getDrawerCount();
-            if (drawerCount < 5) {
-                throw new Error('No drivers available');
-            }
-            const randomDrawerIndex = faker.number.int({ min: 5, max: drawerCount });
-            await this.clickDrawer(await this.getDrawer(randomDrawerIndex));
+    async assignAllOrdersToRandomDrawers() {
+        // make sure we're on unassigned orders
+        const unassignedDrawer = await this.getDrawer('Unassigned');
+        const thirdPartyDrawer = await this.getDrawer('Third Party Pickup');
+        const registerDrawer1 = await this.getDrawer('Drawer 1');
+        const registerDrawer2 = await this.getDrawer('Drawer 2');
+        const driverCount = await this.getDriverCount();
+        const driverDrawers: Locator[] = [];
+        for (let i = 0; i < driverCount; i++) {
+            const driverDrawer = await this.getDrawer(i + 4);
+            driverDrawers.push(driverDrawer);
         }
-        return lastTicket;
+        await this.clickDrawer(unassignedDrawer);
+        const orderTicketsCount = await this.page.locator('.order-ticket').count();
+        for (let i = 0; i < orderTicketsCount; i++) {
+            const { lastTicket, orderData } = await this.orderTicketActions.getLastTicketAndOrder();
+            const { orderType, origin } = orderData;
+            await this.orderTicketActions.toggleTicketSelection(lastTicket);
+            if (orderType === 'pickup') {
+                if (origin.is_third_party) {
+                    await this.clickDrawer(thirdPartyDrawer);
+                } else {
+                    const randomDrawer = faker.number.int({ min: 1, max: 2 });
+                    if (randomDrawer === 1) {
+                        await this.clickDrawer(registerDrawer1);
+                    } else if (randomDrawer === 2) {
+                        await this.clickDrawer(registerDrawer2);
+                    }
+                }
+            } else {
+                if (driverCount === 0) return;
+                const driverIndex = faker.number.int({ min: 0, max: driverCount - 1 });
+                await this.clickDrawer(driverDrawers[driverIndex]);
+            }
+            // await this.assignLastOrderToRandomDrawer();
+            await this.clickDrawer(unassignedDrawer);
+        }
     }
 }

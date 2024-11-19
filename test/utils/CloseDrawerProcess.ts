@@ -49,10 +49,10 @@ export class CloseDrawerProcess {
     }
 
     async completeCloseRegister() {
-        // await this.clickSaveAndCloseDrawer();
-        // await this.waitForDialog();
-        // await this.clickConfirmDrawerClosure();
-        // await this.assertDrawerClosed();
+        await this.clickSaveAndCloseDrawer();
+        await this.waitForDialog();
+        await this.clickConfirmDrawerClosure();
+        await this.assertDrawerClosed();
     }
 
     async completeCloseThirdParty() {

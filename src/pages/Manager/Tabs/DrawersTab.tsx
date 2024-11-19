@@ -1,4 +1,4 @@
-import { Stack, StackOwnProps } from '@mui/material';
+import { Button, Stack, StackOwnProps } from '@mui/material';
 import { DrawerCard } from '../DrawerCard';
 import { useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { AddDriverCard } from '../AddDriverCard';
@@ -29,6 +29,10 @@ export const DrawersTab = () => {
         whileHover: { scale: 1.05 },
     };
 
+    const dayCanBeClosed = combinedDrawersAndDrivers.every((drawer) => {
+        return summaries.byDrawerID(drawer.drawer_id)?.is_locked;
+    });
+
     return (
         <Stack
             {...stackProps}
@@ -54,6 +58,11 @@ export const DrawersTab = () => {
             <MotionWrapper motionProps={motionProps} motionKey="add-driver-card">
                 <AddDriverCard {...addDriverCardDialogProps} />
             </MotionWrapper>
+            {dayCanBeClosed && (
+                <MotionWrapper motionProps={motionProps} motionKey="close-business-day">
+                    <Button>Close Business Day</Button>
+                </MotionWrapper>
+            )}
             <Suspense fallback={<DrawerSideBarSkeleton />}>
                 <DrawerSideBar />
             </Suspense>

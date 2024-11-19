@@ -14,19 +14,22 @@ import { SideBar, SideBarSkeleton } from '../../../components/SideBar';
 import { DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../../components/Base/DrawerCardBase';
 import { ContextMenu } from '../../../components/Base/ContextMenu';
 import { DrawerCard } from '../DrawerCard';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { BusinessDayDrawerSummary } from '../../../typesAndValidators';
 import {
+    useEffect,
+    useMemo,
     // useEffect, useMemo,
     useState,
 } from 'react';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
-import { SummaryStack } from './SummaryStack';
+import { SummaryDetails, SummaryStack, ThirdPartySummary } from './SummaryStack';
 import { formatCurrency } from '../../../utils';
 import { CashTransferEditor } from './CashTransferEditor';
+import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 
 type FormValues = BusinessDayDrawerSummary;
 
@@ -38,6 +41,11 @@ export const DrawerSideBar = () => {
     const { orders, drawers, summaries, cashTransfers, drivers } = useManagerDashboardContext();
 
     const [editableCashTransferID, setEditableCashTransferID] = useState<string | null>(null);
+
+    const closeDialog = () => {
+        close();
+        setEditableCashTransferID(null);
+    };
 
     // KEEP: if a driver is saved in localstorage, make sure they're currently working
     const currentDrawerExists =
@@ -78,39 +86,65 @@ export const DrawerSideBar = () => {
     
     */
 
-    const defaultValues = {
-        business_date: businessDate.format('YYYY-MM-DD'),
-        drawer_id: currentDrawer?.drawer_id,
-        bank_in_cents: bankTransfers.reduce((acc, transfer) => acc + transfer.amount_in_cents, 0),
-        hours: summary?.hours || 0,
-        hours_in_cents: summary?.hours_in_cents || 0,
-        other_in_cents: otherTransfers.reduce((acc, transfer) => acc + transfer.amount_in_cents, 0),
-        is_locked: summary?.is_locked || false,
-        special_note: summary?.special_note || '',
-    };
+    const defaultValues = useMemo(() => {
+        return {
+            business_date: businessDate.format('YYYY-MM-DD'),
+            drawer_id: currentDrawer?.drawer_id,
+            bank_in_cents:
+                currentDrawer?.drawer_type === 'register'
+                    ? summary?.bank_in_cents || constants.default.register_starting_cash_in_cents
+                    : bankTransfers.reduce((acc, transfer) => acc + transfer.amount_in_cents, 0),
+            hours: summary?.hours || 0,
+            hours_in_cents: summary?.hours_in_cents || 0,
+            other_in_cents: otherTransfers.reduce((acc, transfer) => acc + transfer.amount_in_cents, 0),
+            is_locked: summary?.is_locked || false,
+            special_note: summary?.special_note || '',
+        };
+    }, [
+        businessDate,
+        currentDrawer?.drawer_id,
+        currentDrawer?.drawer_type,
+        constants.default.register_starting_cash_in_cents,
+        bankTransfers,
+        summary?.hours,
+        summary?.hours_in_cents,
+        summary?.is_locked,
+        summary?.bank_in_cents,
+        summary?.special_note,
+        otherTransfers,
+    ]);
 
-    const { handleSubmit, register } = useForm<FormValues>({
+    const { handleSubmit, control, setValue, reset, watch } = useForm<FormValues>({
         defaultValues: summary || defaultValues,
     });
+
+    useEffect(() => {
+        if (currentDrawerID) {
+            reset(defaultValues);
+        }
+    }, [reset, currentDrawerID, defaultValues]);
 
     if (!currentDrawer || currentDrawer.name === 'Unassigned') {
         return null;
     }
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
+        const hoursInCents = data.hours * constants.default.driver_hourly_wage_in_cents;
         const cleanedData = {
             ...data,
             drawer_id: currentDrawer.drawer_id,
-            hours_in_cents: data.hours * constants.default.driver_hourly_wage_in_cents,
+            hours_in_cents: hoursInCents,
         };
-        // drawerID is empty for some reason
-        console.log(data, cleanedData, defaultValues, currentDrawer);
         summaries.update(cleanedData);
     };
 
     const drawersOrders = orders.byDrawerID(currentDrawer.drawer_id);
     const drawerSummary = {
-        bank_in_cents: bankTransfers[0]?.amount_in_cents || 0,
+        bank_in_cents:
+            currentDrawer?.drawer_type === 'register'
+                ? // ? constants.default.register_starting_cash_in_cents
+                  watch('bank_in_cents')
+                : bankTransfers.reduce((acc, transfer) => acc + transfer.amount_in_cents, 0) || 0,
         total_in_cents: 0,
         orders: 0,
         cash_in_cents: 0,
@@ -123,6 +157,7 @@ export const DrawerSideBar = () => {
         third_party_tips_in_cents: 0,
         delivery_fees_in_cents: 0,
     };
+    const thirdPartySummary: ThirdPartySummary = {};
     drawersOrders.forEach((order) => {
         drawerSummary.total_in_cents += order.total_in_cents;
         drawerSummary.orders += 1;
@@ -137,6 +172,11 @@ export const DrawerSideBar = () => {
             } else if (payment.payment_type === 'third_party') {
                 drawerSummary.third_party_in_cents += payment.amount_in_cents;
                 drawerSummary.third_party_tips_in_cents += payment.tip_in_cents;
+                if (order.origin_id in thirdPartySummary) {
+                    thirdPartySummary[order.origin_id].total_in_cents += payment.amount_in_cents;
+                } else {
+                    thirdPartySummary[order.origin_id] = { total_in_cents: payment.amount_in_cents };
+                }
             }
         });
     });
@@ -189,14 +229,12 @@ export const DrawerSideBar = () => {
     };
 
     const total = drawerSummary.total_in_cents;
-    // const bank = watch('bank_in_cents');
     const bank = drawerSummary.bank_in_cents;
-    // const hours = watch('hours_in_cents');
-    const hours = drawerSummary.hours_in_cents;
+    const hours = watch('hours_in_cents'); // this way we dont have to wait for the db to update
+    // const hours = drawerSummary.hours_in_cents;
     const card = drawerSummary.card_in_cents + drawerSummary.card_tips_in_cents;
     const thirdParty = drawerSummary.third_party_in_cents + drawerSummary.third_party_tips_in_cents;
     const deliveryFees = drawerSummary.delivery_fees_in_cents;
-    // const other = watch('other_in_cents');
     const other = otherTransfers.reduce(
         (acc, { amount_in_cents, source }) => (source === currentDrawer.drawer_id ? -1 : 1) * amount_in_cents + acc,
         0,
@@ -246,12 +284,16 @@ export const DrawerSideBar = () => {
         case 'register':
             items.push(
                 {
-                    label: 'Total',
-                    value: total,
+                    label: 'Starting Cash',
+                    value: bank,
                 },
                 {
-                    label: 'Cards',
-                    value: -card,
+                    label: 'Cash Orders',
+                    value: total - card,
+                },
+                {
+                    label: 'Card Orders',
+                    value: card,
                 },
             );
             break;
@@ -304,8 +346,19 @@ export const DrawerSideBar = () => {
                     </AnimatePresence>
                     {isLocked ? (
                         <>
-                            {/* TODO: *** CONTINUE ***  Replace SummaryStack with SummaryDetails for Register and ThirdParty*/}
-                            <SummaryStack items={items} />
+                            {/* TODO: DB:dont allow db to lock if ending balance isnt 0 */}
+                            {currentDrawer?.drawer_type === 'register' && (
+                                <SummaryDetails
+                                    items={items}
+                                    drawerID={currentDrawer.drawer_id}
+                                    transfers={[...bankTransfers, ...pmtTransfers, ...otherTransfers]}
+                                    forSideBar
+                                />
+                            )}
+                            {isDriver && <SummaryStack items={items} />}
+                            {currentDrawer.drawer_type === 'third_party' && (
+                                <ThirdPartySummary thirdPartySummary={thirdPartySummary} />
+                            )}
                             <Button onClick={handleReopenDrawerClick}>Reopen Drawer</Button>
                         </>
                     ) : (
@@ -316,22 +369,63 @@ export const DrawerSideBar = () => {
                             {currentDrawer.drawer_type !== 'third_party' && (
                                 <Button onClick={openCashTransfers}>Cash Transfers</Button>
                             )}
+                            {/* {isDriver && <TextField label="Hours" {...register('hours')} />} */}
                             {isDriver && (
-                                <>
-                                    <TextField label="Hours" {...register('hours')} />
-                                </>
+                                <Controller
+                                    name="hours"
+                                    control={control}
+                                    render={({ field: { onChange, value } }) => {
+                                        const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+                                            const value = Number(event.target.value);
+                                            onChange(value);
+                                            setValue(
+                                                'hours_in_cents',
+                                                value * constants.default.driver_hourly_wage_in_cents,
+                                                { shouldDirty: true },
+                                            );
+                                        };
+
+                                        return <TextField label="Hours" value={value} onChange={handleChange} />;
+                                    }}
+                                />
+                            )}
+                            {currentDrawer.drawer_type === 'register' && (
+                                <Controller
+                                    name="bank_in_cents"
+                                    control={control}
+                                    render={({ field: { value } }) => (
+                                        <TextFieldWithMask
+                                            sx={{ minWidth: 100 }}
+                                            label="Amount"
+                                            maskVariant="currency"
+                                            value={value}
+                                            handleChange={(value, shouldDirty) =>
+                                                setValue('bank_in_cents', value, { shouldDirty })
+                                            }
+                                        />
+                                    )}
+                                />
                             )}
                             <Button onClick={handleCloseDrawerClick}>Save & Close Drawer</Button>
                         </>
                     )}
-                    <Button onClick={() => drawers.onClick(drawers.current!)}>Collapse SideBar</Button>
-                    <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
+                    <Dialog open={isOpen} onClose={closeDialog} fullWidth maxWidth="sm">
                         <DialogTitle>Confirm Drawer Close</DialogTitle>
                         <DialogContent>
-                            <SummaryStack items={items} />
+                            {isDriver && <SummaryStack items={items} />}
+                            {currentDrawer?.drawer_type === 'register' && (
+                                <SummaryDetails
+                                    items={items}
+                                    drawerID={currentDrawer.drawer_id}
+                                    transfers={[...bankTransfers, ...pmtTransfers, ...otherTransfers]}
+                                />
+                            )}
+                            {currentDrawer.drawer_type === 'third_party' && (
+                                <ThirdPartySummary thirdPartySummary={thirdPartySummary} />
+                            )}
                         </DialogContent>
-                        <DialogActions>
-                            {outstandingAmount !== 0 ? (
+                        <DialogActions sx={{ justifyContent: 'center' }}>
+                            {isDriver && outstandingAmount !== 0 ? (
                                 <>
                                     {editableCashTransferID === 'closing-cash-transfer' ? (
                                         closingPmtTransfer ? (
@@ -508,7 +602,6 @@ export const DrawerSideBarSkeleton = () => {
                     </Skeleton>
                     <Button>Save</Button>
                     <Button>Close Drawer</Button>
-                    <Button>Collapse SideBar</Button>
                 </Stack>
             </Stack>
         </SideBarSkeleton>
