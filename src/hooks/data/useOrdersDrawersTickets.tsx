@@ -22,6 +22,7 @@ const unassignedDrawer: Drawer = {
 };
 
 export const useOrdersDrawersTickets = () => {
+    // COMPLETED useSubscribeToTable
     const [businessDate] = useBusinessDate();
 
     const { orderAPI } = useOrderAPI({ businessDate });

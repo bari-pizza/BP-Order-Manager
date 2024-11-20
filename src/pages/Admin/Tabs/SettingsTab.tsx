@@ -95,7 +95,10 @@ export const SettingsTab = () => {
                     />
                 )}
             />
-            <Button onClick={handleSubmit(onSubmit)}>Save Changes</Button>
+            {/* disabled until implemented */}
+            <Button disabled onClick={handleSubmit(onSubmit)}>
+                Save Changes
+            </Button>
         </LabeledStack>
     );
 };

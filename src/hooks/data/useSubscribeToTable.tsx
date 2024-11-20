@@ -44,12 +44,12 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
                         switch (eventType) {
                             case 'INSERT':
                                 if (showToast.includes('insert')) {
-                                    toast.info(`Other user inserted a record in ${tableName}s table`);
+                                    toast.info(`A new record was added in ${tableName}s table`);
                                 }
                                 return [...currentData, newData];
                             case 'UPDATE':
                                 if (showToast.includes('update')) {
-                                    toast.info(`Other user updated a record in ${tableName}s table`);
+                                    toast.info(`A record was updated in ${tableName}s table`);
                                 }
                                 return currentData.map((item) => {
                                     if (item[rowIDField] === rowIDValue) {
@@ -62,7 +62,7 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
                                 });
                             case 'DELETE':
                                 if (showToast.includes('delete')) {
-                                    toast.info(`Other user deleted a record from ${tableName}s table`);
+                                    toast.info(`A record was deleted from ${tableName}s table`);
                                 }
                                 return currentData.filter((item) => item[rowIDField] !== rowIDValue);
                             default:
@@ -77,7 +77,7 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
         return () => {
             channel.unsubscribe();
         };
-    }, [tableName]);
+    }, [tableName, showToast]);
 
     return data;
 };

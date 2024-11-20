@@ -20,7 +20,7 @@ import { Home } from './pages/Home/Home.tsx';
 import { MyAccount } from './pages/Profile/MyAccount.tsx';
 import { Login } from './pages/Profile/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
-import { getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
+import { getAllAppSettings, getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
 import { BariPizzaContext } from './context/BariPizzaContext.tsx';
 import { AdminDashboard, AdminDashboardSkeleton } from './pages/Admin/AdminDashboard.tsx';
 import { ToastContainer } from 'react-toastify';
@@ -113,7 +113,8 @@ function Layout() {
     const sideBarSkeletonRef = useRef<HTMLDivElement>(null);
     const [sideBarWidth, setSideBarWidth] = useState<number | string>(0);
     const [sideBarSkeletonWidth, setSideBarSkeletonWidth] = useState<number | string>(0);
-    const [{ data: drawers }, { data: drivers }, { data: origins }] = useSuspenseQueries({
+    // MAYBE include useSubscribeToTable here but these shouldnt be changed often
+    const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }] = useSuspenseQueries({
         queries: [
             {
                 queryKey: ['drawers'],
@@ -134,20 +135,15 @@ function Layout() {
                 staleTime: 1000 * 60 * 30,
                 refetchOnWindowFocus: false,
             },
+            {
+                queryKey: ['constants'],
+                queryFn: getAllAppSettings,
+                staleTime: 1000 * 60 * 30,
+                refetchOnWindowFocus: false,
+            },
         ],
     });
 
-    // TODO: make this a supabase query eventually
-    const constants = {
-        default: {
-            delivery_fee_in_cents: 300,
-            driver_starting_cash_in_cents: 2000,
-            driver_hourly_wage_in_cents: 500,
-            register_starting_cash_in_cents: 10000,
-            register_for_bank_transfers: 'feb2fc5d-19bd-42ab-b16e-38f12c86ce6a',
-            register_for_cash_transfers: 'feb2fc5d-19bd-42ab-b16e-38f12c86ce6a',
-        },
-    };
     return (
         // <APIProvider
         //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
