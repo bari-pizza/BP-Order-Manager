@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { CloseDrawerProcess } from '../utils/CloseDrawerProcess';
+import { faker } from '@faker-js/faker/locale/en_US';
 
 type DrawerIdentifier = string | number;
 
@@ -94,7 +95,7 @@ export class ManagerPage extends BasePage {
         } else if (typeof driver === 'string') {
             // Select driver by name
             await driverList.fill(driver);
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 200));
             await driverList.press('ArrowDown');
             await driverList.press('Enter');
         } else if (typeof driver === 'number') {
@@ -110,6 +111,7 @@ export class ManagerPage extends BasePage {
         const submitButton = this.page.locator(
             `//div[contains(@class, 'MuiDialog-root')]//button[contains(text(), 'Add Driver')]`,
         );
+        await new Promise((resolve) => setTimeout(resolve, 200));
         await submitButton.click();
         await expect(submitButton).not.toBeVisible();
 
@@ -119,7 +121,7 @@ export class ManagerPage extends BasePage {
 
     async closeDriver(drawerLocator: Locator) {
         await this.clickDrawer(drawerLocator);
-        await this.closeDrawerProcess.completeCloseDriver(5);
+        await this.closeDrawerProcess.completeCloseDriver(faker.number.int({ min: 5, max: 12 }));
     }
 
     async closeDrivers() {

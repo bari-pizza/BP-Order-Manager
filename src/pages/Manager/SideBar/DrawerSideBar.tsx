@@ -64,24 +64,25 @@ export const DrawerSideBar = () => {
     const closingPmtTransfer = pmtTransfers.find((pmt) => pmt.title === 'Closing Payment');
 
     /*TODO: ***Cash Transfer ****
-        get all cash transfers in context (figure out if I need them in any other screens)
 
-        find bank cash transfer for drawer
-        if doesnt exist, use default value
-        if exists, use value
+        [x] get all cash transfers in context (figure out if I need them in any other screens)
 
-        on save, create new cash transfer with bank_in_cents value
+        [x] find bank cash transfer for drawer
+        [x] if doesnt exist, use default value
+        [x] if exists, use value
+
+        [x] on save, create new cash transfer with bank_in_cents value
         or update cash transfer with bank_in_cents value
 
-        allow user to change bank source 
+        [x] allow user to change bank source 
 
-        implement a way to create other cash transfers
+        [x] implement a way to create other cash transfers
 
-        determine payment to be created
+        [x] determine payment to be created
 
-        backend - if source or destination is_locked, don't allow changes
+        [ ] backend - if source or destination is_locked, don't allow changes
 
-        create popup to show all cash transfers and edit/delete them
+        [x] create popup to show all cash transfers and edit/delete them
 
     
     */
@@ -223,6 +224,9 @@ export const DrawerSideBar = () => {
         close();
     };
 
+    // TODO: don't allow reopening of driver drawer if there are no open registers
+    // probably handle this in backend
+
     const handleReopenDrawerClick = () => {
         console.log(`Reopening drawer ${currentDrawer.name}`);
         drawers.reOpen(currentDrawer);
@@ -346,7 +350,6 @@ export const DrawerSideBar = () => {
                     </AnimatePresence>
                     {isLocked ? (
                         <>
-                            {/* TODO: DB:dont allow db to lock if ending balance isnt 0 */}
                             {currentDrawer?.drawer_type === 'register' && (
                                 <SummaryDetails
                                     items={items}

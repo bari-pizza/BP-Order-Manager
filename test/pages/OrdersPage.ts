@@ -116,6 +116,7 @@ export class OrdersPage extends BasePage {
         }
         await this.clickDrawer(unassignedDrawer);
         const orderTicketsCount = await this.page.locator('.order-ticket').count();
+        console.log({ orderTicketsCount });
         for (let i = 0; i < orderTicketsCount; i++) {
             const { lastTicket, orderData } = await this.orderTicketActions.getLastTicketAndOrder();
             const { orderType, origin } = orderData;
@@ -136,8 +137,8 @@ export class OrdersPage extends BasePage {
                 const driverIndex = faker.number.int({ min: 0, max: driverCount - 1 });
                 await this.clickDrawer(driverDrawers[driverIndex]);
             }
-            // await this.assignLastOrderToRandomDrawer();
             await this.clickDrawer(unassignedDrawer);
         }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 }

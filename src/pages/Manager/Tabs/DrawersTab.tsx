@@ -61,6 +61,11 @@ export const DrawersTab = () => {
             {dayCanBeClosed && (
                 <MotionWrapper motionProps={motionProps} motionKey="close-business-day">
                     <Button>Close Business Day</Button>
+                    {/* 
+                        - should confirm that all drawers are locked
+                        - should confirm that all payments are locked
+                        - should confirm that all orders are locked and assigned to a drawer
+                    */}
                 </MotionWrapper>
             )}
             <Suspense fallback={<DrawerSideBarSkeleton />}>

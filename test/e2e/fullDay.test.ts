@@ -30,18 +30,17 @@ test.afterAll(async () => {
 });
 
 test('should add drivers to the day', async () => {
-    // const managerPage = new ManagerPage(page);
-    // await managerPage.login();
     await managerPage.navigateToManager();
     await managerPage.navigateToTab('Drawers');
     await managerPage.addDriver('Cedrick Catalan');
     await managerPage.addDriver('Julia Catalan');
+    // assert that all drivers are added
 });
 
 test('should add mock orders to the day', async () => {
     test.setTimeout(1000 * 60 * 5);
     await ordersPage.navigateToOrders();
-    await ordersPage.createRandomOrders(10, 15);
+    await ordersPage.createRandomOrders(50, 90);
 });
 
 test('should add orders to random drawers', async () => {
@@ -50,10 +49,20 @@ test('should add orders to random drawers', async () => {
     // make sure its loaded
     console.log('Navigated to orders');
     await ordersPage.assignAllOrdersToRandomDrawers();
+    // assert that there are no unassigned orders
 });
-test('should close out each driver', async () => {
+test('should close out all drawers', async () => {
     await managerPage.navigateToManager();
     await managerPage.navigateToTab('Drawers');
     await managerPage.closeDrawers();
+    // assert that all drawers are closed
+    // didnt close out the third party drawer
 });
-//     test('should close out the day', async ({ page }) => {});
+
+test('should close out the day', async () => {
+    // assert that close day button appears
+    // click it
+    // dialog should open
+    // will ask to confirm if all is good
+    // otherwise will show issues
+});

@@ -1,4 +1,4 @@
-import { PostgrestError } from '@supabase/supabase-js';
+import { PostgrestError, PostgrestResponse } from '@supabase/supabase-js';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
@@ -6,14 +6,15 @@ import { OneOfType } from '../typesAndValidators';
 
 export type Payload<T> =
     | {
-          data: T[];
-      }
-    | {
-          error: PostgrestError;
-      }
-    | {
           data: { successes: T[]; failures: T[] };
-      };
+      }
+    // | {
+    //       data: T[];
+    //   }
+    // | {
+    //       error: PostgrestError;
+    //   }
+    | PostgrestResponse<T>;
 
 export type StandardPayload<T> = {
     data: T[];
@@ -27,7 +28,20 @@ export const handlePayload = <T,>(payload: Payload<T>) => {
         mainError: null,
         errors: null,
     };
-    if ('data' in payload) {
+    // if ('data' in payload) {
+    //     const data = payload.data;
+    //     if ('successes' in data) {
+    //         result.data = data.successes;
+    //         result.errors = data.failures;
+    //     } else {
+    //         result.data = data;
+    //     }else {
+    //        result.mainError = payload.error;
+    //    }
+    if ('error' in payload && payload.error) {
+        // Complete Failure
+        throw payload.error;
+    } else {
         const data = payload.data;
         if ('successes' in data) {
             result.data = data.successes;
@@ -35,8 +49,6 @@ export const handlePayload = <T,>(payload: Payload<T>) => {
         } else {
             result.data = data;
         }
-    } else {
-        result.mainError = payload.error;
     }
     return result;
 };
@@ -153,11 +165,15 @@ export const useInteractionHandler = <T, U>({
         onError: (error: Error) => {
             // I think this only happens when an error is thrown
             // might need to add error throwing in the interactor
+            console.log({ error });
             toast.update(toastRef.current, {
-                render: error.message,
+                render: <div dangerouslySetInnerHTML={{ __html: error.message }} />,
                 type: 'error',
                 isLoading: false,
-                autoClose: 2000,
+                autoClose: 10000,
+                closeButton: true,
+                closeOnClick: true,
+                pauseOnHover: true,
             });
             if (handleFailure) {
                 handleFailure(error);
@@ -230,10 +246,13 @@ export const useRPCInteractionHandler = <T,>({
             // I think this only happens when an error is thrown
             // might need to add error throwing in the interactor
             toast.update(toastRef.current, {
-                render: getMessages.mainError(error),
+                render: <div dangerouslySetInnerHTML={{ __html: error.message }} />,
                 type: 'error',
                 isLoading: false,
-                autoClose: 2000,
+                autoClose: 10000,
+                closeButton: true,
+                closeOnClick: true,
+                pauseOnHover: true,
             });
             if (handleFailure) {
                 handleFailure(error);

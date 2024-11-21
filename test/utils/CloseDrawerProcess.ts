@@ -21,7 +21,7 @@ export class CloseDrawerProcess {
     }
 
     async createClosingPayment() {
-        await this.page.locator('text=Create Closing Payment').click();
+        await this.page.locator('text=/Create|Edit Closing Payment/').click();
         await this.page.locator('button:has([data-testid="SaveIcon"])').click();
     }
 
@@ -38,9 +38,9 @@ export class CloseDrawerProcess {
         await this.clickSaveAndCloseDrawer();
         await this.waitForDialog();
 
-        const buttonCreateClosing = await this.page.$('text=Create Closing Payment');
+        const buttonClosingPayment = this.page.locator('text=/Create|Edit Closing Payment/');
 
-        if (buttonCreateClosing) {
+        if (await buttonClosingPayment.isVisible()) {
             await this.createClosingPayment();
         }
 
@@ -56,9 +56,9 @@ export class CloseDrawerProcess {
     }
 
     async completeCloseThirdParty() {
-        // await this.clickSaveAndCloseDrawer();
-        // await this.waitForDialog();
-        // await this.clickConfirmDrawerClosure();
-        // await this.assertDrawerClosed();
+        await this.clickSaveAndCloseDrawer();
+        await this.waitForDialog();
+        await this.clickConfirmDrawerClosure();
+        await this.assertDrawerClosed();
     }
 }
