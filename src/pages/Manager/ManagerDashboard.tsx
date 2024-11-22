@@ -82,6 +82,8 @@ export const ManagerDashboard = () => {
         },
     };
 
+    console.log(`tabName: ${tabName}, orders: ${orders.all.length}, drivers: ${drivers.todays.length}`);
+
     return (
         <ManagerDashboardContext.Provider
             value={{

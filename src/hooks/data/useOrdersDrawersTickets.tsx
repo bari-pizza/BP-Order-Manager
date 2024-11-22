@@ -30,7 +30,6 @@ export const useOrdersDrawersTickets = () => {
     const allOrders = useSubscribeToTable<Order_Payment>({
         tableName: 'Order',
         initialData: initialOrderData,
-        // showToast: ['delete', 'update', 'insert'],
     });
 
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({

@@ -23,7 +23,7 @@ import {
     Edit as EditIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { InfoPopover } from './SummaryStack';
+import { InfoPopover } from '../../../rickcedlib/InfoPopover';
 
 interface CashTransferEditorBaseProps {
     drawerID: string;

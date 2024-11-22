@@ -262,12 +262,13 @@ export const DrawerSideBar = () => {
                 {
                     label: 'Hours',
                     value: -hours,
+                    // TODO: update these details
                     details: '10 hours @ $5/hour',
                 },
                 {
                     label: 'Cards',
                     value: -card,
-                    details: '$53.25 base, $3.25 tips',
+                    details: '$53.25 base | $3.25 tips',
                 },
                 {
                     label: '3rd Party',

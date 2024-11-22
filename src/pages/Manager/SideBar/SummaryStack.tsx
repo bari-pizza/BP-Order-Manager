@@ -1,9 +1,9 @@
-import { Divider, IconButton, Popover, Stack, Typography } from '@mui/material';
-import { Fragment, useState } from 'react';
+import { Divider, Stack, Typography } from '@mui/material';
+import { Fragment } from 'react';
 import { formatCurrency, getRunningTotal } from '../../../utils';
 import { CashTransfer } from '../../../typesAndValidators';
 import { useBariPizzaContext, useManagerDashboardContext } from '../../../hooks/data/useContextData';
-import { Info as InfoIcon } from '@mui/icons-material';
+import { InfoPopover } from '../../../rickcedlib/InfoPopover';
 
 interface SummaryStackProps {
     items: { label: string; value: number; details?: string }[];
@@ -29,12 +29,18 @@ export const SummaryStack = ({ items }: SummaryStackProps) => {
             {items.map((item, index) => (
                 <Fragment key={item.label}>
                     <Stack direction="row" justifyContent="right" spacing={2}>
+                        {item.details && (
+                            <InfoPopover
+                                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                                transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
+                                <Typography variant="body1">{item.details}</Typography>
+                            </InfoPopover>
+                        )}
                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                             {item.label}:
                         </Typography>
                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                             {formatCurrency(item.value, index > 0)}
-                            {/* ${(item.value / 100).toFixed(2)} */}
                         </Typography>
                     </Stack>
                     {index > 0 && (item.value !== 0 || index === items.length - 1) && (
@@ -45,19 +51,9 @@ export const SummaryStack = ({ items }: SummaryStackProps) => {
                                     variant="body1"
                                     sx={{ fontWeight: index === items.length - 1 ? 'bold' : '' }}>
                                     {formatCurrency(runningTotals[index])}
-                                    {/* ${(runningTotals[index] / 100).toFixed(2)} */}
                                 </Typography>
                             </Stack>
                         </>
-                    )}
-                    {item.details && (
-                        <div style={{ position: 'relative' }}>
-                            <div style={{ position: 'absolute', top: 0, left: 0 }}>
-                                <InfoPopover>
-                                    <Typography variant="body1">{item.details}</Typography>
-                                </InfoPopover>
-                            </div>
-                        </div>
                     )}
                 </Fragment>
             ))}
@@ -183,42 +179,5 @@ export const ThirdPartySummary = ({ thirdPartySummary }: { thirdPartySummary: Th
                 );
             })}
         </Stack>
-    );
-};
-
-export const InfoPopover = ({ children }: { children: React.ReactNode }) => {
-    // TODO: implement
-    // allow for size, color, absolute positioning, on click and on hover
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-    const handleInfoClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(e.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    return (
-        <>
-            <IconButton onClick={handleInfoClick} color="info">
-                <InfoIcon />
-            </IconButton>
-            <Popover
-                open={!!anchorEl}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                slotProps={{ paper: { sx: { padding: 2 } } }}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}>
-                {children}
-            </Popover>
-        </>
     );
 };
