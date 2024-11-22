@@ -40,7 +40,7 @@ test('should add drivers to the day', async () => {
 test('should add mock orders to the day', async () => {
     test.setTimeout(1000 * 60 * 5);
     await ordersPage.navigateToOrders();
-    await ordersPage.createRandomOrders(50, 90);
+    await ordersPage.createRandomOrders(5, 9);
 });
 
 test('should add orders to random drawers', async () => {

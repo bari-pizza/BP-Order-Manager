@@ -8,7 +8,7 @@ import {
     NewCashTransfer,
     validators,
 } from '../../../typesAndValidators';
-import { Autocomplete, Button, ButtonGroup, IconButton, Popover, Stack, TextField, Typography } from '@mui/material';
+import { Autocomplete, Button, ButtonGroup, IconButton, Stack, TextField, Typography } from '@mui/material';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
@@ -20,11 +20,10 @@ import {
     DeleteForever as DeleteForeverIcon,
     Save as SaveIcon,
     Replay as CancelIcon,
-    Info as InfoIcon,
     Edit as EditIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { InfoPopover } from './SummaryStack';
 
 interface CashTransferEditorBaseProps {
     drawerID: string;
@@ -132,15 +131,6 @@ export const CashTransferEditor = ({
         reValidateMode: 'onChange',
     });
     const { cashTransfers } = useManagerDashboardContext();
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-    const handleInfoClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(e.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
 
     const onSubmit = (data: FormValues) => {
         const { cashTransfer } = data;
@@ -269,26 +259,10 @@ export const CashTransferEditor = ({
                     {arrowIcon}
                     <Typography variant="body1">{formatCurrency(cashTransfer.amount_in_cents)}</Typography>
                     {/* <Stack direction="column" justifyContent="space-between"> */}
-                    <IconButton onClick={handleInfoClick} color="info">
-                        <InfoIcon />
-                    </IconButton>
                     <IconButton onClick={() => setIsEditing(true)} color="primary">
                         <EditIcon />
                     </IconButton>
-                    <Popover
-                        open={!!anchorEl}
-                        anchorEl={anchorEl}
-                        onClose={handleClose}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                        }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                        }}>
-                        <Typography sx={{ p: 2 }}>{interpretCashTransfer(cashTransfer, drawerID)}</Typography>
-                    </Popover>
+                    <InfoPopover>{interpretCashTransfer(cashTransfer, drawerID)}</InfoPopover>
                     {/* </Stack> */}
                 </LabeledStack>
             );

@@ -1,11 +1,12 @@
-import { Divider, Stack, Typography } from '@mui/material';
-import { Fragment } from 'react';
+import { Divider, IconButton, Popover, Stack, Typography } from '@mui/material';
+import { Fragment, useState } from 'react';
 import { formatCurrency, getRunningTotal } from '../../../utils';
 import { CashTransfer } from '../../../typesAndValidators';
 import { useBariPizzaContext, useManagerDashboardContext } from '../../../hooks/data/useContextData';
+import { Info as InfoIcon } from '@mui/icons-material';
 
 interface SummaryStackProps {
-    items: { label: string; value: number }[];
+    items: { label: string; value: number; details?: string }[];
 }
 
 interface SummaryDetailsProps extends SummaryStackProps {
@@ -48,6 +49,15 @@ export const SummaryStack = ({ items }: SummaryStackProps) => {
                                 </Typography>
                             </Stack>
                         </>
+                    )}
+                    {item.details && (
+                        <div style={{ position: 'relative' }}>
+                            <div style={{ position: 'absolute', top: 0, left: 0 }}>
+                                <InfoPopover>
+                                    <Typography variant="body1">{item.details}</Typography>
+                                </InfoPopover>
+                            </div>
+                        </div>
                     )}
                 </Fragment>
             ))}
@@ -173,5 +183,42 @@ export const ThirdPartySummary = ({ thirdPartySummary }: { thirdPartySummary: Th
                 );
             })}
         </Stack>
+    );
+};
+
+export const InfoPopover = ({ children }: { children: React.ReactNode }) => {
+    // TODO: implement
+    // allow for size, color, absolute positioning, on click and on hover
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+    const handleInfoClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(e.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    return (
+        <>
+            <IconButton onClick={handleInfoClick} color="info">
+                <InfoIcon />
+            </IconButton>
+            <Popover
+                open={!!anchorEl}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                slotProps={{ paper: { sx: { padding: 2 } } }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}>
+                {children}
+            </Popover>
+        </>
     );
 };

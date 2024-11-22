@@ -115,9 +115,32 @@ export class OrdersPage extends BasePage {
             driverDrawers.push(driverDrawer);
         }
         await this.clickDrawer(unassignedDrawer);
-        const orderTicketsCount = await this.page.locator('.order-ticket').count();
-        console.log({ orderTicketsCount });
-        for (let i = 0; i < orderTicketsCount; i++) {
+        // const orderTicketsCount = await this.page.locator('.order-ticket').count();
+        // console.log({ orderTicketsCount });
+        // for (let i = 0; i < orderTicketsCount; i++) {
+        //     const { lastTicket, orderData } = await this.orderTicketActions.getLastTicketAndOrder();
+        //     const { orderType, origin } = orderData;
+        //     await this.orderTicketActions.toggleTicketSelection(lastTicket);
+        //     if (orderType === 'pickup') {
+        //         if (origin.is_third_party) {
+        //             await this.clickDrawer(thirdPartyDrawer);
+        //         } else {
+        //             const randomDrawer = faker.number.int({ min: 1, max: 2 });
+        //             if (randomDrawer === 1) {
+        //                 await this.clickDrawer(registerDrawer1);
+        //             } else if (randomDrawer === 2) {
+        //                 await this.clickDrawer(registerDrawer2);
+        //             }
+        //         }
+        //     } else {
+        //         if (driverCount === 0) return;
+        //         const driverIndex = faker.number.int({ min: 0, max: driverCount - 1 });
+        //         await this.clickDrawer(driverDrawers[driverIndex]);
+        //     }
+        //     await this.clickDrawer(unassignedDrawer);
+        // }
+        let orderTicketsCount = await this.page.locator('.order-ticket').count();
+        while (orderTicketsCount > 0) {
             const { lastTicket, orderData } = await this.orderTicketActions.getLastTicketAndOrder();
             const { orderType, origin } = orderData;
             await this.orderTicketActions.toggleTicketSelection(lastTicket);
@@ -138,6 +161,7 @@ export class OrdersPage extends BasePage {
                 await this.clickDrawer(driverDrawers[driverIndex]);
             }
             await this.clickDrawer(unassignedDrawer);
+            orderTicketsCount = await this.page.locator('.order-ticket').count();
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
     }
