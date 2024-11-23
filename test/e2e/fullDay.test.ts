@@ -51,6 +51,7 @@ test('should add orders to random drawers', async () => {
     await ordersPage.assignAllOrdersToRandomDrawers();
     // assert that there are no unassigned orders
 });
+
 test('should close out all drawers', async () => {
     await managerPage.navigateToManager();
     await managerPage.navigateToTab('Drawers');

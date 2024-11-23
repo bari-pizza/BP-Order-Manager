@@ -1,5 +1,6 @@
-import { Suspense } from 'react';
-import { Button, Divider, Stack } from '@mui/material';
+import { Suspense, useState } from 'react';
+import { Button, Dialog, Divider, SpeedDial, SpeedDialAction, SpeedDialIcon, Stack } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
 import { OrderEditor } from './OrderEditor/OrderEditor';
@@ -46,6 +47,81 @@ export const OrderDashboard = () => {
                     </Stack>
                 </Stack>
             </SideBar>
+        </OrderDashboardContext.Provider>
+    );
+};
+
+export const OrderDashboardMobile = () => {
+    const { drivers } = useDrivers();
+    const { ticket, drawer, orders, summaries } = useOrdersDrawersTickets();
+    const [openSpeedDial, setOpenSpeedDial] = useState(false);
+    const { open: openEditor, close: closeEditor, isOpen: editorIsOpen } = useDialogProps();
+
+    const handleOpen = () => setOpenSpeedDial(true);
+    const handleClose = () => setOpenSpeedDial(false);
+
+    const handleAddOrderClick = () => {
+        setOpenSpeedDial(false);
+        openEditor();
+    };
+    // floating speed dial button to add order
+
+    // create and edit orders in popup/drawer
+
+    // statistics page (with link in navbar)
+
+    /* TODO: drivers need to be able to:
+
+        - add orders
+            - origin
+            - drawer (self)
+            - order type (delivery)
+            - order #/name
+            - delivery fee (default)
+            - total
+
+        - update orders
+            - order #/name
+            - total
+
+        - request to delete orders
+
+        - add payments
+            - payment type
+            - amount
+            - tip
+
+        - update payments
+            - payment type
+            - amount
+            - tip
+
+        - delete payments
+
+
+
+        - access end of day payment slip
+
+    */
+
+    return (
+        <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers, summaries }}>
+            <SpeedDial
+                ariaLabel="SpeedDial"
+                sx={{ position: 'absolute', bottom: 16, right: 16 }}
+                icon={<SpeedDialIcon />}
+                color="secondary"
+                onClose={handleClose}
+                onOpen={handleOpen}
+                open={openSpeedDial}>
+                <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
+            </SpeedDial>
+            <Stack direction="column" sx={{ height: '100%' }} mt={2}>
+                <OrderTicketArea />
+                <Dialog open={editorIsOpen} onClose={closeEditor}>
+                    Let's add an order!
+                </Dialog>
+            </Stack>
         </OrderDashboardContext.Provider>
     );
 };
