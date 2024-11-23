@@ -1,5 +1,5 @@
 import { IconButton, Popover } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Info as InfoIcon } from '@mui/icons-material';
 
 type InfoPopoverProps = {
@@ -10,17 +10,28 @@ type InfoPopoverProps = {
 };
 
 export const InfoPopover = ({ children, size = 'small', anchorOrigin, transformOrigin }: InfoPopoverProps) => {
-    // TODO: implement
-    // allow for size, color, absolute positioning, on click and on hover
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const popoverAnchor = useRef<HTMLButtonElement | null>(null);
+    const [openedPopover, setOpenedPopover] = useState(false);
 
-    const handleInfoClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(e.currentTarget);
+    const handlePopoverEnter = () => {
+        setOpenedPopover(true);
+    };
+
+    const handlePopoverLeave = () => {
+        setOpenedPopover(false);
     };
 
     const handleClose = () => {
-        setAnchorEl(null);
+        setOpenedPopover(false);
     };
+
+    const handleInfoClick = () => {
+        setOpenedPopover(true);
+    };
+
+    /* TODO: figure out this issue
+        Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at <URL>.
+    */
 
     return (
         <div
@@ -34,14 +45,21 @@ export const InfoPopover = ({ children, size = 'small', anchorOrigin, transformO
                 style={{
                     position: 'absolute',
                 }}>
-                <IconButton onClick={handleInfoClick} color="info" size={size}>
+                <IconButton
+                    ref={popoverAnchor}
+                    onClick={handleInfoClick}
+                    color="info"
+                    size={size}
+                    disableFocusRipple
+                    onMouseEnter={handlePopoverEnter}
+                    onMouseLeave={handlePopoverLeave}>
                     <InfoIcon />
                 </IconButton>
                 <Popover
-                    open={!!anchorEl}
-                    anchorEl={anchorEl}
+                    aria-modal
+                    open={openedPopover}
+                    anchorEl={popoverAnchor.current}
                     onClose={handleClose}
-                    slotProps={{ paper: { sx: { padding: 2 } } }}
                     anchorOrigin={{
                         vertical: anchorOrigin?.vertical ?? 'bottom',
                         horizontal: anchorOrigin?.horizontal ?? 'left',
@@ -49,7 +67,11 @@ export const InfoPopover = ({ children, size = 'small', anchorOrigin, transformO
                     transformOrigin={{
                         vertical: transformOrigin?.vertical ?? 'top',
                         horizontal: transformOrigin?.horizontal ?? 'left',
-                    }}>
+                    }}
+                    onMouseEnter={handlePopoverEnter}
+                    onMouseLeave={handlePopoverLeave}
+                    slotProps={{ paper: { sx: { pointerEvents: 'auto', padding: 2 } } }}
+                    sx={{ pointerEvents: 'none' }}>
                     {children}
                 </Popover>
             </div>
