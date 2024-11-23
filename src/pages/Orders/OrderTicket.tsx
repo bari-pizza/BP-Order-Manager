@@ -13,6 +13,7 @@ import { OriginLogo } from '../../components/Order/OriginLogo';
 import { PaymentTypeIcon } from './PaymentTypeIcon';
 import { formatCurrency } from '../../utils';
 import { LockLottieIcon } from '../../rickcedlib/LottieIcons';
+import { useMobile } from '../../hooks/data/useMobile';
 
 interface OrderTicketProps {
     order: Order_Payment;
@@ -23,6 +24,7 @@ interface OrderTicketProps {
 export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProps) => {
     const { origins } = useBariPizzaContext();
     const { open, isOpen, close } = useDialogProps();
+    const { driver } = useMobile();
 
     const { ticket } = useOrderDashboardContext();
     const theme = useTheme();
@@ -156,7 +158,7 @@ export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProp
                 </div>
             )}
 
-            <OrderEditor order={order} asDialog close={close} isOpen={isOpen} />
+            <OrderEditor order={order} asDialog close={close} isOpen={isOpen} driverDrawerID={driver?.drawer_id} />
         </Card>
     );
 };

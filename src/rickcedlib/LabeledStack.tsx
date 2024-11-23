@@ -25,7 +25,7 @@ export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
             transform: '',
             padding: '0 8px',
             backgroundColor: theme.palette.background.paper,
-            color: color || theme.palette.primary.main,
+            color,
             fontSize: '0.875rem', // Adjust to your needs
             fontWeight: 500,
             textTransform: 'capitalize', // Capitalizes the label by default
@@ -49,7 +49,7 @@ export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
                     ref={ref}
                     sx={{
                         position: 'relative',
-                        border: `2px solid ${color || theme.palette.primary.main}`,
+                        border: `2px solid ${color}`,
                         borderRadius: '4px',
                         padding: theme.spacing(2),
                         marginTop: theme.spacing(1.5),
@@ -73,7 +73,7 @@ export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
                 ref={ref}
                 sx={{
                     position: 'relative',
-                    border: `2px solid ${color || theme.palette.primary.main}`,
+                    border: `2px solid ${color}`,
                     borderRadius: '4px',
                     padding: theme.spacing(2),
                     ...stackSx,

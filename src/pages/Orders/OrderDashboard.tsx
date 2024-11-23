@@ -9,8 +9,20 @@ import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTicket
 import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
+import { useMobile } from '../../hooks/data/useMobile';
+import { AnimatePresence, MotionProps } from 'framer-motion';
+import { MotionWrapper } from '../../rickcedlib/MotionWrapper';
+import { OrderTicket } from './OrderTicket';
+import { Player } from '@lottiefiles/react-lottie-player';
+import { useLayoutContext } from '../../hooks/data/useContextData';
 
 export const OrderDashboard = () => {
+    const { isMobile } = useLayoutContext();
+
+    return isMobile ? <OrderDashboardMobile /> : <OrderDashboardDesktop />;
+};
+
+const OrderDashboardDesktop = () => {
     const { drivers } = useDrivers();
     const { open, close, isOpen } = useDialogProps();
     const { ticket, drawer, orders, summaries } = useOrdersDrawersTickets();
@@ -51,11 +63,10 @@ export const OrderDashboard = () => {
     );
 };
 
-export const OrderDashboardMobile = () => {
-    const { drivers } = useDrivers();
-    const { ticket, drawer, orders, summaries } = useOrdersDrawersTickets();
+const OrderDashboardMobile = () => {
     const [openSpeedDial, setOpenSpeedDial] = useState(false);
     const { open: openEditor, close: closeEditor, isOpen: editorIsOpen } = useDialogProps();
+    const { driver, orders, ticket } = useMobile();
 
     const handleOpen = () => setOpenSpeedDial(true);
     const handleClose = () => setOpenSpeedDial(false);
@@ -104,8 +115,16 @@ export const OrderDashboardMobile = () => {
 
     */
 
+    if (!driver) return null;
+
+    const motionProps: MotionProps = {
+        initial: { opacity: 0 },
+        animate: { opacity: 1, transition: { duration: 0.5 } },
+        exit: { opacity: 0, transition: { duration: 1 } },
+    };
+
     return (
-        <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers, summaries }}>
+        <>
             <SpeedDial
                 ariaLabel="SpeedDial"
                 sx={{ position: 'absolute', bottom: 16, right: 16 }}
@@ -117,12 +136,51 @@ export const OrderDashboardMobile = () => {
                 <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
             </SpeedDial>
             <Stack direction="column" sx={{ height: '100%' }} mt={2}>
-                <OrderTicketArea />
+                <Stack className="hover-scroll" p={1} pb="50px" m={2}>
+                    <Stack className="hover-scroll-content">
+                        {orders.length ? (
+                            <AnimatePresence>
+                                <MotionWrapper
+                                    motionProps={motionProps}
+                                    gridProps={{
+                                        justifyContent: 'space-between',
+                                        container: true,
+                                        rowGap: 3,
+                                        columnGap: 1,
+                                    }}
+                                    motionKey="orders">
+                                    {orders.map((order) => {
+                                        return (
+                                            <OrderTicket
+                                                order={order}
+                                                key={order.order_id}
+                                                toggleSelected={() => ticket.select(order)}
+                                                selected={ticket.isSelected(order)}
+                                            />
+                                        );
+                                    })}
+                                </MotionWrapper>
+                            </AnimatePresence>
+                        ) : (
+                            <Player
+                                src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
+                                loop
+                                autoplay
+                                style={{ width: '100%', height: '100%', maxHeight: '515px' }}
+                            />
+                        )}
+                    </Stack>
+                </Stack>
                 <Dialog open={editorIsOpen} onClose={closeEditor}>
-                    Let's add an order!
+                    <OrderEditor
+                        close={closeEditor}
+                        isOpen={editorIsOpen}
+                        forNewOrder
+                        driverDrawerID={driver.drawer_id}
+                    />
                 </Dialog>
             </Stack>
-        </OrderDashboardContext.Provider>
+        </>
     );
 };
 

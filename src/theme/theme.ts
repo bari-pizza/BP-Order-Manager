@@ -13,5 +13,25 @@ export const themeOptions: ThemeOptions = {
             light: '#F76A5A',
             dark: '#AB3022',
         },
+        error: {
+            main: '#f54531',
+            light: '#F76A5A',
+            dark: '#AB3022',
+        },
+        warning: {
+            main: '#f54531',
+            light: '#F76A5A',
+            dark: '#AB3022',
+        },
+        info: {
+            main: '#f54531',
+            light: '#F76A5A',
+            dark: '#AB3022',
+        },
+        success: {
+            main: '#f54531',
+            light: '#F76A5A',
+            dark: '#AB3022',
+        },
     },
 };

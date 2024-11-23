@@ -14,6 +14,7 @@ type TextFieldWithMaskProps = TextFieldProps & {
     handleChange: (value: number, shouldDirty: boolean) => void;
     keepMask?: boolean;
     inputRef?: React.RefObject<HTMLInputElement>;
+    color?: string;
     // optional ref used for things like focusing the input
 };
 
@@ -23,6 +24,7 @@ export const TextFieldWithMask = ({
     handleChange,
     keepMask = false,
     inputRef,
+    color,
     ...props
 }: TextFieldWithMaskProps) => {
     const [value, setValue] = useState(initialValue + '');
@@ -60,6 +62,7 @@ export const TextFieldWithMask = ({
     return (
         <TextField
             {...props}
+            sx={{ borderColor: 'red' }}
             value={displayValue}
             onChange={(e) => setDisplayValue(e.target.value)}
             inputRef={ref} // Attach masked ref

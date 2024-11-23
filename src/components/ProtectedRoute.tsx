@@ -17,13 +17,11 @@ const defaultProtections = {
 export const ProtectedRoute = ({
     children,
     fallback,
-    forMobile,
     protections = defaultProtections,
     redirect = '/',
 }: {
     children: React.ReactNode;
     fallback: React.ReactNode;
-    forMobile?: React.ReactNode;
     protections?: Protections;
     redirect?: string | false;
 }) => {
@@ -55,7 +53,6 @@ export const ProtectedRoute = ({
     }
 
     if (allProtections.isDesktop && isMobile) {
-        if (forMobile) return forMobile;
         return <Typography variant="body1">Please use a desktop or tablet to use this page.</Typography>;
     }
 

@@ -14,7 +14,7 @@ import './App.css';
 import { LayoutContext } from './context/LayoutContext.tsx';
 import { UserContext } from './context/UserContext.tsx';
 import { useSession } from './hooks/data/useSession.ts';
-import { OrderDashboard, OrderDashboardMobile, OrderDashboardSkeleton } from './pages/Orders/OrderDashboard.tsx';
+import { OrderDashboard, OrderDashboardSkeleton } from './pages/Orders/OrderDashboard.tsx';
 import { PageMissing } from './components/PageMissing.tsx';
 import { Home } from './pages/Home/Home.tsx';
 import { MyAccount } from './pages/Profile/MyAccount.tsx';
@@ -49,10 +49,7 @@ const router = createBrowserRouter([
             {
                 path: '/orders',
                 element: (
-                    <ProtectedRoute
-                        fallback={<OrderDashboardSkeleton />}
-                        forMobile={<OrderDashboardMobile />}
-                        protections={{ isDesktop: true }}>
+                    <ProtectedRoute fallback={<OrderDashboardSkeleton />}>
                         <OrderDashboard />
                     </ProtectedRoute>
                 ),

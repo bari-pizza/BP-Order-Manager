@@ -98,6 +98,14 @@ export const PaymentEditor = ({
         setValue('payment_type', paymentType, { shouldDirty: true });
     };
 
+    const paymentType = watch('payment_type');
+
+    const paymentTypeName = paymentType.split('_').join(' ');
+
+    const invalidPaymentType = !validPaymentTypes.find(({ value }) => value === paymentType);
+
+    console.log({ validPaymentTypes, paymentType, paymentTypeName, invalidPaymentType });
+
     if (!isEditing) {
         if (forNewPayment) {
             return (
@@ -109,7 +117,8 @@ export const PaymentEditor = ({
             return (
                 <LabeledStack
                     style={{ cursor: 'pointer' }}
-                    label={payment.payment_type.split('_').join(' ')}
+                    label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
+                    color={invalidPaymentType ? theme.palette.error.main : ''}
                     direction="row"
                     spacing={2}
                     height={60}
@@ -130,13 +139,11 @@ export const PaymentEditor = ({
         }
     }
 
-    const paymentTypeName = watch('payment_type').split('_').join(' ');
-
     return (
         <Stack direction="column" rowGap={2}>
             <LabeledStack
                 label={paymentTypeName}
-                color={isDirty || forNewPayment ? theme.palette.secondary.main : theme.palette.primary.main}
+                color={isDirty || forNewPayment ? theme.palette.primary.main : ''}
                 direction="column"
                 justifyContent="space-between"
                 mt={1}
@@ -159,7 +166,7 @@ export const PaymentEditor = ({
                                     handleChange={(value, shouldDirty) =>
                                         setValue('amount_in_cents', value, { shouldDirty })
                                     }
-                                    color={dirtyFields.amount_in_cents || forNewPayment ? 'secondary' : 'primary'}
+                                    // color={dirtyFields.amount_in_cents || forNewPayment ? 'primary' : undefined}
                                     focused
                                 />
                             );

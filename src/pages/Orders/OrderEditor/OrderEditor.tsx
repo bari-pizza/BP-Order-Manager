@@ -36,9 +36,16 @@ import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { motion } from 'framer-motion';
 
-const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_type: OrderType) => {
+const isValidDrawer = (
+    drawer: Drawer | null,
+    is_third_party: boolean,
+    order_type: OrderType,
+    driverDrawerID?: string,
+) => {
     if (!drawer) return true;
     const { drawer_type } = drawer;
+
+    if (driverDrawerID) return drawer.drawer_id === driverDrawerID;
 
     if (order_type === 'delivery' && drawer_type === 'driver') {
         return true;
@@ -80,6 +87,7 @@ type OrderEditorProps = {
     order?: Order_Payment;
     asDialog?: boolean;
     forNewOrder?: boolean;
+    driverDrawerID?: string;
 };
 
 type FormValues =
@@ -88,10 +96,18 @@ type FormValues =
           initial_payment_type: PaymentType;
       });
 
-export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = false }: OrderEditorProps) => {
+export const OrderEditor = ({
+    close,
+    isOpen,
+    asDialog,
+    order,
+    driverDrawerID,
+    forNewOrder = false,
+}: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { origins, drawers, drivers, constants } = useBariPizzaContext();
-    // TODO: get max order number from orders
+    const driverIsEditing = !!driverDrawerID;
+
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
         return {
@@ -102,11 +118,11 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
             order_type: 'delivery' as OrderType,
             phone: null,
             total_in_cents: 0,
-            drawer_id: '',
+            drawer_id: driverDrawerID || '', // if a driver is editing, they can only choose their own drawer
             delivery_fee_in_cents: defaultDeliveryFee,
             initial_payment_type: 'cash' as PaymentType,
         };
-    }, [businessDate, origins, defaultDeliveryFee]);
+    }, [businessDate, origins, defaultDeliveryFee, driverDrawerID]);
     const {
         handleSubmit,
         register,
@@ -161,15 +177,22 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
 
     const { can_deliver, has_order_number, is_third_party } = currentOrigin;
 
+    const validOrigins = driverDrawerID ? origins.filter((origin) => origin.can_deliver) : origins;
+
     const invalidOrderType = currentOrderType === 'delivery' && can_deliver === false;
 
-    const validDrawers = drawersAndDrivers.filter((drawer) => isValidDrawer(drawer, is_third_party, currentOrderType));
+    const validDrawers = drawersAndDrivers.filter((drawer) =>
+        isValidDrawer(drawer, is_third_party, currentOrderType, driverDrawerID),
+    );
 
-    const invalidDrawer = !isValidDrawer(currentDrawer, is_third_party, currentOrderType);
+    const invalidDrawer = !isValidDrawer(currentDrawer, is_third_party, currentOrderType, driverDrawerID);
 
     const validPaymentTypes = paymentTypes.filter(({ value }) => isValidPaymentType(value, currentOrigin));
 
     const invalidInitialPaymentType = !isValidPaymentType(watch('initial_payment_type'), currentOrigin);
+
+    console.log({ invalidOrderType, invalidDrawer, invalidInitialPaymentType });
+    if (invalidDrawer) console.log({ currentDrawer, is_third_party, currentOrderType });
 
     useEffect(() => {
         if (order) {
@@ -231,7 +254,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 render={({ field }) => {
                     return (
                         <TextField {...field} label="Origin" select value={field.value}>
-                            {origins.map((origin) => (
+                            {validOrigins.map((origin) => (
                                 <MenuItem key={origin.name} value={origin.origin_id}>
                                     {origin.name}
                                 </MenuItem>
@@ -250,10 +273,11 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                             {...field}
                             label="Order Type"
                             select
+                            disabled={driverIsEditing}
                             value={valueWithFallback}
                             style={{ textTransform: 'capitalize' }}>
                             {can_deliver && <MenuItem value="delivery">Delivery</MenuItem>}
-                            <MenuItem value="pickup">Pickup</MenuItem>
+                            {!driverDrawerID && <MenuItem value="pickup">Pickup</MenuItem>}
                         </TextField>
                     );
                 }}
@@ -269,6 +293,8 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                               ? field.value
                               : '';
 
+                    // console.log({ validDrawers, driverDrawerID, currentDrawerID, field });
+
                     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
                         if (['Delete', 'Backspace', 'Escape'].includes(event.key)) {
                             // Clear the value if Delete, Backspace, or Esc is pressed
@@ -277,7 +303,13 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                     };
 
                     return (
-                        <TextField {...field} label="Drawer" select value={currentDrawerID} onKeyDown={handleKeyDown}>
+                        <TextField
+                            {...field}
+                            label="Drawer"
+                            select
+                            value={currentDrawerID}
+                            onKeyDown={handleKeyDown}
+                            disabled={driverIsEditing}>
                             {validDrawers.map((drawer) => {
                                 return (
                                     <MenuItem key={drawer.name} value={drawer.drawer_id}>
@@ -329,7 +361,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                                 error={!!errors.delivery_fee_in_cents}
                                 helperText={errors.delivery_fee_in_cents?.message}
                                 value={value}
-                                disabled={currentOrderType !== 'delivery'}
+                                disabled={currentOrderType !== 'delivery' || driverIsEditing}
                                 handleChange={(value, shouldDirty) =>
                                     setValue('delivery_fee_in_cents', value, { shouldDirty })
                                 }
