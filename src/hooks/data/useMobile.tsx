@@ -15,7 +15,6 @@ export const useMobile = () => {
 
     if (!isMobile) {
         return {
-            isMobile,
             businessDate,
             profile,
             driver: undefined,
@@ -31,7 +30,6 @@ export const useMobile = () => {
 
     if (!driver)
         return {
-            isMobile,
             businessDate,
             profile,
             driver,
@@ -80,7 +78,6 @@ export const useMobile = () => {
     */
 
     return {
-        isMobile,
         businessDate,
         profile,
         driver,

@@ -8,7 +8,7 @@ import {
     NewCashTransfer,
     validators,
 } from '../../../typesAndValidators';
-import { Autocomplete, Button, ButtonGroup, IconButton, Stack, TextField, Typography } from '@mui/material';
+import { Autocomplete, Button, ButtonGroup, IconButton, Stack, Typography } from '@mui/material';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { InfoPopover } from '../../../rickcedlib/InfoPopover';
+import { SmartTextField } from '../../../rickcedlib/SmartTextField';
 
 interface CashTransferEditorBaseProps {
     drawerID: string;
@@ -314,7 +315,7 @@ export const CashTransferEditor = ({
                             disabled={!forNewCashTransfer}
                             onChange={(_, selectedOption) => onChange(selectedOption?.drawer_id || '')}
                             renderInput={(params) => (
-                                <TextField
+                                <SmartTextField
                                     {...params}
                                     label={transferType === 'bank' ? 'Register' : 'Drawer'}
                                     error={!!errors.cashTransfer?.destination}
@@ -340,7 +341,7 @@ export const CashTransferEditor = ({
                             disabled={!forNewCashTransfer}
                             onChange={(_, selectedOption) => onChange(selectedOption?.drawer_id || '')}
                             renderInput={(params) => (
-                                <TextField
+                                <SmartTextField
                                     {...params}
                                     label={transferType === 'bank' ? 'Register' : 'Drawer'}
                                     error={!!errors.cashTransfer?.source}
@@ -353,7 +354,7 @@ export const CashTransferEditor = ({
                     )}
                 />
             ) : (
-                <TextField label="Title" {...register('cashTransfer.title')} />
+                <SmartTextField label="Title" {...register('cashTransfer.title')} />
             )}
             {validTFSRs.length > 1 ? (
                 <Controller

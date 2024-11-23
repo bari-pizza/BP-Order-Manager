@@ -1,14 +1,4 @@
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Button,
-    Stack,
-    Typography,
-    TextField,
-    MenuItem,
-    Divider,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Button, Stack, Typography, MenuItem, Divider } from '@mui/material';
 import { createNewOrder, updateOrder } from '../../../supabaseQueries';
 import {
     Drawer,
@@ -35,6 +25,7 @@ import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { motion } from 'framer-motion';
+import { SmartTextField } from '../../../rickcedlib/SmartTextField';
 
 const isValidDrawer = (
     drawer: Drawer | null,
@@ -128,7 +119,7 @@ export const OrderEditor = ({
         register,
         control,
         setError,
-        formState: { errors, isDirty },
+        formState: { errors, isDirty, dirtyFields },
         reset,
         watch,
         setValue,
@@ -191,7 +182,6 @@ export const OrderEditor = ({
 
     const invalidInitialPaymentType = !isValidPaymentType(watch('initial_payment_type'), currentOrigin);
 
-    console.log({ invalidOrderType, invalidDrawer, invalidInitialPaymentType });
     if (invalidDrawer) console.log({ currentDrawer, is_third_party, currentOrderType });
 
     useEffect(() => {
@@ -253,13 +243,13 @@ export const OrderEditor = ({
                 control={control}
                 render={({ field }) => {
                     return (
-                        <TextField {...field} label="Origin" select value={field.value}>
+                        <SmartTextField {...field} label="Origin" select value={field.value}>
                             {validOrigins.map((origin) => (
                                 <MenuItem key={origin.name} value={origin.origin_id}>
                                     {origin.name}
                                 </MenuItem>
                             ))}
-                        </TextField>
+                        </SmartTextField>
                     );
                 }}
             />
@@ -269,7 +259,7 @@ export const OrderEditor = ({
                 render={({ field }) => {
                     const valueWithFallback = can_deliver ? field.value : 'pickup';
                     return (
-                        <TextField
+                        <SmartTextField
                             {...field}
                             label="Order Type"
                             select
@@ -278,7 +268,7 @@ export const OrderEditor = ({
                             style={{ textTransform: 'capitalize' }}>
                             {can_deliver && <MenuItem value="delivery">Delivery</MenuItem>}
                             {!driverDrawerID && <MenuItem value="pickup">Pickup</MenuItem>}
-                        </TextField>
+                        </SmartTextField>
                     );
                 }}
             />
@@ -303,7 +293,7 @@ export const OrderEditor = ({
                     };
 
                     return (
-                        <TextField
+                        <SmartTextField
                             {...field}
                             label="Drawer"
                             select
@@ -317,7 +307,7 @@ export const OrderEditor = ({
                                     </MenuItem>
                                 );
                             })}
-                        </TextField>
+                        </SmartTextField>
                     );
                 }}
             />
@@ -327,7 +317,7 @@ export const OrderEditor = ({
     const rightSide = (
         <>
             {currentOrigin?.has_order_number ? (
-                <TextField
+                <SmartTextField
                     key="order_number"
                     label="Order Number"
                     {...register('order_number', {
@@ -336,9 +326,10 @@ export const OrderEditor = ({
                     })}
                     error={!!errors.order_number}
                     helperText={errors.order_number?.message}
+                    isDirty={dirtyFields.order_number}
                 />
             ) : (
-                <TextField
+                <SmartTextField
                     key="order_name"
                     label="Order Name"
                     {...register('order_name', {
@@ -365,6 +356,7 @@ export const OrderEditor = ({
                                 handleChange={(value, shouldDirty) =>
                                     setValue('delivery_fee_in_cents', value, { shouldDirty })
                                 }
+                                isDirty={dirtyFields.delivery_fee_in_cents}
                             />
                         );
                     }}
@@ -383,6 +375,7 @@ export const OrderEditor = ({
                             helperText={errors.total_in_cents?.message}
                             value={value}
                             handleChange={(value, shouldDirty) => setValue('total_in_cents', value, { shouldDirty })}
+                            isDirty={dirtyFields.total_in_cents}
                         />
                     );
                 }}
@@ -516,8 +509,13 @@ const OrderEditorDialog = ({
         )
     ) : null;
 
+    const handleClose = () => {
+        close();
+        setEditablePaymentID(null);
+    };
+
     return (
-        <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
+        <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
             <DialogTitle>Order Editor</DialogTitle>
             <DialogContent sx={{ minHeight: 250, overflowY: 'hidden' }}>
                 {!editablePaymentID ? (

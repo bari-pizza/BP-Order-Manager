@@ -2,7 +2,8 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { LabeledStack } from '../../../rickcedlib/LabeledStack';
 import { TextFieldWithMask } from '../../../rickcedlib/TextFieldWithMask';
-import { Autocomplete, Button, TextField } from '@mui/material';
+import { Autocomplete, Button } from '@mui/material';
+import { SmartTextField } from '../../../rickcedlib/SmartTextField';
 
 type FormValues = {
     default_delivery_fee_in_cents: number;
@@ -90,7 +91,7 @@ export const SettingsTab = () => {
                         value={value}
                         sx={{ width: 225 }}
                         onChange={(_, drawerID) => onChange(drawerID || '')}
-                        renderInput={(params) => <TextField {...params} label="Default Bank Register" />}
+                        renderInput={(params) => <SmartTextField {...params} label="Default Bank Register" />}
                         getOptionLabel={(option) => drawers.find((d) => d.drawer_id === option)?.name || ''}
                     />
                 )}

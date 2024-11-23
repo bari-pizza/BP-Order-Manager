@@ -1,8 +1,9 @@
-import { MenuItem, Slider, Stack, TextField } from '@mui/material';
+import { MenuItem, Slider, Stack } from '@mui/material';
 import { useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { LineChart } from '@mui/x-charts';
 import { MutableRefObject, useState } from 'react';
 import { Portal } from '@mui/base';
+import { SmartTextField } from '../../../rickcedlib/SmartTextField';
 
 interface WindowSelectorProps {
     range: [number, number];
@@ -61,7 +62,7 @@ const PeriodSelector = ({ periodMinutes, setPeriodMinutes }: PeriodSelectorProps
     ];
 
     return (
-        <TextField
+        <SmartTextField
             id="outlined-select-currency"
             select
             label="Group by"
@@ -73,7 +74,7 @@ const PeriodSelector = ({ periodMinutes, setPeriodMinutes }: PeriodSelectorProps
                     {option.label}
                 </MenuItem>
             ))}
-        </TextField>
+        </SmartTextField>
     );
 };
 

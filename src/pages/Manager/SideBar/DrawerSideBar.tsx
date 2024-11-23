@@ -1,14 +1,4 @@
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Skeleton,
-    Stack,
-    TextField,
-    Typography,
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, Stack, Typography } from '@mui/material';
 import { useBariPizzaContext, useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { SideBar, SideBarSkeleton } from '../../../components/SideBar';
 import { DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../../components/Base/DrawerCardBase';
@@ -30,6 +20,7 @@ import { SummaryDetails, SummaryStack, ThirdPartySummary } from './SummaryStack'
 import { formatCurrency } from '../../../utils';
 import { CashTransferEditor } from './CashTransferEditor';
 import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
+import { SmartTextField } from '../../../rickcedlib/SmartTextField';
 
 type FormValues = BusinessDayDrawerSummary;
 
@@ -377,7 +368,7 @@ export const DrawerSideBar = () => {
                             {currentDrawer.drawer_type !== 'third_party' && (
                                 <Button onClick={openCashTransfers}>Cash Transfers</Button>
                             )}
-                            {/* {isDriver && <TextField label="Hours" {...register('hours')} />} */}
+                            {/* {isDriver && <SmartTextFieldlabel="Hours" {...register('hours')} />} */}
                             {isDriver && (
                                 <Controller
                                     name="hours"
@@ -393,7 +384,7 @@ export const DrawerSideBar = () => {
                                             );
                                         };
 
-                                        return <TextField label="Hours" value={value} onChange={handleChange} />;
+                                        return <SmartTextField label="Hours" value={value} onChange={handleChange} />;
                                     }}
                                 />
                             )}
@@ -600,13 +591,13 @@ export const DrawerSideBarSkeleton = () => {
                         <Typography variant="h6">TOTAL: $125.50</Typography>
                     </Skeleton>
                     <Skeleton>
-                        <TextField />
+                        <SmartTextField />
                     </Skeleton>
                     <Skeleton>
-                        <TextField />
+                        <SmartTextField />
                     </Skeleton>
                     <Skeleton>
-                        <TextField />
+                        <SmartTextField />
                     </Skeleton>
                     <Button>Save</Button>
                     <Button>Close Drawer</Button>

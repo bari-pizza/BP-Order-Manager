@@ -1,20 +1,11 @@
 import { useBariPizzaContext, useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardBase } from '../../components/Base/DrawerCardBase';
-import {
-    Dialog,
-    Autocomplete,
-    TextField,
-    Button,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Stack,
-    Divider,
-} from '@mui/material';
+import { Dialog, Autocomplete, Button, DialogTitle, DialogContent, DialogActions, Stack, Divider } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import TextFieldWithMask from '../../rickcedlib/TextFieldWithMask';
 import dayjs from 'dayjs';
+import { SmartTextField } from '../../rickcedlib/SmartTextField';
 
 interface AddDriverCardProps {
     open: () => void;
@@ -123,7 +114,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
                                         options={availableDrivers.map((driver) => driver.drawer_id)}
                                         sx={{ width: 225 }}
                                         onChange={(_, drawerID) => onChange(drawerID || '')}
-                                        renderInput={(params) => <TextField {...params} label="Driver" />}
+                                        renderInput={(params) => <SmartTextField {...params} label="Driver" />}
                                         getOptionLabel={(option) =>
                                             availableDrivers.find((d) => d.drawer_id === option)?.name || ''
                                         }
@@ -131,7 +122,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
                                 )}
                             />
                         ) : (
-                            <TextField label="No Drivers Available" disabled />
+                            <SmartTextField label="No Drivers Available" disabled />
                         )}
                     </Stack>
                     <Divider />
@@ -148,7 +139,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
                                         value={value}
                                         sx={{ width: 225 }}
                                         onChange={(_, drawerID) => onChange(drawerID || '')}
-                                        renderInput={(params) => <TextField {...params} label="Register" />}
+                                        renderInput={(params) => <SmartTextField {...params} label="Register" />}
                                         getOptionLabel={(option) =>
                                             drawers.find((d) => d.drawer_id === option)?.name || ''
                                         }

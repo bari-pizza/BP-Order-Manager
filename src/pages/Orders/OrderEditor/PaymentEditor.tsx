@@ -9,6 +9,7 @@ import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { PaymentTypeIcon } from '../PaymentTypeIcon';
 import { formatCurrency } from '../../../utils';
+import { useLayoutContext } from '../../../hooks/data/useContextData';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -40,6 +41,7 @@ export const PaymentEditor = ({
     setIsEditing,
 }: PaymentEditorProps) => {
     const [businessDate] = useBusinessDate();
+    const { isMobile } = useLayoutContext();
     const defaultNewPayment = {
         payment_type: validPaymentTypes[0].value,
         amount_in_cents: defaultAmount,
@@ -130,10 +132,14 @@ export const PaymentEditor = ({
                     <Typography variant="body1">{formatCurrency(payment.amount_in_cents)}</Typography>
                     <Divider orientation="vertical" />
                     <Typography variant="body1">{formatCurrency(payment.tip_in_cents)}</Typography>
-                    <Divider orientation="vertical" />
-                    <Typography variant="body1">
-                        {formatCurrency(payment.amount_in_cents + payment.tip_in_cents)}
-                    </Typography>
+                    {!isMobile && (
+                        <>
+                            <Divider orientation="vertical" />
+                            <Typography variant="body1">
+                                {formatCurrency(payment.amount_in_cents + payment.tip_in_cents)}
+                            </Typography>
+                        </>
+                    )}
                 </LabeledStack>
             );
         }
@@ -166,8 +172,7 @@ export const PaymentEditor = ({
                                     handleChange={(value, shouldDirty) =>
                                         setValue('amount_in_cents', value, { shouldDirty })
                                     }
-                                    // color={dirtyFields.amount_in_cents || forNewPayment ? 'primary' : undefined}
-                                    focused
+                                    isDirty={dirtyFields.amount_in_cents || forNewPayment}
                                 />
                             );
                         }}
@@ -187,8 +192,7 @@ export const PaymentEditor = ({
                                     handleChange={(value, shouldDirty) =>
                                         setValue('tip_in_cents', value, { shouldDirty })
                                     }
-                                    color={dirtyFields.tip_in_cents || forNewPayment ? 'secondary' : 'primary'}
-                                    focused
+                                    isDirty={dirtyFields.tip_in_cents || forNewPayment}
                                 />
                             );
                         }}
