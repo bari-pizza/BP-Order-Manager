@@ -245,6 +245,7 @@ export const OrderEditor = ({
                     return (
                         <SmartTextField
                             {...field}
+                            autoFocus
                             label="Origin"
                             select
                             value={field.value}
@@ -525,7 +526,7 @@ const OrderEditorDialog = ({
     return (
         <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
             <DialogTitle>Order Editor</DialogTitle>
-            <DialogContent sx={{ minHeight: 250, overflowY: 'hidden' }}>
+            <DialogContent sx={{ minHeight: 250 }}>
                 {!editablePaymentID ? (
                     <Stack direction="column" spacing={2} mt={2}>
                         <Stack direction="row" spacing={2} mt={2} width="100%">

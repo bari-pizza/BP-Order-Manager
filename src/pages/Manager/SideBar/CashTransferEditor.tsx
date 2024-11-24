@@ -352,7 +352,12 @@ export const CashTransferEditor = ({
                     )}
                 />
             ) : (
-                <SmartTextField label="Title" {...register('cashTransfer.title')} />
+                <SmartTextField
+                    label="Title"
+                    error={!!errors.cashTransfer?.title}
+                    helperText={errors.cashTransfer?.title?.message}
+                    {...register('cashTransfer.title', { required: transferType === 'other' && 'Title is required' })}
+                />
             )}
             {validTFSRs.length > 1 ? (
                 <Controller
@@ -401,9 +406,23 @@ export const CashTransferEditor = ({
                         render={() => {
                             const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
                                 const value = e.currentTarget.value as CashTransferType;
-                                const tsfr = ['bank', 'payment'].includes(value) ? 'from' : 'spent';
-                                const source = ['bank', 'payment'].includes(value) ? '' : drawerID;
-                                const destination = ['bank', 'payment'].includes(value) ? drawerID : '';
+                                let tsfr: 'to' | 'from' | 'spent' | 'received', source, destination;
+                                if (value === 'bank') {
+                                    tsfr = 'from';
+                                    source = constants.default.register_for_bank_transfers;
+                                    destination = drawerID;
+                                } else if (value === 'payment') {
+                                    tsfr = 'to';
+                                    source = drawerID;
+                                    destination = constants.default.register_for_cash_transfers;
+                                } else {
+                                    tsfr = 'spent';
+                                    source = drawerID;
+                                    destination = '';
+                                }
+                                // const tsfr = ['bank', 'payment'].includes(value) ? 'from' : 'spent';
+                                // const source = ['bank', 'payment'].includes(value) ? '' : drawerID ;
+                                // const destination = ['bank', 'payment'].includes(value) ? drawerID : '';
                                 reset({
                                     cashTransfer: {
                                         amount_in_cents:
@@ -468,6 +487,7 @@ export const CashTransferEditor = ({
                                     label="Amount"
                                     maskVariant="currency"
                                     error={!!errors.cashTransfer?.amount_in_cents}
+                                    helperText={errors.cashTransfer?.amount_in_cents?.message}
                                     value={value}
                                     handleChange={(value, shouldDirty) =>
                                         setValue('cashTransfer.amount_in_cents', value, { shouldDirty })

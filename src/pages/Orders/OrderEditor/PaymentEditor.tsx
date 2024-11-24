@@ -117,30 +117,31 @@ export const PaymentEditor = ({
             );
         } else if (payment) {
             return (
-                <LabeledStack
-                    style={{ cursor: 'pointer' }}
-                    label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
-                    color={invalidPaymentType ? theme.palette.error.main : ''}
-                    direction="row"
-                    spacing={2}
-                    height={60}
-                    alignItems="center"
-                    justifyContent="space-between"
-                    onClick={() => setIsEditing(true)}>
-                    <PaymentTypeIcon paymentType={payment.payment_type} />
-                    <Divider orientation="vertical" />
-                    <Typography variant="body1">{formatCurrency(payment.amount_in_cents)}</Typography>
-                    <Divider orientation="vertical" />
-                    <Typography variant="body1">{formatCurrency(payment.tip_in_cents)}</Typography>
-                    {!isMobile && (
-                        <>
-                            <Divider orientation="vertical" />
-                            <Typography variant="body1">
-                                {formatCurrency(payment.amount_in_cents + payment.tip_in_cents)}
-                            </Typography>
-                        </>
-                    )}
-                </LabeledStack>
+                <Button onClick={() => setIsEditing(true)} sx={{ padding: 0, width: '100%' }}>
+                    <LabeledStack
+                        style={{ cursor: 'pointer', width: '100%' }}
+                        label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
+                        color={invalidPaymentType ? theme.palette.error.main : ''}
+                        direction="row"
+                        spacing={2}
+                        height={60}
+                        alignItems="center"
+                        justifyContent="space-between">
+                        <PaymentTypeIcon paymentType={payment.payment_type} />
+                        <Divider orientation="vertical" />
+                        <Typography variant="body1">{formatCurrency(payment.amount_in_cents)}</Typography>
+                        <Divider orientation="vertical" />
+                        <Typography variant="body1">{formatCurrency(payment.tip_in_cents)}</Typography>
+                        {!isMobile && (
+                            <>
+                                <Divider orientation="vertical" />
+                                <Typography variant="body1">
+                                    {formatCurrency(payment.amount_in_cents + payment.tip_in_cents)}
+                                </Typography>
+                            </>
+                        )}
+                    </LabeledStack>
+                </Button>
             );
         }
     }

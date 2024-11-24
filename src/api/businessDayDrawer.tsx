@@ -29,7 +29,6 @@ const getAllBusinessDayDrawers = async ({ businessDate }: { businessDate: dayjs.
         .from('BusinessDayDrawer')
         .select('*')
         .eq('business_date', businessDate.format('YYYY-MM-DD'));
-    console.log({ data, error, businessDate });
     if (error) {
         console.error(error);
         return [];
