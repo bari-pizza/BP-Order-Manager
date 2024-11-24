@@ -8,7 +8,7 @@ import { useRef, useState } from 'react';
 import { DataWithError, HandleOutcomeProps } from '../../toast/toast';
 import { addDriverToBusinessDayToast, removeDriverFromBusinessDayToast } from '../../toast/driversToast';
 import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
-import useSubscribeToTable from './useSubscribeToTable';
+import { useSubscribeToTable } from './useSubscribeToTable';
 
 export const useDrivers = () => {
     const [businessDate] = useBusinessDate();

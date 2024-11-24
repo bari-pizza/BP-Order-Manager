@@ -11,7 +11,7 @@ import { useLocalStorage } from './useLocalStorage';
 import { useBusinessDayDrawerAPI } from '../../api/businessDayDrawer';
 import { useOrderAPI } from '../../api/order';
 import { RPCPayload } from '../../api/helpers';
-import useSubscribeToTable from './useSubscribeToTable';
+import { useSubscribeToTable, useSubscribeToPayments } from './useSubscribeToTable';
 import { useCashTransferAPI } from '../../api/cashTransfer';
 
 const unassignedDrawer: Drawer = {
@@ -27,10 +27,11 @@ export const useOrdersDrawersTickets = () => {
 
     const { orderAPI } = useOrderAPI({ businessDate });
     const { data: initialOrderData } = orderAPI.getAll;
-    const allOrders = useSubscribeToTable<Order_Payment>({
+    const orderPayments = useSubscribeToTable<Order_Payment>({
         tableName: 'Order',
         initialData: initialOrderData,
     });
+    const allOrders = useSubscribeToPayments(orderPayments);
 
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
@@ -278,16 +279,16 @@ export const useOrdersDrawersTickets = () => {
         summaries: {
             all: summaries,
             forCurrentDrawer: getSummaryByDrawerID(openDrawer?.drawer_id),
-            byDrawerID: (drawerID: string) => getSummaryByDrawerID(drawerID),
+            byDrawerID: getSummaryByDrawerID,
             update: businessDayDrawerAPI.upsert,
         },
         cashTransfers: {
             all: cashTransfers,
             create: cashTransferAPI.create,
             delete: cashTransferAPI.delete,
-            forCurrentDrawer: getCashTransferByDrawerID(openDrawer?.drawer_id),
-            byDrawerID: (drawerID: string) => getCashTransferByDrawerID(drawerID),
             update: cashTransferAPI.update,
+            forCurrentDrawer: getCashTransferByDrawerID(openDrawer?.drawer_id),
+            byDrawerID: getCashTransferByDrawerID,
         },
     };
 };

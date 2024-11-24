@@ -42,7 +42,6 @@ const deleteCashTransfer: SupabaseInteractor<CashTransfer, CashTransfer> = async
         .delete()
         .eq('cash_transfer_id', cashTransfer.cash_transfer_id)
         .select();
-    console.log({ payload });
     return handlePayload<CashTransfer>(payload);
 };
 

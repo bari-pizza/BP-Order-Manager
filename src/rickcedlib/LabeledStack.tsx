@@ -13,6 +13,7 @@ interface LabeledStackProps extends StackProps {
 export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
     ({ children, label, labelProps, alignLabel = 'center', color, fixed, ...props }, ref) => {
         const theme = useTheme();
+        color = color || theme.palette.primary.main;
 
         const { sx: labelSx, ...labelPropsRest } = labelProps || {};
         const { sx: stackSx, ...stackPropsRest } = props || {};

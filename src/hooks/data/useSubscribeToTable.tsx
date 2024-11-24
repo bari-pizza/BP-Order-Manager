@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { supaClient } from '../../supaClient';
 import { toast } from 'react-toastify';
+import { Order_Payment, Payment } from '../../typesAndValidators';
 
 type ShowToastOptions = ('insert' | 'update' | 'delete')[];
 
-const useSubscribeToTable = <T extends Record<string, unknown>>({
+export const useSubscribeToTable = <T extends Record<string, unknown>>({
     tableName,
     initialData,
     showToast = [],
@@ -82,4 +83,64 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
     return data;
 };
 
-export default useSubscribeToTable;
+// custom solution since Order_Payments has to subscribe to both Order and Payment
+export const useSubscribeToPayments = (orders: Order_Payment[]) => {
+    const [updatedOrders, setUpdatedOrders] = useState<Order_Payment[]>([]);
+
+    useEffect(() => {
+        if (orders) {
+            setUpdatedOrders(orders);
+        }
+    }, [orders]);
+
+    useEffect(() => {
+        const paymentChannel = supaClient
+            .channel('payment-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'Payment',
+                },
+                (payload) => {
+                    const eventType = payload.eventType;
+                    const newPayment = payload.new as Payment;
+                    const oldPayment = payload.old as Payment;
+
+                    console.log(`Change detected in Payment:`, payload);
+
+                    setUpdatedOrders((currentOrders) => {
+                        return currentOrders.map((order) => {
+                            if (eventType === 'INSERT' || eventType === 'UPDATE') {
+                                if (!order.payments) order.payments = [];
+                                if (newPayment && newPayment.order_id === order.order_id) {
+                                    // Insert or update the payment in the payments list
+                                    const updatedPayments =
+                                        eventType === 'INSERT'
+                                            ? [...order.payments, newPayment]
+                                            : order.payments.map((payment) =>
+                                                  payment.payment_id === newPayment.payment_id ? newPayment : payment,
+                                              );
+                                    order.payments = updatedPayments;
+                                }
+                            } else if (eventType === 'DELETE') {
+                                // Remove deleted payment from the order's payments
+                                order.payments = order.payments.filter(
+                                    (payment) => payment.payment_id !== oldPayment.payment_id,
+                                );
+                            }
+                            return order;
+                        });
+                    });
+                },
+            )
+            .subscribe();
+
+        return () => {
+            paymentChannel.unsubscribe();
+        };
+    }, [orders]);
+
+    return updatedOrders;
+};

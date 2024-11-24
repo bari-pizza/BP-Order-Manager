@@ -243,7 +243,12 @@ export const OrderEditor = ({
                 control={control}
                 render={({ field }) => {
                     return (
-                        <SmartTextField {...field} label="Origin" select value={field.value}>
+                        <SmartTextField
+                            {...field}
+                            label="Origin"
+                            select
+                            value={field.value}
+                            isDirty={dirtyFields.origin_id}>
                             {validOrigins.map((origin) => (
                                 <MenuItem key={origin.name} value={origin.origin_id}>
                                     {origin.name}
@@ -261,6 +266,7 @@ export const OrderEditor = ({
                     return (
                         <SmartTextField
                             {...field}
+                            isDirty={dirtyFields.order_type}
                             label="Order Type"
                             select
                             disabled={driverIsEditing}
@@ -297,6 +303,7 @@ export const OrderEditor = ({
                             {...field}
                             label="Drawer"
                             select
+                            isDirty={dirtyFields.drawer_id}
                             value={currentDrawerID}
                             onKeyDown={handleKeyDown}
                             disabled={driverIsEditing}>
@@ -337,6 +344,7 @@ export const OrderEditor = ({
                     })}
                     error={!!errors.order_name}
                     helperText={errors.order_name?.message}
+                    isDirty={dirtyFields.order_name}
                 />
             )}
             {asDialog && (
@@ -410,7 +418,7 @@ export const OrderEditor = ({
         return (
             <OrderEditorDialog
                 isOpen={isOpen}
-                close={close}
+                close={handleCancel}
                 handleSubmit={handleSubmit}
                 onSubmit={onSubmit}
                 onError={onError}
@@ -529,9 +537,14 @@ const OrderEditorDialog = ({
                                 {rightSide}
                             </Stack>
                         </Stack>
-                        <Button onClick={handleSubmit(onSubmit, onError)} disabled={!isDirty}>
-                            Save Changes
-                        </Button>
+                        <Stack direction="row" alignItems="center" justifyContent="space-around" width="100%">
+                            <Button onClick={handleClose} disabled={!isDirty} color="error">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleSubmit(onSubmit, onError)} disabled={!isDirty}>
+                                Save Changes
+                            </Button>
+                        </Stack>
 
                         <Divider />
                         {payments

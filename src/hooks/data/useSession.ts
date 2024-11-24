@@ -44,7 +44,7 @@ export const useSession = (): SupashipUserInfo => {
                     {
                         event: '*',
                         schema: 'public',
-                        table: 'profiles',
+                        table: 'Profile',
                         filter: `id=eq.${userId}`,
                     },
                     (payload) => {

@@ -259,12 +259,10 @@ export const CashTransferEditor = ({
                     {toFromSpentReceivedStack}
                     {arrowIcon}
                     <Typography variant="body1">{formatCurrency(cashTransfer.amount_in_cents)}</Typography>
-                    {/* <Stack direction="column" justifyContent="space-between"> */}
                     <IconButton onClick={() => setIsEditing(true)} color="primary">
                         <EditIcon />
                     </IconButton>
                     <InfoPopover>{interpretCashTransfer(cashTransfer, drawerID)}</InfoPopover>
-                    {/* </Stack> */}
                 </LabeledStack>
             );
         }

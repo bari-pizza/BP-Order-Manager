@@ -5,6 +5,7 @@ import { CreditCardLottieIcon, ThirdPartyLottieIcon } from '../../rickcedlib/Lot
 
 export const PaymentTypeIcon = ({ paymentType }: { paymentType?: PaymentType }) => {
     if (!paymentType) return null;
+    // TODO: return a question mark instead
     let icon = <CashIcon />;
     if (paymentType === 'card') {
         icon = <CreditCardLottieIcon />;
