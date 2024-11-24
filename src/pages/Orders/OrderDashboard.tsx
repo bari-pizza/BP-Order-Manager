@@ -117,6 +117,8 @@ const OrderDashboardMobile = () => {
 
     if (!driver) return <div>Driver not found</div>;
 
+    // TODO: make this responsive to changes
+
     if (!driverIsWorkingToday) return <div>Ask manager to assign you to work today</div>;
 
     const motionProps: MotionProps = {
@@ -129,7 +131,7 @@ const OrderDashboardMobile = () => {
         <>
             <SpeedDial
                 ariaLabel="SpeedDial"
-                sx={{ position: 'absolute', bottom: 16, right: 16 }}
+                sx={{ position: 'fixed', bottom: 16, right: 16 }}
                 icon={<SpeedDialIcon />}
                 color="secondary"
                 onClose={handleClose}
@@ -138,8 +140,8 @@ const OrderDashboardMobile = () => {
                 <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
             </SpeedDial>
             <Stack direction="column" sx={{ height: '100%' }} mt={2}>
-                <Stack className="hover-scroll" p={1} pb="50px" m={2}>
-                    <Stack className="hover-scroll-content">
+                <Stack className="hover2-scroll" p={1} pb="50px" m={2}>
+                    <Stack className="hover2-scroll-content">
                         {orders.length ? (
                             <AnimatePresence>
                                 <MotionWrapper
@@ -173,7 +175,7 @@ const OrderDashboardMobile = () => {
                         )}
                     </Stack>
                 </Stack>
-                <Dialog open={editorIsOpen} onClose={closeEditor}>
+                <Dialog open={editorIsOpen} onClose={closeEditor} fullWidth maxWidth="sm">
                     <OrderEditor
                         close={closeEditor}
                         isOpen={editorIsOpen}

@@ -45,7 +45,7 @@ export const useMobile = () => {
             driverIsWorkingToday: false,
         };
 
-    const driverIsWorkingToday = todaysDrivers.find((driver) => driver.drawer_id === driver.drawer_id);
+    const driverIsWorkingToday = todaysDrivers.some((driver) => driver.drawer_id === driver.drawer_id);
 
     if (!driverIsWorkingToday) {
         return {

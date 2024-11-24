@@ -439,7 +439,7 @@ export const OrderEditor = ({
                 <Typography variant="h5" textAlign={'center'}>
                     Order Editor
                 </Typography>
-                <Stack direction="column" spacing={2} mt={2}>
+                <Stack direction="column" spacing={2} mt={2} mb={2}>
                     {errors.root && <Typography color="error">{errors.root.message}</Typography>}
                     {leftSide}
                     {rightSide}
