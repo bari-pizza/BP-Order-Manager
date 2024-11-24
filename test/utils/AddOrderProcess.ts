@@ -1,22 +1,25 @@
 import { faker } from '@faker-js/faker/locale/en_US';
 import { Page } from '@playwright/test';
 import { OrderData, orderOriginsWithTypes } from './data';
-import { OrderTicketActions } from './OrderTicketActions';
 
 export class AddOrderProcess {
     private page: Page;
     private static currentOrderNumber = 0;
     private static generatedNames: Set<string> = new Set();
-    private orderTicketActions: OrderTicketActions;
+    private isMobile: boolean;
 
-    constructor(page: Page) {
+    constructor(page: Page, isMobile: boolean) {
         this.page = page;
-        this.orderTicketActions = new OrderTicketActions(page);
+        this.isMobile = isMobile;
     }
 
     async startAddOrderProcess() {
-        await this.page.locator('button.MuiButton-contained:has-text("Add Order")').click();
-        // wait for any modals or transitions if necessary
+        if (this.isMobile) {
+            // click on speed dial
+            // click on add order option
+        } else {
+            await this.page.locator('button.MuiButton-contained:has-text("Add Order")').click();
+        }
     }
 
     async chooseOrigin(origin: OrderData['origin']['name']) {
@@ -63,25 +66,43 @@ export class AddOrderProcess {
         return AddOrderProcess.currentOrderNumber.toString();
     }
 
-    public static generateRandomOrder() {
-        const weightedOrderOrigins = [
-            { weight: 0.15, value: 'DoorDash' },
-            { weight: 0.1, value: 'Pizzamico' },
-            { weight: 0.75, value: 'Bari Pizza' },
-        ];
-        const randomOriginKey = faker.helpers.weightedArrayElement(weightedOrderOrigins);
-        const origin = orderOriginsWithTypes[randomOriginKey].origin;
+    public static generateRandomOrder(isMobile: boolean) {
+        if (isMobile) {
+            const weightedOrderOrigins = [
+                { weight: 0.25, value: 'Pizzamico' },
+                { weight: 0.75, value: 'Bari Pizza' },
+            ];
+            const randomOriginKey = faker.helpers.weightedArrayElement(weightedOrderOrigins);
+            const origin = orderOriginsWithTypes[randomOriginKey].origin;
 
-        // Determine if we should generate an orderNumber or an orderName based on has_order_number
-        const orderData: Omit<OrderData, 'orderNumber' | 'orderName'> = {
-            origin: origin,
-            orderType: faker.helpers.arrayElement(orderOriginsWithTypes[randomOriginKey].validTypes),
-            paymentType: faker.helpers.arrayElement(orderOriginsWithTypes[randomOriginKey].validPayments),
-            // total_in_cents: faker.number.int({ min: 500, max: 12000 }),
-            total_in_cents: AddOrderProcess.generateRightSkewedNumber(500, 12000, 1800),
-        };
+            // Determine if we should generate an orderNumber or an orderName based on has_order_number
+            const orderData: Omit<OrderData, 'orderNumber' | 'orderName'> = {
+                origin: origin,
+                orderType: 'delivery',
+                paymentType: faker.helpers.arrayElement(orderOriginsWithTypes[randomOriginKey].validPayments),
+                total_in_cents: AddOrderProcess.generateRightSkewedNumber(1400, 12000, 1800),
+            };
 
-        return orderData;
+            return orderData;
+        } else {
+            const weightedOrderOrigins = [
+                { weight: 0.15, value: 'DoorDash' },
+                { weight: 0.1, value: 'Pizzamico' },
+                { weight: 0.75, value: 'Bari Pizza' },
+            ];
+            const randomOriginKey = faker.helpers.weightedArrayElement(weightedOrderOrigins);
+            const origin = orderOriginsWithTypes[randomOriginKey].origin;
+
+            // Determine if we should generate an orderNumber or an orderName based on has_order_number
+            const orderData: Omit<OrderData, 'orderNumber' | 'orderName'> = {
+                origin: origin,
+                orderType: faker.helpers.arrayElement(orderOriginsWithTypes[randomOriginKey].validTypes),
+                paymentType: faker.helpers.arrayElement(orderOriginsWithTypes[randomOriginKey].validPayments),
+                total_in_cents: AddOrderProcess.generateRightSkewedNumber(500, 12000, 1800),
+            };
+
+            return orderData;
+        }
     }
 
     public static generateRightSkewedNumber(min: number, max: number, mean: number) {
@@ -127,7 +148,7 @@ export class AddOrderProcess {
     }
 
     async completeAddOrder() {
-        const { origin, orderType, total_in_cents, paymentType } = AddOrderProcess.generateRandomOrder();
+        const { origin, orderType, total_in_cents, paymentType } = AddOrderProcess.generateRandomOrder(this.isMobile);
 
         await this.startAddOrderProcess();
 

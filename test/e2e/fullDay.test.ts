@@ -1,32 +1,45 @@
-import { test, chromium, Browser, BrowserContext } from '@playwright/test';
-import { ManagerPage } from '../pages/ManagerPage';
-import { OrdersPage } from '../pages/OrdersPage';
+import { test, chromium, Browser, BrowserContext, devices } from '@playwright/test';
+import { ManagerPage } from '../pages/desktop/ManagerPage';
+import { OrdersPage } from '../pages/desktop/OrdersPage';
+import { OrdersPageMobile } from '../pages/mobile/OrdersPageMobile';
 
-let browser: Browser;
-let context: BrowserContext;
+let desktopBrowser: Browser;
+let desktopContext: BrowserContext;
+let mobileBrowser: Browser;
+let mobileContext: BrowserContext;
 let managerPage: ManagerPage;
 let ordersPage: OrdersPage;
+let ordersPageMobile: OrdersPageMobile;
+
+const iPhone = devices['iPhone 11']; // Mobile emulation for iPhone 11
 
 // npx playwright test
 
 test.beforeAll(async () => {
     // Start a single browser instance and context
-    browser = await chromium.launch(); // or `chromium.launch({ headless: false })` for a visible browser
-    context = await browser.newContext();
-    const page = await context.newPage();
-
-    // Initialize your page classes
-    managerPage = new ManagerPage(page);
-    ordersPage = new OrdersPage(page);
-
-    // Perform common login for all tests
+    desktopBrowser = await chromium.launch(); // or `chromium.launch({ headless: false })` for a visible browser
+    desktopContext = await desktopBrowser.newContext();
+    const desktopPage = await desktopContext.newPage();
+    managerPage = new ManagerPage(desktopPage);
+    ordersPage = new OrdersPage(desktopPage);
     await ordersPage.login();
+
+    mobileBrowser = await chromium.launch({ headless: false });
+    mobileContext = await mobileBrowser.newContext({
+        ...iPhone,
+    });
+    const mobilePage = await mobileContext.newPage();
+    ordersPageMobile = new OrdersPageMobile(mobilePage);
+    await ordersPageMobile.login();
 });
 
 test.afterAll(async () => {
     // Close the browser after all tests
-    await context.close();
-    await browser.close();
+    await desktopContext.close();
+    await desktopBrowser.close();
+
+    await mobileContext.close();
+    await mobileBrowser.close();
 });
 
 test('should add drivers to the day', async () => {
@@ -58,6 +71,16 @@ test('should close out all drawers', async () => {
     await managerPage.closeDrawers();
     // assert that all drawers are closed
     // didnt close out the third party drawer
+});
+
+test('should allow drivers to add orders', async () => {
+    test.setTimeout(1000 * 60 * 5);
+    await ordersPageMobile.navigateToOrders();
+    await ordersPageMobile.createRandomOrders(5, 9);
+});
+
+test('should allow drivers to update orders', async () => {
+    // assert that drivers can update orders
 });
 
 test('should close out the day', async () => {

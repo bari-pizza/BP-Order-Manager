@@ -1,5 +1,6 @@
 import { useBusinessDate } from './useBusinessDate';
 import { useBariPizzaContext, useLayoutContext, useUserContext } from './useContextData';
+import { useDrivers } from './useDrivers';
 // import { useRef } from 'react';
 import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
 
@@ -7,6 +8,9 @@ export const useMobile = () => {
     const [businessDate] = useBusinessDate();
     const { isMobile } = useLayoutContext();
     const { profile } = useUserContext();
+    const {
+        drivers: { todays: todaysDrivers },
+    } = useDrivers();
     const { drivers, drawers, origins, constants } = useBariPizzaContext();
     const { orders, ticket } = useOrdersDrawersTickets();
     // const toastRef = useRef<{
@@ -38,13 +42,30 @@ export const useMobile = () => {
             constants: constants,
             orders: [],
             ticket,
+            driverIsWorkingToday: false,
         };
+
+    const driverIsWorkingToday = todaysDrivers.find((driver) => driver.drawer_id === driver.drawer_id);
+
+    if (!driverIsWorkingToday) {
+        return {
+            businessDate,
+            profile,
+            driver,
+            drawers: drawers, // non-driver drawers
+            origins: origins,
+            constants: constants,
+            orders: [],
+            ticket,
+            driverIsWorkingToday,
+        };
+    }
 
     const driversOrders = orders.byDrawerID(driver.drawer_id);
 
     /* TODO: drivers need to be able to:
 
-        - add orders
+        [x] add orders
             - origin
             - drawer (self)
             - order type (delivery)
@@ -52,28 +73,28 @@ export const useMobile = () => {
             - delivery fee (default)
             - total
 
-        - update orders
+        [x] update orders
             - origin
             - order #/name
             - total
 
-        - request to delete orders
+        [ ] request to delete orders
 
-        - add payments
+        [x] add payments
             - payment type
             - amount
             - tip
 
-        - update payments
+        [x] update payments
             - payment type
             - amount
             - tip
 
-        - delete payments
+        [x] delete payments
 
 
 
-        - access end of day payment slip
+        [ ] access end of day payment slip
 
     */
 
@@ -86,5 +107,6 @@ export const useMobile = () => {
         constants: constants,
         orders: driversOrders,
         ticket,
+        driverIsWorkingToday,
     };
 };

@@ -66,7 +66,7 @@ const OrderDashboardDesktop = () => {
 const OrderDashboardMobile = () => {
     const [openSpeedDial, setOpenSpeedDial] = useState(false);
     const { open: openEditor, close: closeEditor, isOpen: editorIsOpen } = useDialogProps();
-    const { driver, orders, ticket } = useMobile();
+    const { driver, orders, ticket, driverIsWorkingToday } = useMobile();
 
     const handleOpen = () => setOpenSpeedDial(true);
     const handleClose = () => setOpenSpeedDial(false);
@@ -115,7 +115,9 @@ const OrderDashboardMobile = () => {
 
     */
 
-    if (!driver) return null;
+    if (!driver) return <div>Driver not found</div>;
+
+    if (!driverIsWorkingToday) return <div>Ask manager to assign you to work today</div>;
 
     const motionProps: MotionProps = {
         initial: { opacity: 0 },

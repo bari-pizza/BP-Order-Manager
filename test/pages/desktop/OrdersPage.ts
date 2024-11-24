@@ -1,8 +1,8 @@
 import { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
-import { AddOrderProcess } from '../utils/AddOrderProcess';
-import { OrderData } from '../utils/data';
-import { OrderTicketActions } from '../utils/OrderTicketActions';
+import { AddOrderProcess } from '../../utils/AddOrderProcess';
+import { OrderData } from '../../utils/data';
+import { OrderTicketActions } from '../../utils/OrderTicketActions';
 import { faker } from '@faker-js/faker/locale/en_US';
 
 type DrawerIndentifier = string | number;
@@ -14,7 +14,7 @@ export class OrdersPage extends BasePage {
 
     constructor(page: Page) {
         super(page);
-        this.addOrderProcess = new AddOrderProcess(this.page);
+        this.addOrderProcess = new AddOrderProcess(this.page, false);
         this.orderTicketActions = new OrderTicketActions(this.page);
     }
 

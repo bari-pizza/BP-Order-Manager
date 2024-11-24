@@ -1,6 +1,6 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
-import { CloseDrawerProcess } from '../utils/CloseDrawerProcess';
+import { CloseDrawerProcess } from '../../utils/CloseDrawerProcess';
 import { faker } from '@faker-js/faker/locale/en_US';
 
 type DrawerIdentifier = string | number;
