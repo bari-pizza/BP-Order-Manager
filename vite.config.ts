@@ -27,25 +27,25 @@ export default defineConfig({
                 start_url: '/',
                 icons: [
                     {
-                        src: '/assets/icons/BP logo.png',
+                        src: '/assets/icons/BP logo 192.png',
                         sizes: '192x192',
                         type: 'image/png',
                     },
                     {
-                        src: '/assets/icons/BP logo.png',
+                        src: '/assets/icons/BP logo 512.png',
                         sizes: '512x512',
                         type: 'image/png',
                     },
                 ],
                 screenshots: [
                     {
-                        src: '/assets/screenshots/screenshot-wide.png',
+                        src: '/assets/screenshots/screenshot-wide-1280.png',
                         sizes: '1280x720',
                         type: 'image/png',
                         form_factor: 'wide',
                     },
                     {
-                        src: '/assets/screenshots/screenshot-mobile.png',
+                        src: '/assets/screenshots/screenshot-mobile-720.png',
                         sizes: '720x1280',
                         type: 'image/png',
                         form_factor: 'narrow',
@@ -53,7 +53,7 @@ export default defineConfig({
                 ],
             },
             workbox: {
-                maximumFileSizeToCacheInBytes: 5000000, // Set limit to 5 MiB
+                maximumFileSizeToCacheInBytes: 5000000, // 5MB limit
             },
         }),
     ],

@@ -34,6 +34,7 @@ export function NavBar() {
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
+    const version = import.meta.env.VITE_REACT_APP_VERSION;
 
     const drawerWidth = isMobile ? 65 : 200;
 
@@ -70,6 +71,7 @@ export function NavBar() {
         <Drawer
             sx={{
                 width: drawerWidth,
+                overflow: 'clip',
                 flexShrink: 0,
                 alignItems: isMobile ? 'center' : 'flex-start',
                 '& .MuiDrawer-paper': {
@@ -80,7 +82,21 @@ export function NavBar() {
             variant="permanent"
             anchor="left">
             <Toolbar />
-            <List>
+            <List
+                className={isMobile ? 'mobile-nav' : 'desktop-nav'}
+                sx={{
+                    height: '100%',
+                    '&.mobile-nav .MuiListItem-root': {
+                        paddingX: 0,
+                        '& .MuiListItemIcon-root': {
+                            width: '100%',
+                            justifyContent: 'center',
+                        },
+                        '& .MuiListItemButton-root': {
+                            padding: 0,
+                        },
+                    },
+                }}>
                 {listItems.map((item) => (
                     <ListItem
                         className="lottie-icon-container"
@@ -93,10 +109,7 @@ export function NavBar() {
                               }
                             : { component: 'div' })}
                         key={item.text}>
-                        <ListItemButton
-                            selected={location.pathname === item.path}
-                            onClick={item.onClick}
-                            sx={{ padding: isMobile ? 0 : 1 }}>
+                        <ListItemButton selected={location.pathname === item.path} onClick={item.onClick}>
                             <ListItemIcon>{item.icon}</ListItemIcon>
                             {!isMobile && (
                                 <ListItemText primary={item.text} primaryTypographyProps={{ color: 'primary' }} />
@@ -104,12 +117,13 @@ export function NavBar() {
                         </ListItemButton>
                     </ListItem>
                 ))}
+                {/* TODO: replace with Lottice Icon */}
                 <ListItem className="lottie-icon-container" key={isMobile ? 'phone' : 'computer'} component="div">
-                    <ListItemButton>
-                        {/* TODO: replace with Lottice Icon */}
-                        <ListItemIcon>{isMobile ? <PhoneIcon /> : <ComputerIcon />}</ListItemIcon>
-                        {!isMobile && <ListItemText primary={isMobile ? 'Phone' : 'Computer'} />}
-                    </ListItemButton>
+                    <ListItemIcon>{isMobile ? <PhoneIcon /> : <ComputerIcon />}</ListItemIcon>
+                    {!isMobile && <ListItemText primary={isMobile ? 'Mobile' : 'Desktop'} />}
+                </ListItem>
+                <ListItem sx={{ position: 'absolute', bottom: 0, textAlign: 'center' }}>
+                    <ListItemText>{version}</ListItemText>
                 </ListItem>
             </List>
 

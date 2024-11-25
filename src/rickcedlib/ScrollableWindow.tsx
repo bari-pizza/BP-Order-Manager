@@ -4,9 +4,10 @@ import { Stack } from '@mui/material';
 interface ScrollableWindowProps {
     children: React.ReactNode;
     height?: string | number; // Allow passing custom height
+    gradientHeight?: number;
 }
 
-export const ScrollableWindow = ({ children, height = '100vh' }: ScrollableWindowProps) => {
+export const ScrollableWindow = ({ children, height = '100vh', gradientHeight = 80 }: ScrollableWindowProps) => {
     return (
         <Stack
             className="scroll-wrapper"
@@ -23,7 +24,7 @@ export const ScrollableWindow = ({ children, height = '100vh' }: ScrollableWindo
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: '40px',
+                    height: gradientHeight,
                     background: 'linear-gradient(to bottom, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))',
                     zIndex: 2,
                     pointerEvents: 'none',
@@ -37,8 +38,9 @@ export const ScrollableWindow = ({ children, height = '100vh' }: ScrollableWindo
                     position: 'relative',
                     height: '100%',
                     overflowY: 'auto',
-                    padding: 2,
-                    backgroundColor: '#fff',
+                    padding: `${gradientHeight / 2}px 0`,
+                    // backgroundColor: '#fff',
+                    // backgroundColor: 'rgb(249 127 127 / 80%)',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                 }}>
                 {children}
@@ -52,7 +54,7 @@ export const ScrollableWindow = ({ children, height = '100vh' }: ScrollableWindo
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: '40px',
+                    height: gradientHeight,
                     background: 'linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))',
                     zIndex: 2,
                     pointerEvents: 'none',

@@ -1,5 +1,5 @@
 import { Suspense, useState } from 'react';
-import { Button, Dialog, Divider, SpeedDial, SpeedDialAction, SpeedDialIcon, Stack } from '@mui/material';
+import { Button, Dialog, Divider, Grid, SpeedDial, SpeedDialAction, SpeedDialIcon, Stack } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
 import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
@@ -98,10 +98,11 @@ const OrderDashboardMobile = () => {
                 open={openSpeedDial}>
                 <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
             </SpeedDial>
-            <Stack direction="column" sx={{ height: 'calc(100vh - 64px)', overflowY: 'scroll' }} mt={2}>
+            <Stack direction="column">
                 {orders.length ? (
-                    <ScrollableWindow height="100vh">
-                        <Stack direction="column" alignItems="center" rowGap={3} pt={3} pb={8}>
+                    <ScrollableWindow>
+                        {/* <Stack direction="column" alignItems="center" rowGap={3}> */}
+                        <Grid alignItems="center" rowGap={3} container columnGap={1} justifyContent="center">
                             {orders.map((order) => {
                                 return (
                                     <OrderTicket
@@ -112,7 +113,8 @@ const OrderDashboardMobile = () => {
                                     />
                                 );
                             })}
-                        </Stack>
+                        </Grid>
+                        {/* </Stack> */}
                     </ScrollableWindow>
                 ) : (
                     <Player
