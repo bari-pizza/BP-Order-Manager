@@ -67,7 +67,7 @@ export const TextFieldWithMask = ({
             value={displayValue}
             isDirty={isDirty}
             onChange={(e) => setDisplayValue(e.target.value)}
-            inputRef={ref} // Attach masked ref
+            ref={ref} // Attach masked ref
         />
     );
 };

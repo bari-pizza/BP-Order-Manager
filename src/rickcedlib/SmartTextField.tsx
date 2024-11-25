@@ -1,5 +1,4 @@
 import { TextField, TextFieldProps, useTheme } from '@mui/material';
-// import to merge sx
 import { deepmerge } from '@mui/utils';
 import { forwardRef } from 'react';
 
@@ -7,7 +6,6 @@ type SmartTextFieldProps = TextFieldProps & {
     isDirty?: boolean;
 };
 
-// export const SmartTextField = ({ isDirty, ...props }: SmartTextFieldProps) => {
 export const SmartTextField = forwardRef<HTMLInputElement, SmartTextFieldProps>(({ isDirty, ...props }, ref) => {
     const theme = useTheme();
     if (isDirty) {
@@ -24,5 +22,11 @@ export const SmartTextField = forwardRef<HTMLInputElement, SmartTextFieldProps>(
             },
         });
     }
-    return <TextField {...props} ref={ref} />;
+    return (
+        <TextField
+            {...props}
+            // ref={ref}
+            inputRef={ref}
+        />
+    );
 });

@@ -53,7 +53,7 @@ function TabPanel(props: TabPanelProps) {
 type TabName = AdminDashboardTabName;
 
 export const AdminDashboard = () => {
-    const { orders, drawer, summaries } = useOrdersDrawersTickets();
+    const { orders, drawer, summaries, cashTransfers } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'adminDashboardTabName'>(
@@ -86,6 +86,7 @@ export const AdminDashboard = () => {
     return (
         <AdminDashboardContext.Provider
             value={{
+                cashTransfers,
                 orders,
                 drawers: {
                     all: drawers,
