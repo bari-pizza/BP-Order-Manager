@@ -10,8 +10,7 @@ import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import { useMobile } from '../../hooks/data/useMobile';
-import { AnimatePresence, MotionProps } from 'framer-motion';
-import { MotionWrapper } from '../../rickcedlib/MotionWrapper';
+import { ScrollableWindow } from '../../rickcedlib/ScrollableWindow';
 import { OrderTicket } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useLayoutContext } from '../../hooks/data/useContextData';
@@ -81,51 +80,11 @@ const OrderDashboardMobile = () => {
 
     // statistics page (with link in navbar)
 
-    /* TODO: drivers need to be able to:
-
-        - add orders
-            - origin
-            - drawer (self)
-            - order type (delivery)
-            - order #/name
-            - delivery fee (default)
-            - total
-
-        - update orders
-            - order #/name
-            - total
-
-        - request to delete orders
-
-        - add payments
-            - payment type
-            - amount
-            - tip
-
-        - update payments
-            - payment type
-            - amount
-            - tip
-
-        - delete payments
-
-
-
-        - access end of day payment slip
-
-    */
-
     if (!driver) return <div>Driver not found</div>;
 
     // TODO: make this responsive to changes
 
     if (!driverIsWorkingToday) return <div>Ask manager to assign you to work today</div>;
-
-    const motionProps: MotionProps = {
-        initial: { opacity: 0 },
-        animate: { opacity: 1, transition: { duration: 0.5 } },
-        exit: { opacity: 0, transition: { duration: 1 } },
-    };
 
     return (
         <>
@@ -139,42 +98,30 @@ const OrderDashboardMobile = () => {
                 open={openSpeedDial}>
                 <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
             </SpeedDial>
-            <Stack direction="column" sx={{ height: '100%' }} mt={2}>
-                <Stack className="hover2-scroll" p={1} pb="50px" m={2}>
-                    <Stack className="hover2-scroll-content">
-                        {orders.length ? (
-                            <AnimatePresence>
-                                <MotionWrapper
-                                    motionProps={motionProps}
-                                    gridProps={{
-                                        justifyContent: 'space-between',
-                                        container: true,
-                                        rowGap: 3,
-                                        columnGap: 1,
-                                    }}
-                                    motionKey="orders">
-                                    {orders.map((order) => {
-                                        return (
-                                            <OrderTicket
-                                                order={order}
-                                                key={order.order_id}
-                                                toggleSelected={() => ticket.select(order)}
-                                                selected={ticket.isSelected(order)}
-                                            />
-                                        );
-                                    })}
-                                </MotionWrapper>
-                            </AnimatePresence>
-                        ) : (
-                            <Player
-                                src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
-                                loop
-                                autoplay
-                                style={{ width: '100%', height: '100%', maxHeight: '515px' }}
-                            />
-                        )}
-                    </Stack>
-                </Stack>
+            <Stack direction="column" sx={{ height: 'calc(100vh - 64px)', overflowY: 'scroll' }} mt={2}>
+                {orders.length ? (
+                    <ScrollableWindow height="100vh">
+                        <Stack direction="column" alignItems="center" rowGap={3} pt={3} pb={8}>
+                            {orders.map((order) => {
+                                return (
+                                    <OrderTicket
+                                        order={order}
+                                        key={order.order_id}
+                                        toggleSelected={() => ticket.select(order)}
+                                        selected={ticket.isSelected(order)}
+                                    />
+                                );
+                            })}
+                        </Stack>
+                    </ScrollableWindow>
+                ) : (
+                    <Player
+                        src="https://lottie.host/538d9535-f6f3-41e0-be65-0bcbb04fa513/AUH39pGkWo.json"
+                        loop
+                        autoplay
+                        style={{ width: '100%', height: '100%', maxHeight: '515px' }}
+                    />
+                )}
                 <Dialog open={editorIsOpen} onClose={closeEditor} fullWidth maxWidth="sm">
                     <OrderEditor
                         close={closeEditor}

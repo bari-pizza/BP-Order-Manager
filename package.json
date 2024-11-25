@@ -7,7 +7,7 @@
         "dev": "vite --host",
         "test": "vitest",
         "build": "tsc -b && vite build",
-        "serve": "npx serve -s build",
+        "serve": "npx serve -s dist",
         "start": "vite preview",
         "lint": "eslint . && tsc -b",
         "preview": "vite preview",

@@ -25,7 +25,6 @@ interface NavBarItem {
     forMobile: boolean;
     onClick?: () => void;
 }
-// TODO: Handle order deletion
 
 const today = dayjs();
 

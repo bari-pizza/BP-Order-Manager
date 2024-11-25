@@ -71,7 +71,7 @@ export const DrawerSideBar = () => {
 
         [x] determine payment to be created
 
-        [ ] backend - if source or destination is_locked, don't allow changes
+        [x] backend - if source or destination is_locked, don't allow changes
 
         [x] create popup to show all cash transfers and edit/delete them
 

@@ -229,6 +229,7 @@ export const useRPCInteractionHandler = <T,>({
             }
             // TODO: failures aren't coming through with the right shape
             // fix for both rpc functions probably
+            // might have been fixed, no idea lol
             console.log({ payload });
             payload.data?.failures.forEach((data) => {
                 const error = Object.values(data)[0];
