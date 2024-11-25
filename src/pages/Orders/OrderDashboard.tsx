@@ -39,7 +39,7 @@ const OrderDashboardDesktop = () => {
             </Stack>
             <SideBar width="300px">
                 <Stack alignContent="center" justifyContent="center" direction="column" height="100%">
-                    <OrderEditor close={close} isOpen={isOpen} forNewOrder />
+                    <OrderEditor close={close} isOpen={isOpen} forNewOrder isRepeat={orders.isRepeat} />
                     <Stack direction="column" m={2} gap={2}>
                         {!isOpen && (
                             <>
@@ -65,7 +65,7 @@ const OrderDashboardDesktop = () => {
 const OrderDashboardMobile = () => {
     const [openSpeedDial, setOpenSpeedDial] = useState(false);
     const { open: openEditor, close: closeEditor, isOpen: editorIsOpen } = useDialogProps();
-    const { driver, orders, ticket, driverIsWorkingToday } = useMobile();
+    const { driver, orders, ticket, driverIsWorkingToday, isRepeat } = useMobile();
 
     const handleOpen = () => setOpenSpeedDial(true);
     const handleClose = () => setOpenSpeedDial(false);
@@ -129,6 +129,7 @@ const OrderDashboardMobile = () => {
                         close={closeEditor}
                         isOpen={editorIsOpen}
                         forNewOrder
+                        isRepeat={isRepeat}
                         driverDrawerID={driver.drawer_id}
                     />
                 </Dialog>

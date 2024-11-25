@@ -122,7 +122,7 @@ export function NavBar() {
                     <ListItemIcon>{isMobile ? <PhoneIcon /> : <ComputerIcon />}</ListItemIcon>
                     {!isMobile && <ListItemText primary={isMobile ? 'Mobile' : 'Desktop'} />}
                 </ListItem>
-                <ListItem sx={{ position: 'absolute', bottom: 0, textAlign: 'center' }}>
+                <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
                     <ListItemText>{version}</ListItemText>
                 </ListItem>
             </List>

@@ -240,6 +240,51 @@ export const useOrdersDrawersTickets = () => {
         return byType;
     };
 
+    const orderDictionary = {
+        orderNumbers: new Set(),
+        orderNames: new Set(),
+    };
+
+    const repeats = {
+        orderNumbers: new Set<number>(),
+        orderNames: new Set<string>(),
+    };
+
+    orders.forEach((order) => {
+        if (order.order_number) {
+            if (orderDictionary.orderNumbers.has(order.order_number)) {
+                repeats.orderNumbers.add(order.order_number);
+            } else {
+                orderDictionary.orderNumbers.add(order.order_number);
+            }
+        } else if (order.order_name) {
+            const orderName = order.order_name.trim().toLowerCase();
+            if (orderDictionary.orderNames.has(orderName)) {
+                repeats.orderNames.add(orderName);
+            } else {
+                orderDictionary.orderNames.add(orderName);
+            }
+        }
+    });
+
+    const isRepeat = (nameOrNumber: number | string | null, isStatic?: boolean) => {
+        if (!nameOrNumber) {
+            return false;
+        }
+        if (typeof nameOrNumber === 'number') {
+            if (isStatic) {
+                return repeats.orderNumbers.has(nameOrNumber);
+            }
+            return orderDictionary.orderNumbers.has(nameOrNumber);
+        } else {
+            const orderName = nameOrNumber.trim().toLowerCase();
+            if (isStatic) {
+                return repeats.orderNames.has(orderName);
+            }
+            return orderDictionary.orderNames.has(orderName);
+        }
+    };
+
     return {
         ticket: {
             select: toggleSelectedTicket,
@@ -271,6 +316,7 @@ export const useOrdersDrawersTickets = () => {
             forCurrentDrawer: orders,
             all: allOrders,
             byDrawerID: getOrdersByDrawerID,
+            isRepeat,
         },
         payments: {
             all: allPayments,

@@ -78,6 +78,7 @@ type OrderEditorProps = {
     order?: Order_Payment;
     asDialog?: boolean;
     forNewOrder?: boolean;
+    isRepeat: (nameOrNumber: number | string | null, isStatic?: boolean) => boolean;
     driverDrawerID?: string;
 };
 
@@ -93,6 +94,7 @@ export const OrderEditor = ({
     asDialog,
     order,
     driverDrawerID,
+    isRepeat,
     forNewOrder = false,
 }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
@@ -322,6 +324,9 @@ export const OrderEditor = ({
         </>
     );
 
+    const nameAlreadyExists = isRepeat(currentOrderName) && 'Order name already exists';
+    const numberAlreadyExists = isRepeat(currentOrderNumber) && 'Order number already exists';
+
     const rightSide = (
         <>
             {currentOrigin?.has_order_number ? (
@@ -332,8 +337,8 @@ export const OrderEditor = ({
                         ...validators.order.order_number,
                         // shouldUnregister: true,
                     })}
-                    error={!!errors.order_number}
-                    helperText={errors.order_number?.message}
+                    error={!!(errors.order_number || numberAlreadyExists)}
+                    helperText={errors.order_number?.message || numberAlreadyExists}
                     isDirty={dirtyFields.order_number}
                 />
             ) : (
@@ -343,8 +348,8 @@ export const OrderEditor = ({
                     {...register('order_name', {
                         required: !currentOrigin?.has_order_number && 'Required',
                     })}
-                    error={!!errors.order_name}
-                    helperText={errors.order_name?.message}
+                    error={!!(errors.order_name || nameAlreadyExists)}
+                    helperText={errors.order_name?.message || nameAlreadyExists}
                     isDirty={dirtyFields.order_name}
                 />
             )}

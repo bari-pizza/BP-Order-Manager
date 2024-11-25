@@ -34,7 +34,7 @@ export const OrderTicket = ({ order, toggleSelected, selected }: OrderTicketProp
 };
 
 const OrderTicketMobile = ({ order }: OrderTicketMobileProps) => {
-    const { driver } = useMobile();
+    const { driver, isRepeat } = useMobile();
     const { origins } = useBariPizzaContext();
     const { open, isOpen, close } = useDialogProps();
 
@@ -69,7 +69,9 @@ const OrderTicketMobile = ({ order }: OrderTicketMobileProps) => {
             <CardActionArea onClick={handleEditClick}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
-                        <Typography variant="h5" className={order.order_name ? 'order-name' : 'order-number'}>
+                        <Typography
+                            variant="h5"
+                            className={`${order.order_name ? 'order-name' : 'order-number'} ${isRepeat(order.order_name ?? order.order_number, true) ? 'repeated-name-or-number' : ''}`}>
                             {order.order_name ?? `Order #${order.order_number || 'N/A'}`}
                         </Typography>
                         <PaymentTypeIcon paymentType={initialPayment?.payment_type} />
@@ -107,7 +109,14 @@ const OrderTicketMobile = ({ order }: OrderTicketMobileProps) => {
                 </div>
             )}
 
-            <OrderEditor order={order} asDialog close={close} isOpen={isOpen} driverDrawerID={driver?.drawer_id} />
+            <OrderEditor
+                order={order}
+                asDialog
+                close={close}
+                isOpen={isOpen}
+                driverDrawerID={driver?.drawer_id}
+                isRepeat={isRepeat}
+            />
         </Card>
     );
 };
@@ -116,7 +125,7 @@ const OrderTicketDesktop = ({ order, toggleSelected, selected }: OrderTicketProp
     const { origins } = useBariPizzaContext();
     const { open, isOpen, close } = useDialogProps();
 
-    const { ticket } = useOrderDashboardContext();
+    const { ticket, orders } = useOrderDashboardContext();
     const theme = useTheme();
     const ticketRef = useRef<SVGSVGElement>(null);
 
@@ -171,7 +180,9 @@ const OrderTicketDesktop = ({ order, toggleSelected, selected }: OrderTicketProp
             <CardActionArea onClick={handleSelect}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
-                        <Typography variant="h5" className={order.order_name ? 'order-name' : 'order-number'}>
+                        <Typography
+                            variant="h5"
+                            className={`${order.order_name ? 'order-name' : 'order-number'} ${orders.isRepeat(order.order_name ?? order.order_number, true) ? 'repeated-name-or-number' : ''}`}>
                             {order.order_name ?? `Order #${order.order_number || 'N/A'}`}
                         </Typography>
                         {selected ? (
@@ -248,7 +259,7 @@ const OrderTicketDesktop = ({ order, toggleSelected, selected }: OrderTicketProp
                 </div>
             )}
 
-            <OrderEditor order={order} asDialog close={close} isOpen={isOpen} />
+            <OrderEditor order={order} asDialog close={close} isOpen={isOpen} isRepeat={orders.isRepeat} />
         </Card>
     );
 };

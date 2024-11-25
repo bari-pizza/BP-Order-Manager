@@ -40,6 +40,7 @@ interface OrderDashboardContextProps {
         forCurrentDrawer: Order_Payment[];
         all: Order_Payment[];
         byDrawerID: (drawerID: string) => Order_Payment[];
+        isRepeat: (nameOrNumber: string | number | null, isStatic?: boolean) => boolean;
     };
     drivers: {
         all: Driver_Drawer[];
@@ -87,6 +88,7 @@ export const OrderDashboardContext = createContext<OrderDashboardContextProps>({
         forCurrentDrawer: [],
         all: [],
         byDrawerID: () => [],
+        isRepeat: () => false,
     },
     drivers: {
         all: [],

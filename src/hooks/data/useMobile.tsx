@@ -26,7 +26,9 @@ export const useMobile = () => {
             origins: origins,
             constants: constants,
             orders: [],
+            isRepeat: () => false,
             ticket,
+            driverIsWorkingToday: false,
         };
     }
 
@@ -41,6 +43,7 @@ export const useMobile = () => {
             origins: origins,
             constants: constants,
             orders: [],
+            isRepeat: () => false,
             ticket,
             driverIsWorkingToday: false,
         };
@@ -56,6 +59,7 @@ export const useMobile = () => {
             origins: origins,
             constants: constants,
             orders: [],
+            isRepeat: () => false,
             ticket,
             driverIsWorkingToday,
         };
@@ -106,6 +110,7 @@ export const useMobile = () => {
         origins: origins,
         constants: constants,
         orders: driversOrders,
+        isRepeat: orders.isRepeat,
         ticket,
         driverIsWorkingToday,
     };

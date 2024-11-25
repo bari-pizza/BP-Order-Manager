@@ -8,7 +8,7 @@ type SmartTextFieldProps = TextFieldProps & {
 
 export const SmartTextField = forwardRef<HTMLInputElement, SmartTextFieldProps>(({ isDirty, ...props }, ref) => {
     const theme = useTheme();
-    if (isDirty) {
+    if (isDirty && !props.error) {
         if (!props.sx) props.sx = {};
         props.sx = deepmerge(props.sx, {
             '& .MuiOutlinedInput-root': {
