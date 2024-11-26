@@ -6,7 +6,7 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
 
 /* TODO: Julia
 
-    [ ] add something at the top of the screen
+    [ ] add something at the top of the screen (Business Date!)
     [ ] fix scrolling in orders area
 
 */
@@ -112,7 +112,7 @@ export const useMobile = () => {
 
 
 
-        [ ] access end of day payment slip
+        [x] access end of day payment slip
 
     */
 

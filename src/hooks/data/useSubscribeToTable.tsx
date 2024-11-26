@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supaClient } from '../../supaClient';
 import { toast } from 'react-toastify';
 import { Order_Payment, Payment } from '../../typesAndValidators';
+import { useQueryClient } from '@tanstack/react-query';
 
 type ShowToastOptions = ('insert' | 'update' | 'delete')[];
 
@@ -84,8 +85,10 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
 };
 
 // custom solution since Order_Payments has to subscribe to both Order and Payment
-export const useSubscribeToPayments = (orders: Order_Payment[]) => {
+export const useSubscribeToPayments = (orders: Order_Payment[], queryKey: string[]) => {
     const [updatedOrders, setUpdatedOrders] = useState<Order_Payment[]>([]);
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (orders) {
@@ -133,6 +136,8 @@ export const useSubscribeToPayments = (orders: Order_Payment[]) => {
                             return order;
                         });
                     });
+
+                    queryClient.invalidateQueries({ queryKey });
                 },
             )
             .subscribe();

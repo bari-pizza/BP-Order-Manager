@@ -209,8 +209,6 @@ const OrderDashboardMobile = () => {
         );
     }
 
-    // TODO: figure out how to treat a driver spending money on food to eat vs money on fruteria etc.
-
     return (
         <>
             <SpeedDial

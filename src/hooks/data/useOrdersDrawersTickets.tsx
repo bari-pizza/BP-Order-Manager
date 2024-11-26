@@ -31,7 +31,7 @@ export const useOrdersDrawersTickets = () => {
         tableName: 'Order',
         initialData: initialOrderData,
     });
-    const allOrders = useSubscribeToPayments(orderPayments);
+    const allOrders = useSubscribeToPayments(orderPayments, ['orders', businessDate.format('YYYY-MM-DD')]);
 
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,

@@ -253,7 +253,6 @@ export const DrawerSideBar = () => {
                 {
                     label: 'Hours',
                     value: -hours,
-                    // TODO: update these details
                     details: `${(hours / constants.default.driver_hourly_wage_in_cents).toFixed(2)} hours @ ${formatCurrency(constants.default.driver_hourly_wage_in_cents)}`,
                 },
                 {
@@ -278,6 +277,9 @@ export const DrawerSideBar = () => {
                 {
                     label: 'Payments',
                     value: payments,
+                    details: closingPmtTransfer
+                        ? `Closing Payment: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
+                        : 'No Closing Payment',
                 },
             );
             break;

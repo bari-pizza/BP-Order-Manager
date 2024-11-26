@@ -24,7 +24,8 @@ export const SummaryStack = ({ items }: SummaryStackProps) => {
             direction="column"
             spacing={1}
             margin="auto"
-            maxWidth={200}
+            maxWidth="50%"
+            minWidth="250px"
             justifyContent={'right'}>
             {items.map((item, index) => (
                 <Fragment key={item.label}>
