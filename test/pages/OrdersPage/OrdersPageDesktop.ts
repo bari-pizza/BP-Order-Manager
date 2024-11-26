@@ -1,21 +1,26 @@
 import { Locator, Page } from '@playwright/test';
-import { BasePage } from './BasePage';
-import { AddOrderProcess } from '../../utils/AddOrderProcess';
 import { OrderData } from '../../utils/data';
 import { OrderTicketActions } from '../../utils/OrderTicketActions';
 import { faker } from '@faker-js/faker/locale/en_US';
+import { OrdersPageBase } from './OrdersPageBase';
 
 type DrawerIndentifier = string | number;
 type OrderIdentifier = string | number;
 
-export class OrdersPage extends BasePage {
-    private addOrderProcess: AddOrderProcess;
+export class OrdersPageDesktop extends OrdersPageBase {
     private orderTicketActions: OrderTicketActions;
 
     constructor(page: Page) {
         super(page);
-        this.addOrderProcess = new AddOrderProcess(this.page, false);
         this.orderTicketActions = new OrderTicketActions(this.page);
+    }
+
+    async clickAddOrder() {
+        console.log('checking if add order button is visible');
+        await this.page.locator('.MuiButton-contained:has-text("Add Order")').isVisible();
+
+        console.log('about to click add order');
+        await this.page.locator('.MuiButton-contained:has-text("Add Order")').click();
     }
 
     async getDriverCount() {
@@ -48,14 +53,8 @@ export class OrdersPage extends BasePage {
         if (!drawerLocator) {
             throw new Error('Drawer locator is null');
         }
-        // const originallyOpen = (await drawerLocator.getAttribute('class'))?.includes('open-drawer');
-        await drawerLocator.click({ timeout: 5000, delay: 100 });
 
-        // if (originallyOpen) {
-        //     await expect(drawerLocator).not.toHaveClass(/open-drawer/);
-        // } else {
-        //     await expect(drawerLocator).toHaveClass(/open-drawer/);
-        // }
+        await drawerLocator.click({ timeout: 5000, delay: 100 });
     }
 
     async rightClickDrawer(drawerLocator: Locator | null) {
@@ -75,27 +74,20 @@ export class OrdersPage extends BasePage {
         await this.page.click(`text=${orderIdentifier}`);
     }
 
-    // Open an OrderTicket for details
-    async openOrderTicket(orderIdentifier: OrderIdentifier) {
-        await this.page.click(`text=${orderIdentifier} >> .open-button-selector`);
+    async createOrders(min: number, max: number) {
+        await this.createRandomOrders(min, max, false);
     }
+
+    // Open an OrderTicket for details
+    // async openOrderTicket(orderIdentifier: OrderIdentifier) {
+    //     await this.page.click(`text=${orderIdentifier} >> .open-button-selector`);
+    // }
 
     // Select all OrderTickets
     async selectAllTickets() {
         await this.page.click('text=SELECT ALL');
     }
 
-    // Add new order
-    async addOrder() {
-        await this.addOrderProcess.completeAddOrder();
-    }
-
-    async createRandomOrders(min: number, max: number) {
-        const randomNumber = faker.number.int({ min: min, max: max });
-        for (let i = 0; i < randomNumber; i++) {
-            await this.addOrderProcess.completeAddOrder();
-        }
-    }
     async hasUnassignedOrders() {
         const orderTicketCount = await this.page.locator('.order-ticket').count();
         const hasUnassignedOrders = orderTicketCount > 0;
@@ -115,30 +107,7 @@ export class OrdersPage extends BasePage {
             driverDrawers.push(driverDrawer);
         }
         await this.clickDrawer(unassignedDrawer);
-        // const orderTicketsCount = await this.page.locator('.order-ticket').count();
-        // console.log({ orderTicketsCount });
-        // for (let i = 0; i < orderTicketsCount; i++) {
-        //     const { lastTicket, orderData } = await this.orderTicketActions.getLastTicketAndOrder();
-        //     const { orderType, origin } = orderData;
-        //     await this.orderTicketActions.toggleTicketSelection(lastTicket);
-        //     if (orderType === 'pickup') {
-        //         if (origin.is_third_party) {
-        //             await this.clickDrawer(thirdPartyDrawer);
-        //         } else {
-        //             const randomDrawer = faker.number.int({ min: 1, max: 2 });
-        //             if (randomDrawer === 1) {
-        //                 await this.clickDrawer(registerDrawer1);
-        //             } else if (randomDrawer === 2) {
-        //                 await this.clickDrawer(registerDrawer2);
-        //             }
-        //         }
-        //     } else {
-        //         if (driverCount === 0) return;
-        //         const driverIndex = faker.number.int({ min: 0, max: driverCount - 1 });
-        //         await this.clickDrawer(driverDrawers[driverIndex]);
-        //     }
-        //     await this.clickDrawer(unassignedDrawer);
-        // }
+
         let orderTicketsCount = await this.page.locator('.order-ticket').count();
         while (orderTicketsCount > 0) {
             const { lastTicket, orderData } = await this.orderTicketActions.getLastTicketAndOrder();

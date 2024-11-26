@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { BasePageDesktop } from './BasePageDesktop';
 import { CloseDrawerProcess } from '../../utils/CloseDrawerProcess';
 import { faker } from '@faker-js/faker/locale/en_US';
 
@@ -7,7 +7,7 @@ type DrawerIdentifier = string | number;
 
 type DriverIdentifier = string | number | null;
 
-export class ManagerPage extends BasePage {
+export class ManagerPage extends BasePageDesktop {
     private closeDrawerProcess: CloseDrawerProcess;
     constructor(page: Page) {
         super(page);

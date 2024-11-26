@@ -1,12 +1,27 @@
-import { expect, Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
-export class BasePage {
-    constructor(protected page: Page) {
+export abstract class BasePage {
+    protected page: Page;
+
+    constructor(page: Page) {
         this.page = page;
     }
 
-    async waitForTimeout(timeout: number) {
-        await this.page.waitForTimeout(timeout);
+    // Common navigation methods
+
+    protected async navigateToHref(href: string) {
+        const link = this.page.locator(`a[href="${href}"]`);
+        await expect(link).toBeVisible();
+        await this.waitForTimeout(1000);
+        await link.click();
+    }
+
+    async navigateToHome() {
+        await this.navigateToHref('/');
+    }
+
+    async navigateToOrders() {
+        await this.navigateToHref('/orders');
     }
 
     async login() {
@@ -15,36 +30,17 @@ export class BasePage {
         await this.page.locator('input[name="email"]').fill('ccata002@gmail.com');
         await this.page.locator('input[name="password"]').fill('Password1234!');
         await this.page.locator('button[type="submit"]').click();
-        // await expect(this.page.locator('input[name="email"]')).toBeVisible();
-        // await this.page.fill('input[name="email"]', 'ccata002@gmail.com');
-
-        // await expect(this.page.locator('input[name="password"]')).toBeVisible();
-        // await this.page.fill('input[name="password"]', 'Password1234!');
-
-        // await expect(this.page.locator('button[type="submit"]')).toBeVisible();
-        // await this.page.click('button[type="submit"]');
     }
 
-    // Common navigation methods
-    async navigateToHome() {
-        await expect(this.page.locator('.MuiDrawer-docked >> text=Home')).toBeVisible();
-        await this.page.locator('.MuiDrawer-docked >> text=Home').click();
+    async waitForTimeout(timeout: number) {
+        await this.page.waitForTimeout(timeout);
     }
 
-    async navigateToOrders() {
-        const ordersLink = this.page.locator('.MuiDrawer-docked >> text=Orders');
-        await expect(ordersLink).toBeVisible();
-        console.log({ ordersLink });
-        await ordersLink.click();
+    async getTitle(): Promise<string> {
+        return await this.page.title();
     }
 
-    async navigateToManager() {
-        await expect(this.page.locator('.MuiDrawer-docked >> text=Manager')).toBeVisible();
-        await this.page.locator('.MuiDrawer-docked >> text=Manager').click();
-    }
-
-    // Common page methods (like waiting for elements)
-    async waitForPageLoad() {
-        await this.page.waitForLoadState('load');
+    async takeScreenshot(filename: string): Promise<void> {
+        await this.page.screenshot({ path: filename });
     }
 }
