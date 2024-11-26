@@ -324,8 +324,9 @@ export const OrderEditor = ({
         </>
     );
 
-    const nameAlreadyExists = isRepeat(currentOrderName) && 'Order name already exists';
-    const numberAlreadyExists = isRepeat(currentOrderNumber) && 'Order number already exists';
+    const nameAlreadyExists = isRepeat(currentOrderName, !dirtyFields.order_name) && 'Order name already exists';
+    const numberAlreadyExists =
+        isRepeat(currentOrderNumber, !dirtyFields.order_number) && 'Order number already exists';
 
     const rightSide = (
         <>

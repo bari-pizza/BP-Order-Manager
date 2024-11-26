@@ -250,7 +250,7 @@ export const useOrdersDrawersTickets = () => {
         orderNames: new Set<string>(),
     };
 
-    orders.forEach((order) => {
+    allOrders.forEach((order) => {
         if (order.order_number) {
             if (orderDictionary.orderNumbers.has(order.order_number)) {
                 repeats.orderNumbers.add(order.order_number);
