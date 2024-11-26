@@ -20,6 +20,7 @@ interface PaymentEditorProps {
     defaultAmount?: number;
     isEditing: boolean;
     setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+    disabled?: boolean;
 }
 
 const allPaymentTypes: { value: PaymentType; label: string }[] = [
@@ -30,6 +31,8 @@ const allPaymentTypes: { value: PaymentType; label: string }[] = [
 
 type FormValues = Payment;
 
+// TODO: make sure payment tip auto-updates
+
 export const PaymentEditor = ({
     payment,
     forNewPayment,
@@ -39,6 +42,7 @@ export const PaymentEditor = ({
     defaultAmount = 0,
     isEditing = false,
     setIsEditing,
+    disabled = false,
 }: PaymentEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { isMobile } = useLayoutContext();
@@ -106,18 +110,16 @@ export const PaymentEditor = ({
 
     const invalidPaymentType = !validPaymentTypes.find(({ value }) => value === paymentType);
 
-    console.log({ validPaymentTypes, paymentType, paymentTypeName, invalidPaymentType });
-
     if (!isEditing) {
         if (forNewPayment) {
             return (
-                <Button onClick={() => setIsEditing(true)} sx={{ width: '100%' }}>
+                <Button onClick={() => setIsEditing(true)} sx={{ width: '100%' }} disabled={disabled}>
                     Add Payment
                 </Button>
             );
         } else if (payment) {
             return (
-                <Button onClick={() => setIsEditing(true)} sx={{ padding: 0, width: '100%' }}>
+                <Button onClick={() => setIsEditing(true)} sx={{ padding: 0, width: '100%' }} disabled={disabled}>
                     <LabeledStack
                         style={{ cursor: 'pointer', width: '100%' }}
                         label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
@@ -204,7 +206,7 @@ export const PaymentEditor = ({
                     isDirty={dirtyFields.payment_type || forNewPayment}
                     validPaymentTypes={validPaymentTypes}
                     handleChange={handlePaymentTypeChange}
-                    variant={variant}
+                    variant={isMobile ? 'icon' : variant}
                 />
             </LabeledStack>
             <Stack direction="row" justifyContent="flex-end" gap={2}>
@@ -254,7 +256,7 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                         {...field}>
                         {validPaymentTypes.map((option) => {
                             const isSelected = option.value === field.value;
-                            if (variant === 'icon') {
+                            if (variant === 'standard') {
                                 return (
                                     <Button
                                         key={option.value}

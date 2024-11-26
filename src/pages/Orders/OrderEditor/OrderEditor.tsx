@@ -238,6 +238,8 @@ export const OrderEditor = ({
         }
     }, [has_order_number, setValue]);
 
+    const isLocked = order?.is_locked;
+
     const leftSide = (
         <>
             <Controller
@@ -250,6 +252,7 @@ export const OrderEditor = ({
                             autoFocus
                             label="Origin"
                             select
+                            disabled={isLocked}
                             value={field.value}
                             isDirty={dirtyFields.origin_id}>
                             {validOrigins.map((origin) => (
@@ -272,7 +275,7 @@ export const OrderEditor = ({
                             isDirty={dirtyFields.order_type}
                             label="Order Type"
                             select
-                            disabled={driverIsEditing}
+                            disabled={isLocked || driverIsEditing}
                             value={valueWithFallback}
                             style={{ textTransform: 'capitalize' }}>
                             {can_deliver && <MenuItem value="delivery">Delivery</MenuItem>}
@@ -309,7 +312,7 @@ export const OrderEditor = ({
                             isDirty={dirtyFields.drawer_id}
                             value={currentDrawerID}
                             onKeyDown={handleKeyDown}
-                            disabled={driverIsEditing}>
+                            disabled={isLocked || driverIsEditing}>
                             {validDrawers.map((drawer) => {
                                 return (
                                     <MenuItem key={drawer.name} value={drawer.drawer_id}>
@@ -338,6 +341,7 @@ export const OrderEditor = ({
                         ...validators.order.order_number,
                         // shouldUnregister: true,
                     })}
+                    disabled={isLocked}
                     error={!!(errors.order_number || numberAlreadyExists)}
                     helperText={errors.order_number?.message || numberAlreadyExists}
                     isDirty={dirtyFields.order_number}
@@ -349,6 +353,7 @@ export const OrderEditor = ({
                     {...register('order_name', {
                         required: !currentOrigin?.has_order_number && 'Required',
                     })}
+                    disabled={isLocked}
                     error={!!(errors.order_name || nameAlreadyExists)}
                     helperText={errors.order_name?.message || nameAlreadyExists}
                     isDirty={dirtyFields.order_name}
@@ -367,7 +372,7 @@ export const OrderEditor = ({
                                 error={!!errors.delivery_fee_in_cents}
                                 helperText={errors.delivery_fee_in_cents?.message}
                                 value={value}
-                                disabled={currentOrderType !== 'delivery' || driverIsEditing}
+                                disabled={isLocked || currentOrderType !== 'delivery' || driverIsEditing}
                                 handleChange={(value, shouldDirty) =>
                                     setValue('delivery_fee_in_cents', value, { shouldDirty })
                                 }
@@ -386,6 +391,7 @@ export const OrderEditor = ({
                         <TextFieldWithMask
                             label="Total"
                             maskVariant="currency"
+                            disabled={isLocked}
                             error={!!errors.total_in_cents}
                             helperText={errors.total_in_cents?.message}
                             value={value}
@@ -500,6 +506,8 @@ const OrderEditorDialog = ({
         ? payments?.find((payment) => payment.payment_id === editablePaymentID)
         : null;
 
+    const isLocked = order.is_locked;
+
     const activePaymentEditor = editablePaymentID ? (
         editablePaymentID === 'newPayment' ? (
             <PaymentEditor
@@ -564,6 +572,7 @@ const OrderEditorDialog = ({
                                         validPaymentTypes={validPaymentTypes}
                                         isEditing={editablePaymentID === payment.payment_id}
                                         setIsEditing={(bool) => setEditablePaymentID(bool ? payment.payment_id : null)}
+                                        disabled={isLocked}
                                     />
                                 </motion.div>
                             ))}
@@ -575,6 +584,7 @@ const OrderEditorDialog = ({
                             defaultAmount={missingPaymentInCents}
                             isEditing={editablePaymentID === 'newPayment'}
                             setIsEditing={(bool) => setEditablePaymentID(bool ? 'newPayment' : null)}
+                            disabled={isLocked}
                         />
                     </Stack>
                 ) : (

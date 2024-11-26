@@ -104,6 +104,7 @@ const OrderTicketMobile = ({ order }: OrderTicketMobileProps) => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
+                        pointerEvents: 'none',
                     }}>
                     <LockLottieIcon height="8em" width="8em" />
                 </div>
@@ -177,7 +178,7 @@ const OrderTicketDesktop = ({ order, toggleSelected, selected }: OrderTicketProp
 
     return (
         <Card variant="elevation" sx={cardSX} raised className="lottie-icon-container order-ticket">
-            <CardActionArea onClick={handleSelect}>
+            <CardActionArea onClick={handleSelect} sx={{ backgroundColor: theme.palette.primary.light }}>
                 <Stack direction="column">
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
                         <Typography

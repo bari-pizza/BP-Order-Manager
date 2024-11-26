@@ -254,22 +254,22 @@ export const DrawerSideBar = () => {
                     label: 'Hours',
                     value: -hours,
                     // TODO: update these details
-                    details: '10 hours @ $5/hour',
+                    details: `${(hours / constants.default.driver_hourly_wage_in_cents).toFixed(2)} hours @ ${formatCurrency(constants.default.driver_hourly_wage_in_cents)}`,
                 },
                 {
                     label: 'Cards',
                     value: -card,
-                    details: '$53.25 base | $3.25 tips',
+                    details: `${formatCurrency(drawerSummary.card_in_cents)} base | ${formatCurrency(drawerSummary.card_tips_in_cents)} tips`,
                 },
                 {
                     label: '3rd Party',
                     value: -thirdParty,
-                    details: 'Prepaid orders',
+                    details: `${formatCurrency(drawerSummary.third_party_in_cents)} base | ${formatCurrency(drawerSummary.third_party_tips_in_cents)} tips`,
                 },
                 {
                     label: 'Deliveries',
                     value: -deliveryFees,
-                    details: '$4 per delivery',
+                    details: '$4 per order',
                 },
                 {
                     label: 'Other',

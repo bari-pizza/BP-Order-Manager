@@ -4,6 +4,13 @@ import { useDrivers } from './useDrivers';
 // import { useRef } from 'react';
 import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
 
+/* TODO: Julia
+
+    [ ] add something at the top of the screen
+    [ ] fix scrolling in orders area
+
+*/
+
 export const useMobile = () => {
     const [businessDate] = useBusinessDate();
     const { isMobile } = useLayoutContext();
@@ -12,7 +19,7 @@ export const useMobile = () => {
         drivers: { todays: todaysDrivers },
     } = useDrivers();
     const { drivers, drawers, origins, constants } = useBariPizzaContext();
-    const { orders, ticket } = useOrdersDrawersTickets();
+    const { orders, ticket, summaries, cashTransfers } = useOrdersDrawersTickets();
     // const toastRef = useRef<{
     //     [toastID: string]: ({ data, errors, forEachError }: HandleOutcomeProps) => void;
     // }>({});
@@ -24,11 +31,13 @@ export const useMobile = () => {
             driver: undefined,
             drawers: drawers, // non-driver drawers
             origins: origins,
-            constants: constants,
+            constants,
             orders: [],
             isRepeat: () => false,
             ticket,
             driverIsWorkingToday: false,
+            summary: undefined,
+            cashTransfers: [],
         };
     }
 
@@ -46,6 +55,8 @@ export const useMobile = () => {
             isRepeat: () => false,
             ticket,
             driverIsWorkingToday: false,
+            summary: undefined,
+            cashTransfers: [],
         };
 
     const driverIsWorkingToday = todaysDrivers.some((driver) => driver.drawer_id === driver.drawer_id);
@@ -62,10 +73,13 @@ export const useMobile = () => {
             isRepeat: () => false,
             ticket,
             driverIsWorkingToday,
+            summary: undefined,
+            cashTransfers: [],
         };
     }
 
     const driversOrders = orders.byDrawerID(driver.drawer_id);
+    const driverCashTransfers = cashTransfers.byDrawerID(driver.drawer_id);
 
     /* TODO: drivers need to be able to:
 
@@ -113,5 +127,7 @@ export const useMobile = () => {
         isRepeat: orders.isRepeat,
         ticket,
         driverIsWorkingToday,
+        summary: summaries.byDrawerID(driver.drawer_id),
+        cashTransfers: driverCashTransfers,
     };
 };
