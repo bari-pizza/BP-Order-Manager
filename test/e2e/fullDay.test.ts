@@ -1,5 +1,5 @@
 import { test, chromium, Browser, BrowserContext, devices } from '@playwright/test';
-import { ManagerPage } from '../pages/desktop/ManagerPage';
+import { ManagerPage } from '../pages/Desktop/ManagerPage';
 import { OrdersPageDesktop } from '../pages/OrdersPage/OrdersPageDesktop';
 import { OrdersPageMobile } from '../pages/OrdersPage/OrdersPageMobile';
 
@@ -50,7 +50,7 @@ test('should add drivers to the day', async () => {
     // assert that all drivers are added
 });
 
-test.only('should add mock orders to the day', async () => {
+test('should add mock orders to the day', async () => {
     test.setTimeout(1000 * 60 * 5);
     await ordersPageDesktop.navigateToOrders();
     await ordersPageDesktop.createOrders(5, 9);
@@ -63,14 +63,17 @@ test('should add orders to random drawers', async () => {
     // assert that there are no unassigned orders
 });
 
-test.skip('should allow drivers to add orders', async () => {
+test('should allow drivers to add orders', async () => {
     test.setTimeout(1000 * 60 * 5);
     await ordersPageMobile.navigateToOrders();
     await ordersPageMobile.createOrders(5, 9);
 });
 
+// TODO: create a way to allow drivers to add tips to an order
+
 test('should allow drivers to update orders', async () => {
-    // assert that drivers can update orders
+    test.setTimeout(1000 * 60 * 5);
+    await ordersPageMobile.navigateToOrders();
 });
 
 test('should close out all drawers', async () => {

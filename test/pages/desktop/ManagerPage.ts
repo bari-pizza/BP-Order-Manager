@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { BasePageDesktop } from './BasePageDesktop';
+import { BasePageDesktop } from '../BasePage/BasePageDesktop';
 import { CloseDrawerProcess } from '../../utils/CloseDrawerProcess';
 import { faker } from '@faker-js/faker/locale/en_US';
 

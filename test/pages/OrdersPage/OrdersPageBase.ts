@@ -1,13 +1,13 @@
 import { Page } from '@playwright/test';
-import { BasePage } from '../desktop/BasePage';
+import { BasePage } from '../BasePage/BasePage';
 import { faker } from '@faker-js/faker/locale/en_US';
 import { OrderData, orderOriginsWithTypes } from '../../utils/data';
-
-type OrderIdentifier = string | number;
+import { TicketPageBase } from '../TicketPage/TicketPageBase';
 
 export abstract class OrdersPageBase extends BasePage {
     private static currentOrderNumber = 0;
     private static generatedNames: Set<string> = new Set();
+    protected ticketPage: TicketPageBase;
 
     constructor(page: Page) {
         super(page);
@@ -97,6 +97,10 @@ export abstract class OrdersPageBase extends BasePage {
         return Math.floor(Math.min(max, Math.max(min, adjustedValue)));
     }
 
+    public static generateRandomTip() {
+        return OrdersPageBase.generateRightSkewedNumber(0, 1500, 300);
+    }
+
     protected async createRandomOrders(min: number, max: number, isMobile: boolean) {
         const randomNumber = faker.number.int({ min: min, max: max });
         for (let i = 0; i < randomNumber; i++) {
@@ -116,6 +120,8 @@ export abstract class OrdersPageBase extends BasePage {
 
     async chooseOrderType(orderType: OrderData['orderType']) {
         const orderTypeSelect = this.page.locator(`//label[text()='Order Type']/following::div[1]`);
+        const className = await orderTypeSelect.getAttribute('class');
+        if (className?.includes('Mui-disabled')) return;
         await orderTypeSelect.click();
         const optionText = orderType.charAt(0).toUpperCase() + orderType.slice(1);
         const dropdownOption = this.page.locator(`//li[text()='${optionText}']`);
@@ -146,9 +152,9 @@ export abstract class OrdersPageBase extends BasePage {
 
     async addOrder(isMobile: boolean) {
         const { origin, orderType, total_in_cents, paymentType } = OrdersPageBase.generateRandomOrder(isMobile);
-        console.log({ origin, orderType, total_in_cents, paymentType });
 
         await this.clickAddOrder();
+        console.log({ origin, orderType, total_in_cents, paymentType });
 
         await this.chooseOrigin(origin.name);
         await this.chooseOrderType(orderType);
@@ -168,9 +174,5 @@ export abstract class OrdersPageBase extends BasePage {
 
     async confirmOrder() {
         await this.page.locator('text=Save').click();
-    }
-
-    async openOrderTicket(orderIdentifier: OrderIdentifier) {
-        await this.page.click(`text=${orderIdentifier} >> .open-button-selector`);
     }
 }

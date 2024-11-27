@@ -10,9 +10,4 @@ export class BasePageDesktop extends BasePage {
     async navigateToManager() {
         await this.navigateToHref('/manager');
     }
-
-    // Common page methods (like waiting for elements)
-    async waitForPageLoad() {
-        await this.page.waitForLoadState('load');
-    }
 }

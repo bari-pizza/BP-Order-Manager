@@ -1,25 +1,20 @@
 import { Locator, Page } from '@playwright/test';
 import { OrderData } from '../../utils/data';
-import { OrderTicketActions } from '../../utils/OrderTicketActions';
 import { faker } from '@faker-js/faker/locale/en_US';
 import { OrdersPageBase } from './OrdersPageBase';
+import { TicketPageDesktop } from '../TicketPage/TicketPageDesktop';
 
 type DrawerIndentifier = string | number;
 type OrderIdentifier = string | number;
 
 export class OrdersPageDesktop extends OrdersPageBase {
-    private orderTicketActions: OrderTicketActions;
-
     constructor(page: Page) {
         super(page);
-        this.orderTicketActions = new OrderTicketActions(this.page);
+        this.ticketPage = new TicketPageDesktop(page);
     }
 
     async clickAddOrder() {
-        console.log('checking if add order button is visible');
         await this.page.locator('.MuiButton-contained:has-text("Add Order")').isVisible();
-
-        console.log('about to click add order');
         await this.page.locator('.MuiButton-contained:has-text("Add Order")').click();
     }
 
@@ -66,8 +61,8 @@ export class OrdersPageDesktop extends OrdersPageBase {
 
     // Select or unselect an OrderTicket
     async selectOrderTicket(orderData: OrderData) {
-        const ticket = await this.orderTicketActions.findTicket(orderData);
-        await this.orderTicketActions.toggleTicketSelection(ticket);
+        const ticket = await this.ticketPage.findTicketByOrderData(orderData);
+        await this.ticketPage.toggleTicketSelection(ticket);
     }
 
     async unselectOrderTicket(orderIdentifier: OrderIdentifier) {
@@ -77,11 +72,6 @@ export class OrdersPageDesktop extends OrdersPageBase {
     async createOrders(min: number, max: number) {
         await this.createRandomOrders(min, max, false);
     }
-
-    // Open an OrderTicket for details
-    // async openOrderTicket(orderIdentifier: OrderIdentifier) {
-    //     await this.page.click(`text=${orderIdentifier} >> .open-button-selector`);
-    // }
 
     // Select all OrderTickets
     async selectAllTickets() {
@@ -110,9 +100,9 @@ export class OrdersPageDesktop extends OrdersPageBase {
 
         let orderTicketsCount = await this.page.locator('.order-ticket').count();
         while (orderTicketsCount > 0) {
-            const { lastTicket, orderData } = await this.orderTicketActions.getLastTicketAndOrder();
+            const { lastTicket, orderData } = await this.ticketPage.getLastTicketAndOrder();
             const { orderType, origin } = orderData;
-            await this.orderTicketActions.toggleTicketSelection(lastTicket);
+            await this.ticketPage.toggleTicketSelection(lastTicket);
             if (orderType === 'pickup') {
                 if (origin.is_third_party) {
                     await this.clickDrawer(thirdPartyDrawer);

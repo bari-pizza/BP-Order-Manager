@@ -10,10 +10,11 @@ export abstract class BasePage {
     // Common navigation methods
 
     protected async navigateToHref(href: string) {
+        await this.page.waitForTimeout(500);
         const link = this.page.locator(`a[href="${href}"]`);
         await expect(link).toBeVisible();
-        await this.waitForTimeout(1000);
         await link.click();
+        await this.page.waitForTimeout(1500);
     }
 
     async navigateToHome() {
@@ -30,10 +31,6 @@ export abstract class BasePage {
         await this.page.locator('input[name="email"]').fill('ccata002@gmail.com');
         await this.page.locator('input[name="password"]').fill('Password1234!');
         await this.page.locator('button[type="submit"]').click();
-    }
-
-    async waitForTimeout(timeout: number) {
-        await this.page.waitForTimeout(timeout);
     }
 
     async getTitle(): Promise<string> {
