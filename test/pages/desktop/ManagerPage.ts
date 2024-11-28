@@ -94,6 +94,7 @@ export class ManagerPage extends BasePageDesktop {
             await driverList.press('Enter');
         } else if (typeof driver === 'string') {
             // Select driver by name
+            // TODO: improve this logic
             await driverList.fill(driver);
             await new Promise((resolve) => setTimeout(resolve, 200));
             await driverList.press('ArrowDown');

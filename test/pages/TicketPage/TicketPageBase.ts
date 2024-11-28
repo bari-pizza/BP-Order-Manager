@@ -4,6 +4,9 @@ import { OrderData, orderOriginsWithTypes } from '../../utils/data';
 import { Payment } from '../../../src/typesAndValidators';
 
 export abstract class TicketPageBase extends BasePage {
+    // protected orderEditor: Locator = this.page.locator('text=Order Editor').locator('..');
+    protected orderEditor: Locator = this.page.locator('_react=OrderEditor');
+    protected backDrop: Locator = this.page.locator('.MuiBackdrop-root.MuiModal-backdrop');
     constructor(page: Page) {
         super(page);
     }
@@ -66,49 +69,82 @@ export abstract class TicketPageBase extends BasePage {
         return { lastTicket, orderData };
     }
 
+    async getNthTicketAndOrder(index: number) {
+        // Select the last ticket element
+        const nthTicket = this.page.locator(`.order-ticket:nth-child(${index})`);
+
+        // Scrape the order data from the last ticket
+        const orderNumberLocator = nthTicket.locator('.order-number');
+        const orderNameLocator = nthTicket.locator('.order-name');
+        const orderNumber = (await orderNumberLocator.count()) > 0 ? await orderNumberLocator.textContent() : undefined;
+        const orderName = (await orderNameLocator.count()) > 0 ? await orderNameLocator.textContent() : undefined;
+        const originClass = await nthTicket.locator('[class*="origin-logo-"]').getAttribute('class');
+        const orderTypeClass = await nthTicket.locator('[class*="order-type-"]').getAttribute('class');
+        const totalText = (await nthTicket.locator('.order-total').textContent()) || '';
+
+        // Parse and format the scraped data
+        const origin = originClass?.match(/origin-logo-(.*)/)?.[1]?.replace(/\./g, ' ');
+        const orderType = orderTypeClass?.match(/order-type-(.*)-icon/)?.[1];
+        const total_in_cents = parseFloat(totalText?.replace('$', '')) * 100;
+
+        if (!origin || !orderType || isNaN(total_in_cents)) throw new Error('Failed to parse order data');
+
+        // Create the OrderData object
+        const orderData = {
+            orderNumber: orderNumber ? orderNumber.replace('Order #', '') : undefined,
+            orderName: orderName || undefined,
+            origin: orderOriginsWithTypes[origin as keyof typeof orderOriginsWithTypes].origin,
+            orderType,
+            total_in_cents,
+        };
+
+        return { nthTicket, orderData };
+    }
+
     // Open ticket
     async openTicket(ticket: Locator) {
         // can click on ticket total to open
         await ticket.locator('.order-total').click();
-        // check that order editor has opened
-        await expect(this.page.locator('text=Order Editor')).toBeVisible();
+        await expect(this.orderEditor).toBeVisible();
     }
 
     async closeTicket() {
-        await this.page.locator('.MuiModal-backdrop').click();
-        await this.page.waitForTimeout(500);
+        await this.orderEditor.press('Escape');
+        await expect(this.orderEditor).not.toBeVisible();
     }
 
-    // Toggle ticket selection
-    async toggleTicketSelection(ticket: Locator) {
-        const orderNumber = ticket.locator('.order-number');
-        const orderName = ticket.locator('.order-name');
-        const orderNumberCount = await orderNumber.count();
-        const selectButton = (orderNumberCount === 1 ? orderNumber : orderName).locator('../../..');
-        await selectButton.click({ timeout: 5000, delay: 100, force: true });
-    }
-
-    // Toggle select all tickets
-    async toggleSelectAll() {
-        const selectAllSelector = `data-test-id=select-all`;
-        await this.page.click(selectAllSelector);
+    async openTicketIfClosed(ticket: Locator) {
+        const isOpen = await this.orderEditor.isVisible();
+        if (isOpen) return;
+        await this.openTicket(ticket);
     }
 
     async editPayment(ticket: Locator, payment: Partial<Payment>, index = 0) {
-        await this.openTicket(ticket);
-        // find all payments
-        const payments = ticket.locator('.payment');
-        // click on payment
-        await payments.nth(index).click();
+        let hasChanges = false;
+        await this.openTicketIfClosed(ticket);
+
+        // find and click on payment
+        await this.orderEditor.locator(`.payment-editor-edit-payment:nth-child(${index + 1})`).click();
+
         // click on payment type
         // handle payment amount
         // handle payment tip
+        if (payment?.tip_in_cents !== undefined) {
+            const paymentInput = this.orderEditor.locator(`.payment-tip-input input`);
+            if ((await paymentInput.inputValue()) !== payment.tip_in_cents.toString()) {
+                hasChanges = true;
+                await paymentInput.fill(payment.tip_in_cents.toString());
+            }
+        }
         // handle payment type
         // save
+        if (hasChanges) {
+            await this.orderEditor.locator('button:has-text("Save")').click();
+            await expect(this.orderEditor.locator('.payment-editor-editing-payment')).not.toBeVisible();
+        }
     }
 
     async editTip(ticket: Locator, tip_in_cents: number) {
-        await this.openTicket(ticket);
-        this.editPayment(ticket, { tip_in_cents });
+        await this.editPayment(ticket, { tip_in_cents });
     }
 }

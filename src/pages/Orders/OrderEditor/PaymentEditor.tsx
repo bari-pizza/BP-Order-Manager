@@ -115,13 +115,21 @@ export const PaymentEditor = ({
     if (!isEditing) {
         if (forNewPayment) {
             return (
-                <Button onClick={() => setIsEditing(true)} sx={{ width: '100%' }} disabled={disabled}>
+                <Button
+                    onClick={() => setIsEditing(true)}
+                    sx={{ width: '100%' }}
+                    disabled={disabled}
+                    className="payment-editor-add-payment">
                     Add Payment
                 </Button>
             );
         } else if (payment) {
             return (
-                <Button onClick={() => setIsEditing(true)} sx={{ padding: 0, width: '100%' }} disabled={disabled}>
+                <Button
+                    onClick={() => setIsEditing(true)}
+                    sx={{ padding: 0, width: '100%' }}
+                    disabled={disabled}
+                    className="payment-editor-edit-payment">
                     <LabeledStack
                         style={{ cursor: 'pointer', width: '100%' }}
                         label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
@@ -151,7 +159,7 @@ export const PaymentEditor = ({
     }
 
     return (
-        <Stack direction="column" rowGap={2}>
+        <Stack direction="column" rowGap={2} className="payment-editor-editing-payment">
             <LabeledStack
                 label={paymentTypeName}
                 color={isDirty || forNewPayment ? theme.palette.primary.main : ''}
@@ -169,6 +177,7 @@ export const PaymentEditor = ({
                         render={({ field: { value } }) => {
                             return (
                                 <TextFieldWithMask
+                                    className="payment-amount-input"
                                     sx={{ minWidth: 100 }}
                                     label="Amount"
                                     maskVariant="currency"
@@ -189,6 +198,7 @@ export const PaymentEditor = ({
                         render={({ field: { value } }) => {
                             return (
                                 <TextFieldWithMask
+                                    className="payment-tip-input"
                                     sx={{ minWidth: 100 }}
                                     label="Tip"
                                     maskVariant="currency"

@@ -137,6 +137,7 @@ export const OrderEditor = ({
         onSuccess: (data) => {
             console.log({ data });
             close();
+            reset();
             queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
 

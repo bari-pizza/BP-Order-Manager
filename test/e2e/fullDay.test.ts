@@ -53,7 +53,13 @@ test('should add drivers to the day', async () => {
 test('should add mock orders to the day', async () => {
     test.setTimeout(1000 * 60 * 5);
     await ordersPageDesktop.navigateToOrders();
-    await ordersPageDesktop.createOrders(5, 9);
+    await ordersPageDesktop.createOrders(40, 60);
+});
+
+test('should allow drivers to add orders', async () => {
+    test.setTimeout(1000 * 60 * 5);
+    await ordersPageMobile.navigateToOrders();
+    await ordersPageMobile.createOrders(8, 15);
 });
 
 test('should add orders to random drawers', async () => {
@@ -63,17 +69,10 @@ test('should add orders to random drawers', async () => {
     // assert that there are no unassigned orders
 });
 
-test('should allow drivers to add orders', async () => {
+test('should allow drivers to update orders (tips)', async () => {
     test.setTimeout(1000 * 60 * 5);
     await ordersPageMobile.navigateToOrders();
-    await ordersPageMobile.createOrders(5, 9);
-});
-
-// TODO: create a way to allow drivers to add tips to an order
-
-test('should allow drivers to update orders', async () => {
-    test.setTimeout(1000 * 60 * 5);
-    await ordersPageMobile.navigateToOrders();
+    await ordersPageMobile.addTipsToAllOrders();
 });
 
 test('should close out all drawers', async () => {

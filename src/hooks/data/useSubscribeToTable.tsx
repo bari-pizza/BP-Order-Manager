@@ -114,27 +114,68 @@ export const useSubscribeToPayments = (orders: Order_Payment[], queryKey: string
                     console.log(`Change detected in Payment:`, payload);
 
                     setUpdatedOrders((currentOrders) => {
+                        // probably improve this by searching for the order and then updating that order.payments
                         return currentOrders.map((order) => {
-                            if (eventType === 'INSERT' || eventType === 'UPDATE') {
-                                if (!order.payments) order.payments = [];
-                                if (newPayment && newPayment.order_id === order.order_id) {
-                                    // Insert or update the payment in the payments list
-                                    const updatedPayments =
-                                        eventType === 'INSERT'
-                                            ? [...order.payments, newPayment]
-                                            : order.payments.map((payment) =>
-                                                  payment.payment_id === newPayment.payment_id ? newPayment : payment,
-                                              );
-                                    order.payments = updatedPayments;
-                                }
-                            } else if (eventType === 'DELETE') {
-                                // Remove deleted payment from the order's payments
-                                order.payments = order.payments.filter(
-                                    (payment) => payment.payment_id !== oldPayment.payment_id,
-                                );
+                            // Skip orders that aren't affected by this event
+                            if (newPayment?.order_id !== order.order_id && eventType !== 'DELETE') {
+                                return order;
                             }
+
+                            // Ensure the `payments` array exists
+                            const payments = order.payments || [];
+
+                            if (eventType === 'INSERT') {
+                                // Add the new payment to the payments list
+                                return {
+                                    ...order,
+                                    payments: [...payments, newPayment],
+                                };
+                            }
+
+                            if (eventType === 'UPDATE') {
+                                // Update the existing payment
+                                return {
+                                    ...order,
+                                    payments: payments.map((payment) =>
+                                        payment.payment_id === newPayment.payment_id ? newPayment : payment,
+                                    ),
+                                };
+                            }
+
+                            if (eventType === 'DELETE' && oldPayment) {
+                                // Remove the deleted payment
+                                return {
+                                    ...order,
+                                    payments: payments.filter(
+                                        (payment) => payment.payment_id !== oldPayment.payment_id,
+                                    ),
+                                };
+                            }
+
+                            // If no changes are needed, return the original order
                             return order;
                         });
+
+                        //                         if (eventType === 'INSERT' || eventType === 'UPDATE') {
+                        //                             if (!order.payments) order.payments = [];
+                        //                             if (newPayment && newPayment.order_id === order.order_id) {
+                        //                                 // Insert or update the payment in the payments list
+                        //                                 const updatedPayments =
+                        //                                     eventType === 'INSERT'
+                        //                                         ? [...order.payments, newPayment]
+                        //                                         : order.payments.map((payment) =>
+                        //                                               payment.payment_id === newPayment.payment_id ? newPayment : payment,
+                        //                                           );
+                        //                                 order.payments = updatedPayments;
+                        //                             }
+                        //                         } else if (eventType === 'DELETE') {
+                        //                             // Remove deleted payment from the order's payments
+                        //                             order.payments = order.payments.filter(
+                        //                                 (payment) => payment.payment_id !== oldPayment.payment_id,
+                        //                             );
+                        //                         }
+                        //                         return order;
+                        //                     });
                     });
 
                     queryClient.invalidateQueries({ queryKey });

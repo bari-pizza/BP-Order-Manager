@@ -10,11 +10,9 @@ export abstract class BasePage {
     // Common navigation methods
 
     protected async navigateToHref(href: string) {
-        await this.page.waitForTimeout(500);
         const link = this.page.locator(`a[href="${href}"]`);
         await expect(link).toBeVisible();
         await link.click();
-        await this.page.waitForTimeout(1500);
     }
 
     async navigateToHome() {
@@ -23,14 +21,24 @@ export abstract class BasePage {
 
     async navigateToOrders() {
         await this.navigateToHref('/orders');
+        // make sure page has loaded
+        await expect(this.page.locator('_react=OrderDashboard').nth(0)).toBeVisible();
     }
 
     async login() {
         await this.page.goto('/login');
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        await this.page.locator('input[name="email"]').fill('ccata002@gmail.com');
-        await this.page.locator('input[name="password"]').fill('Password1234!');
-        await this.page.locator('button[type="submit"]').click();
+
+        const emailInput = this.page.locator('input[name="email"]');
+        const passwordInput = this.page.locator('input[name="password"]');
+        const loginButton = this.page.locator('button[type="submit"]');
+
+        await expect(emailInput).toBeVisible();
+        await expect(passwordInput).toBeVisible();
+        await expect(loginButton).toBeVisible();
+
+        await emailInput.fill('ccata002@gmail.com');
+        await passwordInput.fill('Password1234!');
+        await loginButton.click();
     }
 
     async getTitle(): Promise<string> {

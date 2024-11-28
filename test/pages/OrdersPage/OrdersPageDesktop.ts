@@ -8,6 +8,7 @@ type DrawerIndentifier = string | number;
 type OrderIdentifier = string | number;
 
 export class OrdersPageDesktop extends OrdersPageBase {
+    protected ticketPage: TicketPageDesktop;
     constructor(page: Page) {
         super(page);
         this.ticketPage = new TicketPageDesktop(page);

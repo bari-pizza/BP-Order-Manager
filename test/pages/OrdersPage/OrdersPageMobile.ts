@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { OrdersPageBase } from './OrdersPageBase';
 import { OrderData } from '../../utils/data';
 import { TicketPageMobile } from '../TicketPage/TicketPageMobile';
@@ -6,22 +6,21 @@ import { TicketPageMobile } from '../TicketPage/TicketPageMobile';
 // type OrderIdentifier = string | number;
 
 export class OrdersPageMobile extends OrdersPageBase {
+    protected ticketPage: TicketPageMobile;
+    private speedDial: Locator = this.page.locator('[aria-label="SpeedDial"]');
+    private addOrderButton: Locator = this.page.locator('[aria-label="Add Order"]');
+    private speedDialExpanded: Locator = this.page.locator('[aria-label="SpeedDial"][aria-expanded="true"]');
     constructor(page: Page) {
         super(page);
         this.ticketPage = new TicketPageMobile(page);
     }
 
-    private async openSpeedDial() {
-        const speedDial = this.page.locator('[aria-label="SpeedDial"]');
-        await this.page.waitForTimeout(500);
-        const isExpanded = await speedDial.getAttribute('aria-expanded');
-        if (isExpanded === 'true') return;
-        await speedDial.click();
-    }
-
     async clickAddOrder() {
-        await this.openSpeedDial();
-        await this.page.locator('[aria-label="Add Order"]').click();
+        await this.page.waitForTimeout(500); // couldnt get this to work without the timeout
+        if (!(await this.addOrderButton.isVisible())) {
+            await this.speedDial.click();
+        }
+        await this.addOrderButton.click();
     }
 
     async createOrders(min: number, max: number) {
@@ -29,15 +28,13 @@ export class OrdersPageMobile extends OrdersPageBase {
     }
 
     async addTipsToAllOrders() {
-        let orderTicketsCount = await this.page.locator('.order-ticket').count();
-        while (orderTicketsCount > 0) {
+        const orderTicketsCount = await this.page.locator('.order-ticket').count();
+        for (let i = 0; i < orderTicketsCount; i++) {
             const tip = OrdersPageBase.generateRandomTip();
-            const { lastTicket } = await this.ticketPage.getLastTicketAndOrder();
-            await this.ticketPage.editTip(lastTicket, tip);
-            orderTicketsCount = await this.page.locator('.order-ticket').count();
-            this.ticketPage.closeTicket();
+            const { nthTicket } = await this.ticketPage.getNthTicketAndOrder(i + 1);
+            await this.ticketPage.editTip(nthTicket, tip);
+            await this.ticketPage.closeTicket();
         }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     async editOrderTip(orderData: OrderData, tip_in_cents: number) {

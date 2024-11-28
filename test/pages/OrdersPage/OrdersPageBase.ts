@@ -154,7 +154,6 @@ export abstract class OrdersPageBase extends BasePage {
         const { origin, orderType, total_in_cents, paymentType } = OrdersPageBase.generateRandomOrder(isMobile);
 
         await this.clickAddOrder();
-        console.log({ origin, orderType, total_in_cents, paymentType });
 
         await this.chooseOrigin(origin.name);
         await this.chooseOrderType(orderType);
