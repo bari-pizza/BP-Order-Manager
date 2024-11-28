@@ -3,7 +3,7 @@ import { useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { LineChart } from '@mui/x-charts';
 import { MutableRefObject, useState } from 'react';
 import { Portal } from '@mui/base';
-import { SmartTextField } from '../../../rickcedlib/SmartTextField';
+import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 
 interface WindowSelectorProps {
     range: [number, number];

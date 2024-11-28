@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { formatCurrency, getRunningTotal } from '../../../utils';
 import { CashTransfer } from '../../../typesAndValidators';
 import { useBariPizzaContext, useManagerDashboardContext } from '../../../hooks/data/useContextData';
-import { InfoPopover } from '../../../rickcedlib/InfoPopover';
+import { InfoPopover } from '../../../rickcedlib/components/InfoPopover';
 
 interface SummaryStackProps {
     items: { label: string; value: number; details?: string }[];
@@ -75,7 +75,6 @@ const getToFromSpentReceived = (cashTransfer: CashTransfer, drawerID: string) =>
 };
 
 export const SummaryDetails = ({ items, transfers, drawerID, forSideBar }: SummaryDetailsProps) => {
-    console.log({ items, transfers, drawerID });
     const { drawers, drivers } = useManagerDashboardContext();
     const getDrawer = (drawerID: string | null) => {
         return (

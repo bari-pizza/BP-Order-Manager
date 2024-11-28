@@ -1,11 +1,11 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
-import { LabeledStack } from '../../../rickcedlib/LabeledStack';
+import { LabeledStack } from '../../../rickcedlib/components/LabeledStack';
 import { Payment, PaymentType, validators } from '../../../typesAndValidators';
 import { Button, ButtonGroup, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useEffect } from 'react';
 import { usePaymentCRUD } from '../../../api/payment';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
-import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
+import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { PaymentTypeIcon } from '../PaymentTypeIcon';
 import { formatCurrency } from '../../../utils';

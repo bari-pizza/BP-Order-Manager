@@ -3,7 +3,7 @@ import { OrderTicket, OrderTicketSkeleton } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { AnimatePresence, MotionProps } from 'framer-motion';
-import { MotionWrapper } from '../../rickcedlib/MotionWrapper';
+import { MotionWrapper } from '../../rickcedlib/components/MotionWrapper';
 
 const motionProps: MotionProps = {
     initial: { opacity: 0 },

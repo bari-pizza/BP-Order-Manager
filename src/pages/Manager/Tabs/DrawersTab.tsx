@@ -1,4 +1,4 @@
-import { Button, Stack, StackOwnProps } from '@mui/material';
+import { Stack, StackOwnProps } from '@mui/material';
 import { DrawerCard } from '../DrawerCard';
 import { useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { AddDriverCard } from '../AddDriverCard';
@@ -6,8 +6,9 @@ import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { DrawerSideBar, DrawerSideBarSkeleton } from '../SideBar/DrawerSideBar';
 import { ContextMenu } from '../../../components/Base/ContextMenu';
 import { MotionProps } from 'framer-motion';
-import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
+import { MotionWrapper } from '../../../rickcedlib/components/MotionWrapper';
 import { Suspense } from 'react';
+import { CloseBusinessDayCard } from '../CloseBusinessDayCard';
 
 const stackProps: Partial<StackOwnProps> = {
     direction: 'row',
@@ -21,17 +22,13 @@ const stackProps: Partial<StackOwnProps> = {
 
 export const DrawersTab = () => {
     const addDriverCardDialogProps = useDialogProps();
-    const { combinedDrawersAndDrivers, summaries } = useManagerDashboardContext();
+    const { combinedDrawersAndDrivers } = useManagerDashboardContext();
 
     // TODO: probably fix ContextMenu for Drawer
     const motionProps: MotionProps = {
         whileTap: { scale: 0.95 },
         whileHover: { scale: 1.05 },
     };
-
-    const dayCanBeClosed = combinedDrawersAndDrivers.every((drawer) => {
-        return summaries.byDrawerID(drawer.drawer_id)?.is_locked;
-    });
 
     return (
         <Stack
@@ -43,12 +40,11 @@ export const DrawersTab = () => {
             height="100%"
             flexWrap={'wrap'}>
             {combinedDrawersAndDrivers.map((drawer) => {
-                const isLocked = summaries.byDrawerID(drawer.drawer_id)?.is_locked;
                 return (
                     <ContextMenu openOnType="right-click" key={drawer.drawer_id}>
                         <ContextMenu.Base>
                             <MotionWrapper motionProps={motionProps} motionKey={drawer.drawer_id}>
-                                <DrawerCard drawer={drawer} isLocked={isLocked} />
+                                <DrawerCard drawer={drawer} />
                             </MotionWrapper>
                         </ContextMenu.Base>
                         <DrawerCard.contextMenu drawer={drawer} />
@@ -58,16 +54,10 @@ export const DrawersTab = () => {
             <MotionWrapper motionProps={motionProps} motionKey="add-driver-card">
                 <AddDriverCard {...addDriverCardDialogProps} />
             </MotionWrapper>
-            {dayCanBeClosed && (
-                <MotionWrapper motionProps={motionProps} motionKey="close-business-day">
-                    <Button>Close Business Day</Button>
-                    {/* 
-                        - should confirm that all drawers are locked
-                        - should confirm that all payments are locked
-                        - should confirm that all orders are locked and assigned to a drawer
-                    */}
-                </MotionWrapper>
-            )}
+            <MotionWrapper motionProps={motionProps} motionKey="close-business-day">
+                <CloseBusinessDayCard />
+            </MotionWrapper>
+
             <Suspense fallback={<DrawerSideBarSkeleton />}>
                 <DrawerSideBar />
             </Suspense>

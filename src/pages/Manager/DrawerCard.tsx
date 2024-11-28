@@ -21,15 +21,13 @@ interface DrawerCardProps {
     };
     props?: DrawerCardSlotProps;
     canOpen?: boolean;
-    isLocked?: boolean;
 }
 
-export const DrawerCard = ({ drawer, sx, props, isLocked, canOpen = true }: DrawerCardProps) => {
-    const {
-        orders,
-        // drivers
-        drawers,
-    } = useManagerDashboardContext();
+export const DrawerCard = ({ drawer, sx, props, canOpen = true }: DrawerCardProps) => {
+    const { orders, drawers, summaries } = useManagerDashboardContext();
+
+    const summary = summaries.byDrawerID(drawer.drawer_id);
+    const isLocked = summary?.is_locked || false;
 
     const badgeCount = orders.byDrawerID(drawer.drawer_id).length;
 

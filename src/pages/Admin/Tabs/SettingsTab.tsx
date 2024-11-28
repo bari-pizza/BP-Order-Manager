@@ -1,9 +1,9 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
-import { LabeledStack } from '../../../rickcedlib/LabeledStack';
-import { TextFieldWithMask } from '../../../rickcedlib/TextFieldWithMask';
+import { LabeledStack } from '../../../rickcedlib/components/LabeledStack';
+import { TextFieldWithMask } from '../../../rickcedlib/components/TextFieldWithMask';
 import { Autocomplete, Button } from '@mui/material';
-import { SmartTextField } from '../../../rickcedlib/SmartTextField';
+import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 
 type FormValues = {
     default_delivery_fee_in_cents: number;

@@ -41,7 +41,7 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
                     const rowID = Object.entries(oldData)[0];
                     const rowIDField = rowID[0] as keyof T;
                     const rowIDValue = rowID[1];
-                    console.log(`Change detected in ${tableName}:`, payload);
+                    // console.log(`Change detected in ${tableName}:`, payload);
                     setData((currentData) => {
                         switch (eventType) {
                             case 'INSERT':
@@ -111,7 +111,7 @@ export const useSubscribeToPayments = (orders: Order_Payment[], queryKey: string
                     const newPayment = payload.new as Payment;
                     const oldPayment = payload.old as Payment;
 
-                    console.log(`Change detected in Payment:`, payload);
+                    // console.log(`Change detected in Payment:`, payload);
 
                     setUpdatedOrders((currentOrders) => {
                         // probably improve this by searching for the order and then updating that order.payments

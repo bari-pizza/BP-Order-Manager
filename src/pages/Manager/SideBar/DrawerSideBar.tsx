@@ -5,7 +5,7 @@ import { DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../../components
 import { ContextMenu } from '../../../components/Base/ContextMenu';
 import { DrawerCard } from '../DrawerCard';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { MotionWrapper } from '../../../rickcedlib/MotionWrapper';
+import { MotionWrapper } from '../../../rickcedlib/components/MotionWrapper';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { BusinessDayDrawerSummary } from '../../../typesAndValidators';
@@ -19,8 +19,8 @@ import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { SummaryDetails, SummaryStack, ThirdPartySummary } from './SummaryStack';
 import { formatCurrency } from '../../../utils';
 import { CashTransferEditor } from './CashTransferEditor';
-import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
-import { SmartTextField } from '../../../rickcedlib/SmartTextField';
+import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
+import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 
 type FormValues = BusinessDayDrawerSummary;
 
@@ -334,13 +334,7 @@ export const DrawerSideBar = () => {
                         <ContextMenu openOnType="click">
                             <ContextMenu.Base>
                                 <MotionWrapper motionProps={motionProps} motionKey={currentDrawer.drawer_id}>
-                                    <DrawerCard
-                                        drawer={currentDrawer}
-                                        sx={sx}
-                                        props={props}
-                                        canOpen={false}
-                                        isLocked={summary?.is_locked}
-                                    />
+                                    <DrawerCard drawer={currentDrawer} sx={sx} props={props} canOpen={false} />
                                 </MotionWrapper>
                             </ContextMenu.Base>
                             <DrawerCard.contextMenu drawer={currentDrawer} />

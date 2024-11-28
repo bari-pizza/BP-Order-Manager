@@ -23,9 +23,9 @@ import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
-import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
+import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
 import { motion } from 'framer-motion';
-import { SmartTextField } from '../../../rickcedlib/SmartTextField';
+import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 
 const isValidDrawer = (
     drawer: Drawer | null,

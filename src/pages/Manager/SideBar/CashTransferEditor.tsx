@@ -1,5 +1,5 @@
 import { Controller, useForm } from 'react-hook-form';
-import { LabeledStack } from '../../../rickcedlib/LabeledStack';
+import { LabeledStack } from '../../../rickcedlib/components/LabeledStack';
 import {
     CashTransfer,
     CashTransferType,
@@ -10,7 +10,7 @@ import {
 } from '../../../typesAndValidators';
 import { Autocomplete, Button, ButtonGroup, IconButton, Stack, Typography } from '@mui/material';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
-import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
+import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { formatCurrency } from '../../../utils';
 import { useBariPizzaContext, useManagerDashboardContext } from '../../../hooks/data/useContextData';
@@ -23,8 +23,8 @@ import {
     Edit as EditIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { InfoPopover } from '../../../rickcedlib/InfoPopover';
-import { SmartTextField } from '../../../rickcedlib/SmartTextField';
+import { InfoPopover } from '../../../rickcedlib/components/InfoPopover';
+import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 
 interface CashTransferEditorBaseProps {
     drawerID: string;

@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { SxProps, useTheme } from '@mui/material/styles';
-import { AnimatedBadge } from '../../rickcedlib/AnimatedBadge';
+import { AnimatedBadge } from '../../rickcedlib/components/AnimatedBadge';
 import { usePrevious } from '@uidotdev/usehooks';
 import { DrawerAvatar, DrawerAvatarSkeleton } from './DrawerAvatar';
 

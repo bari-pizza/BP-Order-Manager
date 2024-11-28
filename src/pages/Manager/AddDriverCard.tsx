@@ -3,9 +3,9 @@ import { Driver_Drawer } from '../../typesAndValidators';
 import { DrawerCardBase } from '../../components/Base/DrawerCardBase';
 import { Dialog, Autocomplete, Button, DialogTitle, DialogContent, DialogActions, Stack, Divider } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import TextFieldWithMask from '../../rickcedlib/TextFieldWithMask';
+import TextFieldWithMask from '../../rickcedlib/components/TextFieldWithMask';
 import dayjs from 'dayjs';
-import { SmartTextField } from '../../rickcedlib/SmartTextField';
+import { SmartTextField } from '../../rickcedlib/components/SmartTextField';
 
 interface AddDriverCardProps {
     open: () => void;

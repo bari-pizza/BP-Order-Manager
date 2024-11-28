@@ -21,7 +21,7 @@ import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import { useMobile } from '../../hooks/data/useMobile';
-import { ScrollableWindow } from '../../rickcedlib/ScrollableWindow';
+import { ScrollableWindow } from '../../rickcedlib/components/ScrollableWindow';
 import { OrderTicket } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useLayoutContext } from '../../hooks/data/useContextData';
