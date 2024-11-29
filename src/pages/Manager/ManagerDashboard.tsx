@@ -51,7 +51,7 @@ function TabPanel(props: TabPanelProps) {
 type TabName = ManagerDashboardTabName;
 
 export const ManagerDashboard = () => {
-    const { orders, drawer, summaries, cashTransfers } = useOrdersDrawersTickets();
+    const { orders, drawer, summaries, cashTransfers, businessDay } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>(
@@ -107,6 +107,7 @@ export const ManagerDashboard = () => {
                 },
                 // all these properties should eventually come from useDrivers
                 combinedDrawersAndDrivers: drawers.concat(drivers.todays),
+                businessDay,
             }}>
             <Stack height="100vh" width="100%" sx={{ overflowY: 'hidden' }}>
                 <Stack m={2}>

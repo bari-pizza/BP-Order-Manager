@@ -29,7 +29,7 @@ export const DrawerSideBar = () => {
     const { open: openCashTransfers, close: closeCashTransfers, isOpen: isOpenCashTransfers } = useDialogProps();
     const [businessDate] = useBusinessDate();
     const { constants } = useBariPizzaContext();
-    const { orders, drawers, summaries, cashTransfers, drivers } = useManagerDashboardContext();
+    const { orders, drawers, summaries, cashTransfers, drivers, businessDay } = useManagerDashboardContext();
 
     const [editableCashTransferID, setEditableCashTransferID] = useState<string | null>(null);
 
@@ -354,7 +354,9 @@ export const DrawerSideBar = () => {
                             {currentDrawer.drawer_type === 'third_party' && (
                                 <ThirdPartySummary thirdPartySummary={thirdPartySummary} />
                             )}
-                            <Button onClick={handleReopenDrawerClick}>Reopen Drawer</Button>
+                            <Button onClick={handleReopenDrawerClick} disabled={businessDay.isLocked}>
+                                Reopen Drawer
+                            </Button>
                         </>
                     ) : (
                         <>

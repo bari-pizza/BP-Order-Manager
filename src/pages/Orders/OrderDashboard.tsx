@@ -37,7 +37,7 @@ export const OrderDashboard = () => {
 const OrderDashboardDesktop = () => {
     const { drivers } = useDrivers();
     const { open, close, isOpen } = useDialogProps();
-    const { ticket, drawer, orders, summaries } = useOrdersDrawersTickets();
+    const { ticket, drawer, orders, summaries, businessDay } = useOrdersDrawersTickets();
 
     return (
         <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers, summaries }}>
@@ -63,7 +63,7 @@ const OrderDashboardDesktop = () => {
                                         </Button>
                                     </>
                                 )}
-                                <Button variant="contained" onClick={open}>
+                                <Button variant="contained" onClick={open} disabled={businessDay.isLocked}>
                                     Add Order
                                 </Button>
                             </>
@@ -209,6 +209,8 @@ const OrderDashboardMobile = () => {
         );
     }
 
+    const isLocked = summary?.is_locked || false;
+
     return (
         <>
             <SpeedDial
@@ -219,12 +221,50 @@ const OrderDashboardMobile = () => {
                 onClose={handleClose}
                 onOpen={handleOpen}
                 open={openSpeedDial}>
-                <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
-                <SpeedDialAction
-                    icon={<ReceiptLongIcon />}
-                    tooltipTitle={'See Summary'}
-                    onClick={handleOpenSummaryClick}
-                />
+                {isLocked ? (
+                    <>
+                        <Dialog open={summaryIsOpen} onClose={closeSummary} fullWidth maxWidth="sm">
+                            <DialogTitle>{activeSummaryTab === 0 ? 'Closing Summary' : 'Take Home'}</DialogTitle>
+                            {activeSummaryTab === 0 ? (
+                                <SummaryStack items={closingItems} />
+                            ) : (
+                                <SummaryStack items={takeHomeItems} />
+                            )}
+                            <DialogActions>
+                                <ButtonGroup>
+                                    <Button
+                                        onClick={() => setActiveSummaryTab(0)}
+                                        variant={activeSummaryTab === 0 ? 'contained' : 'outlined'}>
+                                        Closing Summary
+                                    </Button>
+                                    <Button
+                                        onClick={() => setActiveSummaryTab(1)}
+                                        variant={activeSummaryTab === 1 ? 'contained' : 'outlined'}>
+                                        Take Home
+                                    </Button>
+                                </ButtonGroup>
+                            </DialogActions>
+                        </Dialog>
+                        <SpeedDialAction
+                            icon={<ReceiptLongIcon />}
+                            tooltipTitle={'See Summary'}
+                            onClick={handleOpenSummaryClick}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <Dialog open={editorIsOpen} onClose={closeEditor} fullWidth maxWidth="sm">
+                            <OrderEditor
+                                close={closeEditor}
+                                isOpen={editorIsOpen}
+                                forNewOrder
+                                isRepeat={isRepeat}
+                                driverDrawerID={driver.drawer_id}
+                            />
+                        </Dialog>
+                        <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
+                    </>
+                )}
             </SpeedDial>
             <Stack direction="column">
                 {orders.length ? (
@@ -252,37 +292,6 @@ const OrderDashboardMobile = () => {
                         style={{ width: '100%', height: '100%', maxHeight: '515px' }}
                     />
                 )}
-                <Dialog open={editorIsOpen} onClose={closeEditor} fullWidth maxWidth="sm">
-                    <OrderEditor
-                        close={closeEditor}
-                        isOpen={editorIsOpen}
-                        forNewOrder
-                        isRepeat={isRepeat}
-                        driverDrawerID={driver.drawer_id}
-                    />
-                </Dialog>
-                <Dialog open={summaryIsOpen} onClose={closeSummary} fullWidth maxWidth="sm">
-                    <DialogTitle>{activeSummaryTab === 0 ? 'Closing Summary' : 'Take Home'}</DialogTitle>
-                    {activeSummaryTab === 0 ? (
-                        <SummaryStack items={closingItems} />
-                    ) : (
-                        <SummaryStack items={takeHomeItems} />
-                    )}
-                    <DialogActions>
-                        <ButtonGroup>
-                            <Button
-                                onClick={() => setActiveSummaryTab(0)}
-                                variant={activeSummaryTab === 0 ? 'contained' : 'outlined'}>
-                                Closing Summary
-                            </Button>
-                            <Button
-                                onClick={() => setActiveSummaryTab(1)}
-                                variant={activeSummaryTab === 1 ? 'contained' : 'outlined'}>
-                                Take Home
-                            </Button>
-                        </ButtonGroup>
-                    </DialogActions>
-                </Dialog>
             </Stack>
         </>
     );

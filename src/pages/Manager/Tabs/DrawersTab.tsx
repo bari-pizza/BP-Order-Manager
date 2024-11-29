@@ -22,7 +22,7 @@ const stackProps: Partial<StackOwnProps> = {
 
 export const DrawersTab = () => {
     const addDriverCardDialogProps = useDialogProps();
-    const { combinedDrawersAndDrivers } = useManagerDashboardContext();
+    const { combinedDrawersAndDrivers, businessDay } = useManagerDashboardContext();
 
     // TODO: probably fix ContextMenu for Drawer
     const motionProps: MotionProps = {
@@ -51,9 +51,11 @@ export const DrawersTab = () => {
                     </ContextMenu>
                 );
             })}
-            <MotionWrapper motionProps={motionProps} motionKey="add-driver-card">
-                <AddDriverCard {...addDriverCardDialogProps} />
-            </MotionWrapper>
+            {!businessDay.isLocked && (
+                <MotionWrapper motionProps={motionProps} motionKey="add-driver-card">
+                    <AddDriverCard {...addDriverCardDialogProps} />
+                </MotionWrapper>
+            )}
             <MotionWrapper motionProps={motionProps} motionKey="close-business-day">
                 <CloseBusinessDayCard />
             </MotionWrapper>

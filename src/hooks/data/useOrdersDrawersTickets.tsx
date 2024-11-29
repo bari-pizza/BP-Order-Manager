@@ -13,6 +13,7 @@ import { useOrderAPI } from '../../api/order';
 import { RPCPayload } from '../../api/helpers';
 import { useSubscribeToTable, useSubscribeToPayments } from './useSubscribeToTable';
 import { useCashTransferAPI } from '../../api/cashTransfer';
+import { useBusinessDaySummaryAPI } from '../../api/businessDateSummary';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -24,6 +25,11 @@ const unassignedDrawer: Drawer = {
 export const useOrdersDrawersTickets = () => {
     // COMPLETED useSubscribeToTable
     const [businessDate] = useBusinessDate();
+    const { businessDaySummaryAPI } = useBusinessDaySummaryAPI({ businessDate });
+    const {
+        data: [businessDaySummary],
+    } = businessDaySummaryAPI.getToday;
+    const businessDayIsLocked = businessDaySummary?.is_locked || false;
 
     const { orderAPI } = useOrderAPI({ businessDate });
     const { data: initialOrderData } = orderAPI.getAll;
@@ -335,6 +341,11 @@ export const useOrdersDrawersTickets = () => {
             update: cashTransferAPI.update,
             forCurrentDrawer: getCashTransferByDrawerID(openDrawer?.drawer_id),
             byDrawerID: getCashTransferByDrawerID,
+        },
+        businessDay: {
+            isLocked: businessDayIsLocked,
+            reopen: businessDaySummaryAPI.open,
+            close: businessDaySummaryAPI.close,
         },
     };
 };

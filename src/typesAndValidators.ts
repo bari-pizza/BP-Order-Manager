@@ -21,6 +21,7 @@ export type BusinessDayDrawerSummary = Tables<'BusinessDayDrawer'>;
 export type CashTransfer = Tables<'CashTransfer'>;
 export type CashTransferType = Tables<'CashTransfer'>['transfer_type'];
 export type AppSetting = Tables<'AppSetting'>;
+export type BusinessDaySummary = Tables<'BusinessDaySummary'>;
 
 export type NewProfile = Omit<Profile, 'id' | 'created_at'>;
 export type NewDrawer = Omit<Drawer, 'drawer_id' | 'created_at'>;
