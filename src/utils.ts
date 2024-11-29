@@ -31,3 +31,8 @@ export const getRunningTotal = (values: number[]) => {
     }
     return runningTotal;
 };
+
+export const nonZeroModulo = (a: number, b: number) => {
+    const c = a % b;
+    return c === 0 ? b : c;
+};

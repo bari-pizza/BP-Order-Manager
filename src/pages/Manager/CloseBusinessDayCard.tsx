@@ -1,4 +1,14 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Stack, Typography } from '@mui/material';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    Stack,
+    Typography,
+    useTheme,
+} from '@mui/material';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
 import { useManagerDashboardContext } from '../../hooks/data/useContextData';
 import { Drawer, Driver_Drawer, Order } from '../../typesAndValidators';
@@ -7,6 +17,7 @@ import { formatCurrency } from '../../utils';
 export const CloseBusinessDayCard = () => {
     const { open, close, isOpen } = useDialogProps();
     const { combinedDrawersAndDrivers, summaries, orders, businessDay } = useManagerDashboardContext();
+    const theme = useTheme();
 
     const openDrawers: (Drawer | Driver_Drawer)[] = [];
     const openOrders: Order[] = [];
@@ -58,7 +69,18 @@ export const CloseBusinessDayCard = () => {
 
     return (
         <>
-            <Button onClick={open}>{businessDay.isLocked ? 'Show Business Day Summary' : 'Close Business Day'}</Button>
+            <Button
+                onClick={open}
+                variant="outlined"
+                sx={{
+                    height: '224px',
+                    width: '100%',
+                    '&:hover': {
+                        backgroundColor: theme.palette.primary.light,
+                    },
+                }}>
+                {businessDay.isLocked ? 'Show Business Day Summary' : 'Close Business Day'}
+            </Button>
             <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
                 <DialogTitle>{businessDay.isLocked ? 'Business Day Summary' : 'Close Business Day'}</DialogTitle>
                 <DialogContent>
