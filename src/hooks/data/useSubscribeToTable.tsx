@@ -9,13 +9,19 @@ type ShowToastOptions = ('insert' | 'update' | 'delete')[];
 export const useSubscribeToTable = <T extends Record<string, unknown>>({
     tableName,
     initialData,
+    primaryKeys,
+    queryKey,
     showToast = [],
 }: {
     tableName: string;
     initialData: T[];
+    primaryKeys: (keyof T)[];
+    queryKey: string[];
     showToast?: ShowToastOptions;
 }) => {
     const [data, setData] = useState<T[]>([]);
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (initialData) {
@@ -24,6 +30,10 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
     }, [initialData]);
 
     useEffect(() => {
+        const isMatch = (a: T, b: T) => {
+            return primaryKeys.every((key) => a[key] === b[key]);
+        };
+
         // Set up the subscription with a filter
         const channel = supaClient
             .channel(tableName + '-changes')
@@ -37,10 +47,10 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
                 (payload) => {
                     const eventType = payload.eventType;
                     const newData = payload.new as T;
-                    const oldData = payload.old;
-                    const rowID = Object.entries(oldData)[0];
-                    const rowIDField = rowID[0] as keyof T;
-                    const rowIDValue = rowID[1];
+                    const oldData = payload.old as T;
+                    // const rowID = Object.entries(oldData)[0];
+                    // const rowIDField = rowID[0] as keyof T;
+                    // const rowIDValue = rowID[1];
                     // console.log(`Change detected in ${tableName}:`, payload);
                     setData((currentData) => {
                         switch (eventType) {
@@ -54,23 +64,22 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
                                     toast.info(`A record was updated in ${tableName}s table`);
                                 }
                                 return currentData.map((item) => {
-                                    if (item[rowIDField] === rowIDValue) {
-                                        // loop through each field and update the value
-                                        Object.entries(newData).forEach(([key, value]) => {
-                                            (item as Record<string, unknown>)[key] = value;
-                                        });
+                                    if (isMatch(item, newData)) {
+                                        return newData;
                                     }
-                                    return item;
+                                    return newData;
                                 });
                             case 'DELETE':
                                 if (showToast.includes('delete')) {
                                     toast.info(`A record was deleted from ${tableName}s table`);
                                 }
-                                return currentData.filter((item) => item[rowIDField] !== rowIDValue);
+                                return currentData.filter((item) => !isMatch(item, oldData));
+                            // return currentData.filter((item) => item[rowIDField] !== rowIDValue);
                             default:
                                 return currentData;
                         }
                     });
+                    queryClient.invalidateQueries({ queryKey });
                 },
             )
             .subscribe();
@@ -79,7 +88,7 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
         return () => {
             channel.unsubscribe();
         };
-    }, [tableName, showToast]);
+    }, [tableName, showToast, primaryKeys, queryClient, queryKey]);
 
     return data;
 };
@@ -155,27 +164,6 @@ export const useSubscribeToPayments = (orders: Order_Payment[], queryKey: string
                             // If no changes are needed, return the original order
                             return order;
                         });
-
-                        //                         if (eventType === 'INSERT' || eventType === 'UPDATE') {
-                        //                             if (!order.payments) order.payments = [];
-                        //                             if (newPayment && newPayment.order_id === order.order_id) {
-                        //                                 // Insert or update the payment in the payments list
-                        //                                 const updatedPayments =
-                        //                                     eventType === 'INSERT'
-                        //                                         ? [...order.payments, newPayment]
-                        //                                         : order.payments.map((payment) =>
-                        //                                               payment.payment_id === newPayment.payment_id ? newPayment : payment,
-                        //                                           );
-                        //                                 order.payments = updatedPayments;
-                        //                             }
-                        //                         } else if (eventType === 'DELETE') {
-                        //                             // Remove deleted payment from the order's payments
-                        //                             order.payments = order.payments.filter(
-                        //                                 (payment) => payment.payment_id !== oldPayment.payment_id,
-                        //                             );
-                        //                         }
-                        //                         return order;
-                        //                     });
                     });
 
                     queryClient.invalidateQueries({ queryKey });
@@ -186,7 +174,7 @@ export const useSubscribeToPayments = (orders: Order_Payment[], queryKey: string
         return () => {
             paymentChannel.unsubscribe();
         };
-    }, [orders]);
+    }, [orders, queryKey, queryClient]);
 
     return updatedOrders;
 };

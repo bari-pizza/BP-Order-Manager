@@ -51,26 +51,26 @@ test('should add drivers to the day', async () => {
 });
 
 test('should add mock orders to the day', async () => {
-    test.setTimeout(1000 * 60 * 5);
+    test.setTimeout(1000 * 60 * 10);
     await ordersPageDesktop.navigateToOrders();
-    await ordersPageDesktop.createOrders(40, 60);
+    await ordersPageDesktop.createOrders(60, 80);
 });
 
 test('should allow drivers to add orders', async () => {
-    test.setTimeout(1000 * 60 * 5);
+    test.setTimeout(1000 * 60 * 10);
     await ordersPageMobile.navigateToOrders();
     await ordersPageMobile.createOrders(8, 15);
 });
 
 test('should add orders to random drawers', async () => {
-    test.setTimeout(1000 * 60 * 5);
+    test.setTimeout(1000 * 60 * 10);
     await ordersPageDesktop.navigateToOrders();
     await ordersPageDesktop.assignAllOrdersToRandomDrawers();
     // assert that there are no unassigned orders
 });
 
 test('should allow drivers to update orders (tips)', async () => {
-    test.setTimeout(1000 * 60 * 5);
+    test.setTimeout(1000 * 60 * 10);
     await ordersPageMobile.navigateToOrders();
     await ordersPageMobile.addTipsToAllOrders();
 });
@@ -85,8 +85,9 @@ test('should close out all drawers', async () => {
 
 test('should close out the day', async () => {
     // assert that close day button appears
-    // click it
-    // dialog should open
+    await managerPage.navigateToManager();
+    await managerPage.navigateToTab('Drawers');
+    await managerPage.closeBusinessDay();
     // will ask to confirm if all is good
     // otherwise will show issues
 });

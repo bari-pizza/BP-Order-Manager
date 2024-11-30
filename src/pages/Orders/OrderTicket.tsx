@@ -209,7 +209,7 @@ const OrderTicketDesktop = ({ order, toggleSelected, selected }: OrderTicketProp
                 disableRipple>
                 <Stack direction="column" width="100%" justifyContent="space-between" height="100%">
                     <Stack direction="row" spacing={1} pl={1} pr={1} justifyContent="space-between">
-                        {payments.length > 0 ? (
+                        {payments?.length > 0 ? (
                             <>
                                 <PaymentTypeIcon paymentType={initialPayment?.payment_type} />
                                 <Divider orientation="vertical" />

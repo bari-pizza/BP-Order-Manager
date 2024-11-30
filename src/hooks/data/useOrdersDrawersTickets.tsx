@@ -1,6 +1,7 @@
 import { useRef, useState, RefObject } from 'react';
 import {
     BusinessDayDrawerSummary,
+    BusinessDaySummary,
     type CashTransfer,
     type Drawer,
     type Driver_Drawer,
@@ -14,6 +15,7 @@ import { RPCPayload } from '../../api/helpers';
 import { useSubscribeToTable, useSubscribeToPayments } from './useSubscribeToTable';
 import { useCashTransferAPI } from '../../api/cashTransfer';
 import { useBusinessDaySummaryAPI } from '../../api/businessDateSummary';
+import { useDocumentTitle } from 'usehooks-ts';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -26,16 +28,25 @@ export const useOrdersDrawersTickets = () => {
     // COMPLETED useSubscribeToTable
     const [businessDate] = useBusinessDate();
     const { businessDaySummaryAPI } = useBusinessDaySummaryAPI({ businessDate });
-    const {
-        data: [businessDaySummary],
-    } = businessDaySummaryAPI.getToday;
-    const businessDayIsLocked = businessDaySummary?.is_locked || false;
+    const { data: initialBusinessDaySummary } = businessDaySummaryAPI.getToday;
+    const businessDaySummary = useSubscribeToTable<BusinessDaySummary>({
+        tableName: 'BusinessDaySummary',
+        initialData: initialBusinessDaySummary,
+        primaryKeys: ['business_date'],
+        queryKey: ['businessDaySummary', businessDate.format('YYYY-MM-DD')],
+    });
+
+    const businessDayIsLocked = businessDaySummary[0]?.is_locked || false;
+
+    useDocumentTitle(`Order Manager [${businessDayIsLocked ? 'CLOSED' : 'OPEN'}]`);
 
     const { orderAPI } = useOrderAPI({ businessDate });
     const { data: initialOrderData } = orderAPI.getAll;
     const orderPayments = useSubscribeToTable<Order_Payment>({
         tableName: 'Order',
         initialData: initialOrderData,
+        primaryKeys: ['order_id'],
+        queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
     });
     const allOrders = useSubscribeToPayments(orderPayments, ['orders', businessDate.format('YYYY-MM-DD')]);
 
@@ -46,6 +57,8 @@ export const useOrdersDrawersTickets = () => {
     const summaries = useSubscribeToTable<BusinessDayDrawerSummary>({
         tableName: 'BusinessDayDrawer',
         initialData: initialBusinessDayDrawerData,
+        primaryKeys: ['drawer_id', 'business_date'],
+        queryKey: ['businessDayDrawers', businessDate.format('YYYY-MM-DD')],
     });
 
     const { cashTransferAPI } = useCashTransferAPI({ businessDate });
@@ -53,6 +66,8 @@ export const useOrdersDrawersTickets = () => {
     const cashTransfers = useSubscribeToTable<CashTransfer>({
         tableName: 'CashTransfer',
         initialData: initialCashTransferData,
+        primaryKeys: ['cash_transfer_id'],
+        queryKey: ['cashTransfers', businessDate.format('YYYY-MM-DD')],
     });
 
     const allPayments = allOrders.flatMap((order) => order.payments);

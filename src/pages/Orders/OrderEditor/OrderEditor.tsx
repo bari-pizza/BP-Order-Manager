@@ -498,7 +498,7 @@ const OrderEditorDialog = ({
     validPaymentTypes: { value: PaymentType; label: string }[];
 }) => {
     const [editablePaymentID, setEditablePaymentID] = useState<string | null>(null);
-    const payments = order.payments?.sort((a, b) => b.created_at.localeCompare(a.created_at));
+    const payments = order.payments?.sort((a, b) => b.created_at.localeCompare(a.created_at)) || [];
 
     const paymentsTotalInCents = payments.reduce((total, payment) => total + payment.amount_in_cents, 0);
     const missingPaymentInCents = order.total_in_cents - paymentsTotalInCents;

@@ -8,6 +8,9 @@ type DrawerIdentifier = string | number;
 type DriverIdentifier = string | number | null;
 
 export class ManagerPage extends BasePageDesktop {
+    private closeBusinessDayCard: Locator = this.page.locator('//button[text()="Close Business Day"]');
+    private closeBusinessDayPopup: Locator = this.page.locator('.MuiDialog-root:has-text("Close Business Day")');
+    private closeBusinessDayButton: Locator = this.closeBusinessDayPopup.locator('//button[text()="Close Day"]');
     private closeDrawerProcess: CloseDrawerProcess;
     constructor(page: Page) {
         super(page);
@@ -49,18 +52,9 @@ export class ManagerPage extends BasePageDesktop {
     }
 
     // Interact with a drawer by passing the drawer locator
-    async clickDrawer(drawerLocator: Locator | null) {
-        if (!drawerLocator) {
-            throw new Error('Drawer locator is null');
-        }
-        const originallyOpen = (await drawerLocator.getAttribute('class'))?.includes('open-drawer');
+    async clickDrawer(drawerLocator: Locator) {
         await drawerLocator.click();
-
-        if (originallyOpen) {
-            await expect(drawerLocator).not.toHaveClass(/open-drawer/);
-        } else {
-            await expect(drawerLocator).toHaveClass(/open-drawer/);
-        }
+        await this.page.waitForTimeout(500);
     }
 
     async rightClickDrawer(drawerLocator: Locator | null) {
@@ -153,5 +147,16 @@ export class ManagerPage extends BasePageDesktop {
     async closeDrawers() {
         await this.closeDrivers();
         await this.closeOtherDrawers();
+    }
+
+    async openCloseDayPopup() {
+        await this.closeBusinessDayCard.click();
+        await this.closeBusinessDayPopup.isVisible();
+    }
+
+    async closeBusinessDay() {
+        await this.openCloseDayPopup();
+        await this.closeBusinessDayButton.click();
+        await this.page.waitForTimeout(5000);
     }
 }

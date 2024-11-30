@@ -71,7 +71,6 @@ const subscribeToOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
 
 const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
     const formattedDate = businessDate.format('YYYY-MM-DD');
-    console.log('Formatted Business Date:', formattedDate);
     const { data, error } = await supaClient
         .from('Order')
         .select(

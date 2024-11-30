@@ -27,6 +27,8 @@ export const useDrivers = () => {
     const businessDayDrivers = useSubscribeToTable<BusinessDayDriver>({
         tableName: 'BusinessDayDriver',
         initialData: initialBusinessDayDrivers,
+        primaryKeys: ['business_date', 'drawer_id'],
+        queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')],
     });
 
     const todaysDrivers = businessDayDrivers

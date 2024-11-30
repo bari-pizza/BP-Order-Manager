@@ -51,6 +51,7 @@ export class OrdersPageDesktop extends OrdersPageBase {
         }
 
         await drawerLocator.click({ timeout: 5000, delay: 100 });
+        await this.page.waitForTimeout(1000);
     }
 
     async rightClickDrawer(drawerLocator: Locator | null) {

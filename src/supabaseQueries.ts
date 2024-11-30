@@ -176,12 +176,8 @@ export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
 };
 
 export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
-    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
-    if (validateError) return [] as BusinessDayDriver[];
-    const { data, error } = await supaClient
-        .from('BusinessDayDriver')
-        .select('*')
-        .eq('business_date', `${year}-${month}-${day}`);
+    const formattedDate = businessDate.format('YYYY-MM-DD');
+    const { data, error } = await supaClient.from('BusinessDayDriver').select('*').eq('business_date', formattedDate);
 
     return handleResponse<BusinessDayDriver>({ data, error });
 };
