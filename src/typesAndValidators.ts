@@ -35,8 +35,15 @@ export type OrderWithFullDetails = Order_Payment & {
     origin: OrderOrigin;
 };
 
+export type PaymentWithFullDetails = Payment & {
+    drawer?: Drawer;
+    driver?: Driver_Drawer;
+    order: Order_Payment;
+    origin: OrderOrigin;
+};
+
 export type AdminDashboardTabName = 'employees' | 'origins' | 'orders' | 'settings';
-export type ManagerDashboardTabName = 'sales' | 'drawers' | 'orders' | 'settings';
+export type ManagerDashboardTabName = 'sales' | 'drawers' | 'orders' | 'cards' | 'settings';
 export type LocalStorageField = {
     adminDashboardTabName: AdminDashboardTabName;
     managerDashboardTabName: ManagerDashboardTabName;

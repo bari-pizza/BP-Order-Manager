@@ -53,7 +53,7 @@ export abstract class OrdersPageBase extends BasePage {
                 origin: origin,
                 orderType: 'delivery',
                 paymentType: faker.helpers.arrayElement(orderOriginsWithTypes[randomOriginKey].validPayments),
-                total_in_cents: OrdersPageBase.generateRightSkewedNumber(1400, 12000, 1800),
+                total_in_cents: OrdersPageBase.generateRightSkewedNumber(1463, 12000, 1800),
             };
 
             return orderData;

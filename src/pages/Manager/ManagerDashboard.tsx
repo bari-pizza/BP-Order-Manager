@@ -9,6 +9,7 @@ import { ManagerDashboardTabName } from '../../typesAndValidators';
 import { DrawersTab } from './Tabs/DrawersTab';
 import { SalesTab } from './Tabs/SalesTab';
 import { OrdersTab } from './Tabs/OrdersTab';
+import { CardsTab } from './Tabs/CardsTab';
 
 /*    TODO: About Today
         Sales
@@ -123,6 +124,7 @@ export const ManagerDashboard = () => {
                         <Tab value="sales" label="Sales" icon={<SalesIcon />} iconPosition="start" />
                         <Tab value="drawers" label="Drawers" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
+                        <Tab value="cards" label="Credit Cards" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />
                     </Tabs>
                 </Box>
@@ -134,6 +136,9 @@ export const ManagerDashboard = () => {
                 </TabPanel>
                 <TabPanel tabName="orders" value={tabName}>
                     <OrdersTab />
+                </TabPanel>
+                <TabPanel tabName="cards" value={tabName}>
+                    <CardsTab />
                 </TabPanel>
                 <TabPanel tabName="settings" value={tabName}>
                     Settings go here!
