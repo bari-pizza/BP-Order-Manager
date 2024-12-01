@@ -1,4 +1,4 @@
-import { Stack, Tooltip, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     GridColDef,
@@ -41,43 +41,41 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
 
     const columns: GridColDef<OrderWithFullDetails>[] = [
         {
-            field: 'number/name',
-            headerName: 'Order #',
-            width: 175,
-            renderCell: (params) => {
-                const { row } = params;
-                const { order_number, order_name, origin, order_type } = row;
-                return (
-                    <Tooltip title={`${origin.name} ${order_type} ${order_number ?? order_name}`}>
-                        <Stack direction="row" alignItems="center" height="100%" spacing={1}>
-                            <OriginLogo orderOrigin={origin} size="medium" variant="border" />
-                            <OrderTypeIcon orderType={order_type} />
-                            <span>{order_number ?? order_name}</span>
-                        </Stack>
-                    </Tooltip>
-                );
-            },
-        },
-        {
             field: 'drawer',
             headerName: 'Drawer',
-            width: 150,
+            flex: 1,
             renderCell: (params) => {
                 const { row } = params;
                 const { drawer, driver } = row;
                 return (
-                    <Tooltip title={driver?.name ?? drawer?.name ?? 'Unassigned'}>
-                        <Stack direction="row" alignItems="center" height="100%" spacing={1}>
-                            <DrawerAvatar drawer={driver ?? drawer} variant="border" />
-                        </Stack>
-                    </Tooltip>
+                    <Stack direction="row" alignItems="center" height="100%" spacing={1}>
+                        <DrawerAvatar drawer={driver ?? drawer} variant="border" />
+                        <Typography>{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
+                    </Stack>
                 );
             },
         },
         {
+            field: 'number/name',
+            headerName: 'Order #',
+            flex: 1,
+            renderCell: (params) => {
+                const { row } = params;
+                const { order_number, order_name, origin, order_type } = row;
+                return (
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2}>
+                        <OriginLogo orderOrigin={origin} size="medium" variant="border" />
+                        <OrderTypeIcon orderType={order_type} />
+                        <span>{order_number ?? order_name}</span>
+                    </Stack>
+                );
+            },
+        },
+
+        {
             field: 'total_in_cents',
             headerName: 'Total',
-            width: 150,
+            flex: 1,
             renderCell: (params) => {
                 const { row } = params;
                 const { total_in_cents, payments } = row;
@@ -86,56 +84,19 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 return (
                     <Stack direction="row" alignItems="center" height="100%" spacing={1}>
                         <Typography variant="body1" color={isPaid ? 'primary' : 'error'}>
-                            {`$${(total_in_cents / 100).toFixed(2)}`}
+                            {formatCurrency(total_in_cents)}
                         </Typography>
                     </Stack>
                 );
             },
         },
-        {
-            field: 'is_locked',
-            headerName: 'Locked',
-            width: 125,
-            renderCell: () => {
-                return 'No';
-            },
-        },
-        {
-            field: 'non-cash-tips',
-            headerName: 'Tips',
-            width: 125,
-            valueGetter: (value, row) => {
-                const { payments } = row;
-                const nonCashTips = payments.reduce((acc: number, curr) => {
-                    if (curr.payment_type !== 'cash') {
-                        return acc + curr.tip_in_cents;
-                    }
-                    return acc;
-                }, 0);
-                return nonCashTips;
-            },
-            valueFormatter: (value) => formatCurrency(value as number),
-            // renderCell: (params) => {
-            //     const { row } = params;
-            //     const { payments } = row;
-            //     const nonCashTips = payments.reduce((acc: number, curr) => {
-            //         if (curr.payment_type !== 'cash') {
-            //             return acc + curr.tip_in_cents;
-            //         }
-            //         return acc;
-            //     }, 0);
-            //     return `$${(nonCashTips / 100).toFixed(2)}`;
-            // },
-        },
     ];
     return (
         <Stack direction="column">
             <DataGrid
-                // sx={{
-                //     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
-                // }}
                 rows={rows}
                 columns={columns}
+                autoHeight
                 editMode="row"
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}

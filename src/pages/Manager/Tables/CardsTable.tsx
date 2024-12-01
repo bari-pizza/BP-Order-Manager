@@ -1,4 +1,4 @@
-import { Stack, Tooltip, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     GridColDef,
@@ -39,9 +39,32 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
 
     const columns: GridColDef<PaymentWithFullDetails>[] = [
         {
+            field: 'drawer',
+            headerName: 'Drawer',
+            flex: 1,
+            valueGetter: (value, { drawer, driver }) => driver?.name ?? drawer?.name ?? 'Unassigned',
+            renderCell: (params) => {
+                const { row } = params;
+                const { drawer, driver } = row;
+                return (
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2}>
+                        <DrawerAvatar drawer={driver ?? drawer} variant="border" />
+                        <Typography>{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
+                    </Stack>
+                );
+            },
+        },
+        {
             field: 'number/name',
             headerName: 'Order #',
-            width: 175,
+            flex: 1,
+            valueGetter: (value, row) => {
+                const orderNumber = row.order?.order_number;
+                const orderName = row.order?.order_name;
+                return orderNumber
+                    ? orderNumber.toString().padStart(3, '0') // Pad with leading zeros
+                    : orderName || ''; // Use order_name if order_number is not available
+            },
             renderCell: (params) => {
                 const { row } = params;
                 const {
@@ -49,43 +72,25 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
                     origin,
                 } = row;
                 return (
-                    <Tooltip title={`${origin.name} ${order_type} ${order_number ?? order_name}`}>
-                        <Stack direction="row" alignItems="center" height="100%" spacing={1}>
-                            <OriginLogo orderOrigin={origin} size="medium" variant="border" />
-                            <OrderTypeIcon orderType={order_type} />
-                            <span>{order_number ?? order_name}</span>
-                        </Stack>
-                    </Tooltip>
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2}>
+                        <OriginLogo orderOrigin={origin} size="medium" variant="border" />
+                        <OrderTypeIcon orderType={order_type} />
+                        <span>{order_number ?? order_name}</span>
+                    </Stack>
                 );
             },
         },
-        {
-            field: 'drawer',
-            headerName: 'Drawer',
-            width: 250,
-            renderCell: (params) => {
-                const { row } = params;
-                const { drawer, driver } = row;
-                return (
-                    <Tooltip title={driver?.name ?? drawer?.name ?? 'Unassigned'}>
-                        <Stack direction="row" alignItems="center" height="100%" spacing={1}>
-                            <DrawerAvatar drawer={driver ?? drawer} variant="border" />
-                            <Typography>{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
-                        </Stack>
-                    </Tooltip>
-                );
-            },
-        },
+
         {
             field: 'amount_in_cents',
             headerName: 'Total',
-            width: 150,
+            flex: 1,
             valueFormatter: (value) => formatCurrency(value as number),
         },
         {
             field: 'tip_in_cents',
             headerName: 'Tips',
-            width: 125,
+            flex: 1,
             valueFormatter: (value) => formatCurrency(value as number),
         },
     ];
@@ -94,6 +99,7 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
             <DataGrid
                 rows={rows}
                 columns={columns}
+                autoHeight
                 editMode="row"
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}

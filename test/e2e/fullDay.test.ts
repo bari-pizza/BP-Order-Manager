@@ -88,6 +88,4 @@ test('should close out the day', async () => {
     await managerPage.navigateToManager();
     await managerPage.navigateToTab('Drawers');
     await managerPage.closeBusinessDay();
-    // will ask to confirm if all is good
-    // otherwise will show issues
 });

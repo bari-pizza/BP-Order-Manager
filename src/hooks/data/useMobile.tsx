@@ -96,7 +96,10 @@ export const useMobile = () => {
             - order #/name
             - total
 
-        [ ] request to delete orders
+        [ ] - request to delete orders
+        [ ] - info telling manager to delete order they must first:
+                - delete all payments
+                - unassign from any drawers
 
         [x] add payments
             - payment type
