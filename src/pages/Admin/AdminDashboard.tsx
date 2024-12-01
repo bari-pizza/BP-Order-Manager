@@ -53,7 +53,7 @@ function TabPanel(props: TabPanelProps) {
 type TabName = AdminDashboardTabName;
 
 export const AdminDashboard = () => {
-    const { orders, drawer, summaries, cashTransfers } = useOrdersDrawersTickets();
+    const { orders, drawer, summaries, cashTransfers, businessDay } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'adminDashboardTabName'>(
@@ -86,6 +86,7 @@ export const AdminDashboard = () => {
     return (
         <AdminDashboardContext.Provider
             value={{
+                businessDay,
                 cashTransfers,
                 orders,
                 drawers: {
@@ -109,7 +110,6 @@ export const AdminDashboard = () => {
                     remove: drivers.remove, // some supabase mutation
                     handleClick: drivers.handleClick,
                 },
-                // all these properties should eventually come from useDrivers
             }}>
             <Stack height="100vh" width="100%">
                 <Stack m={2}>

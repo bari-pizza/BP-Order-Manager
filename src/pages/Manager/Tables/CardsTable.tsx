@@ -42,7 +42,7 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
             field: 'drawer',
             headerName: 'Drawer',
             flex: 1,
-            valueGetter: (value, { drawer, driver }) => driver?.name ?? drawer?.name ?? 'Unassigned',
+            valueGetter: (_value, { drawer, driver }) => driver?.name ?? drawer?.name ?? 'Unassigned',
             renderCell: (params) => {
                 const { row } = params;
                 const { drawer, driver } = row;
@@ -58,7 +58,7 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
             field: 'number/name',
             headerName: 'Order #',
             flex: 1,
-            valueGetter: (value, row) => {
+            valueGetter: (_value, row) => {
                 const orderNumber = row.order?.order_number;
                 const orderName = row.order?.order_name;
                 return orderNumber
