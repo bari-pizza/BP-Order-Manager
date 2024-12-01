@@ -1,6 +1,7 @@
 import { deepmerge } from '@mui/utils';
 import {
     AvatarProps,
+    Badge,
     BadgeProps,
     Button,
     ButtonProps,
@@ -13,8 +14,6 @@ import {
 } from '@mui/material';
 import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { SxProps, useTheme } from '@mui/material/styles';
-import { AnimatedBadge } from '../../rickcedlib/AnimatedBadge';
-import { usePrevious } from '@uidotdev/usehooks';
 import { DrawerAvatar, DrawerAvatarSkeleton } from './DrawerAvatar';
 
 export interface DrawerCardSlotProps {
@@ -58,7 +57,6 @@ export const DrawerCardBase = ({
     isLocked,
 }: DrawerCardBaseProps) => {
     const theme = useTheme();
-    const previousBadgeCount = usePrevious(badgeCount as number);
 
     const baseSX: DrawerCardOverrideSX = {
         avatar: {
@@ -123,7 +121,12 @@ export const DrawerCardBase = ({
 
     return (
         <Button
-            className={(isOpen ? 'open-drawer' : '') + ' lottie-icon-container'}
+            className={
+                (isOpen ? 'open-drawer' : '') +
+                ' lottie-icon-container drawer-card-button ' +
+                'drawer-card-button-' +
+                (drawer.drawer_id === 'add-driver' ? 'add-driver' : drawer.drawer_type)
+            }
             onClick={handleClick}
             variant="outlined"
             color="primary"
@@ -136,8 +139,9 @@ export const DrawerCardBase = ({
                 gap={1}
                 justifyContent="space-between"
                 {...props?.buttonStack}>
-                <AnimatedBadge
-                    badgeCount={{ start: previousBadgeCount, end: badgeCount }}
+                <Badge
+                    // badgeCount={{ start: previousBadgeCount, end: badgeCount }}
+                    badgeContent={badgeCount}
                     sx={overrideSX.badge}
                     overlap="circular"
                     {...props?.badge}
@@ -149,7 +153,7 @@ export const DrawerCardBase = ({
                         props={props}
                         isLocked={isLocked}
                     />
-                </AnimatedBadge>
+                </Badge>
                 <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
                     <Typography pt={1} variant="body2" {...props?.nameTypography}>
                         {drawerName}
@@ -226,13 +230,9 @@ export const DrawerCardBaseSkeleton = ({ sx, props }: { sx?: DrawerCardOverrideS
                 gap={1}
                 justifyContent="space-between"
                 {...props?.buttonStack}>
-                <AnimatedBadge
-                    badgeCount={{ start: 0, end: 0 }}
-                    sx={overrideSX.badge}
-                    overlap="circular"
-                    {...props?.badge}>
+                <Badge sx={overrideSX.badge} overlap="circular" {...props?.badge}>
                     <DrawerAvatarSkeleton size="xlarge" />
-                </AnimatedBadge>
+                </Badge>
 
                 <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
                     <Skeleton>

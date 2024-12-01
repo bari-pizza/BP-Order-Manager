@@ -1,0 +1,136 @@
+import { useBusinessDate } from './useBusinessDate';
+import { useBariPizzaContext, useLayoutContext, useUserContext } from './useContextData';
+import { useDrivers } from './useDrivers';
+// import { useRef } from 'react';
+import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
+
+/* TODO: Julia
+
+    [ ] add something at the top of the screen (Business Date!)
+    [ ] fix scrolling in orders area
+
+*/
+
+export const useMobile = () => {
+    const [businessDate] = useBusinessDate();
+    const { isMobile } = useLayoutContext();
+    const { profile } = useUserContext();
+    const {
+        drivers: { todays: todaysDrivers },
+    } = useDrivers();
+    const { drivers, drawers, origins, constants } = useBariPizzaContext();
+    const { orders, ticket, summaries, cashTransfers } = useOrdersDrawersTickets();
+    // const toastRef = useRef<{
+    //     [toastID: string]: ({ data, errors, forEachError }: HandleOutcomeProps) => void;
+    // }>({});
+
+    if (!isMobile) {
+        return {
+            businessDate,
+            profile,
+            driver: undefined,
+            drawers: drawers, // non-driver drawers
+            origins: origins,
+            constants,
+            orders: [],
+            isRepeat: () => false,
+            ticket,
+            driverIsWorkingToday: false,
+            summary: undefined,
+            cashTransfers: [],
+        };
+    }
+
+    const driver = drivers.find((driver) => driver.driver.id === profile?.id);
+
+    if (!driver)
+        return {
+            businessDate,
+            profile,
+            driver,
+            drawers: drawers, // non-driver drawers
+            origins: origins,
+            constants: constants,
+            orders: [],
+            isRepeat: () => false,
+            ticket,
+            driverIsWorkingToday: false,
+            summary: undefined,
+            cashTransfers: [],
+        };
+
+    const driverIsWorkingToday = todaysDrivers.some((driver) => driver.drawer_id === driver.drawer_id);
+
+    if (!driverIsWorkingToday) {
+        return {
+            businessDate,
+            profile,
+            driver,
+            drawers: drawers, // non-driver drawers
+            origins: origins,
+            constants: constants,
+            orders: [],
+            isRepeat: () => false,
+            ticket,
+            driverIsWorkingToday,
+            summary: undefined,
+            cashTransfers: [],
+        };
+    }
+
+    const driversOrders = orders.byDrawerID(driver.drawer_id);
+    const driverCashTransfers = cashTransfers.byDrawerID(driver.drawer_id);
+
+    /* TODO: drivers need to be able to:
+
+        [x] add orders
+            - origin
+            - drawer (self)
+            - order type (delivery)
+            - order #/name
+            - delivery fee (default)
+            - total
+
+        [x] update orders
+            - origin
+            - order #/name
+            - total
+
+        [ ] - request to delete orders
+        [ ] - info telling manager to delete order they must first:
+                - delete all payments
+                - unassign from any drawers
+
+        [x] add payments
+            - payment type
+            - amount
+            - tip
+
+        [x] update payments
+            - payment type
+            - amount
+            - tip
+
+        [x] delete payments
+
+
+
+        [x] access end of day payment slip
+
+    */
+
+    return {
+        businessDate,
+        profile,
+        driver,
+        drawers: drawers, // non-driver drawers
+        origins: origins,
+        constants: constants,
+        orders: driversOrders,
+        isRepeat: orders.isRepeat,
+        ticket,
+        driverIsWorkingToday,
+        summary: summaries.byDrawerID(driver.drawer_id),
+        cashTransfers: driverCashTransfers,
+    };
+};

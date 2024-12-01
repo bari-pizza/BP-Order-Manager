@@ -18,11 +18,16 @@ export type Payment = Tables<'Payment'>;
 export type Order_Payment = Order & { payments: Payment[] };
 export type PaymentType = Tables<'Payment'>['payment_type'];
 export type BusinessDayDrawerSummary = Tables<'BusinessDayDrawer'>;
+export type CashTransfer = Tables<'CashTransfer'>;
+export type CashTransferType = Tables<'CashTransfer'>['transfer_type'];
+export type AppSetting = Tables<'AppSetting'>;
+export type BusinessDaySummary = Tables<'BusinessDaySummary'>;
 
 export type NewProfile = Omit<Profile, 'id' | 'created_at'>;
 export type NewDrawer = Omit<Drawer, 'drawer_id' | 'created_at'>;
 export type NewOrder = Omit<Order, 'order_id' | 'created_at'>;
 export type NewPayment = Omit<Payment, 'payment_id' | 'created_at'>;
+export type NewCashTransfer = Omit<CashTransfer, 'cash_transfer_id' | 'created_at'>;
 
 export type OrderWithFullDetails = Order_Payment & {
     drawer?: Drawer;
@@ -30,8 +35,15 @@ export type OrderWithFullDetails = Order_Payment & {
     origin: OrderOrigin;
 };
 
+export type PaymentWithFullDetails = Payment & {
+    drawer?: Drawer;
+    driver?: Driver_Drawer;
+    order: Order_Payment;
+    origin: OrderOrigin;
+};
+
 export type AdminDashboardTabName = 'employees' | 'origins' | 'orders' | 'settings';
-export type ManagerDashboardTabName = 'sales' | 'drawers' | 'orders' | 'settings';
+export type ManagerDashboardTabName = 'sales' | 'drawers' | 'orders' | 'cards' | 'settings';
 export type LocalStorageField = {
     adminDashboardTabName: AdminDashboardTabName;
     managerDashboardTabName: ManagerDashboardTabName;

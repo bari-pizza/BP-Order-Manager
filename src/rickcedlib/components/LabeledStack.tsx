@@ -7,11 +7,13 @@ interface LabeledStackProps extends StackProps {
     labelProps?: TypographyProps;
     alignLabel?: 'left' | 'center' | 'right';
     color?: string;
+    fixed?: boolean;
 }
 
 export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
-    ({ children, label, labelProps, alignLabel = 'center', color, ...props }, ref) => {
+    ({ children, label, labelProps, alignLabel = 'center', color, fixed, ...props }, ref) => {
         const theme = useTheme();
+        color = color || theme.palette.primary.main;
 
         const { sx: labelSx, ...labelPropsRest } = labelProps || {};
         const { sx: stackSx, ...stackPropsRest } = props || {};
@@ -24,7 +26,7 @@ export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
             transform: '',
             padding: '0 8px',
             backgroundColor: theme.palette.background.paper,
-            color: color || theme.palette.primary.main,
+            color,
             fontSize: '0.875rem', // Adjust to your needs
             fontWeight: 500,
             textTransform: 'capitalize', // Capitalizes the label by default
@@ -40,13 +42,39 @@ export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
             typographySx.transform = 'translateX(-50%)';
         }
 
+        if (fixed) {
+            return (
+                <Stack
+                    className="labeled-stack"
+                    {...stackPropsRest}
+                    ref={ref}
+                    sx={{
+                        position: 'relative',
+                        border: `2px solid ${color}`,
+                        borderRadius: '4px',
+                        padding: theme.spacing(2),
+                        marginTop: theme.spacing(1.5),
+                        ...stackSx,
+                    }}>
+                    <Typography
+                        component="span"
+                        sx={typographySx as SxProps}
+                        {...labelPropsRest} // Spread any additional label props passed by the user
+                    >
+                        {label}
+                    </Typography>
+                    {children}
+                </Stack>
+            );
+        }
         return (
             <Stack
+                className="labeled-stack"
                 {...stackPropsRest}
                 ref={ref}
                 sx={{
                     position: 'relative',
-                    border: `2px solid ${color || theme.palette.primary.main}`,
+                    border: `2px solid ${color}`,
                     borderRadius: '4px',
                     padding: theme.spacing(2),
                     ...stackSx,

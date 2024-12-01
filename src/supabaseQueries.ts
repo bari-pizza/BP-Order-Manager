@@ -15,9 +15,6 @@ import { z } from 'zod';
 import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
 import { PostgrestError } from '@supabase/supabase-js';
-// const bariPizzaLogo = new URL('/BP logo.png', import.meta.url).href;
-// const doorDashLogo = new URL('/DoorDash logo.png', import.meta.url).href;
-// const pizzamicoLogo = new URL('/Pizzamico logo.ico', import.meta.url).href;
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -107,6 +104,58 @@ export const getAllOrigins = async () => {
     return data as unknown as OrderOrigin[];
 };
 
+export const getAllAppSettings = async () => {
+    const { data, error } = await supaClient.from('AppSetting').select('*');
+    type AppSettingDefaults = {
+        delivery_fee_in_cents: number;
+        driver_starting_cash_in_cents: number;
+        driver_hourly_wage_in_cents: number;
+        register_starting_cash_in_cents: number;
+        register_for_bank_transfers: string;
+        register_for_cash_transfers: string;
+    };
+
+    const constants: { default: AppSettingDefaults } = {
+        default: {
+            delivery_fee_in_cents: 0,
+            driver_starting_cash_in_cents: 0,
+            driver_hourly_wage_in_cents: 0,
+            register_starting_cash_in_cents: 0,
+            register_for_bank_transfers: '',
+            register_for_cash_transfers: '',
+        },
+    };
+
+    function isAssignableToDefault<T extends keyof AppSettingDefaults>(
+        key: T,
+        value: number | string,
+    ): value is AppSettingDefaults[T] {
+        const defaultValue = constants.default[key];
+        return typeof defaultValue === typeof value;
+    }
+
+    if (error) {
+        console.error(error);
+        return constants;
+    }
+
+    data.forEach(({ setting_name, setting_value, setting_type }) => {
+        if (setting_name in constants.default) {
+            // Narrow `setting_name` to valid keys of `constants.default`.
+            const key = setting_name as keyof AppSettingDefaults;
+
+            // Determine the value based on its type.
+            const value = setting_type === 'integer' ? parseInt(setting_value, 10) : String(setting_value);
+
+            if (isAssignableToDefault(key, value)) {
+                (constants.default as Record<keyof AppSettingDefaults, number | string>)[key] = value;
+            }
+        }
+    });
+
+    return constants;
+};
+
 export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
     const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
     if (validateError) return [] as Order_Payment[];
@@ -127,12 +176,8 @@ export const getAllDaysOrders = async (businessDate: dayjs.Dayjs) => {
 };
 
 export const getAllDaysDrivers = async (businessDate: dayjs.Dayjs) => {
-    const { month, day, year, error: validateError } = validateBusinessDate(businessDate);
-    if (validateError) return [] as BusinessDayDriver[];
-    const { data, error } = await supaClient
-        .from('BusinessDayDriver')
-        .select('*')
-        .eq('business_date', `${year}-${month}-${day}`);
+    const formattedDate = businessDate.format('YYYY-MM-DD');
+    const { data, error } = await supaClient.from('BusinessDayDriver').select('*').eq('business_date', formattedDate);
 
     return handleResponse<BusinessDayDriver>({ data, error });
 };

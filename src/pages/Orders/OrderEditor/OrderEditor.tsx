@@ -1,14 +1,4 @@
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Button,
-    Stack,
-    Typography,
-    TextField,
-    MenuItem,
-    Divider,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Button, Stack, Typography, MenuItem, Divider } from '@mui/material';
 import { createNewOrder, updateOrder } from '../../../supabaseQueries';
 import {
     Drawer,
@@ -33,12 +23,20 @@ import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
-import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
+import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
 import { motion } from 'framer-motion';
+import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 
-const isValidDrawer = (drawer: Drawer | null, is_third_party: boolean, order_type: OrderType) => {
+const isValidDrawer = (
+    drawer: Drawer | null,
+    is_third_party: boolean,
+    order_type: OrderType,
+    driverDrawerID?: string,
+) => {
     if (!drawer) return true;
     const { drawer_type } = drawer;
+
+    if (driverDrawerID) return drawer.drawer_id === driverDrawerID;
 
     if (order_type === 'delivery' && drawer_type === 'driver') {
         return true;
@@ -80,6 +78,8 @@ type OrderEditorProps = {
     order?: Order_Payment;
     asDialog?: boolean;
     forNewOrder?: boolean;
+    isRepeat: (nameOrNumber: number | string | null, isStatic?: boolean) => boolean;
+    driverDrawerID?: string;
 };
 
 type FormValues =
@@ -88,10 +88,19 @@ type FormValues =
           initial_payment_type: PaymentType;
       });
 
-export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = false }: OrderEditorProps) => {
+export const OrderEditor = ({
+    close,
+    isOpen,
+    asDialog,
+    order,
+    driverDrawerID,
+    isRepeat,
+    forNewOrder = false,
+}: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { origins, drawers, drivers, constants } = useBariPizzaContext();
-    // TODO: get max order number from orders
+    const driverIsEditing = !!driverDrawerID;
+
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
         return {
@@ -102,17 +111,17 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
             order_type: 'delivery' as OrderType,
             phone: null,
             total_in_cents: 0,
-            drawer_id: '',
+            drawer_id: driverDrawerID || '', // if a driver is editing, they can only choose their own drawer
             delivery_fee_in_cents: defaultDeliveryFee,
             initial_payment_type: 'cash' as PaymentType,
         };
-    }, [businessDate, origins, defaultDeliveryFee]);
+    }, [businessDate, origins, defaultDeliveryFee, driverDrawerID]);
     const {
         handleSubmit,
         register,
         control,
         setError,
-        formState: { errors, isDirty },
+        formState: { errors, isDirty, dirtyFields },
         reset,
         watch,
         setValue,
@@ -128,6 +137,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
         onSuccess: (data) => {
             console.log({ data });
             close();
+            reset();
             queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
 
@@ -161,15 +171,21 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
 
     const { can_deliver, has_order_number, is_third_party } = currentOrigin;
 
+    const validOrigins = driverDrawerID ? origins.filter((origin) => origin.can_deliver) : origins;
+
     const invalidOrderType = currentOrderType === 'delivery' && can_deliver === false;
 
-    const validDrawers = drawersAndDrivers.filter((drawer) => isValidDrawer(drawer, is_third_party, currentOrderType));
+    const validDrawers = drawersAndDrivers.filter((drawer) =>
+        isValidDrawer(drawer, is_third_party, currentOrderType, driverDrawerID),
+    );
 
-    const invalidDrawer = !isValidDrawer(currentDrawer, is_third_party, currentOrderType);
+    const invalidDrawer = !isValidDrawer(currentDrawer, is_third_party, currentOrderType, driverDrawerID);
 
     const validPaymentTypes = paymentTypes.filter(({ value }) => isValidPaymentType(value, currentOrigin));
 
     const invalidInitialPaymentType = !isValidPaymentType(watch('initial_payment_type'), currentOrigin);
+
+    if (invalidDrawer) console.log({ currentDrawer, is_third_party, currentOrderType });
 
     useEffect(() => {
         if (order) {
@@ -223,6 +239,8 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
         }
     }, [has_order_number, setValue]);
 
+    const isLocked = order?.is_locked;
+
     const leftSide = (
         <>
             <Controller
@@ -230,13 +248,20 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 control={control}
                 render={({ field }) => {
                     return (
-                        <TextField {...field} label="Origin" select value={field.value}>
-                            {origins.map((origin) => (
+                        <SmartTextField
+                            {...field}
+                            autoFocus
+                            label="Origin"
+                            select
+                            disabled={isLocked}
+                            value={field.value}
+                            isDirty={dirtyFields.origin_id}>
+                            {validOrigins.map((origin) => (
                                 <MenuItem key={origin.name} value={origin.origin_id}>
                                     {origin.name}
                                 </MenuItem>
                             ))}
-                        </TextField>
+                        </SmartTextField>
                     );
                 }}
             />
@@ -246,15 +271,17 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 render={({ field }) => {
                     const valueWithFallback = can_deliver ? field.value : 'pickup';
                     return (
-                        <TextField
+                        <SmartTextField
                             {...field}
+                            isDirty={dirtyFields.order_type}
                             label="Order Type"
                             select
+                            disabled={isLocked || driverIsEditing}
                             value={valueWithFallback}
                             style={{ textTransform: 'capitalize' }}>
                             {can_deliver && <MenuItem value="delivery">Delivery</MenuItem>}
-                            <MenuItem value="pickup">Pickup</MenuItem>
-                        </TextField>
+                            {!driverDrawerID && <MenuItem value="pickup">Pickup</MenuItem>}
+                        </SmartTextField>
                     );
                 }}
             />
@@ -269,6 +296,8 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                               ? field.value
                               : '';
 
+                    // console.log({ validDrawers, driverDrawerID, currentDrawerID, field });
+
                     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
                         if (['Delete', 'Backspace', 'Escape'].includes(event.key)) {
                             // Clear the value if Delete, Backspace, or Esc is pressed
@@ -277,7 +306,14 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                     };
 
                     return (
-                        <TextField {...field} label="Drawer" select value={currentDrawerID} onKeyDown={handleKeyDown}>
+                        <SmartTextField
+                            {...field}
+                            label="Drawer"
+                            select
+                            isDirty={dirtyFields.drawer_id}
+                            value={currentDrawerID}
+                            onKeyDown={handleKeyDown}
+                            disabled={isLocked || driverIsEditing}>
                             {validDrawers.map((drawer) => {
                                 return (
                                     <MenuItem key={drawer.name} value={drawer.drawer_id}>
@@ -285,35 +321,43 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                                     </MenuItem>
                                 );
                             })}
-                        </TextField>
+                        </SmartTextField>
                     );
                 }}
             />
         </>
     );
 
+    const nameAlreadyExists = isRepeat(currentOrderName, !dirtyFields.order_name) && 'Order name already exists';
+    const numberAlreadyExists =
+        isRepeat(currentOrderNumber, !dirtyFields.order_number) && 'Order number already exists';
+
     const rightSide = (
         <>
             {currentOrigin?.has_order_number ? (
-                <TextField
+                <SmartTextField
                     key="order_number"
                     label="Order Number"
                     {...register('order_number', {
                         ...validators.order.order_number,
                         // shouldUnregister: true,
                     })}
-                    error={!!errors.order_number}
-                    helperText={errors.order_number?.message}
+                    disabled={isLocked}
+                    error={!!(errors.order_number || numberAlreadyExists)}
+                    helperText={errors.order_number?.message || numberAlreadyExists}
+                    isDirty={dirtyFields.order_number}
                 />
             ) : (
-                <TextField
+                <SmartTextField
                     key="order_name"
                     label="Order Name"
                     {...register('order_name', {
                         required: !currentOrigin?.has_order_number && 'Required',
                     })}
-                    error={!!errors.order_name}
-                    helperText={errors.order_name?.message}
+                    disabled={isLocked}
+                    error={!!(errors.order_name || nameAlreadyExists)}
+                    helperText={errors.order_name?.message || nameAlreadyExists}
+                    isDirty={dirtyFields.order_name}
                 />
             )}
             {asDialog && (
@@ -329,10 +373,11 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                                 error={!!errors.delivery_fee_in_cents}
                                 helperText={errors.delivery_fee_in_cents?.message}
                                 value={value}
-                                disabled={currentOrderType !== 'delivery'}
+                                disabled={isLocked || currentOrderType !== 'delivery' || driverIsEditing}
                                 handleChange={(value, shouldDirty) =>
                                     setValue('delivery_fee_in_cents', value, { shouldDirty })
                                 }
+                                isDirty={dirtyFields.delivery_fee_in_cents}
                             />
                         );
                     }}
@@ -347,10 +392,12 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                         <TextFieldWithMask
                             label="Total"
                             maskVariant="currency"
+                            disabled={isLocked}
                             error={!!errors.total_in_cents}
                             helperText={errors.total_in_cents?.message}
                             value={value}
                             handleChange={(value, shouldDirty) => setValue('total_in_cents', value, { shouldDirty })}
+                            isDirty={dirtyFields.total_in_cents}
                         />
                     );
                 }}
@@ -385,7 +432,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
         return (
             <OrderEditorDialog
                 isOpen={isOpen}
-                close={close}
+                close={handleCancel}
                 handleSubmit={handleSubmit}
                 onSubmit={onSubmit}
                 onError={onError}
@@ -405,7 +452,7 @@ export const OrderEditor = ({ close, isOpen, asDialog, order, forNewOrder = fals
                 <Typography variant="h5" textAlign={'center'}>
                     Order Editor
                 </Typography>
-                <Stack direction="column" spacing={2} mt={2}>
+                <Stack direction="column" spacing={2} mt={2} mb={2}>
                     {errors.root && <Typography color="error">{errors.root.message}</Typography>}
                     {leftSide}
                     {rightSide}
@@ -451,7 +498,7 @@ const OrderEditorDialog = ({
     validPaymentTypes: { value: PaymentType; label: string }[];
 }) => {
     const [editablePaymentID, setEditablePaymentID] = useState<string | null>(null);
-    const payments = order.payments?.sort((a, b) => b.created_at.localeCompare(a.created_at));
+    const payments = order.payments?.sort((a, b) => b.created_at.localeCompare(a.created_at)) || [];
 
     const paymentsTotalInCents = payments.reduce((total, payment) => total + payment.amount_in_cents, 0);
     const missingPaymentInCents = order.total_in_cents - paymentsTotalInCents;
@@ -459,6 +506,8 @@ const OrderEditorDialog = ({
     const activePayment = editablePaymentID
         ? payments?.find((payment) => payment.payment_id === editablePaymentID)
         : null;
+
+    const isLocked = order.is_locked;
 
     const activePaymentEditor = editablePaymentID ? (
         editablePaymentID === 'newPayment' ? (
@@ -484,10 +533,15 @@ const OrderEditorDialog = ({
         )
     ) : null;
 
+    const handleClose = () => {
+        close();
+        setEditablePaymentID(null);
+    };
+
     return (
-        <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
+        <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
             <DialogTitle>Order Editor</DialogTitle>
-            <DialogContent sx={{ minHeight: 250, overflowY: 'hidden' }}>
+            <DialogContent sx={{ minHeight: 250 }}>
                 {!editablePaymentID ? (
                     <Stack direction="column" spacing={2} mt={2}>
                         <Stack direction="row" spacing={2} mt={2} width="100%">
@@ -499,9 +553,14 @@ const OrderEditorDialog = ({
                                 {rightSide}
                             </Stack>
                         </Stack>
-                        <Button onClick={handleSubmit(onSubmit, onError)} disabled={!isDirty}>
-                            Save Changes
-                        </Button>
+                        <Stack direction="row" alignItems="center" justifyContent="space-around" width="100%">
+                            <Button onClick={handleClose} disabled={!isDirty} color="error">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleSubmit(onSubmit, onError)} disabled={!isDirty}>
+                                Save Changes
+                            </Button>
+                        </Stack>
 
                         <Divider />
                         {payments
@@ -514,6 +573,7 @@ const OrderEditorDialog = ({
                                         validPaymentTypes={validPaymentTypes}
                                         isEditing={editablePaymentID === payment.payment_id}
                                         setIsEditing={(bool) => setEditablePaymentID(bool ? payment.payment_id : null)}
+                                        disabled={isLocked}
                                     />
                                 </motion.div>
                             ))}
@@ -525,6 +585,7 @@ const OrderEditorDialog = ({
                             defaultAmount={missingPaymentInCents}
                             isEditing={editablePaymentID === 'newPayment'}
                             setIsEditing={(bool) => setEditablePaymentID(bool ? 'newPayment' : null)}
+                            disabled={isLocked}
                         />
                     </Stack>
                 ) : (

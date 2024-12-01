@@ -9,6 +9,7 @@ import { ManagerDashboardTabName } from '../../typesAndValidators';
 import { DrawersTab } from './Tabs/DrawersTab';
 import { SalesTab } from './Tabs/SalesTab';
 import { OrdersTab } from './Tabs/OrdersTab';
+import { CardsTab } from './Tabs/CardsTab';
 
 /*    TODO: About Today
         Sales
@@ -51,7 +52,7 @@ function TabPanel(props: TabPanelProps) {
 type TabName = ManagerDashboardTabName;
 
 export const ManagerDashboard = () => {
-    const { orders, drawer, summaries } = useOrdersDrawersTickets();
+    const { orders, drawer, summaries, cashTransfers, businessDay } = useOrdersDrawersTickets();
     const { drawers, origins } = useBariPizzaContext();
     const { drivers } = useDrivers();
     const { value: tabName, setValue: setTabName } = useLocalStorage<'managerDashboardTabName'>(
@@ -86,6 +87,7 @@ export const ManagerDashboard = () => {
         <ManagerDashboardContext.Provider
             value={{
                 orders,
+                cashTransfers,
                 drawers: {
                     all: drawers,
                     onClick: drawer.onClick,
@@ -106,6 +108,7 @@ export const ManagerDashboard = () => {
                 },
                 // all these properties should eventually come from useDrivers
                 combinedDrawersAndDrivers: drawers.concat(drivers.todays),
+                businessDay,
             }}>
             <Stack height="100vh" width="100%" sx={{ overflowY: 'hidden' }}>
                 <Stack m={2}>
@@ -121,6 +124,7 @@ export const ManagerDashboard = () => {
                         <Tab value="sales" label="Sales" icon={<SalesIcon />} iconPosition="start" />
                         <Tab value="drawers" label="Drawers" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
+                        <Tab value="cards" label="Credit Cards" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />
                     </Tabs>
                 </Box>
@@ -132,6 +136,9 @@ export const ManagerDashboard = () => {
                 </TabPanel>
                 <TabPanel tabName="orders" value={tabName}>
                     <OrdersTab />
+                </TabPanel>
+                <TabPanel tabName="cards" value={tabName}>
+                    <CardsTab />
                 </TabPanel>
                 <TabPanel tabName="settings" value={tabName}>
                     Settings go here!

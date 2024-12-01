@@ -1,11 +1,13 @@
 import { Suspense } from 'react';
-import { useUserContext } from '../hooks/data/useContextData';
+import { useLayoutContext, useUserContext } from '../hooks/data/useContextData';
 import { SmartNavigate } from './SmartNavigate';
+import { Typography } from '@mui/material';
 
 interface Protections {
     isLoggedIn?: boolean;
     isAdmin?: boolean;
     isManager?: boolean;
+    isDesktop?: boolean;
 }
 
 const defaultProtections = {
@@ -24,6 +26,7 @@ export const ProtectedRoute = ({
     redirect?: string | false;
 }) => {
     const { session, profile, loading } = useUserContext();
+    const { isMobile } = useLayoutContext();
 
     const allProtections = { ...defaultProtections, ...protections };
 
@@ -47,6 +50,10 @@ export const ProtectedRoute = ({
             return <SmartNavigate redirect keepSearchParams to={redirect} />;
         }
         return null;
+    }
+
+    if (allProtections.isDesktop && isMobile) {
+        return <Typography variant="body1">Please use a desktop or tablet to use this page.</Typography>;
     }
 
     return <Suspense fallback={fallback}>{children}</Suspense>;

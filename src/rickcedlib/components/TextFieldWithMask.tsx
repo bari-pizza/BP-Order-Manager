@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { TextFieldProps } from '@mui/material/TextField';
 import { useRefMask, getCurrencyMaskGenerator } from 'react-hook-mask'; // Assuming you're using react-hook-mask
+import { SmartTextField } from './SmartTextField';
 
 const currencyMaskGenerator = getCurrencyMaskGenerator({
     prefix: '$',
@@ -13,6 +14,7 @@ type TextFieldWithMaskProps = TextFieldProps & {
     value: string | number;
     handleChange: (value: number, shouldDirty: boolean) => void;
     keepMask?: boolean;
+    isDirty?: boolean;
     inputRef?: React.RefObject<HTMLInputElement>;
     // optional ref used for things like focusing the input
 };
@@ -23,6 +25,7 @@ export const TextFieldWithMask = ({
     handleChange,
     keepMask = false,
     inputRef,
+    isDirty,
     ...props
 }: TextFieldWithMaskProps) => {
     const [value, setValue] = useState(initialValue + '');
@@ -58,11 +61,13 @@ export const TextFieldWithMask = ({
     });
 
     return (
-        <TextField
+        <SmartTextField
             {...props}
+            // sx={sx}
             value={displayValue}
+            isDirty={isDirty}
             onChange={(e) => setDisplayValue(e.target.value)}
-            inputRef={ref} // Attach masked ref
+            ref={ref} // Attach masked ref
         />
     );
 };

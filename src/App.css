@@ -24,3 +24,7 @@ body {
 .MuiCard-root:hover .show-on-card-hover {
     opacity: 1;
 }
+
+.repeated-name-or-number {
+    color: red;
+}

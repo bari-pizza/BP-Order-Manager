@@ -1,16 +1,27 @@
 import { useEffect, useState } from 'react';
 import { supaClient } from '../../supaClient';
+import { toast } from 'react-toastify';
+import { Order_Payment, Payment } from '../../typesAndValidators';
+import { useQueryClient } from '@tanstack/react-query';
 
-// call this directly from order.tsx
+type ShowToastOptions = ('insert' | 'update' | 'delete')[];
 
-const useSubscribeToTable = <T extends Record<string, unknown>>({
+export const useSubscribeToTable = <T extends Record<string, unknown>>({
     tableName,
     initialData,
+    primaryKeys,
+    queryKey,
+    showToast = [],
 }: {
     tableName: string;
     initialData: T[];
+    primaryKeys: (keyof T)[];
+    queryKey: string[];
+    showToast?: ShowToastOptions;
 }) => {
     const [data, setData] = useState<T[]>([]);
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (initialData) {
@@ -19,9 +30,13 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
     }, [initialData]);
 
     useEffect(() => {
+        const isMatch = (a: T, b: T) => {
+            return primaryKeys.every((key) => a[key] === b[key]);
+        };
+
         // Set up the subscription with a filter
         const channel = supaClient
-            .channel('order-changes')
+            .channel(tableName + '-changes')
             .on(
                 'postgres_changes',
                 {
@@ -32,31 +47,39 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
                 (payload) => {
                     const eventType = payload.eventType;
                     const newData = payload.new as T;
-                    const oldData = payload.old;
-                    const rowID = Object.entries(oldData)[0];
-                    const rowIDField = rowID[0] as keyof T;
-                    const rowIDValue = rowID[1];
-
+                    const oldData = payload.old as T;
+                    // const rowID = Object.entries(oldData)[0];
+                    // const rowIDField = rowID[0] as keyof T;
+                    // const rowIDValue = rowID[1];
+                    // console.log(`Change detected in ${tableName}:`, payload);
                     setData((currentData) => {
                         switch (eventType) {
                             case 'INSERT':
+                                if (showToast.includes('insert')) {
+                                    toast.info(`A new record was added in ${tableName}s table`);
+                                }
                                 return [...currentData, newData];
                             case 'UPDATE':
+                                if (showToast.includes('update')) {
+                                    toast.info(`A record was updated in ${tableName}s table`);
+                                }
                                 return currentData.map((item) => {
-                                    if (item[rowIDField] === rowIDValue) {
-                                        // loop through each field and update the value
-                                        Object.entries(newData).forEach(([key, value]) => {
-                                            (item as Record<string, unknown>)[key] = value;
-                                        });
+                                    if (isMatch(item, newData)) {
+                                        return newData;
                                     }
-                                    return item;
+                                    return newData;
                                 });
                             case 'DELETE':
-                                return currentData.filter((item) => item[rowIDField] !== rowIDValue);
+                                if (showToast.includes('delete')) {
+                                    toast.info(`A record was deleted from ${tableName}s table`);
+                                }
+                                return currentData.filter((item) => !isMatch(item, oldData));
+                            // return currentData.filter((item) => item[rowIDField] !== rowIDValue);
                             default:
                                 return currentData;
                         }
                     });
+                    queryClient.invalidateQueries({ queryKey });
                 },
             )
             .subscribe();
@@ -65,9 +88,93 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
         return () => {
             channel.unsubscribe();
         };
-    }, [tableName]);
+    }, [tableName, showToast, primaryKeys, queryClient, queryKey]);
 
     return data;
 };
 
-export default useSubscribeToTable;
+// custom solution since Order_Payments has to subscribe to both Order and Payment
+export const useSubscribeToPayments = (orders: Order_Payment[], queryKey: string[]) => {
+    const [updatedOrders, setUpdatedOrders] = useState<Order_Payment[]>([]);
+
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (orders) {
+            setUpdatedOrders(orders);
+        }
+    }, [orders]);
+
+    useEffect(() => {
+        const paymentChannel = supaClient
+            .channel('payment-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'Payment',
+                },
+                (payload) => {
+                    const eventType = payload.eventType;
+                    const newPayment = payload.new as Payment;
+                    const oldPayment = payload.old as Payment;
+
+                    // console.log(`Change detected in Payment:`, payload);
+
+                    setUpdatedOrders((currentOrders) => {
+                        // probably improve this by searching for the order and then updating that order.payments
+                        return currentOrders.map((order) => {
+                            // Skip orders that aren't affected by this event
+                            if (newPayment?.order_id !== order.order_id && eventType !== 'DELETE') {
+                                return order;
+                            }
+
+                            // Ensure the `payments` array exists
+                            const payments = order.payments || [];
+
+                            if (eventType === 'INSERT') {
+                                // Add the new payment to the payments list
+                                return {
+                                    ...order,
+                                    payments: [...payments, newPayment],
+                                };
+                            }
+
+                            if (eventType === 'UPDATE') {
+                                // Update the existing payment
+                                return {
+                                    ...order,
+                                    payments: payments.map((payment) =>
+                                        payment.payment_id === newPayment.payment_id ? newPayment : payment,
+                                    ),
+                                };
+                            }
+
+                            if (eventType === 'DELETE' && oldPayment) {
+                                // Remove the deleted payment
+                                return {
+                                    ...order,
+                                    payments: payments.filter(
+                                        (payment) => payment.payment_id !== oldPayment.payment_id,
+                                    ),
+                                };
+                            }
+
+                            // If no changes are needed, return the original order
+                            return order;
+                        });
+                    });
+
+                    queryClient.invalidateQueries({ queryKey });
+                },
+            )
+            .subscribe();
+
+        return () => {
+            paymentChannel.unsubscribe();
+        };
+    }, [orders, queryKey, queryClient]);
+
+    return updatedOrders;
+};

@@ -6,16 +6,16 @@ type LottieIconProps = {
     lottieSrc: string | object;
     height?: string;
     width?: string;
-    loop?: boolean;
     autoPlay?: boolean;
+    className?: string;
 };
 
 export const LottieIcon = ({
     lottieSrc,
     height = '35px',
     width = '35px',
-    loop = true,
     autoPlay = false,
+    className,
 }: LottieIconProps) => {
     const playerRef = useRef<Player | null>(null); // Ref to access Player methods
     const containerRef = useRef<HTMLDivElement | null>(null); // Ref to access DOM methods
@@ -26,18 +26,14 @@ export const LottieIcon = ({
 
         const handleHover = () => {
             if (playerRef.current) {
-                playerRef.current.stop(); // Stop any previous animation
-                playerRef.current.play(); // Play the animation when the ancestor is hovered
+                playerRef.current.play();
+                playerRef.current.setLoop(true);
             }
         };
 
         const handleLeave = () => {
             if (playerRef.current) {
-                // small delay before stopping
-                setTimeout(() => {
-                    playerRef.current?.stop();
-                }, 150);
-                // playerRef.current.stop(); // Stop the animation
+                playerRef.current.setLoop(false);
             }
         };
 
@@ -53,10 +49,11 @@ export const LottieIcon = ({
     useEffect(() => {
         if (playerRef.current) {
             if (autoPlay) {
-                playerRef.current.play(); // Play animation if autoPlay is true
+                playerRef.current.play();
+                playerRef.current.setLoop(true);
             } else {
                 setTimeout(() => {
-                    playerRef.current?.stop(); // Stop animation if autoPlay is false
+                    playerRef.current?.setLoop(false);
                 }, 150);
             }
         }
@@ -71,9 +68,10 @@ export const LottieIcon = ({
             justifyContent="center"
             ref={containerRef}>
             <Player
+                className={className}
                 ref={playerRef}
                 src={lottieSrc}
-                loop={loop}
+                loop
                 autoplay={autoPlay}
                 style={{ minHeight: height, minWidth: width }}
             />

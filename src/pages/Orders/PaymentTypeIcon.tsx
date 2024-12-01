@@ -6,10 +6,10 @@ import { CreditCardLottieIcon, ThirdPartyLottieIcon } from '../../rickcedlib/Lot
 export const PaymentTypeIcon = ({ paymentType }: { paymentType?: PaymentType }) => {
     if (!paymentType) return null;
     let icon = <CashIcon />;
+    // TODO: replace with lottie icon
     if (paymentType === 'card') {
         icon = <CreditCardLottieIcon />;
     } else if (paymentType === 'third_party') {
-        // icon = <ThirdPartyIcon />;
         icon = <ThirdPartyLottieIcon />;
     }
     return (

@@ -13,7 +13,7 @@ export const AnimatedBadge = ({ badgeCount: { start, end }, ...props }: Animated
     const [currentStep, setCurrentStep] = useState(start);
     const [isPlaying, setPlaying] = useState(false);
     const [accDelay, setAccDelay] = useState(0);
-    const delay = (500 + 3 * accDelay) / Math.abs(end - (start || 0));
+    const delay = (500 + 3 * accDelay) / Math.abs(end - (start ?? end));
 
     useInterval(
         () => {

@@ -6,6 +6,7 @@ export type RoundImageProps = {
     style?: React.CSSProperties;
     variant?: 'border' | 'standard';
     size?: 'small' | 'medium' | 'large' | 'xlarge';
+    className?: string;
 };
 
 const smallStyle = {
@@ -32,7 +33,14 @@ const xlargeStyle = {
     border: '4px solid',
 };
 
-export const RoundImage = ({ src, alt, style, variant = 'standard', size = 'small' }: RoundImageProps) => {
+export const RoundImage = ({
+    src,
+    alt,
+    style,
+    className = '',
+    variant = 'standard',
+    size = 'small',
+}: RoundImageProps) => {
     const theme = useTheme();
 
     const finalStyle = {
@@ -46,5 +54,5 @@ export const RoundImage = ({ src, alt, style, variant = 'standard', size = 'smal
         ...style,
     };
 
-    return <img src={src} alt={alt} style={finalStyle} />;
+    return <img src={src} alt={alt} style={finalStyle} className={className} />;
 };

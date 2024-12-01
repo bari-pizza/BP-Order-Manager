@@ -1,14 +1,15 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
-import { LabeledStack } from '../../../rickcedlib/LabeledStack';
+import { LabeledStack } from '../../../rickcedlib/components/LabeledStack';
 import { Payment, PaymentType, validators } from '../../../typesAndValidators';
 import { Button, ButtonGroup, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useEffect } from 'react';
 import { usePaymentCRUD } from '../../../api/payment';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
-import TextFieldWithMask from '../../../rickcedlib/TextFieldWithMask';
+import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { PaymentTypeIcon } from '../PaymentTypeIcon';
 import { formatCurrency } from '../../../utils';
+import { useLayoutContext } from '../../../hooks/data/useContextData';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -19,6 +20,7 @@ interface PaymentEditorProps {
     defaultAmount?: number;
     isEditing: boolean;
     setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+    disabled?: boolean;
 }
 
 const allPaymentTypes: { value: PaymentType; label: string }[] = [
@@ -29,6 +31,10 @@ const allPaymentTypes: { value: PaymentType; label: string }[] = [
 
 type FormValues = Payment;
 
+// TODO: make sure payment tip auto-updates
+// TODO: add a note to explain how bank, payment, and other works
+// TODO: explain that food is not included in this system and should be handled separately
+
 export const PaymentEditor = ({
     payment,
     forNewPayment,
@@ -38,8 +44,10 @@ export const PaymentEditor = ({
     defaultAmount = 0,
     isEditing = false,
     setIsEditing,
+    disabled = false,
 }: PaymentEditorProps) => {
     const [businessDate] = useBusinessDate();
+    const { isMobile } = useLayoutContext();
     const defaultNewPayment = {
         payment_type: validPaymentTypes[0].value,
         amount_in_cents: defaultAmount,
@@ -98,45 +106,63 @@ export const PaymentEditor = ({
         setValue('payment_type', paymentType, { shouldDirty: true });
     };
 
+    const paymentType = watch('payment_type');
+
+    const paymentTypeName = paymentType.split('_').join(' ');
+
+    const invalidPaymentType = !validPaymentTypes.find(({ value }) => value === paymentType);
+
     if (!isEditing) {
         if (forNewPayment) {
             return (
-                <Button onClick={() => setIsEditing(true)} sx={{ width: '100%' }}>
+                <Button
+                    onClick={() => setIsEditing(true)}
+                    sx={{ width: '100%' }}
+                    disabled={disabled}
+                    className="payment-editor-add-payment">
                     Add Payment
                 </Button>
             );
         } else if (payment) {
             return (
-                <LabeledStack
-                    style={{ cursor: 'pointer' }}
-                    label={payment.payment_type.split('_').join(' ')}
-                    direction="row"
-                    spacing={2}
-                    height={60}
-                    alignItems="center"
-                    justifyContent="space-between"
-                    onClick={() => setIsEditing(true)}>
-                    <PaymentTypeIcon paymentType={payment.payment_type} />
-                    <Divider orientation="vertical" />
-                    <Typography variant="body1">{formatCurrency(payment.amount_in_cents)}</Typography>
-                    <Divider orientation="vertical" />
-                    <Typography variant="body1">{formatCurrency(payment.tip_in_cents)}</Typography>
-                    <Divider orientation="vertical" />
-                    <Typography variant="body1">
-                        {formatCurrency(payment.amount_in_cents + payment.tip_in_cents)}
-                    </Typography>
-                </LabeledStack>
+                <Button
+                    onClick={() => setIsEditing(true)}
+                    sx={{ padding: 0, width: '100%' }}
+                    disabled={disabled}
+                    className="payment-editor-edit-payment">
+                    <LabeledStack
+                        style={{ cursor: 'pointer', width: '100%' }}
+                        label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
+                        color={invalidPaymentType ? theme.palette.error.main : ''}
+                        direction="row"
+                        spacing={2}
+                        height={60}
+                        alignItems="center"
+                        justifyContent="space-between">
+                        <PaymentTypeIcon paymentType={payment.payment_type} />
+                        <Divider orientation="vertical" />
+                        <Typography variant="body1">{formatCurrency(payment.amount_in_cents)}</Typography>
+                        <Divider orientation="vertical" />
+                        <Typography variant="body1">{formatCurrency(payment.tip_in_cents)}</Typography>
+                        {!isMobile && (
+                            <>
+                                <Divider orientation="vertical" />
+                                <Typography variant="body1">
+                                    {formatCurrency(payment.amount_in_cents + payment.tip_in_cents)}
+                                </Typography>
+                            </>
+                        )}
+                    </LabeledStack>
+                </Button>
             );
         }
     }
 
-    const paymentTypeName = watch('payment_type').split('_').join(' ');
-
     return (
-        <Stack direction="column" rowGap={2}>
+        <Stack direction="column" rowGap={2} className="payment-editor-editing-payment">
             <LabeledStack
                 label={paymentTypeName}
-                color={isDirty || forNewPayment ? theme.palette.secondary.main : theme.palette.primary.main}
+                color={isDirty || forNewPayment ? theme.palette.primary.main : ''}
                 direction="column"
                 justifyContent="space-between"
                 mt={1}
@@ -151,6 +177,7 @@ export const PaymentEditor = ({
                         render={({ field: { value } }) => {
                             return (
                                 <TextFieldWithMask
+                                    className="payment-amount-input"
                                     sx={{ minWidth: 100 }}
                                     label="Amount"
                                     maskVariant="currency"
@@ -159,8 +186,7 @@ export const PaymentEditor = ({
                                     handleChange={(value, shouldDirty) =>
                                         setValue('amount_in_cents', value, { shouldDirty })
                                     }
-                                    color={dirtyFields.amount_in_cents || forNewPayment ? 'secondary' : 'primary'}
-                                    focused
+                                    isDirty={dirtyFields.amount_in_cents || forNewPayment}
                                 />
                             );
                         }}
@@ -172,6 +198,7 @@ export const PaymentEditor = ({
                         render={({ field: { value } }) => {
                             return (
                                 <TextFieldWithMask
+                                    className="payment-tip-input"
                                     sx={{ minWidth: 100 }}
                                     label="Tip"
                                     maskVariant="currency"
@@ -180,8 +207,7 @@ export const PaymentEditor = ({
                                     handleChange={(value, shouldDirty) =>
                                         setValue('tip_in_cents', value, { shouldDirty })
                                     }
-                                    color={dirtyFields.tip_in_cents || forNewPayment ? 'secondary' : 'primary'}
-                                    focused
+                                    isDirty={dirtyFields.tip_in_cents || forNewPayment}
                                 />
                             );
                         }}
@@ -192,7 +218,7 @@ export const PaymentEditor = ({
                     isDirty={dirtyFields.payment_type || forNewPayment}
                     validPaymentTypes={validPaymentTypes}
                     handleChange={handlePaymentTypeChange}
-                    variant={variant}
+                    variant={isMobile ? 'icon' : variant}
                 />
             </LabeledStack>
             <Stack direction="row" justifyContent="flex-end" gap={2}>
@@ -242,7 +268,7 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                         {...field}>
                         {validPaymentTypes.map((option) => {
                             const isSelected = option.value === field.value;
-                            if (variant === 'icon') {
+                            if (variant === 'standard') {
                                 return (
                                     <Button
                                         key={option.value}

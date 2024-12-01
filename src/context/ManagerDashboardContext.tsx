@@ -1,5 +1,12 @@
 import { createContext } from 'react';
-import { BusinessDayDrawerSummary, Drawer, Driver_Drawer, Order_Payment, OrderOrigin } from '../typesAndValidators';
+import {
+    BusinessDayDrawerSummary,
+    CashTransfer,
+    Drawer,
+    Driver_Drawer,
+    Order_Payment,
+    OrderOrigin,
+} from '../typesAndValidators';
 
 interface ManagerDashboardProps {
     // all orders, drivers, and origins are already provided by BariPizzaContext
@@ -28,11 +35,32 @@ interface ManagerDashboardProps {
         byDrawerID: (drawerID: string) => BusinessDayDrawerSummary | null;
         update: (summary: BusinessDayDrawerSummary) => void;
     };
+    cashTransfers: {
+        all: CashTransfer[];
+        create: (cashTransfer: Omit<CashTransfer, 'cash_transfer_id' | 'created_at'>) => void;
+        delete: (cashTransfer: CashTransfer) => void;
+        forCurrentDrawer: {
+            bank: CashTransfer[];
+            payment: CashTransfer[];
+            other: CashTransfer[];
+        };
+        byDrawerID: (drawerID: string) => {
+            bank: CashTransfer[];
+            payment: CashTransfer[];
+            other: CashTransfer[];
+        };
+        update: (cashTransfer: CashTransfer) => void;
+    };
     combinedDrawersAndDrivers: (Drawer | Driver_Drawer)[];
     orders: {
         all: Order_Payment[];
         forCurrentDrawer: Order_Payment[];
         byDrawerID: (drawerID: string) => Order_Payment[];
+    };
+    businessDay: {
+        isLocked: boolean;
+        reopen: () => void;
+        close: () => void;
     };
 }
 
@@ -60,10 +88,33 @@ export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
         byDrawerID: () => null,
         update: () => {},
     },
+    cashTransfers: {
+        all: [],
+        create: () => {},
+        delete: () => {},
+        forCurrentDrawer: {
+            bank: [],
+            payment: [],
+            other: [],
+        },
+        byDrawerID: () => {
+            return {
+                bank: [],
+                payment: [],
+                other: [],
+            };
+        },
+        update: () => {},
+    },
     combinedDrawersAndDrivers: [],
     orders: {
         all: [],
         forCurrentDrawer: [],
         byDrawerID: () => [],
+    },
+    businessDay: {
+        isLocked: false,
+        reopen: () => {},
+        close: () => {},
     },
 });

@@ -70,6 +70,7 @@ const subscribeToOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
 };
 
 const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+    const formattedDate = businessDate.format('YYYY-MM-DD');
     const { data, error } = await supaClient
         .from('Order')
         .select(
@@ -80,7 +81,7 @@ const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs })
         )
       `,
         )
-        .eq('business_date', businessDate)
+        .eq('business_date', formattedDate)
         .order('order_number', { ascending: true });
 
     if (error) {

@@ -1,11 +1,21 @@
 import { useRef, useState, RefObject } from 'react';
-import type { Drawer, Driver_Drawer, Order_Payment } from '../../typesAndValidators';
+import {
+    BusinessDayDrawerSummary,
+    BusinessDaySummary,
+    type CashTransfer,
+    type Drawer,
+    type Driver_Drawer,
+    type Order_Payment,
+} from '../../typesAndValidators';
 import { useBusinessDate } from '../data/useBusinessDate';
 import { useLocalStorage } from './useLocalStorage';
 import { useBusinessDayDrawerAPI } from '../../api/businessDayDrawer';
 import { useOrderAPI } from '../../api/order';
 import { RPCPayload } from '../../api/helpers';
-import useSubscribeToTable from './useSubscribeToTable';
+import { useSubscribeToTable, useSubscribeToPayments } from './useSubscribeToTable';
+import { useCashTransferAPI } from '../../api/cashTransfer';
+import { useBusinessDaySummaryAPI } from '../../api/businessDateSummary';
+import { useDocumentTitle } from 'usehooks-ts';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -15,14 +25,50 @@ const unassignedDrawer: Drawer = {
 };
 
 export const useOrdersDrawersTickets = () => {
+    // COMPLETED useSubscribeToTable
     const [businessDate] = useBusinessDate();
+    const { businessDaySummaryAPI } = useBusinessDaySummaryAPI({ businessDate });
+    const { data: initialBusinessDaySummary } = businessDaySummaryAPI.getToday;
+    const businessDaySummary = useSubscribeToTable<BusinessDaySummary>({
+        tableName: 'BusinessDaySummary',
+        initialData: initialBusinessDaySummary,
+        primaryKeys: ['business_date'],
+        queryKey: ['businessDaySummary', businessDate.format('YYYY-MM-DD')],
+    });
+
+    const businessDayIsLocked = businessDaySummary[0]?.is_locked || false;
+
+    useDocumentTitle(`Order Manager [${businessDayIsLocked ? 'CLOSED' : 'OPEN'}]`);
+
     const { orderAPI } = useOrderAPI({ businessDate });
-    const { data: initialData } = orderAPI.getAll;
-    const allOrders = useSubscribeToTable<Order_Payment>({ tableName: 'Order', initialData });
+    const { data: initialOrderData } = orderAPI.getAll;
+    const orderPayments = useSubscribeToTable<Order_Payment>({
+        tableName: 'Order',
+        initialData: initialOrderData,
+        primaryKeys: ['order_id'],
+        queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
+    });
+    const allOrders = useSubscribeToPayments(orderPayments, ['orders', businessDate.format('YYYY-MM-DD')]);
+
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
     });
-    const { data: summaries } = businessDayDrawerAPI.getAll;
+    const { data: initialBusinessDayDrawerData } = businessDayDrawerAPI.getAll;
+    const summaries = useSubscribeToTable<BusinessDayDrawerSummary>({
+        tableName: 'BusinessDayDrawer',
+        initialData: initialBusinessDayDrawerData,
+        primaryKeys: ['drawer_id', 'business_date'],
+        queryKey: ['businessDayDrawers', businessDate.format('YYYY-MM-DD')],
+    });
+
+    const { cashTransferAPI } = useCashTransferAPI({ businessDate });
+    const { data: initialCashTransferData } = cashTransferAPI.getAll;
+    const cashTransfers = useSubscribeToTable<CashTransfer>({
+        tableName: 'CashTransfer',
+        initialData: initialCashTransferData,
+        primaryKeys: ['cash_transfer_id'],
+        queryKey: ['cashTransfers', businessDate.format('YYYY-MM-DD')],
+    });
 
     const allPayments = allOrders.flatMap((order) => order.payments);
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
@@ -32,6 +78,7 @@ export const useOrdersDrawersTickets = () => {
         'openDrawer',
         unassignedDrawer,
     );
+
     const orders = allOrders?.filter(
         (order) => order.drawer_id === (openDrawer.drawer_id === 'unassigned' ? null : openDrawer.drawer_id),
     );
@@ -179,8 +226,6 @@ export const useOrdersDrawersTickets = () => {
         return [];
     };
 
-    // TODO: *** look into subscribing to orders ***
-
     const closeBusinessDayDrawer = (drawer: Drawer | Driver_Drawer) => {
         businessDayDrawerAPI.close({ drawerID: drawer.drawer_id });
     };
@@ -195,6 +240,70 @@ export const useOrdersDrawersTickets = () => {
         }
         const summary = summaries.find(({ drawer_id }) => drawer_id === drawerID) || null;
         return summary;
+    };
+
+    const getCashTransferByDrawerID = (drawerID?: string) => {
+        const byType: { bank: CashTransfer[]; payment: CashTransfer[]; other: CashTransfer[] } = {
+            bank: [],
+            payment: [],
+            other: [],
+        };
+        if (!drawerID) {
+            return byType;
+        }
+        cashTransfers.forEach((transfer) => {
+            const { source, destination, transfer_type } = transfer;
+            if (source !== drawerID && destination !== drawerID) {
+                return;
+            }
+            byType[transfer_type].push(transfer);
+        });
+        return byType;
+    };
+
+    const orderDictionary = {
+        orderNumbers: new Set(),
+        orderNames: new Set(),
+    };
+
+    const repeats = {
+        orderNumbers: new Set<number>(),
+        orderNames: new Set<string>(),
+    };
+
+    allOrders.forEach((order) => {
+        if (order.order_number) {
+            if (orderDictionary.orderNumbers.has(order.order_number)) {
+                repeats.orderNumbers.add(order.order_number);
+            } else {
+                orderDictionary.orderNumbers.add(order.order_number);
+            }
+        } else if (order.order_name) {
+            const orderName = order.order_name.trim().toLowerCase();
+            if (orderDictionary.orderNames.has(orderName)) {
+                repeats.orderNames.add(orderName);
+            } else {
+                orderDictionary.orderNames.add(orderName);
+            }
+        }
+    });
+
+    const isRepeat = (nameOrNumber: number | string | null, isStatic?: boolean) => {
+        if (!nameOrNumber) {
+            return false;
+        }
+        if (typeof nameOrNumber === 'number') {
+            if (isStatic) {
+                return repeats.orderNumbers.has(nameOrNumber);
+            }
+            return orderDictionary.orderNumbers.has(nameOrNumber);
+        } else {
+            const orderName = nameOrNumber.trim().toLowerCase();
+            if (isStatic) {
+                return repeats.orderNames.has(orderName);
+            }
+            return orderDictionary.orderNames.has(orderName);
+        }
     };
 
     return {
@@ -228,6 +337,7 @@ export const useOrdersDrawersTickets = () => {
             forCurrentDrawer: orders,
             all: allOrders,
             byDrawerID: getOrdersByDrawerID,
+            isRepeat,
         },
         payments: {
             all: allPayments,
@@ -236,8 +346,21 @@ export const useOrdersDrawersTickets = () => {
         summaries: {
             all: summaries,
             forCurrentDrawer: getSummaryByDrawerID(openDrawer?.drawer_id),
-            byDrawerID: (drawerID: string) => getSummaryByDrawerID(drawerID),
+            byDrawerID: getSummaryByDrawerID,
             update: businessDayDrawerAPI.upsert,
+        },
+        cashTransfers: {
+            all: cashTransfers,
+            create: cashTransferAPI.create,
+            delete: cashTransferAPI.delete,
+            update: cashTransferAPI.update,
+            forCurrentDrawer: getCashTransferByDrawerID(openDrawer?.drawer_id),
+            byDrawerID: getCashTransferByDrawerID,
+        },
+        businessDay: {
+            isLocked: businessDayIsLocked,
+            reopen: businessDaySummaryAPI.open,
+            close: businessDaySummaryAPI.close,
         },
     };
 };
