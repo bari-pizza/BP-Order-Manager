@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 
-.env
+.env.d/.env
 
 # Editor directories and files
 .vscode/*
@@ -30,3 +30,4 @@ dist-ssr
 schema.sql
 
 *.tsbuildinfo
+
