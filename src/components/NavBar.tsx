@@ -34,7 +34,7 @@ export function NavBar() {
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
-    const version = import.meta.env.VITE_REACT_APP_VERSION;
+    const version = import.meta.env.VITE_REACT_APP_VERSION || process.env.VITE_REACT_APP_VERSIONS;
 
     const drawerWidth = isMobile ? 65 : 200;
 

@@ -56,6 +56,7 @@ interface ManagerDashboardProps {
         all: Order_Payment[];
         forCurrentDrawer: Order_Payment[];
         byDrawerID: (drawerID: string) => Order_Payment[];
+        delete: (orderID: string) => void;
     };
     businessDay: {
         isLocked: boolean;
@@ -111,6 +112,7 @@ export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
         all: [],
         forCurrentDrawer: [],
         byDrawerID: () => [],
+        delete: () => {},
     },
     businessDay: {
         isLocked: false,

@@ -3,6 +3,9 @@ import styles from './Todo.module.css';
 import { toast } from 'react-toastify';
 
 export const Todo = ({ message, children }: { message?: string; children: React.ReactNode }) => {
+    if (import.meta.env.MODE !== 'development' || process.env.NODE_ENV !== 'development') {
+        return null;
+    }
     const handleClick = () => {
         if (message) {
             toast.info(message);

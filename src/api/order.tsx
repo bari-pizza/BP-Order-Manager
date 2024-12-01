@@ -113,8 +113,8 @@ const updateOrder: SupabaseInteractor<Order_Payment, Order> = async (order) => {
     return handlePayload<Order>(payload);
 };
 
-const deleteOrder: SupabaseInteractor<Order_Payment, Order> = async (order) => {
-    const payload = await supaClient.from('Order').delete().eq('order_id', order.order_id).select();
+const deleteOrder: SupabaseInteractor<string, Order> = async (orderID) => {
+    const payload = await supaClient.from('Order').delete().eq('order_id', orderID).select();
     return handlePayload<Order>(payload);
 };
 
@@ -166,7 +166,7 @@ const useUpdateOrder = ({ queryKey }: { queryKey: string[] }) => {
 };
 
 const useDeleteOrder = ({ queryKey }: { queryKey: string[] }) => {
-    return useInteractionHandler<Order_Payment, Order>({
+    return useInteractionHandler<string, Order>({
         interactor: deleteOrder,
         queryKey,
         getMessages: {

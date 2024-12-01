@@ -338,6 +338,7 @@ export const useOrdersDrawersTickets = () => {
             all: allOrders,
             byDrawerID: getOrdersByDrawerID,
             isRepeat,
+            delete: orderAPI.delete,
         },
         payments: {
             all: allPayments,
