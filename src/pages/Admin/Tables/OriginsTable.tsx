@@ -78,6 +78,8 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             headerName: 'Can Deliver',
             width: 150,
             editable: true,
+
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
@@ -90,6 +92,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             headerName: 'Can Tip',
             width: 150,
             editable: true,
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
@@ -102,6 +105,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             headerName: 'Has Order Number',
             width: 150,
             editable: true,
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
@@ -114,6 +118,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             headerName: 'Default Is Prepaid',
             width: 150,
             editable: true,
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
@@ -126,6 +131,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             headerName: 'Is Prepaid Toggleable',
             width: 150,
             editable: true,
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },

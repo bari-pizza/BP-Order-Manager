@@ -48,10 +48,6 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
                     const eventType = payload.eventType;
                     const newData = payload.new as T;
                     const oldData = payload.old as T;
-                    // const rowID = Object.entries(oldData)[0];
-                    // const rowIDField = rowID[0] as keyof T;
-                    // const rowIDValue = rowID[1];
-                    // console.log(`Change detected in ${tableName}:`, payload);
                     setData((currentData) => {
                         switch (eventType) {
                             case 'INSERT':
@@ -65,6 +61,7 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
                                 }
                                 return currentData.map((item) => {
                                     if (isMatch(item, newData)) {
+                                        console.log({ item, newData }, 'is a match');
                                         return newData;
                                     }
                                     return newData;

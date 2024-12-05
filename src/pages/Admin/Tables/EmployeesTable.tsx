@@ -1,4 +1,4 @@
-import { IconButton, Stack } from '@mui/material';
+import { IconButton, Stack, Tooltip } from '@mui/material';
 import {
     DataGrid,
     GridColDef,
@@ -9,20 +9,21 @@ import {
     GridRowModesModel,
 } from '@mui/x-data-grid';
 import { Profile } from '../../../typesAndValidators';
-import { useState } from 'react';
 import { updateEmployee } from '../../../supabaseQueries';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CellEditCheckbox, CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
 import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
 import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
 import { Email as EmailIcon } from '@mui/icons-material';
-import { toast } from 'react-toastify';
+import { Id, toast } from 'react-toastify';
+import { useDataGrid } from '../../../hooks/ui/useDataGrid';
+import { useRef, useState } from 'react';
+import { supaClient } from '../../../supaClient';
 
 type Employee = Profile & { is_driver: boolean };
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
-    const [rows, setRows] = useState<Employee[]>(employees);
-    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+    const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<Employee>({ data: employees });
 
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -35,16 +36,20 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const updateEmployeeMutation = useMutation({
         mutationFn: (employee: Employee) => {
             const { is_driver, ...profile } = employee;
+            console.log({ profile, is_driver });
             return updateEmployee(profile, is_driver);
         },
         onSuccess: (data) => {
+            console.log({ data });
             const { profile, driver } = data[0];
             const updatedRow = {
                 ...profile,
-                is_driver: !driver?.is_deleted,
+                is_driver: driver && !driver.is_deleted,
             };
+            console.log({ updatedRow });
             setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
             queryClient.invalidateQueries({ queryKey: ['profiles'] });
+            queryClient.invalidateQueries({ queryKey: ['drivers'] }); // could change if driver is deleted
         },
         onError: (error) => {
             console.log({ error });
@@ -58,7 +63,6 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             // isNew: false
         };
         updateEmployeeMutation.mutate(updatedRow);
-        // setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         setRows((prev) => prev.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;
     };
@@ -67,7 +71,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         setRowModesModel(newRowModesModel);
     };
 
-    const columns: GridColDef[] = [
+    const columns: GridColDef<Employee>[] = [
         {
             field: 'actions',
             type: 'actions',
@@ -114,6 +118,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             field: 'is_admin',
             headerName: 'Admin',
             width: 100,
+            headerAlign: 'center',
             editable: true,
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
@@ -127,7 +132,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             headerName: 'Manager',
             width: 100,
             editable: true,
-
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
@@ -140,6 +145,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             headerName: 'Driver',
             width: 100,
             editable: true,
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
@@ -150,19 +156,10 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'send_email',
             headerName: 'Send PW Reset Email',
+            headerAlign: 'center',
             width: 175,
             editable: false,
-            renderCell: (params) => {
-                const handleClick = () => {
-                    toast.info('This feature is not yet implemented');
-                    toast.success(`Sent password reset email to ${params.row.email}`);
-                };
-                return (
-                    <IconButton onClick={handleClick}>
-                        <EmailIcon />
-                    </IconButton>
-                );
-            },
+            renderCell: ({ row: { email } }) => <RenderEmail email={email} />,
         },
     ];
     return (
@@ -185,5 +182,44 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                 }}
             />
         </Stack>
+    );
+};
+
+const RenderEmail = ({ email }: { email: string }) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const toastRef = useRef<Id>('');
+
+    const handlePasswordReset = async () => {
+        setIsSubmitting(true);
+        toastRef.current = toast.loading(`Sending password reset email to ${email}`);
+        await supaClient.auth.resetPasswordForEmail(email).then(({ error }) => {
+            if (error) {
+                toast.update(toastRef.current, {
+                    render: error.message,
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 5000,
+                });
+            } else {
+                toast.update(toastRef.current, {
+                    render: `Password reset email sent to ${email}`,
+                    type: 'success',
+                    isLoading: false,
+                    autoClose: 5000,
+                });
+            }
+            setIsSubmitting(false);
+        });
+    };
+    return (
+        <Tooltip title="Send password reset email">
+            <IconButton
+                onClick={handlePasswordReset}
+                disabled={isSubmitting}
+                color="primary"
+                sx={{ justifyContent: 'center', width: '100%' }}>
+                <EmailIcon />
+            </IconButton>
+        </Tooltip>
     );
 };

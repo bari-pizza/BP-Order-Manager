@@ -11,6 +11,9 @@ export const CellCheckbox = ({ params }: { params: GridRenderCellParams }) => {
                 alignItems: 'center',
                 padding: 0,
                 height: '100%',
+                '& .MuiCheckbox-root': {
+                    width: '100%',
+                },
             }}>
             <Checkbox checked={!!params.value} />
         </Box>
@@ -34,8 +37,12 @@ export const CellEditCheckbox = <T,>({ field, params }: { field: keyof T; params
                 alignItems: 'center',
                 padding: 0,
                 height: '100%',
+                width: '100%',
                 '& .MuiSvgIcon-root': {
                     color: isDirty ? theme.palette.secondary.main : '',
+                },
+                '& .MuiCheckbox-root': {
+                    width: '100%',
                 },
             }}>
             <Checkbox checked={!!params.value} onChange={handleCheckboxChange} />
