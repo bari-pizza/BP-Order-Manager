@@ -8,7 +8,7 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
 
     [ ] add something at the top of the screen (Business Date!)
     [ ] fix scrolling in orders area
-    [ ] Add a way for admin to create a new driver
+    [x] Add a way for admin to create a new driver
     [x] Send password reset email
     [ ] Add a way to update your password
     [ ] Choose a prettier secondary color
