@@ -111,6 +111,14 @@ export function Login() {
                                     error={!!errors.password}
                                     helperText={errors.password?.message}
                                     type={showPassword ? 'text' : 'password'}
+                                    // TODO: add this to the theme instead of hardcoding it here
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            '&:has(> input:-webkit-autofill)': {
+                                                backgroundColor: 'rgb(232 240 254)',
+                                            },
+                                        },
+                                    }}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -144,8 +152,6 @@ export function Login() {
                             disabled={!dirtyFields.email || !dirtyFields.password || isSubmitting}>
                             Sign In
                         </Button>
-                        <Divider />
-                        <Typography variant="body1">Don't have an account yet, ask a manager to sign you up</Typography>
                     </>
                 )}
                 <Controller
@@ -160,12 +166,15 @@ export function Login() {
                             }
                         };
                         return (
-                            <Button onClick={handleClick} variant="contained">
-                                {value ? 'Sign In' : 'Forgot Password'}
+                            <Button onClick={handleClick} variant="text" color={value ? 'primary' : 'error'}>
+                                {value ? 'Back' : 'Forgot Password'}
                             </Button>
                         );
                     }}
                 />
+                <Divider />
+                <Typography variant="body1">Don't have an account yet?</Typography>
+                <Typography variant="body1">Ask a manager to sign you up</Typography>
             </Stack>
         );
     }

@@ -56,7 +56,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/login',
-                element: <Login authMode="sign_in" />,
+                element: <Login />,
             },
             {
                 path: '/myaccount',
