@@ -16,7 +16,10 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
             - delete all payments
             - unassign from any drawers
     [ ] - figure out visual bug with lock icon badge (color sometimes showing)
-*/
+    [ ] - fix several warnings in console
+        [ ] - react router future
+
+        */
 
 export const useMobile = () => {
     const [businessDate] = useBusinessDate();

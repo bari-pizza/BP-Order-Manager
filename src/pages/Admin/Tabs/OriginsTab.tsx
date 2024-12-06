@@ -22,7 +22,6 @@ export const OriginsTab = () => {
     const onSubmit = async (data: FormValues) => {
         console.log(data);
         toastRef.current = toast.loading('Adding new origin...');
-        close();
         await new Promise(() => {
             setTimeout(() => {
                 toast.update(toastRef.current, {
@@ -33,6 +32,17 @@ export const OriginsTab = () => {
                 });
             }, 1000);
         });
+        // TODO: implement add origin in backend?
+        // if (error) {
+        //     toast.update(toastRef.current, {
+        //         render: error.message,
+        //         type: 'error',
+        //         isLoading: false,
+        //         autoClose: 5000,
+        //     });
+        //     return;
+        // }
+        close();
     };
 
     return (
@@ -41,8 +51,8 @@ export const OriginsTab = () => {
             <Button onClick={open} variant="contained">
                 Add New Order Origin
             </Button>
-            <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
-                <DialogTitle>Add Employee</DialogTitle>
+            <Dialog open={isOpen} onClose={close} fullWidth maxWidth="xs">
+                <DialogTitle>Add New Order Origin</DialogTitle>
                 <DialogContent>
                     <Stack direction="column" gap={2} mt={2}>
                         <Controller

@@ -93,7 +93,12 @@ function App() {
     return (
         <ErrorBoundary>
             <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
+                <RouterProvider
+                    router={router}
+                    future={{
+                        v7_startTransition: true,
+                    }}
+                />
                 <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
             </QueryClientProvider>
         </ErrorBoundary>

@@ -75,20 +75,12 @@ export const EmployeesTab = () => {
 
         toastRef.current = toast.loading('Creating employee...');
 
-        // fetch a supabase edge function
         const { error } = await supaClient.functions.invoke('create-user', {
             body: { email, first_name, last_name, phone },
             headers: {
                 Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY}`,
             },
         });
-
-        // const { error } = await supaClient.rpc('create_user', {
-        //     p_email: email,
-        //     p_first_name: first_name,
-        //     p_last_name: last_name,
-        //     p_phone: phone,
-        // });
 
         if (error) {
             toast.update(toastRef.current, {

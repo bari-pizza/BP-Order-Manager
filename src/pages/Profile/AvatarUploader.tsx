@@ -52,5 +52,9 @@ export const AvatarUploader = ({ profile, onUpload, onSuccess, onError, disabled
         },
     };
 
+    // TODO: Add a frame around the avatar
+    // [ ] tooltip?
+    // [ ] edit icon on hover/mobile
+
     return <ImageUploader {...imageUploaderProps} disabled={disabled} size="xlarge" />;
 };

@@ -19,6 +19,7 @@ import { Id, toast } from 'react-toastify';
 import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { useRef, useState } from 'react';
 import { supaClient } from '../../../supaClient';
+import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 
 type Employee = Profile & { is_driver: boolean };
 
@@ -211,10 +212,24 @@ const RenderEmail = ({ email }: { email: string }) => {
             setIsSubmitting(false);
         });
     };
+
+    const { handleConfirmation } = useConfirmationToast({
+        message: `Are you sure you want to send a password reset email to ${email}?`,
+        confirmProps: {
+            handler: handlePasswordReset,
+            buttonText: 'Send',
+            color: 'primary',
+        },
+        cancelProps: {
+            buttonText: 'Cancel',
+            color: 'error',
+        },
+    });
+
     return (
         <Tooltip title="Send password reset email">
             <IconButton
-                onClick={handlePasswordReset}
+                onClick={handleConfirmation}
                 disabled={isSubmitting}
                 color="primary"
                 sx={{ justifyContent: 'center', width: '100%' }}>

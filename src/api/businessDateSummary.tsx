@@ -8,16 +8,15 @@ const getBusinessDaySummary = async ({ businessDate }: { businessDate: dayjs.Day
     const { data, error } = await supaClient
         .from('BusinessDaySummary')
         .select('*')
-        .eq('business_date', businessDate.format('YYYY-MM-DD'))
-        .single();
+        .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
     if (error) {
         console.error(error);
-        return [];
+        return [] as BusinessDaySummary[];
     }
-    if (!data || data.length === 0) return [];
+    if (!data || data.length === 0) return [] as BusinessDaySummary[];
 
-    return [data as unknown as BusinessDaySummary];
+    return [data[0] as unknown as BusinessDaySummary];
 };
 
 const upsertBusinessDaySummary: SupabaseInteractor<BusinessDaySummary, BusinessDaySummary> = async (

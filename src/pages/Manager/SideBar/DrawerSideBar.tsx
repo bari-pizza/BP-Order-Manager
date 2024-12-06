@@ -54,30 +54,6 @@ export const DrawerSideBar = () => {
     const otherTransfers = transfers.other;
     const closingPmtTransfer = pmtTransfers.find((pmt) => pmt.title === 'Closing Payment');
 
-    /*TODO: ***Cash Transfer ****
-
-        [x] get all cash transfers in context (figure out if I need them in any other screens)
-
-        [x] find bank cash transfer for drawer
-        [x] if doesnt exist, use default value
-        [x] if exists, use value
-
-        [x] on save, create new cash transfer with bank_in_cents value
-        or update cash transfer with bank_in_cents value
-
-        [x] allow user to change bank source 
-
-        [x] implement a way to create other cash transfers
-
-        [x] determine payment to be created
-
-        [x] backend - if source or destination is_locked, don't allow changes
-
-        [x] create popup to show all cash transfers and edit/delete them
-
-    
-    */
-
     const defaultValues = useMemo(() => {
         return {
             business_date: businessDate.format('YYYY-MM-DD'),
@@ -215,9 +191,6 @@ export const DrawerSideBar = () => {
         close();
     };
 
-    // TODO: don't allow reopening of driver drawer if there are no open registers
-    // probably handle this in backend
-
     const handleReopenDrawerClick = () => {
         console.log(`Reopening drawer ${currentDrawer.name}`);
         drawers.reOpen(currentDrawer);
@@ -253,17 +226,23 @@ export const DrawerSideBar = () => {
                 {
                     label: 'Hours',
                     value: -hours,
-                    details: `${(hours / constants.default.driver_hourly_wage_in_cents).toFixed(2)} hours @ ${formatCurrency(constants.default.driver_hourly_wage_in_cents)}`,
+                    details: `${(hours / constants.default.driver_hourly_wage_in_cents).toFixed(
+                        2,
+                    )} hours @ ${formatCurrency(constants.default.driver_hourly_wage_in_cents)}`,
                 },
                 {
                     label: 'Cards',
                     value: -card,
-                    details: `${formatCurrency(drawerSummary.card_in_cents)} base | ${formatCurrency(drawerSummary.card_tips_in_cents)} tips`,
+                    details: `${formatCurrency(drawerSummary.card_in_cents)} base | ${formatCurrency(
+                        drawerSummary.card_tips_in_cents,
+                    )} tips`,
                 },
                 {
                     label: '3rd Party',
                     value: -thirdParty,
-                    details: `${formatCurrency(drawerSummary.third_party_in_cents)} base | ${formatCurrency(drawerSummary.third_party_tips_in_cents)} tips`,
+                    details: `${formatCurrency(drawerSummary.third_party_in_cents)} base | ${formatCurrency(
+                        drawerSummary.third_party_tips_in_cents,
+                    )} tips`,
                 },
                 {
                     label: 'Deliveries',

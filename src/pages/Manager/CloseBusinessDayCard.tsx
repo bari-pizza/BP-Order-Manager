@@ -23,14 +23,12 @@ export const CloseBusinessDayCard = () => {
     const openOrders: Order[] = [];
 
     combinedDrawersAndDrivers.forEach((drawer) => {
-        // [x] should confirm that all drawers are locked
         if (!summaries.byDrawerID(drawer.drawer_id)?.is_locked) {
             openDrawers.push(drawer);
         }
     });
 
     orders.all.forEach((order) => {
-        // [x] should confirm that all orders are assigned to a drawer
         if (!order.drawer_id) {
             openOrders.push(order);
         }

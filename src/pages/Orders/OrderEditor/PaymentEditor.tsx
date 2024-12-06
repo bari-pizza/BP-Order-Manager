@@ -31,8 +31,6 @@ const allPaymentTypes: { value: PaymentType; label: string }[] = [
 
 type FormValues = Payment;
 
-// TODO: make sure payment tip auto-updates
-// TODO: add a note to explain how bank, payment, and other works
 // TODO: explain that food is not included in this system and should be handled separately
 
 export const PaymentEditor = ({

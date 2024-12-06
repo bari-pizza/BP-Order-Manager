@@ -105,7 +105,6 @@ export function NavBar() {
                                   component: SmartLink,
                                   to: item.path,
                                   keepSearchParams: true,
-                                  unstable_viewTransition: true,
                               }
                             : { component: 'div' })}
                         key={item.text}>
