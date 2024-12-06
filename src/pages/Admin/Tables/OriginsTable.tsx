@@ -147,6 +147,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
                     '& .MuiDataGrid-cell--editing': { padding: 0 },
                 }}
+                disableVirtualization
                 rows={rows}
                 columns={columns}
                 editMode="row"

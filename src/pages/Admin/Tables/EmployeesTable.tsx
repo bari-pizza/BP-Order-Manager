@@ -169,6 +169,8 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                 sx={{
                     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
                 }}
+                pageSizeOptions={[5, 10, 25]}
+                disableVirtualization
                 rows={rows}
                 columns={columns}
                 editMode="row"

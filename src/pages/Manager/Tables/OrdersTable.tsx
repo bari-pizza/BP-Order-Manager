@@ -118,7 +118,7 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
             <DataGrid
                 rows={rows}
                 columns={columns}
-                autoHeight
+                disableVirtualization
                 editMode="row"
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}

@@ -62,7 +62,7 @@ export const DrawersTab = () => {
             <AnimatePresence>
                 {combinedDrawersAndDrivers.map((drawer) => {
                     return (
-                        <MotionWrapper motionProps={motionProps} motionKey={drawer.drawer_id}>
+                        <MotionWrapper motionProps={motionProps} motionKey={drawer.drawer_id} key={drawer.drawer_id}>
                             <ContextMenu openOnType="right-click" key={drawer.drawer_id}>
                                 <ContextMenu.Base>
                                     <DrawerCard drawer={drawer} />
@@ -73,13 +73,14 @@ export const DrawersTab = () => {
                     );
                 })}
                 {!businessDay.isLocked && (
-                    <MotionWrapper motionProps={motionProps} motionKey="add-driver-card">
+                    <MotionWrapper motionProps={motionProps} motionKey="add-driver-card" key="add-driver-card">
                         <AddDriverCard {...addDriverCardDialogProps} />
                     </MotionWrapper>
                 )}
                 <MotionWrapper
                     motionProps={closeDayMotionProps}
                     motionKey="close-business-day"
+                    key="close-business-day"
                     stackProps={{ width: lastCardWidth }}>
                     <CloseBusinessDayCard />
                 </MotionWrapper>

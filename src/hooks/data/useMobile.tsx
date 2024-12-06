@@ -18,6 +18,7 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
     [ ] - figure out visual bug with lock icon badge (color sometimes showing)
     [ ] - fix several warnings in console
         [ ] - react router future
+    [ ] - MUI Data Grid - space between table and footer takes an instant to disappear
 
         */
 

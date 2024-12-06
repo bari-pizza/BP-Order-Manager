@@ -99,7 +99,7 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
             <DataGrid
                 rows={rows}
                 columns={columns}
-                autoHeight
+                disableVirtualization
                 editMode="row"
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
