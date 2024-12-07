@@ -79,9 +79,14 @@ export const useOrdersDrawersTickets = () => {
         unassignedDrawer,
     );
 
+    console.log(openDrawer.drawer_id || 'no open drawer');
+
     const orders = allOrders?.filter(
         (order) => order.drawer_id === (openDrawer.drawer_id === 'unassigned' ? null : openDrawer.drawer_id),
     );
+
+    console.log({ orders, allOrders });
+
     const ordersByDrawer = allOrders?.reduce((acc: { [key: string]: Order_Payment[] }, order) => {
         const key = order.drawer_id ?? 'unassigned';
         if (!acc[key]) {

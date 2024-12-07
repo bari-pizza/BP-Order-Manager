@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from '@mui/material';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { getAllEmployees } from '../../../supabaseQueries';
 import { EmployeesTable } from '../Tables/EmployeesTable';
 import { Profile } from '../../../typesAndValidators';
@@ -10,6 +10,7 @@ import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
+import { useSubscribeToTable } from '../../../hooks/data/useSubscribeToTable';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';
@@ -50,11 +51,17 @@ export const EmployeesTab = () => {
             phone: '',
         },
     });
-    const { data: profiles } = useSuspenseQuery({
+    const { data: initialProfiles } = useSuspenseQuery({
         queryKey: ['profiles'],
         queryFn: () => getAllEmployees(),
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 30,
+    });
+    const profiles = useSubscribeToTable({
+        tableName: 'Profile',
+        initialData: initialProfiles,
+        primaryKeys: ['id'],
+        queryKey: ['profiles'],
     });
     const employees = profiles
         .map((employee) => {
@@ -67,8 +74,6 @@ export const EmployeesTab = () => {
             };
         })
         .sort(sortEmployees);
-
-    const queryClient = useQueryClient();
 
     const onSubmit = async (formData: FormValues) => {
         const { email, first_name, last_name, phone } = formData;
@@ -98,8 +103,6 @@ export const EmployeesTab = () => {
             isLoading: false,
             autoClose: 5000,
         });
-
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
 
         close();
     };

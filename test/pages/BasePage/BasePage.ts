@@ -13,6 +13,8 @@ export abstract class BasePage {
         const link = this.page.locator(`a[href="${href}"]`);
         await expect(link).toBeVisible();
         await link.click();
+        await expect(this.page).toHaveURL(href);
+        await this.page.mouse.move(0, 0);
     }
 
     async navigateToHome() {
@@ -30,7 +32,9 @@ export abstract class BasePage {
 
         const emailInput = this.page.locator('input[name="email"]');
         const passwordInput = this.page.locator('input[name="password"]');
-        const loginButton = this.page.locator('button[type="submit"]');
+        // const loginButton = this.page.locator('button[text="Login"]');
+        // button that has text Sign In
+        const loginButton = this.page.locator('button:has-text("Sign In")');
 
         await expect(emailInput).toBeVisible();
         await expect(passwordInput).toBeVisible();

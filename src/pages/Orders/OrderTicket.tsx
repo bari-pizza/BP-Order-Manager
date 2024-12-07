@@ -205,7 +205,11 @@ const OrderTicketDesktop = ({ order, toggleSelected, selected }: OrderTicketProp
             </CardActionArea>
             <CardActionArea
                 onClick={handleEditClick}
-                sx={{ display: 'flex', justifyContent: 'space-between', height: '-webkit-fill-available' }}
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    height: '-webkit-fill-available',
+                }}
                 disableRipple>
                 <Stack direction="column" width="100%" justifyContent="space-between" height="100%">
                     <Stack direction="row" spacing={1} pl={1} pr={1} justifyContent="space-between">

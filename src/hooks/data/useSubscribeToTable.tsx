@@ -61,10 +61,9 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
                                 }
                                 return currentData.map((item) => {
                                     if (isMatch(item, newData)) {
-                                        console.log({ item, newData }, 'is a match');
                                         return newData;
                                     }
-                                    return newData;
+                                    return item;
                                 });
                             case 'DELETE':
                                 if (showToast.includes('delete')) {

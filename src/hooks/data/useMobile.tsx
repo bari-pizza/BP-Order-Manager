@@ -19,7 +19,8 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
     [ ] - fix several warnings in console
         [ ] - react router future
     [ ] - MUI Data Grid - space between table and footer takes an instant to disappear
-
+    [ ] - separate skeletons for mobile and desktop
+    [ ] - order ticket stretches when a row is added or removed from order ticket area (motion issues)
         */
 
 export const useMobile = () => {
