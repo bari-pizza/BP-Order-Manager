@@ -21,6 +21,8 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
     [ ] - MUI Data Grid - space between table and footer takes an instant to disappear
     [ ] - separate skeletons for mobile and desktop
     [ ] - order ticket stretches when a row is added or removed from order ticket area (motion issues)
+    [ ] - add new lottie icons
+        [ ] - For tabs (Orders, Drivers, Cards, Sales)
         */
 
 export const useMobile = () => {

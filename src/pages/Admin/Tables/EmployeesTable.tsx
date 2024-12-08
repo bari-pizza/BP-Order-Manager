@@ -164,7 +164,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
     ];
     return (
-        <Stack direction="column">
+        <Stack direction="column" minHeight="300px">
             <DataGrid
                 sx={{
                     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
@@ -195,7 +195,7 @@ const RenderEmail = ({ email }: { email: string }) => {
     const handlePasswordReset = async () => {
         setIsSubmitting(true);
         toastRef.current = toast.loading(`Sending password reset email to ${email}`);
-        await supaClient.auth.resetPasswordForEmail(email).then(({ error }) => {
+        await supaClient.auth.resetPasswordForEmail(email, { redirectTo: '/myaccount' }).then(({ error }) => {
             if (error) {
                 toast.update(toastRef.current, {
                     render: error.message,

@@ -1,41 +1,13 @@
 import { Stack, Typography } from '@mui/material';
-import {
-    DataGrid,
-    GridColDef,
-    GridEventListener,
-    GridRowEditStopReasons,
-    GridRowModel,
-    GridRowModesModel,
-} from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { PaymentWithFullDetails } from '../../../typesAndValidators';
-import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { OrderTypeIcon } from '../../../components/Order/OrderTypeIcon';
 import { OriginLogo } from '../../../components/Order/OriginLogo';
 import { DrawerAvatar } from '../../../components/Base/DrawerAvatar';
 import { formatCurrency } from '../../../utils';
 
 export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] }) => {
-    const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<PaymentWithFullDetails>({ data: payments });
-
-    const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-            event.defaultMuiPrevented = true;
-        }
-    };
-
-    const processRowUpdate = (newRow: GridRowModel) => {
-        console.log('processRowUpdate', newRow);
-        const updatedRow = {
-            ...(newRow as PaymentWithFullDetails),
-            // isNew: false
-        };
-        setRows((prev) => prev.map((row) => (row.payment_id === newRow.payment_id ? updatedRow : row)));
-        return updatedRow;
-    };
-
-    const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-        setRowModesModel(newRowModesModel);
-    };
+    const rows = payments;
 
     const columns: GridColDef<PaymentWithFullDetails>[] = [
         {
@@ -95,21 +67,17 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
         },
     ];
     return (
-        <Stack direction="column">
+        <Stack direction="column" minHeight="300px">
             <DataGrid
                 rows={rows}
                 columns={columns}
                 disableVirtualization
-                editMode="row"
-                rowModesModel={rowModesModel}
-                onRowModesModelChange={handleRowModesModelChange}
-                processRowUpdate={processRowUpdate}
-                onRowEditStop={handleRowEditStop}
                 getRowId={(row) => row.order_id}
                 getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
                 getRowClassName={() => {
                     return 'lottie-icon-container';
                 }}
+                hideFooter
             />
         </Stack>
     );

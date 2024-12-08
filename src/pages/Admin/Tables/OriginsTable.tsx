@@ -61,11 +61,11 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             field: 'icon',
             headerName: 'Icon',
             width: 100,
-            editable: false,
-            // renderCell: (params) => {
-            //     return <LogoUploader origin={params.row} disabled />;
-            // },
+            editable: true,
             renderCell: (params) => {
+                return <LogoUploader origin={params.row} disabled />;
+            },
+            renderEditCell: (params) => {
                 const onSuccess = (downloadURL: string) => {
                     console.log(`saving ${downloadURL}`);
                     params.api.setEditCellValue({ id: params.id, field: 'icon', value: downloadURL });

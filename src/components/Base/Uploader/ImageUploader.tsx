@@ -41,8 +41,8 @@ export const ImageUploader = ({
         <Stack
             onClick={disabled ? undefined : () => inputRef.current?.click()}
             justifyContent="center"
-            height="100%"
-            sx={{ cursor: 'pointer' }}>
+            // height="100%"
+            sx={disabled ? { pointerEvents: 'none' } : { cursor: 'pointer' }}>
             <input type="file" onChange={handleFileChange} hidden ref={inputRef} />
             <RoundImage
                 src={uploadedImagePath || originalURL || ''}
