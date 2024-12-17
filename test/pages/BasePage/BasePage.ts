@@ -41,7 +41,7 @@ export abstract class BasePage {
         await expect(loginButton).toBeVisible();
 
         await emailInput.fill('ccata002@gmail.com');
-        await passwordInput.fill('Password1234!');
+        await passwordInput.fill('12345678');
         await loginButton.click();
     }
 

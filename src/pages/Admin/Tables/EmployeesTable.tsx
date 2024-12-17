@@ -26,6 +26,24 @@ type Employee = Profile & { is_driver: boolean };
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<Employee>({ data: employees });
 
+    const deleteEmployee = (id: string) => {
+        // TODO: create this function
+        // TODO: also create a similar function and confirmation for each table with createCellActions
+        toast.info('This should set profile.is_deleted to true and update the driver and drawer (if they exist)');
+        console.log(`Deleting employee ${id}`);
+        return;
+    };
+
+    const { handleConfirmation: confirmDelete } = useConfirmationToast({
+        message: 'Are you sure you want to delete this employee?',
+        confirmProps: {
+            color: 'error',
+            variant: 'outlined',
+            handler: deleteEmployee,
+            buttonText: 'Delete',
+        },
+    });
+
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
             event.defaultMuiPrevented = true;
@@ -80,7 +98,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             width: 100,
             cellClassName: 'actions',
             getActions: ({ id }) => {
-                return createCellActions(id, rowModesModel, setRowModesModel);
+                return createCellActions(id, rowModesModel, setRowModesModel, confirmDelete);
             },
         },
         {
@@ -105,6 +123,10 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             field: 'email',
             headerName: 'Email',
             width: 200,
+            editable: true,
+            renderEditCell: (params) => {
+                return <CellEditTextField params={params} inputProps={{ disabled: true }} field="email" />;
+            },
         },
         {
             field: 'phone',

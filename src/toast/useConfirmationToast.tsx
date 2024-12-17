@@ -9,11 +9,11 @@ import { Id, toast } from 'react-toastify';
 type useConfirmationToastProps = {
     message: string;
     confirmProps: ButtonProps & {
-        handler: () => void;
+        handler: (...args: never[]) => void;
         buttonText?: string;
     };
     cancelProps?: ButtonProps & {
-        handler?: () => void;
+        handler?: (...args: never[]) => void;
         buttonText?: string;
     };
 };

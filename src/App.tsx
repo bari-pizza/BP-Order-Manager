@@ -17,7 +17,7 @@ import { useSession } from './hooks/data/useSession.ts';
 import { OrderDashboard, OrderDashboardSkeleton } from './pages/Orders/OrderDashboard.tsx';
 import { PageMissing } from './components/PageMissing.tsx';
 import { Home } from './pages/Home/Home.tsx';
-import { MyAccount } from './pages/Profile/MyAccount.tsx';
+import { MyAccount, MyAccountSkeleton } from './pages/Profile/MyAccount.tsx';
 import { Login } from './pages/Profile/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllAppSettings, getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
@@ -60,7 +60,11 @@ const router = createBrowserRouter([
             },
             {
                 path: '/myaccount',
-                element: <MyAccount />,
+                element: (
+                    <ProtectedRoute fallback={<MyAccountSkeleton />}>
+                        <MyAccount />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: '/admin',

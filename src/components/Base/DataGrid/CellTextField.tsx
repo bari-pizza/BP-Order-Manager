@@ -3,7 +3,15 @@ import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import { GridRenderEditCellParams } from '@mui/x-data-grid';
 
-export const CellEditTextField = <T,>({ field, params }: { field: keyof T; params: GridRenderEditCellParams }) => {
+export const CellEditTextField = <T,>({
+    field,
+    params,
+    inputProps,
+}: {
+    field: keyof T;
+    params: GridRenderEditCellParams;
+    inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
+}) => {
     const [originalValue] = useState(params.value);
     const theme = useTheme();
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,6 +38,7 @@ export const CellEditTextField = <T,>({ field, params }: { field: keyof T; param
                     fontSize: '14px',
                     fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
                 }}
+                {...inputProps}
             />
         </Box>
     );

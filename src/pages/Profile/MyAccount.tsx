@@ -1,4 +1,4 @@
-import { Stack, Button, Typography, TextField, Divider } from '@mui/material';
+import { Stack, Button, Typography, TextField, Divider, Skeleton } from '@mui/material';
 import { supaClient } from '../../supaClient';
 import { useUserContext } from '../../hooks/data/useContextData';
 import { AvatarUploader } from './AvatarUploader';
@@ -14,7 +14,6 @@ type FormValues = {
     newPassword: string;
     confirmNewPassword: string;
     email: string;
-    password: string;
     first_name: string;
     last_name: string;
     phone: string;
@@ -27,15 +26,15 @@ export const MyAccount = () => {
     const {
         handleSubmit,
         control,
-        formState: { errors },
+        formState: { errors, dirtyFields },
         register,
         setValue,
         watch,
+        getValues,
     } = useForm({
         defaultValues: {
             isEditing: false,
             email: profile?.email || '',
-            password: '',
             first_name: profile?.first_name || '',
             last_name: profile?.last_name || '',
             phone: profile?.phone || '',
@@ -43,6 +42,7 @@ export const MyAccount = () => {
             newPassword: '',
             confirmNewPassword: '',
         },
+        mode: 'onChange',
     });
 
     const handleLogout = async () => {
@@ -67,11 +67,78 @@ export const MyAccount = () => {
 
     const isEditing = watch('isEditing');
     const updatingPassword = watch('updatingPassword');
-    const password = watch('password');
 
-    const onSubmit = (data: FormValues) => console.log(data);
+    const onSubmit = async ({ first_name, last_name, phone, email }: FormValues) => {
+        toastRef.current = toast.loading('Updating profile...');
+
+        if (dirtyFields.email) {
+            await supaClient.auth.updateUser({ email }).then(({ error }) => {
+                if (error) {
+                    toast.update(toastRef.current, {
+                        render: error.message,
+                        type: 'error',
+                        isLoading: false,
+                        autoClose: 5000,
+                    });
+                    toast.info('Make sure to check your inbox to verify your email');
+                    return;
+                }
+            });
+        }
+
+        if (dirtyFields.first_name || dirtyFields.last_name || dirtyFields.phone || dirtyFields.email) {
+            const { error } = await supaClient
+                .from('Profile')
+                .update({ first_name, last_name, phone, email })
+                .eq('id', profile?.id)
+                .select();
+
+            if (error) {
+                toast.update(toastRef.current, {
+                    render: error.message,
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 5000,
+                });
+                return;
+            }
+        }
+
+        toast.update(toastRef.current, {
+            render: 'Profile updated successfully',
+            type: 'success',
+            isLoading: false,
+            autoClose: 5000,
+        });
+        setValue('isEditing', false);
+    };
+
+    const onSubmitPassword = async ({ newPassword }: FormValues) => {
+        toastRef.current = toast.loading('Updating password...');
+        await supaClient.auth.updateUser({ password: newPassword }).then(({ error }) => {
+            if (error) {
+                toast.update(toastRef.current, {
+                    render: error.message,
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 5000,
+                });
+                return;
+            }
+            toast.update(toastRef.current, {
+                render: 'Password updated successfully',
+                type: 'success',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            setValue('updatingPassword', false);
+            setValue('newPassword', '');
+            setValue('confirmNewPassword', '');
+        });
+    };
 
     // TODO: handle submit (idk about changing email)
+    // TODO: break up into left and right side and then render differently if isMobile
 
     return (
         <Stack
@@ -108,6 +175,12 @@ export const MyAccount = () => {
                         control={control}
                         render={({ field: { onChange, value } }) => {
                             const handleClick = () => {
+                                if (!value) {
+                                    setValue('first_name', profile?.first_name || '');
+                                    setValue('last_name', profile?.last_name || '');
+                                    setValue('phone', profile?.phone || '');
+                                    setValue('email', profile?.email || '');
+                                }
                                 onChange(!value);
                             };
                             if (value) {
@@ -131,7 +204,7 @@ export const MyAccount = () => {
                             }
 
                             return (
-                                <Button onClick={handleClick} variant="contained" sx={{ width: 'fit-content' }}>
+                                <Button onClick={handleClick} variant="text" sx={{ width: 'fit-content' }}>
                                     Edit Profile
                                 </Button>
                             );
@@ -158,7 +231,10 @@ export const MyAccount = () => {
                                 <TextField
                                     {...register('confirmNewPassword', {
                                         required: 'Passwords must match',
-                                        validate: (value) => value === password || 'Passwords do not match',
+                                        validate: (value) => {
+                                            const { newPassword } = getValues();
+                                            return value === newPassword || 'Passwords do not match';
+                                        },
                                     })}
                                     autoComplete="new-password"
                                     type="password"
@@ -166,7 +242,7 @@ export const MyAccount = () => {
                                     error={!!errors.confirmNewPassword}
                                     helperText={errors.confirmNewPassword?.message}
                                 />
-                                <Button variant="contained" onClick={handleSubmit(onSubmit)}>
+                                <Button variant="contained" onClick={handleSubmit(onSubmitPassword)}>
                                     Save Password
                                 </Button>
                             </>
@@ -200,6 +276,14 @@ export const MyAccount = () => {
             <Button onClick={handleLogout} sx={{ width: 'fit-content' }}>
                 Logout
             </Button>
+        </Stack>
+    );
+};
+
+export const MyAccountSkeleton = () => {
+    return (
+        <Stack direction="column" sx={{ height: '100%' }} mt={2}>
+            <Skeleton variant="rectangular" width="100%" height="100%" />
         </Stack>
     );
 };
