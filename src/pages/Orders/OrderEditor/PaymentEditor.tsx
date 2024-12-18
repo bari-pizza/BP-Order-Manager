@@ -90,7 +90,7 @@ export const PaymentEditor = ({
     const { handleConfirmation: handleDeletionConfirmation } = useConfirmationToast({
         message: 'Are you sure you want to delete this payment?',
         confirmProps: {
-            handler: handleSubmit(onDelete),
+            handler: () => handleSubmit(onDelete)(),
             buttonText: 'Delete',
             color: 'error',
         },
@@ -127,7 +127,7 @@ export const PaymentEditor = ({
                     onClick={() => setIsEditing(true)}
                     sx={{ padding: 0, width: '100%' }}
                     disabled={disabled}
-                    className="payment-editor-edit-payment">
+                    className={`payment-editor-edit-payment payment-id-${payment.payment_id}`}>
                     <LabeledStack
                         style={{ cursor: 'pointer', width: '100%' }}
                         label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
@@ -139,9 +139,13 @@ export const PaymentEditor = ({
                         justifyContent="space-between">
                         <PaymentTypeIcon paymentType={payment.payment_type} />
                         <Divider orientation="vertical" />
-                        <Typography variant="body1">{formatCurrency(payment.amount_in_cents)}</Typography>
+                        <Typography variant="body1" className="payment-amount-in-cents">
+                            {formatCurrency(payment.amount_in_cents)}
+                        </Typography>
                         <Divider orientation="vertical" />
-                        <Typography variant="body1">{formatCurrency(payment.tip_in_cents)}</Typography>
+                        <Typography variant="body1" className="payment-tip-in-cents">
+                            {formatCurrency(payment.tip_in_cents)}
+                        </Typography>
                         {!isMobile && (
                             <>
                                 <Divider orientation="vertical" />
@@ -157,7 +161,10 @@ export const PaymentEditor = ({
     }
 
     return (
-        <Stack direction="column" rowGap={2} className="payment-editor-editing-payment">
+        <Stack
+            direction="column"
+            rowGap={2}
+            className={`payment-editor-editing-payment payment-id-${payment?.payment_id || 'new'}`}>
             <LabeledStack
                 label={paymentTypeName}
                 color={isDirty || forNewPayment ? theme.palette.primary.main : ''}

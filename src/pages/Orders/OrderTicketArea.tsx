@@ -7,8 +7,6 @@ export const OrderTicketArea = () => {
     const { orders, ticket } = useOrderDashboardContext();
     const drawerOrders = orders.forCurrentDrawer;
 
-    console.log({ drawerOrders });
-
     return (
         <Stack className="hover-scroll" p={1} pb="50px" m={2}>
             <Stack className="hover-scroll-content">

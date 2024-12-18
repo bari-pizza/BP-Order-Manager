@@ -12,7 +12,11 @@ import { useLocalStorage } from './useLocalStorage';
 import { useBusinessDayDrawerAPI } from '../../api/businessDayDrawer';
 import { useOrderAPI } from '../../api/order';
 import { RPCPayload } from '../../api/helpers';
-import { useSubscribeToTable, useSubscribeToPayments } from './useSubscribeToTable';
+import {
+    useSubscribeToTable,
+    // useSubscribeToPayments,
+    useSubscribeToOrderPayments,
+} from './useSubscribeToTable';
 import { useCashTransferAPI } from '../../api/cashTransfer';
 import { useBusinessDaySummaryAPI } from '../../api/businessDateSummary';
 import { useDocumentTitle } from 'usehooks-ts';
@@ -22,6 +26,7 @@ const unassignedDrawer: Drawer = {
     name: 'Unassigned',
     created_at: '2024-08-27T00:00:00.000Z',
     drawer_type: 'unassigned',
+    is_deleted: false,
 };
 
 export const useOrdersDrawersTickets = () => {
@@ -41,14 +46,16 @@ export const useOrdersDrawersTickets = () => {
     useDocumentTitle(`Order Manager [${businessDayIsLocked ? 'CLOSED' : 'OPEN'}]`);
 
     const { orderAPI } = useOrderAPI({ businessDate });
-    const { data: initialOrderData } = orderAPI.getAll;
-    const orderPayments = useSubscribeToTable<Order_Payment>({
-        tableName: 'Order',
-        initialData: initialOrderData,
-        primaryKeys: ['order_id'],
-        queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
-    });
-    const allOrders = useSubscribeToPayments(orderPayments, ['orders', businessDate.format('YYYY-MM-DD')]);
+    // const { data: initialOrderData } = orderAPI.getAll;
+    // const orderPayments = useSubscribeToTable<Order_Payment>({
+    //     tableName: 'Order',
+    //     initialData: initialOrderData,
+    //     primaryKeys: ['order_id'],
+    //     queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
+    //     showToast: ['delete', 'insert', 'update'],
+    // });
+    // const allOrders = useSubscribeToPayments(orderPayments, ['orders', businessDate.format('YYYY-MM-DD')]);
+    const allOrders = useSubscribeToOrderPayments({ businessDate, showToast: ['delete', 'insert', 'update'] });
 
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
@@ -79,13 +86,9 @@ export const useOrdersDrawersTickets = () => {
         unassignedDrawer,
     );
 
-    console.log(openDrawer.drawer_id || 'no open drawer');
-
     const orders = allOrders?.filter(
         (order) => order.drawer_id === (openDrawer.drawer_id === 'unassigned' ? null : openDrawer.drawer_id),
     );
-
-    console.log({ orders, allOrders });
 
     const ordersByDrawer = allOrders?.reduce((acc: { [key: string]: Order_Payment[] }, order) => {
         const key = order.drawer_id ?? 'unassigned';

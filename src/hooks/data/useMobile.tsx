@@ -23,6 +23,9 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
     [ ] - order ticket stretches when a row is added or removed from order ticket area (motion issues)
     [ ] - add new lottie icons
         [ ] - For tabs (Orders, Drivers, Cards, Sales)
+    [ ] - check issues with subscriptions
+        [ ] - mobile is not seeing new orders applied
+        [ ] - not all changes to orders are being shown to a second instance of desktop
         */
 
 export const useMobile = () => {
@@ -34,9 +37,6 @@ export const useMobile = () => {
     } = useDrivers();
     const { drivers, drawers, origins, constants } = useBariPizzaContext();
     const { orders, ticket, summaries, cashTransfers } = useOrdersDrawersTickets();
-    // const toastRef = useRef<{
-    //     [toastID: string]: ({ data, errors, forEachError }: HandleOutcomeProps) => void;
-    // }>({});
 
     if (!isMobile) {
         return {

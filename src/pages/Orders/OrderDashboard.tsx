@@ -136,7 +136,7 @@ const OrderDashboardMobile = () => {
             total += order.total_in_cents;
             // orderCount += 1;
             deliveryFees += order.delivery_fee_in_cents;
-            const payments = order.payments;
+            const payments = order.payments || [];
             payments.forEach((payment) => {
                 if (payment.payment_type === 'cash') {
                     // cashBase += payment.amount_in_cents;

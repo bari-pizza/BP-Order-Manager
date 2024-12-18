@@ -2,6 +2,7 @@ import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from '../BasePage/BasePage';
 import { OrderData, orderOriginsWithTypes } from '../../utils/data';
 import { Payment } from '../../../src/typesAndValidators';
+import { formatCurrency } from '../../../src/utils';
 
 export abstract class TicketPageBase extends BasePage {
     // protected orderEditor: Locator = this.page.locator('text=Order Editor').locator('..');
@@ -128,6 +129,7 @@ export abstract class TicketPageBase extends BasePage {
 
         // click on payment type
         // handle payment amount
+
         // handle payment tip
         if (payment?.tip_in_cents !== undefined) {
             const paymentInput = this.orderEditor.locator(`.payment-tip-input input`);
@@ -136,11 +138,21 @@ export abstract class TicketPageBase extends BasePage {
                 await paymentInput.fill(payment.tip_in_cents.toString());
             }
         }
+
         // handle payment type
+
         // save
         if (hasChanges) {
             await this.orderEditor.locator('button:has-text("Save")').click();
             await expect(this.orderEditor.locator('.payment-editor-editing-payment')).not.toBeVisible();
+            // confirm changes
+            if (payment?.tip_in_cents !== undefined) {
+                await expect(
+                    this.orderEditor.locator(
+                        `.payment-editor-edit-payment:nth-child(${index + 1}) .payment-tip-in-cents`,
+                    ),
+                ).toHaveText(formatCurrency(payment.tip_in_cents));
+            }
         }
     }
 
