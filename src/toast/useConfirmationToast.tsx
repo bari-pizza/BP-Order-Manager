@@ -3,13 +3,13 @@
 // TODO: create a toast.confirmation wrapper - should have an onConfirm function
 
 import { Button, ButtonProps, Stack, Typography } from '@mui/material';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Id, toast } from 'react-toastify';
 
 type useConfirmationToastProps = {
     message: string;
     confirmProps: ButtonProps & {
-        handler: (...args: never[]) => void;
+        handler: (...args: unknown[]) => void;
         buttonText?: string;
     };
     cancelProps?: ButtonProps & {
@@ -21,10 +21,11 @@ type useConfirmationToastProps = {
 export const useConfirmationToast = ({ message, confirmProps, cancelProps }: useConfirmationToastProps) => {
     const { handler: confirmHandler, buttonText: confirmButtonText, ...confirmButtonProps } = confirmProps;
     const { handler: cancelHandler, buttonText: cancelButtonText, ...cancelButtonProps } = cancelProps || {};
+    const [payload, setPayload] = useState<unknown[]>([]);
 
     const toastRef = useRef<Id>('');
     const handleConfirm = () => {
-        confirmHandler();
+        confirmHandler(...payload);
         if (toastRef.current) {
             toast.dismiss(toastRef.current);
         }
@@ -52,7 +53,9 @@ export const useConfirmationToast = ({ message, confirmProps, cancelProps }: use
             </Stack>
         </Stack>
     );
-    const handleConfirmation = () => {
+
+    const handleConfirmation = (...args: unknown[]) => {
+        setPayload(args);
         toastRef.current = toast(content, {
             type: 'info',
             autoClose: false,

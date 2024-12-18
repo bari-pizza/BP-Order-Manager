@@ -190,18 +190,21 @@ export type Database = {
           created_at: string
           drawer_id: string
           drawer_type: Database["public"]["Enums"]["drawer_type"]
+          is_deleted: boolean
           name: string
         }
         Insert: {
           created_at?: string
           drawer_id?: string
           drawer_type: Database["public"]["Enums"]["drawer_type"]
+          is_deleted?: boolean
           name: string
         }
         Update: {
           created_at?: string
           drawer_id?: string
           drawer_type?: Database["public"]["Enums"]["drawer_type"]
+          is_deleted?: boolean
           name?: string
         }
         Relationships: []
@@ -411,6 +414,7 @@ export type Database = {
           id: string
           is_admin: boolean
           is_cashier: boolean
+          is_deleted: boolean
           is_manager: boolean
           last_name: string | null
           phone: string | null
@@ -422,6 +426,7 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_cashier?: boolean
+          is_deleted?: boolean
           is_manager?: boolean
           last_name?: string | null
           phone?: string | null
@@ -433,6 +438,7 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_cashier?: boolean
+          is_deleted?: boolean
           is_manager?: boolean
           last_name?: string | null
           phone?: string | null
@@ -456,6 +462,12 @@ export type Database = {
           p_order_json: Json
         }
         Returns: Json
+      }
+      delete_employee: {
+        Args: {
+          p_id: string
+        }
+        Returns: undefined
       }
       handle_employee_update: {
         Args: {

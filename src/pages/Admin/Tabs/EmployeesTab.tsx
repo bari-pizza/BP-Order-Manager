@@ -17,6 +17,15 @@ const sortEmployees = (a: Profile, b: Profile) => {
     const bFirstName = b.first_name?.toLowerCase() || '';
     const aLastName = a.last_name?.toLowerCase() || '';
     const bLastName = b.last_name?.toLowerCase() || '';
+    const aIsDeleted = a.is_deleted || false;
+    const bIsDeleted = b.is_deleted || false;
+
+    if (aIsDeleted && !bIsDeleted) {
+        return 1;
+    }
+    if (!aIsDeleted && bIsDeleted) {
+        return -1;
+    }
 
     if (aFirstName < bFirstName) {
         return -1;

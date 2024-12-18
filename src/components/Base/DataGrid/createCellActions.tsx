@@ -6,7 +6,8 @@ export const createCellActions = (
     id: GridRowId,
     rowModesModel: GridRowModesModel,
     setRowModesModel: React.Dispatch<React.SetStateAction<GridRowModesModel>>,
-    handleDeleteClick: (id: GridRowId) => void,
+    handleDeleteToggleClick: (id: GridRowId) => void,
+    isDeleted: boolean,
 ) => {
     const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
@@ -24,6 +25,22 @@ export const createCellActions = (
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
         });
     };
+
+    const handleToggleClick = (id: GridRowId) => () => {
+        handleDeleteToggleClick(id);
+    };
+
+    if (isDeleted) {
+        return [
+            <GridActionsCellItem
+                icon={<ReplayIcon />}
+                label="Restore"
+                className="textPrimary"
+                color="inherit"
+                onClick={handleToggleClick(id)}
+            />,
+        ];
+    }
 
     if (isInEditMode) {
         return [
@@ -47,7 +64,7 @@ export const createCellActions = (
                 label="Delete"
                 className="textPrimary"
                 color="error"
-                onClick={() => handleDeleteClick(id)}
+                onClick={handleToggleClick(id)}
             />,
         ];
     }
