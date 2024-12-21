@@ -26,6 +26,8 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
     [ ] - check issues with subscriptions
         [ ] - mobile is not seeing new orders applied
         [ ] - not all changes to orders are being shown to a second instance of desktop
+        [ ] - some orders that driver add dont show up until a payment is recorded
+        [ ] - only some orders show as locked even though all are
         */
 
 export const useMobile = () => {

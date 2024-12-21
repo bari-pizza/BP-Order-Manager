@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { supaClient } from '../../supaClient';
 import { toast } from 'react-toastify';
 import { Order, Order_Payment, Payment } from '../../typesAndValidators';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import dayjs from 'dayjs';
+import { sortOrders } from '../../utils';
 
 type ShowToastOptions = ('insert' | 'update' | 'delete')[];
 
@@ -121,16 +122,21 @@ const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs })
     const formattedDate = businessDate.format('YYYY-MM-DD');
     const { data, error } = await supaClient
         .from('Order')
-        .select(
-            `
-        *,
-        payments:Payment (
-          *
-        )
-      `,
-        )
+        .select('*')
         .eq('business_date', formattedDate)
         .order('order_number', { ascending: true });
+    // const { data, error } = await supaClient
+    //     .from('Order')
+    //     .select(
+    //         `
+    //     *,
+    //     payments:Payment (
+    //       *
+    //     )
+    //   `,
+    //     )
+    //     .eq('business_date', formattedDate)
+    //     .order('order_number', { ascending: true });
 
     if (error) {
         console.error(error);
@@ -138,8 +144,26 @@ const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs })
     }
     if (!data || data.length === 0) return [];
 
-    return data as unknown as Order_Payment[];
+    return data as unknown as Order[];
 };
+
+const getAllDaysPayments = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+    console.log('getAllDaysPayments');
+    const formattedDate = businessDate.format('YYYY-MM-DD');
+    const { data, error } = await supaClient.from('Payment').select('*').eq('business_date', formattedDate);
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+    if (!data || data.length === 0) return [];
+
+    return data as unknown as Payment[];
+};
+
+// THIS WORKED
+// by using setQueryData instead of invalidating the query, we can keep the data in the cache without refetching it
+// TODO: look to do something similar in the api (its causing it to invalidate the query and refetch instead of just updating the cache)
 
 export const useSubscribeToOrderPayments = ({
     businessDate,
@@ -148,24 +172,42 @@ export const useSubscribeToOrderPayments = ({
     businessDate: dayjs.Dayjs;
     showToast?: ShowToastOptions;
 }) => {
-    const { data: initialOrderData } = useSuspenseQuery({
-        queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
-        queryFn: () => getAllDaysOrders({ businessDate }),
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 30,
+    // useSuspenseQuery({
+    //     queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
+    //     queryFn: () => getAllDaysOrders({ businessDate }),
+    //     refetchOnWindowFocus: false,
+    //     staleTime: 1000 * 60 * 30,
+    // });
+    useSuspenseQueries({
+        queries: [
+            {
+                queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
+                queryFn: () => getAllDaysOrders({ businessDate }),
+                refetchOnWindowFocus: false,
+                staleTime: 1000 * 60 * 30,
+            },
+            {
+                queryKey: ['payments', businessDate.format('YYYY-MM-DD')],
+                queryFn: () => getAllDaysPayments({ businessDate }),
+                refetchOnWindowFocus: false,
+                staleTime: 1000 * 60 * 30,
+            },
+        ],
     });
 
-    const [data, setData] = useState<Order_Payment[]>([]);
+    // const [data, setData] = useState<Order_Payment[]>([]);
 
-    useEffect(() => {
-        if (initialOrderData) {
-            setData(initialOrderData);
-        }
-    }, [initialOrderData]);
+    // useEffect(() => {
+    //     if (initialOrderData) {
+    //         setData(initialOrderData);
+    //     }
+    // }, [initialOrderData]);
 
     const queryClient = useQueryClient();
 
     useEffect(() => {
+        // const currentData = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
+        // let newData = currentData;
         // Set up the subscription with a filter
         const channel = supaClient
             .channel('order-changes')
@@ -178,70 +220,85 @@ export const useSubscribeToOrderPayments = ({
                 },
                 (payload) => {
                     const eventType = payload.eventType;
-                    setData((currentData) => {
+                    // setData((currentData) => {
+                    queryClient.setQueryData(['orders', businessDate.format('YYYY-MM-DD')], (currentData: Order[]) => {
+                        let newData = currentData;
                         switch (eventType) {
-                            case 'INSERT': {
-                                if (showToast?.includes('insert')) {
-                                    toast.info(`A new record was added in Orders table`, {
-                                        onClick: () => {
-                                            // toast.info(JSON.stringify(payload, null, 2), {
-                                            //     autoClose: false,
-                                            //     closeOnClick: true,
-                                            // });
-                                            toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                autoClose: false,
-                                                closeOnClick: true,
-                                            });
-                                        },
+                            case 'INSERT':
+                                {
+                                    if (showToast?.includes('insert')) {
+                                        toast.info(
+                                            `Order ${payload.new.order_number || payload.new.order_name} was added`,
+                                            {
+                                                onClick: () => {
+                                                    toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                                                        autoClose: false,
+                                                        closeOnClick: true,
+                                                    });
+                                                },
+                                                autoClose: 500,
+                                            },
+                                        );
+                                    }
+                                    const newOrder = payload.new as Order;
+                                    newData = [...currentData, newOrder];
+                                }
+                                break;
+                            case 'UPDATE':
+                                {
+                                    if (showToast?.includes('update')) {
+                                        toast.info(
+                                            `Order ${payload.new.order_number || payload.new.order_name} was updated`,
+                                            {
+                                                onClick: () => {
+                                                    toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                                                        autoClose: false,
+                                                        closeOnClick: true,
+                                                    });
+                                                },
+                                                autoClose: 500,
+                                            },
+                                        );
+                                    }
+                                    newData = currentData.map((item) => {
+                                        const newOrder = payload.new as Order;
+                                        if (item.order_id === newOrder.order_id) {
+                                            // update the order part of the item
+                                            return { ...item, ...newOrder };
+                                        }
+                                        return item;
                                     });
                                 }
-                                const newData = { ...(payload.new as Order), payments: [] as Payment[] };
-                                return [...currentData, newData];
-                            }
-                            case 'UPDATE': {
-                                if (showToast?.includes('update')) {
-                                    toast.info(
-                                        `Order ${payload.new.order_number || payload.new.order_name} was updated`,
-                                        {
+                                break;
+                            // TODO: give access to all orders to all drivers (otherwise they can't see updates to orders)
+                            case 'DELETE':
+                                {
+                                    if (showToast?.includes('delete')) {
+                                        toast.info(`A record was deleted from Orders table`, {
                                             onClick: () => {
                                                 toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
                                                     autoClose: false,
                                                     closeOnClick: true,
                                                 });
                                             },
-                                        },
-                                    );
-                                }
-                                return currentData.map((item) => {
-                                    const newOrder = payload.new as Order;
-                                    if (item.order_id === newOrder.order_id) {
-                                        // update the order part of the item
-                                        return { ...item, ...newOrder };
+                                            autoClose: 500,
+                                        });
                                     }
-                                    return item;
-                                });
-                            }
-                            // TODO: give access to all orders to all drivers (otherwise they can't see updates to orders)
-                            case 'DELETE': {
-                                if (showToast?.includes('delete')) {
-                                    toast.info(`A record was deleted from Orders table`, {
-                                        onClick: () => {
-                                            toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                autoClose: false,
-                                                closeOnClick: true,
-                                            });
-                                        },
-                                    });
+                                    const orderID = (payload.old as Order).order_id;
+                                    newData = currentData.filter((item) => item.order_id !== orderID);
                                 }
-                                const orderID = (payload.old as Order).order_id;
-                                return currentData.filter((item) => item.order_id !== orderID);
-                            }
+                                break;
                             // return currentData.filter((item) => item[rowIDField] !== rowIDValue);
                             default:
-                                return currentData;
+                                newData = currentData;
                         }
+                        return newData;
                     });
-                    queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
+
+                    // queryClient.setQueryData(['orders', businessDate.format('YYYY-MM-DD')], newData);
+
+                    // });
+                    // queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
                 },
             )
             .subscribe();
@@ -255,6 +312,9 @@ export const useSubscribeToOrderPayments = ({
     // Effect for payments
     useEffect(() => {
         // Set up the subscription with a filter
+        // const currentData = (queryClient.getQueryData(['payments', businessDate.format('YYYY-MM-DD')]) ||
+        //     []) as Payment[];
+        // let newData = currentData;
         const channel = supaClient
             .channel('payment-changes')
             .on(
@@ -269,47 +329,114 @@ export const useSubscribeToOrderPayments = ({
                     const newPayment = payload.new as Payment;
                     const oldPaymentID = payload.old ? (payload.old as Payment).payment_id : null;
 
-                    setData((currentData) => {
-                        return currentData.map((order) => {
-                            // Skip orders that aren't affected by this event
-                            if (newPayment?.order_id !== order.order_id && eventType !== 'DELETE') {
-                                return order;
-                            }
-
-                            // Ensure the `payments` array exists
-                            const payments = order.payments || [];
-
+                    // setData((currentData) => {
+                    queryClient.setQueryData(
+                        ['payments', businessDate.format('YYYY-MM-DD')],
+                        (currentData: Payment[]) => {
+                            let newData = currentData;
                             if (eventType === 'INSERT') {
-                                // Add the new payment to the payments list
-                                return {
-                                    ...order,
-                                    payments: [...payments, newPayment],
-                                };
+                                if (showToast?.includes('insert')) {
+                                    toast.info(`Payment added`, {
+                                        autoClose: 500,
+                                    });
+                                }
+                                newData = [...currentData, newPayment];
                             }
 
                             if (eventType === 'UPDATE') {
-                                // Update the existing payment
-                                return {
-                                    ...order,
-                                    payments: payments.map((payment) =>
-                                        payment.payment_id === newPayment.payment_id ? newPayment : payment,
-                                    ),
-                                };
+                                if (showToast?.includes('update')) {
+                                    toast.info(`Payment for order ${newPayment.order_id} was updated`, {
+                                        onClick: () => {
+                                            toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                                                autoClose: false,
+                                                closeOnClick: true,
+                                            });
+                                        },
+                                        autoClose: 500,
+                                    });
+                                }
+                                newData = currentData.map((payment) => {
+                                    // Skip orders that aren't affected by this event
+                                    if (newPayment?.order_id !== payment.order_id) {
+                                        return payment;
+                                    }
+                                    return newPayment;
+                                });
                             }
 
-                            if (eventType === 'DELETE' && oldPaymentID) {
-                                // Remove the deleted payment
-                                return {
-                                    ...order,
-                                    payments: payments.filter((payment) => payment.payment_id !== oldPaymentID),
-                                };
+                            if (eventType === 'DELETE') {
+                                if (showToast?.includes('delete')) {
+                                    toast.info(`Payment for order ${oldPaymentID} was deleted`, {
+                                        onClick: () => {
+                                            toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                                                autoClose: false,
+                                                closeOnClick: true,
+                                            });
+                                        },
+                                        autoClose: 500,
+                                    });
+                                }
+                                newData = currentData.filter((payment) => payment.payment_id !== oldPaymentID);
                             }
+                            return newData;
+                            // newData = currentData.map((payment) => {
+                            //     // Skip orders that aren't affected by this event
+                            //     if (newPayment?.order_id !== payment.order_id && eventType !== 'DELETE') {
+                            //         return payment;
+                            //     }
 
-                            // If no changes are needed, return the original order
-                            return order;
-                        });
-                    });
-                    queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
+                            //     if (eventType === 'INSERT') {
+                            //         // Add the new payment to the payments list
+                            //         if (showToast?.includes('insert')) {
+                            //             toast.info(`Payment added`);
+                            //         }
+                            //         return {
+                            //             ...payment,
+                            //             payments: [...payments, newPayment],
+                            //         };
+                            //     }
+
+                            //     if (eventType === 'UPDATE') {
+                            //         // Update the existing payment
+                            //         console.log(`Payment for order ${order.order_number || order.order_name} was updated`);
+                            //         // if (showToast?.includes('update')) {
+                            //         //     toast.info(
+                            //         //         `Payment for order ${order.order_number || order.order_name} was updated`,
+                            //         //         {
+                            //         //             onClick: () => {
+                            //         //                 toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                            //         //                     autoClose: false,
+                            //         //                     closeOnClick: true,
+                            //         //                 });
+                            //         //             },
+                            //         //             autoClose: 500,
+                            //         //         },
+                            //         //     );
+                            //         // }
+                            //         return {
+                            //             ...order,
+                            //             payments: payments.map((payment) =>
+                            //                 payment.payment_id === newPayment.payment_id ? newPayment : payment,
+                            //             ),
+                            //         };
+                            //     }
+
+                            //     if (eventType === 'DELETE' && oldPaymentID) {
+                            //         // Remove the deleted payment
+                            //         return {
+                            //             ...order,
+                            //             payments: payments.filter((payment) => payment.payment_id !== oldPaymentID),
+                            //         };
+                            //     }
+
+                            //     // If no changes are needed, return the original order
+                            //     return order;
+                            // });
+                            // });
+                            // queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
+                            // queryClient.setQueryData(['payments', businessDate.format('YYYY-MM-DD')], newData);
+                        },
+                    );
                 },
             )
             .subscribe();
@@ -320,7 +447,16 @@ export const useSubscribeToOrderPayments = ({
         };
     }, [businessDate, showToast, queryClient]);
 
-    return data;
+    const orders = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
+    const payments = queryClient.getQueryData(['payments', businessDate.format('YYYY-MM-DD')]) as Payment[];
+    const orderPayments: Order_Payment[] = orders.map((order) => ({
+        ...order,
+        payments: payments.filter((payment) => payment.order_id === order.order_id),
+    }));
+
+    orderPayments.sort(sortOrders);
+
+    return orderPayments;
 };
 
 // custom solution since Order_Payments has to subscribe to both Order and Payment

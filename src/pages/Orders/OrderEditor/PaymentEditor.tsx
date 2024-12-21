@@ -1,6 +1,6 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
 import { LabeledStack } from '../../../rickcedlib/components/LabeledStack';
-import { Payment, PaymentType, validators } from '../../../typesAndValidators';
+import { NewPayment, Payment, PaymentType, validators } from '../../../typesAndValidators';
 import { Button, ButtonGroup, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useEffect } from 'react';
 import { usePaymentCRUD } from '../../../api/payment';
@@ -10,6 +10,9 @@ import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { PaymentTypeIcon } from '../PaymentTypeIcon';
 import { formatCurrency } from '../../../utils';
 import { useLayoutContext } from '../../../hooks/data/useContextData';
+import { useMutation } from '@tanstack/react-query';
+import { handleResponse } from '../../../supabaseQueries';
+import { supaClient } from '../../../supaClient';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -30,6 +33,22 @@ const allPaymentTypes: { value: PaymentType; label: string }[] = [
 ];
 
 type FormValues = Payment;
+
+const createNewPayment = async (newPayment: NewPayment) => {
+    const { data, error } = await supaClient.from('Payment').insert([newPayment]).select('*');
+    console.log({ data });
+    return handleResponse<Payment>({ data, error, shouldThrow: true });
+};
+
+const updatePayment = async (payment: Payment) => {
+    const { data, error } = await supaClient
+        .from('Payment')
+        .update(payment)
+        .eq('payment_id', payment.payment_id)
+        .select('*');
+    console.log({ data });
+    return handleResponse<Payment>({ data, error, shouldThrow: true });
+};
 
 // TODO: explain that food is not included in this system and should be handled separately
 
@@ -52,6 +71,7 @@ export const PaymentEditor = ({
         tip_in_cents: 0,
         special_note: '',
         order_id: orderID,
+        business_date: businessDate.format('YYYY-MM-DD'),
     };
     const {
         control,
@@ -73,11 +93,39 @@ export const PaymentEditor = ({
 
     const { paymentMutations } = usePaymentCRUD({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
 
+    const createNewPaymentMutation = useMutation({
+        mutationFn: createNewPayment,
+        onSuccess: (data) => {
+            console.log({ data });
+            // I dont think anything needs to be done since a subscription was already made
+            // queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
+        },
+
+        onError: (error) => {
+            console.error('Issue creating new order', error);
+        },
+    });
+
+    const updatePaymentMutation = useMutation({
+        mutationFn: updatePayment,
+        onSuccess: (data) => {
+            console.log({ data });
+            // I dont think anything needs to be done since a subscription was already made
+            // queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
+        },
+
+        onError: (error) => {
+            console.error('Issue updating order', error);
+        },
+    });
+
     const onSubmit = (data: FormValues) => {
         if (forNewPayment) {
-            paymentMutations.create(data);
+            // paymentMutations.create(data);
+            createNewPaymentMutation.mutate(data);
         } else {
-            paymentMutations.update(data);
+            updatePaymentMutation.mutate(data);
+            // paymentMutations.update(data);
         }
         setIsEditing(false);
     };

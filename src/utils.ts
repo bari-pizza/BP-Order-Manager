@@ -1,4 +1,4 @@
-import { Drawer, Driver_Drawer } from './typesAndValidators';
+import { Drawer, Driver_Drawer, Order_Payment } from './typesAndValidators';
 import dayjs from 'dayjs';
 
 export const getDrawerFullName = (drawer: Drawer | Driver_Drawer | null) => {
@@ -14,6 +14,27 @@ export const getDrawerFullName = (drawer: Drawer | Driver_Drawer | null) => {
 export const formatCurrency = (cents: number, includePositiveSign = false) => {
     const sign = cents < 0 ? '-' : includePositiveSign ? '+' : '';
     return `${sign}$${(Math.abs(cents) / 100).toFixed(2)}`;
+};
+
+export const sortOrders = (a: Order_Payment, b: Order_Payment) => {
+    // sort by order number first
+    // then sort by order name
+    if (a?.order_number) {
+        if (b?.order_number) {
+            return a.order_number - b.order_number;
+        } else {
+            return -1;
+        }
+    }
+
+    if (b?.order_number) {
+        return 1;
+    }
+
+    if (a?.order_name && b?.order_name) {
+        return a.order_name.localeCompare(b.order_name);
+    }
+    return 0;
 };
 
 export const dayjsToMDY = (date: dayjs.Dayjs) => {

@@ -368,6 +368,7 @@ export type Database = {
       Payment: {
         Row: {
           amount_in_cents: number
+          business_date: string
           created_at: string
           is_locked: boolean
           order_id: string
@@ -378,6 +379,7 @@ export type Database = {
         }
         Insert: {
           amount_in_cents?: number
+          business_date: string
           created_at?: string
           is_locked?: boolean
           order_id: string
@@ -388,6 +390,7 @@ export type Database = {
         }
         Update: {
           amount_in_cents?: number
+          business_date?: string
           created_at?: string
           is_locked?: boolean
           order_id?: string
@@ -463,12 +466,6 @@ export type Database = {
         }
         Returns: Json
       }
-      delete_employee: {
-        Args: {
-          p_id: string
-        }
-        Returns: undefined
-      }
       handle_employee_update: {
         Args: {
           p_profile: unknown
@@ -496,6 +493,13 @@ export type Database = {
           p_business_date: string
         }
         Returns: Json
+      }
+      update_employee: {
+        Args: {
+          p_id: string
+          p_is_deleted?: boolean
+        }
+        Returns: undefined
       }
     }
     Enums: {

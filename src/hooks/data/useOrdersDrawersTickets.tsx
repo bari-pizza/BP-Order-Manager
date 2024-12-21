@@ -55,7 +55,7 @@ export const useOrdersDrawersTickets = () => {
     //     showToast: ['delete', 'insert', 'update'],
     // });
     // const allOrders = useSubscribeToPayments(orderPayments, ['orders', businessDate.format('YYYY-MM-DD')]);
-    const allOrders = useSubscribeToOrderPayments({ businessDate, showToast: ['delete', 'insert', 'update'] });
+    const allOrders = useSubscribeToOrderPayments({ businessDate, showToast: ['insert', 'update'] });
 
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,

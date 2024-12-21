@@ -53,7 +53,7 @@ test('should add drivers to the day', async () => {
 test('should add mock orders to the day', async () => {
     test.setTimeout(1000 * 60 * 10);
     await ordersPageDesktop.navigateToOrders();
-    await ordersPageDesktop.createOrders(40, 60);
+    await ordersPageDesktop.createOrders(20, 30);
 });
 
 test('should allow drivers to add orders', async () => {

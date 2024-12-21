@@ -18,7 +18,7 @@ import {
     FieldErrors,
     UseFormHandleSubmit,
 } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
@@ -130,7 +130,7 @@ export const OrderEditor = ({
         reValidateMode: 'onChange',
     });
 
-    const queryClient = useQueryClient();
+    // const queryClient = useQueryClient();
 
     const createNewOrderMutation = useMutation({
         mutationFn: createNewOrder,
@@ -138,7 +138,10 @@ export const OrderEditor = ({
             console.log({ data });
             close();
             reset();
-            queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
+            // const oldOrders = queryClient.getQueryData(['orders', data[0].business_date]) as Order_Payment[];
+            // oldOrders.push(data[0] as Order_Payment);
+            // queryClient.setQueryData(['orders', data[0].business_date], oldOrders.sort(sortOrders));
+            // queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
 
         onError: (error) => {
@@ -152,7 +155,10 @@ export const OrderEditor = ({
         onSuccess: (data) => {
             // close();
             reset(data[0]);
-            queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
+            // const oldOrders = queryClient.getQueryData(['orders', data[0].business_date]) as Order_Payment[];
+            // const newOrders = oldOrders.map((order) => (order.order_id === data[0].order_id ? data[0] : order));
+            // queryClient.setQueryData(['orders', data[0].business_date], newOrders);
+            // queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
         onError: (error) => {
             console.error(`Issue updating order: "${order?.order_id}`, error);
