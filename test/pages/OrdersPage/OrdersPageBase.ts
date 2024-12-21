@@ -169,6 +169,12 @@ export abstract class OrdersPageBase extends BasePage {
         await this.setTotalInCents(total_in_cents);
         await this.setPaymentType(paymentType);
         await this.confirmOrder();
+        this.logger.logInfo(`Created order ${orderNumber || orderName}`, {
+            origin: origin.name,
+            orderType,
+            total_in_cents,
+            paymentType,
+        });
     }
 
     async confirmOrder() {

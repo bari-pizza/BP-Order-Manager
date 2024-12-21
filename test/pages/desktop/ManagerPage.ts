@@ -117,6 +117,7 @@ export class ManagerPage extends BasePageDesktop {
     async closeDriver(drawerLocator: Locator) {
         await this.clickDrawer(drawerLocator);
         await this.closeDrawerProcess.completeCloseDriver(faker.number.int({ min: 5, max: 12 }));
+        this.logger.logInfo(`Closed driver ${await drawerLocator.allTextContents()}`);
     }
 
     async closeDrivers() {
@@ -136,12 +137,14 @@ export class ManagerPage extends BasePageDesktop {
         for (const drawer of registers) {
             await this.clickDrawer(drawer);
             await this.closeDrawerProcess.completeCloseRegister();
+            this.logger.logInfo(`Closed drawer ${await drawer.allTextContents()}`);
         }
         const thirdPartyDrawer = this.page.locator(
             '#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-third_party',
         );
         await this.clickDrawer(thirdPartyDrawer);
         await this.closeDrawerProcess.completeCloseThirdParty();
+        this.logger.logInfo(`Closed drawer third party drawer`);
     }
 
     async closeDrawers() {
@@ -158,5 +161,6 @@ export class ManagerPage extends BasePageDesktop {
         await this.openCloseDayPopup();
         await this.closeBusinessDayButton.click();
         await this.page.waitForTimeout(5000);
+        this.logger.logInfo('Closed business day');
     }
 }

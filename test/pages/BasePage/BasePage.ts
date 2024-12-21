@@ -1,10 +1,17 @@
 import { Page, expect } from '@playwright/test';
+import { Logger } from '../../utils/Logger';
 
 export abstract class BasePage {
     protected page: Page;
+    protected logger: Logger;
 
     constructor(page: Page) {
         this.page = page;
+        this.logger = new Logger();
+    }
+
+    logInfo(message: string, details?: object) {
+        this.logger.logInfo(message, details);
     }
 
     // Common navigation methods
@@ -15,6 +22,7 @@ export abstract class BasePage {
         await link.click();
         await expect(this.page).toHaveURL(href);
         await this.page.mouse.move(0, 0);
+        this.logger.logInfo(`Navigated to ${href}`);
     }
 
     async navigateToHome() {
@@ -43,6 +51,7 @@ export abstract class BasePage {
         await emailInput.fill('ccata002@gmail.com');
         await passwordInput.fill('12345678');
         await loginButton.click();
+        this.logger.logInfo('Logged in');
     }
 
     async getTitle(): Promise<string> {

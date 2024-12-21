@@ -148,7 +148,6 @@ const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs })
 };
 
 const getAllDaysPayments = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    console.log('getAllDaysPayments');
     const formattedDate = businessDate.format('YYYY-MM-DD');
     const { data, error } = await supaClient.from('Payment').select('*').eq('business_date', formattedDate);
 

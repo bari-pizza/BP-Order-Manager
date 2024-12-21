@@ -43,6 +43,7 @@ test.afterAll(async () => {
 });
 
 test('should add drivers to the day', async () => {
+    managerPage.logInfo('Adding drivers');
     await managerPage.navigateToManager();
     await managerPage.navigateToTab('Drawers');
     await managerPage.addDriver('Cedrick Catalan');
@@ -51,18 +52,21 @@ test('should add drivers to the day', async () => {
 });
 
 test('should add mock orders to the day', async () => {
+    managerPage.logInfo('Manager adding mock orders');
     test.setTimeout(1000 * 60 * 10);
     await ordersPageDesktop.navigateToOrders();
     await ordersPageDesktop.createOrders(20, 30);
 });
 
 test('should allow drivers to add orders', async () => {
+    ordersPageMobile.logInfo('Driver adding orders');
     test.setTimeout(1000 * 60 * 10);
     await ordersPageMobile.navigateToOrders();
     await ordersPageMobile.createOrders(8, 15);
 });
 
 test('should add orders to random drawers', async () => {
+    ordersPageDesktop.logInfo('Manager assigning orders to random drawers');
     test.setTimeout(1000 * 60 * 10);
     await ordersPageDesktop.navigateToOrders();
     await ordersPageDesktop.assignAllOrdersToRandomDrawers();
@@ -70,12 +74,14 @@ test('should add orders to random drawers', async () => {
 });
 
 test('should allow drivers to update orders (tips)', async () => {
+    ordersPageMobile.logInfo('Driver updating tips');
     test.setTimeout(1000 * 60 * 10);
     await ordersPageMobile.navigateToOrders();
     await ordersPageMobile.addTipsToAllOrders();
 });
 
 test('should close out all drawers', async () => {
+    managerPage.logInfo('Manager closing out all drawers');
     await managerPage.navigateToManager();
     await managerPage.navigateToTab('Drawers');
     await managerPage.closeDrawers();
@@ -85,7 +91,14 @@ test('should close out all drawers', async () => {
 
 test('should close out the day', async () => {
     // assert that close day button appears
+    managerPage.logInfo('Manager closing out the day');
     await managerPage.navigateToManager();
     await managerPage.navigateToTab('Drawers');
     await managerPage.closeBusinessDay();
 });
+
+// check that the UI matches the end state
+// [ ] - all drawers are locked
+// [ ] - all drivers have zero balance
+// [ ] - show business day summary button
+// [ ] - all orders should be locked
