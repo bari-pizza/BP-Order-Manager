@@ -272,6 +272,7 @@ const OrderDashboardMobile = () => {
                 {orders.length ? (
                     <ScrollableWindow>
                         {/* <Stack direction="column" alignItems="center" rowGap={3}> */}
+                        Order Count: {orders.length}
                         <Grid alignItems="center" rowGap={3} container columnGap={1} justifyContent="center">
                             {orders.map((order) => {
                                 return (

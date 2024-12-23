@@ -26,6 +26,7 @@ import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
 import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
 import { motion } from 'framer-motion';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
+import { useSession } from '../../../hooks/data/useSession';
 
 const isValidDrawer = (
     drawer: Drawer | null,
@@ -99,12 +100,14 @@ export const OrderEditor = ({
 }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { origins, drawers, drivers, constants } = useBariPizzaContext();
+    const { profile } = useSession();
     const driverIsEditing = !!driverDrawerID;
 
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
         return {
             business_date: businessDate.format('YYYY-MM-DD'),
+            last_updated_by: profile?.id,
             origin_id: origins.find((o) => o.name === 'Bari Pizza')!.origin_id,
             order_number: null,
             order_name: null,
@@ -115,7 +118,7 @@ export const OrderEditor = ({
             delivery_fee_in_cents: defaultDeliveryFee,
             initial_payment_type: 'cash' as PaymentType,
         };
-    }, [businessDate, origins, defaultDeliveryFee, driverDrawerID]);
+    }, [businessDate, origins, defaultDeliveryFee, driverDrawerID, profile]);
     const {
         handleSubmit,
         register,
@@ -413,6 +416,7 @@ export const OrderEditor = ({
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         data.drawer_id = data.drawer_id || null; // can't be ''
+        data.last_updated_by = profile?.id || null;
         if ('order_id' in data) {
             updateOrderMutation.mutate(data);
         } else {

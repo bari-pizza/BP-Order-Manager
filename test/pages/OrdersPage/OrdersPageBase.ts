@@ -103,6 +103,7 @@ export abstract class OrdersPageBase extends BasePage {
 
     protected async createRandomOrders(min: number, max: number, isMobile: boolean) {
         const randomNumber = faker.number.int({ min: min, max: max });
+        this.logger.logInfo(`${isMobile ? 'Driver' : 'Manager'} creating ${randomNumber} orders`);
         for (let i = 0; i < randomNumber; i++) {
             await this.addOrder(isMobile);
         }

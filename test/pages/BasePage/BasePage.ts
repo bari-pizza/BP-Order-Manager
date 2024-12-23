@@ -8,10 +8,36 @@ export abstract class BasePage {
     constructor(page: Page) {
         this.page = page;
         this.logger = new Logger();
+        this.wrapMethodsWithErrorHandling();
     }
 
     logInfo(message: string, details?: object) {
         this.logger.logInfo(message, details);
+    }
+
+    logError(error: Error, context?: string) {
+        this.logger.logError(`Error in ${context}: ${error.message}`, { stack: error.stack });
+    }
+
+    // Method to wrap all class methods with error handling
+    private wrapMethodsWithErrorHandling() {
+        const methodNames = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .filter((methodName) => methodName !== 'constructor' && typeof (this as any)[methodName] === 'function');
+
+        for (const methodName of methodNames) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const originalMethod = (this as any)[methodName];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (this as any)[methodName] = async (...args: any[]) => {
+                try {
+                    return await originalMethod.apply(this, args);
+                } catch (error) {
+                    this.logError(error, methodName);
+                    throw error; // Rethrow the error
+                }
+            };
+        }
     }
 
     // Common navigation methods

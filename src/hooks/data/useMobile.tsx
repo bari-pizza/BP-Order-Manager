@@ -28,6 +28,7 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
         [ ] - not all changes to orders are being shown to a second instance of desktop
         [ ] - some orders that driver add dont show up until a payment is recorded
         [ ] - only some orders show as locked even though all are
+    [ ] - Order Editor should only use today's drawers not all drawers
         */
 
 export const useMobile = () => {

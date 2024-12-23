@@ -215,7 +215,7 @@ export const useRPCInteractionHandler = <T,>({
         },
         onSuccess: (payload) => {
             if (payload.data?.successes.length === 0) {
-                throw new Error('Failed to save changes');
+                throw new Error('Failed to save changes: ' + payload?.error);
             }
             const successMessage = getMessages.success(payload.data);
             queryClient.invalidateQueries({ queryKey });

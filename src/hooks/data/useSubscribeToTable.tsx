@@ -5,6 +5,7 @@ import { Order, Order_Payment, Payment } from '../../typesAndValidators';
 import { useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { sortOrders } from '../../utils';
+import { useConditionalToast } from '../../toast/useConditionalToast';
 
 type ShowToastOptions = ('insert' | 'update' | 'delete')[];
 
@@ -164,6 +165,11 @@ const getAllDaysPayments = async ({ businessDate }: { businessDate: dayjs.Dayjs 
 // by using setQueryData instead of invalidating the query, we can keep the data in the cache without refetching it
 // TODO: look to do something similar in the api (its causing it to invalidate the query and refetch instead of just updating the cache)
 
+// TODO: might be smart to make all drawers automatically use profile.id as their default drawer.id
+// TODO:conditional toast
+// [ ] - let driver know when changes are made to their order or payment (isMobile && lastUpdatedBy !== 'driver')
+// [ ] - let manager know when changes are made to any order or payment (!isMobile && lastUpdatedBy !== 'manager')
+
 export const useSubscribeToOrderPayments = ({
     businessDate,
     showToast,
@@ -204,6 +210,8 @@ export const useSubscribeToOrderPayments = ({
 
     const queryClient = useQueryClient();
 
+    const conditionalToast = useConditionalToast();
+
     useEffect(() => {
         // const currentData = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
         // let newData = currentData;
@@ -226,18 +234,36 @@ export const useSubscribeToOrderPayments = ({
                             case 'INSERT':
                                 {
                                     if (showToast?.includes('insert')) {
-                                        toast.info(
-                                            `Order ${payload.new.order_number || payload.new.order_name} was added`,
-                                            {
-                                                onClick: () => {
-                                                    toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                        autoClose: false,
-                                                        closeOnClick: true,
-                                                    });
+                                        conditionalToast({
+                                            scenario: [
+                                                {
+                                                    conditions: [
+                                                        { ctxField: 'isMobile', ctxValue: true, comparison: 'eq' },
+                                                        {
+                                                            ctxField: 'profile.id',
+                                                            payloadField: 'last_updated_by',
+                                                            comparison: 'neq',
+                                                        },
+                                                    ],
+                                                    getMessage: (context) => {
+                                                        return `A new order was added to ${context.profile?.first_name}'s drawer.`;
+                                                    },
                                                 },
-                                                autoClose: 500,
-                                            },
-                                        );
+                                            ],
+                                            payload,
+                                        });
+                                        // toast.info(
+                                        //     `Order ${payload.new.order_number || payload.new.order_name} was added`,
+                                        //     {
+                                        //         onClick: () => {
+                                        //             toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                                        //                 autoClose: false,
+                                        //                 closeOnClick: true,
+                                        //             });
+                                        //         },
+                                        //         autoClose: 500,
+                                        //     },
+                                        // );
                                     }
                                     const newOrder = payload.new as Order;
                                     newData = [...currentData, newOrder];
@@ -306,7 +332,7 @@ export const useSubscribeToOrderPayments = ({
         return () => {
             channel.unsubscribe();
         };
-    }, [businessDate, showToast, queryClient]);
+    }, [businessDate, showToast, queryClient, conditionalToast]);
 
     // Effect for payments
     useEffect(() => {
@@ -334,11 +360,11 @@ export const useSubscribeToOrderPayments = ({
                         (currentData: Payment[]) => {
                             let newData = currentData;
                             if (eventType === 'INSERT') {
-                                if (showToast?.includes('insert')) {
-                                    toast.info(`Payment added`, {
-                                        autoClose: 500,
-                                    });
-                                }
+                                // if (showToast?.includes('insert')) {
+                                //     toast.info(`Payment added`, {
+                                //         autoClose: 500,
+                                //     });
+                                // }
                                 newData = [...currentData, newPayment];
                             }
 

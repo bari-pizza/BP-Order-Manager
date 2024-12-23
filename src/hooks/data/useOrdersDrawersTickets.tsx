@@ -66,6 +66,7 @@ export const useOrdersDrawersTickets = () => {
         initialData: initialBusinessDayDrawerData,
         primaryKeys: ['drawer_id', 'business_date'],
         queryKey: ['businessDayDrawers', businessDate.format('YYYY-MM-DD')],
+        showToast: ['delete', 'insert', 'update'],
     });
 
     const { cashTransferAPI } = useCashTransferAPI({ businessDate });

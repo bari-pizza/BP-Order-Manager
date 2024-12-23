@@ -5,10 +5,11 @@ import dayjs from 'dayjs';
 export class Logger {
     private filePath: string;
     constructor(filePath = 'test-log.html') {
-        const timestamp = dayjs().format('YYYY-MM-DD');
-        this.filePath = path.resolve('/test-results/' + timestamp + '-' + filePath);
+        const timestamp = dayjs().format('YYYY-MM-DD-HH-mm');
+        this.filePath = path.resolve('./test-results/' + timestamp + '-' + filePath);
         // Initialize the log file by clearing or creating it
-        fs.writeFileSync(this.filePath, '');
+        const styleTag = `<style>body { font-family: monospace; } .error { color: red; }</style>`;
+        fs.writeFileSync(this.filePath, styleTag);
     }
 
     log(message: string) {
@@ -45,9 +46,25 @@ export class Logger {
         fs.appendFileSync(this.filePath, logMessage);
     }
 
-    logError(message: string) {
+    logError(message: string, stack: object) {
         const timestamp = new Date().toISOString();
-        fs.appendFileSync(this.filePath, `[ERROR] [${timestamp}] ${message}\n`);
+        const logMessage = `
+            <div style="margin-bottom: 1em; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                <div class="error"><strong>[ERROR] [${timestamp}]</strong> ${message}</div>
+                ${
+                    stack
+                        ? `
+                    <details style="margin-top: 10px; font-family: monospace;">
+                        <summary>Stack</summary>
+                        <pre>${JSON.stringify(stack, null, 2)}</pre>
+                    </details>
+                `
+                        : ''
+                }
+            </div>
+        `;
+        fs.appendFileSync(this.filePath, logMessage);
+        // fs.appendFileSync(this.filePath, `[ERROR] [${timestamp}] ${message}\n`);
     }
 
     logRequest(method: string, url: string) {

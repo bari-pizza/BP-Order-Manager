@@ -251,21 +251,18 @@ export type Database = {
           created_at: string | null
           error_message: string
           id: number
-          order_id: string | null
         }
         Insert: {
           context?: string | null
           created_at?: string | null
           error_message: string
           id?: never
-          order_id?: string | null
         }
         Update: {
           context?: string | null
           created_at?: string | null
           error_message?: string
           id?: never
-          order_id?: string | null
         }
         Relationships: []
       }
@@ -276,6 +273,7 @@ export type Database = {
           delivery_fee_in_cents: number
           drawer_id: string | null
           is_locked: boolean
+          last_updated_by: string | null
           order_id: string
           order_name: string | null
           order_number: number | null
@@ -290,6 +288,7 @@ export type Database = {
           delivery_fee_in_cents?: number
           drawer_id?: string | null
           is_locked?: boolean
+          last_updated_by?: string | null
           order_id?: string
           order_name?: string | null
           order_number?: number | null
@@ -304,6 +303,7 @@ export type Database = {
           delivery_fee_in_cents?: number
           drawer_id?: string | null
           is_locked?: boolean
+          last_updated_by?: string | null
           order_id?: string
           order_name?: string | null
           order_number?: number | null
@@ -313,6 +313,13 @@ export type Database = {
           total_in_cents?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "Order_last_updated_by_fkey"
+            columns: ["last_updated_by"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "Order_origin_id_fkey"
             columns: ["origin_id"]
@@ -371,6 +378,7 @@ export type Database = {
           business_date: string
           created_at: string
           is_locked: boolean
+          last_updated_by: string | null
           order_id: string
           payment_id: string
           payment_type: Database["public"]["Enums"]["payment_type"]
@@ -382,6 +390,7 @@ export type Database = {
           business_date: string
           created_at?: string
           is_locked?: boolean
+          last_updated_by?: string | null
           order_id: string
           payment_id?: string
           payment_type: Database["public"]["Enums"]["payment_type"]
@@ -393,6 +402,7 @@ export type Database = {
           business_date?: string
           created_at?: string
           is_locked?: boolean
+          last_updated_by?: string | null
           order_id?: string
           payment_id?: string
           payment_type?: Database["public"]["Enums"]["payment_type"]
@@ -400,6 +410,13 @@ export type Database = {
           tip_in_cents?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "Payment_last_updated_by_fkey"
+            columns: ["last_updated_by"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payments_order_id_fkey"
             columns: ["order_id"]

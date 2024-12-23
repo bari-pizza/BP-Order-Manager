@@ -99,6 +99,11 @@ export abstract class TicketPageBase extends BasePage {
             total_in_cents,
         };
 
+        this.logger.logInfo(
+            `Scraped order data for order ${orderData?.orderNumber || orderData?.orderName}:`,
+            orderData,
+        );
+
         return { nthTicket, orderData };
     }
 
@@ -131,9 +136,16 @@ export abstract class TicketPageBase extends BasePage {
         // handle payment amount
 
         // handle payment tip
-        if (payment?.tip_in_cents !== undefined) {
+        function isDefined<T>(value: T | undefined | null): value is T {
+            return value !== undefined;
+        }
+
+        const formattedTip = isDefined(payment.tip_in_cents) ? formatCurrency(payment.tip_in_cents) : 'N/A';
+        this.logger.logInfo(`Setting payment tip to ${formattedTip}`);
+
+        if (isDefined(payment.tip_in_cents)) {
             const paymentInput = this.orderEditor.locator(`.payment-tip-input input`);
-            if ((await paymentInput.inputValue()) !== payment.tip_in_cents.toString()) {
+            if ((await paymentInput.inputValue()) !== formattedTip) {
                 hasChanges = true;
                 await paymentInput.fill(payment.tip_in_cents.toString());
             }
@@ -146,12 +158,12 @@ export abstract class TicketPageBase extends BasePage {
             await this.orderEditor.locator('button:has-text("Save")').click();
             await expect(this.orderEditor.locator('.payment-editor-editing-payment')).not.toBeVisible();
             // confirm changes
-            if (payment?.tip_in_cents !== undefined) {
+            if (isDefined(payment.tip_in_cents)) {
                 await expect(
                     this.orderEditor.locator(
                         `.payment-editor-edit-payment:nth-child(${index + 1}) .payment-tip-in-cents`,
                     ),
-                ).toHaveText(formatCurrency(payment.tip_in_cents));
+                ).toHaveText(formattedTip);
             }
         }
     }
