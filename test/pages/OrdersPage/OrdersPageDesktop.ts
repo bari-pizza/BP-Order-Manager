@@ -130,4 +130,16 @@ export class OrdersPageDesktop extends OrdersPageBase {
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+
+    async addMockOrders(min = 30, max = 50) {
+        this.logInfo(`Manager adding mock orders`);
+        await this.navigateToOrders();
+        await this.createOrders(min, max);
+    }
+
+    async assignOrders() {
+        this.logInfo(`Manager assigning orders to random drawers`);
+        await this.navigateToOrders();
+        await this.assignAllOrdersToRandomDrawers();
+    }
 }

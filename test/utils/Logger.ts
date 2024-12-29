@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import dayjs from 'dayjs';
+import { chromium } from '@playwright/test';
 
 export class Logger {
     private filePath: string;
@@ -75,5 +76,13 @@ export class Logger {
     logResponse(status: number, url: string) {
         const timestamp = new Date().toISOString();
         fs.appendFileSync(this.filePath, `[RESPONSE] [${timestamp}] Status: ${status}, URL: ${url}\n`);
+    }
+
+    async openLogFile() {
+        const browser = await chromium.launch({ headless: false });
+        const context = await browser.newContext();
+        const page = await context.newPage();
+        await page.goto(`file://${this.filePath}`);
+        console.log(`Log file opened in Playwright: file://${this.filePath}`);
     }
 }

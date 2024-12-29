@@ -18,6 +18,8 @@ export abstract class OrdersPageBase extends BasePage {
 
     abstract createOrders(min: number, max: number): Promise<void>;
 
+    abstract addMockOrders(min: number, max: number): Promise<void>;
+
     public static generateOrderNumber() {
         OrdersPageBase.currentOrderNumber += 1;
         return OrdersPageBase.currentOrderNumber.toString();
@@ -198,11 +200,23 @@ export abstract class OrdersPageBase extends BasePage {
     async addOrder(isMobile: boolean) {
         const { origin, orderType, total_in_cents, paymentType } = OrdersPageBase.generateRandomOrder(isMobile);
 
+        let orderNumber: string | undefined;
+        let orderName: string | undefined;
+        if (origin.has_order_number) {
+            orderNumber = OrdersPageBase.generateOrderNumber();
+            await this.setOrderNumber(orderNumber);
+        } else {
+            orderName = OrdersPageBase.generateUniqueOrderName();
+            await this.setOrderName(orderName);
+        }
+
         this.logger.logInfo(`${isMobile ? 'Driver' : 'Manager'} creating order`, {
             origin: origin.name,
             orderType,
             total_in_cents,
             paymentType,
+            orderNumber,
+            orderName,
         });
 
         await this.clickAddOrder();
@@ -216,16 +230,9 @@ export abstract class OrdersPageBase extends BasePage {
                 // await this.startTimeout(3, `Choosing order type: ${orderType}`);
                 await this.chooseOrderType(orderType);
             }
-
-            let orderNumber: string | undefined;
-            let orderName: string | undefined;
-            if (origin.has_order_number) {
-                orderNumber = OrdersPageBase.generateOrderNumber();
-                // await this.startTimeout(3, `Setting order number: ${orderNumber}`);
+            if (orderNumber) {
                 await this.setOrderNumber(orderNumber);
-            } else {
-                orderName = OrdersPageBase.generateUniqueOrderName();
-                // await this.startTimeout(3, `Setting order number: ${orderName}`);
+            } else if (orderName) {
                 await this.setOrderName(orderName);
             }
 

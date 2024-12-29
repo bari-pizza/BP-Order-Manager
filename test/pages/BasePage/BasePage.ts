@@ -19,6 +19,10 @@ export abstract class BasePage {
         this.logger.logError(`Error in ${context}: ${error.message}`, { stack: error.stack });
     }
 
+    openLogger() {
+        this.logger.openLogFile();
+    }
+
     // Method to wrap all class methods with error handling
     private wrapMethodsWithErrorHandling() {
         const methodNames = Object.getOwnPropertyNames(Object.getPrototypeOf(this))

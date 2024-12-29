@@ -46,9 +46,15 @@ export class OrdersPageMobile extends OrdersPageBase {
         }
     }
 
-    // async editOrderTip(orderData: OrderData, tip_in_cents: number) {
-    //     const ticket = await this.ticketPage.findTicketByOrderData(orderData);
-    //     await this.ticketPage.editTip(ticket, tip_in_cents);
-    //     this.logger.logInfo(`Edited tip for order ${orderData.orderNumber || orderData.orderName} to ${tip_in_cents}`);
-    // }
+    async addMockOrders(min = 8, max = 15) {
+        this.logInfo(`Driver adding mock orders`);
+        await this.navigateToOrders();
+        await this.createOrders(min, max);
+    }
+
+    async addMockTips() {
+        this.logInfo(`Driver adding mock tips`);
+        await this.navigateToOrders();
+        await this.addTipsToAllOrders();
+    }
 }

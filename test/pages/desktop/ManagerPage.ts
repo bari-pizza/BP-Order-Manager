@@ -171,4 +171,26 @@ export class ManagerPage extends BasePageDesktop {
         await this.page.waitForTimeout(5000);
         this.logger.logInfo('Closed business day');
     }
+
+    async addDriversToDay() {
+        this.logInfo('Adding drivers');
+        await this.navigateToManager();
+        await this.navigateToTab('Drawers');
+        await this.addDriver('Julia Catalan');
+        await this.addDriver('Cedrick Catalan');
+    }
+
+    async closeAllDrawers() {
+        this.logInfo('Closing all drawers');
+        await this.navigateToManager();
+        await this.navigateToTab('Drawers');
+        await this.closeDrawers();
+    }
+
+    async closeDay() {
+        this.logInfo('Closing business day');
+        await this.navigateToManager();
+        await this.navigateToTab('Drawers');
+        await this.closeBusinessDay();
+    }
 }
