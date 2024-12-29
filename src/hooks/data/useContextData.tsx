@@ -19,6 +19,7 @@ export const useOrderDashboardContext = () => {
 };
 
 export const useBariPizzaContext = () => {
+    console.log('useBariPizzaContext');
     return useContext(BariPizzaContext);
 };
 

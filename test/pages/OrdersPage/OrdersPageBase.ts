@@ -1,8 +1,9 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { BasePage } from '../BasePage/BasePage';
 import { faker } from '@faker-js/faker/locale/en_US';
 import { OrderData, orderOriginsWithTypes } from '../../utils/data';
 import { TicketPageBase } from '../TicketPage/TicketPageBase';
+import { formatCurrency } from '../../../src/utils';
 
 export abstract class OrdersPageBase extends BasePage {
     private static currentOrderNumber = 0;
@@ -111,30 +112,56 @@ export abstract class OrdersPageBase extends BasePage {
 
     async chooseOrigin(origin: OrderData['origin']['name']) {
         const originSelect = this.page.locator(`//label[text()='Origin']/following::div[1]`);
-        // get originSelect text
-        const initialValue = await originSelect.textContent();
-        if (initialValue === origin + 'Origin') return;
+        if ((await originSelect.textContent()) === origin + 'Origin') return;
+
         await originSelect.click();
         const dropdownOption = this.page.locator(`//li[text()='${origin}']`);
         await dropdownOption.click();
+
+        // confirm that origin has changed
+        await expect(originSelect).toHaveText(origin + 'Origin');
     }
 
     async chooseOrderType(orderType: OrderData['orderType']) {
         const orderTypeSelect = this.page.locator(`//label[text()='Order Type']/following::div[1]`);
         const className = await orderTypeSelect.getAttribute('class');
         if (className?.includes('Mui-disabled')) return;
-        await orderTypeSelect.click();
+
         const optionText = orderType.charAt(0).toUpperCase() + orderType.slice(1);
+        if ((await orderTypeSelect.textContent()) === optionText) return;
+
+        await orderTypeSelect.click();
         const dropdownOption = this.page.locator(`//li[text()='${optionText}']`);
         await dropdownOption.click();
+
+        // confirm that orderType has changed
+        await expect(orderTypeSelect).toHaveText(optionText + 'Order Type', { timeout: 10000 });
     }
 
     async setOrderNumber(orderNumber: string) {
+        if ((await this.page.locator('input[name="order_number"]').inputValue()) === orderNumber) return;
+
         await this.page.locator('input[name="order_number"]').fill(orderNumber);
+
+        // confirm that orderNumber has changed
+        try {
+            await expect(this.page.locator('input[name="order_number"]')).toHaveValue(orderNumber);
+        } catch {
+            await this.setOrderNumber(orderNumber);
+        }
     }
 
     async setOrderName(orderName: string) {
+        if ((await this.page.locator('input[name="order_name"]').inputValue()) === orderName) return;
+
         await this.page.locator('input[name="order_name"]').fill(orderName);
+
+        // confirm that orderName has changed
+        try {
+            await expect(this.page.locator('input[name="order_name"]')).toHaveValue(orderName);
+        } catch {
+            await this.setOrderName(orderName);
+        }
     }
 
     async setPaymentType(paymentType: OrderData['paymentType']) {
@@ -143,42 +170,86 @@ export abstract class OrdersPageBase extends BasePage {
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ')
             .replace('Third', '3rd');
+
         const paymentTypeButton = this.page.locator(`//button[text()='${paymentTypeText}']`);
+
+        const initialClassList = await paymentTypeButton.getAttribute('class');
+        if (initialClassList?.includes('selected')) return;
+
         await paymentTypeButton.click();
+
+        // confirm that paymentType has changed
+        await expect(paymentTypeButton).toHaveClass(/selected/);
     }
 
     async setTotalInCents(total_in_cents: number) {
-        await this.page.locator(`//label[text()='Total']/following::input[1]`).fill(total_in_cents.toString());
+        const totalInput = this.page.locator(`//label[text()='Total']/following::input[1]`);
+        if ((await totalInput.inputValue()) === formatCurrency(total_in_cents)) return;
+
+        await totalInput.fill(total_in_cents.toString());
+
+        // await this.page.locator(`//label[text()='Total']/following::input[1]`).fill(total_in_cents.toString());
+
+        // confirm that total_in_cents has changed
+        const newValue = await this.page.locator(`//label[text()='Total']/following::input[1]`).inputValue();
+        expect(newValue).toBe(formatCurrency(total_in_cents));
     }
 
     async addOrder(isMobile: boolean) {
         const { origin, orderType, total_in_cents, paymentType } = OrdersPageBase.generateRandomOrder(isMobile);
 
-        await this.clickAddOrder();
-
-        await this.chooseOrigin(origin.name);
-        await this.chooseOrderType(orderType);
-        let orderNumber: string | undefined;
-        let orderName: string | undefined;
-        if (origin.has_order_number) {
-            orderNumber = OrdersPageBase.generateOrderNumber();
-            await this.setOrderNumber(orderNumber);
-        } else {
-            orderName = OrdersPageBase.generateUniqueOrderName();
-            await this.setOrderName(orderName);
-        }
-        await this.setTotalInCents(total_in_cents);
-        await this.setPaymentType(paymentType);
-        await this.confirmOrder();
-        this.logger.logInfo(`Created order ${orderNumber || orderName}`, {
+        this.logger.logInfo(`${isMobile ? 'Driver' : 'Manager'} creating order`, {
             origin: origin.name,
             orderType,
             total_in_cents,
             paymentType,
         });
+
+        await this.clickAddOrder();
+
+        let success = false;
+        while (!success) {
+            // await this.startTimeout(3, `Choosing origin: ${origin.name}`);
+            await this.chooseOrigin(origin.name);
+
+            if (!isMobile) {
+                // await this.startTimeout(3, `Choosing order type: ${orderType}`);
+                await this.chooseOrderType(orderType);
+            }
+
+            let orderNumber: string | undefined;
+            let orderName: string | undefined;
+            if (origin.has_order_number) {
+                orderNumber = OrdersPageBase.generateOrderNumber();
+                // await this.startTimeout(3, `Setting order number: ${orderNumber}`);
+                await this.setOrderNumber(orderNumber);
+            } else {
+                orderName = OrdersPageBase.generateUniqueOrderName();
+                // await this.startTimeout(3, `Setting order number: ${orderName}`);
+                await this.setOrderName(orderName);
+            }
+
+            // await this.startTimeout(3, `Setting total: ${total_in_cents}`);
+            await this.setTotalInCents(total_in_cents);
+
+            // await this.startTimeout(3, `Setting payment type: ${paymentType}`);
+            await this.setPaymentType(paymentType);
+
+            // await this.startTimeout(3, 'Confirming order');
+            success = await this.confirmOrder();
+        }
     }
 
     async confirmOrder() {
         await this.page.locator('text=Save').click();
+        // save button should disappear
+        try {
+            await expect(this.page.locator('text=Save')).not.toBeVisible();
+            this.logger.logInfo('Order saved successfully');
+            return true;
+        } catch (e) {
+            this.logger.logError('Failed to save order', e);
+            return false;
+        }
     }
 }

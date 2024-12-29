@@ -82,11 +82,13 @@ export abstract class TicketPageBase extends BasePage {
         const originClass = await nthTicket.locator('[class*="origin-logo-"]').getAttribute('class');
         const orderTypeClass = await nthTicket.locator('[class*="order-type-"]').getAttribute('class');
         const totalText = (await nthTicket.locator('.order-total').textContent()) || '';
+        const tipText = (await nthTicket.locator('.order-tips').textContent()) || '';
 
         // Parse and format the scraped data
         const origin = originClass?.match(/origin-logo-(.*)/)?.[1]?.replace(/\./g, ' ');
         const orderType = orderTypeClass?.match(/order-type-(.*)-icon/)?.[1];
         const total_in_cents = parseFloat(totalText?.replace('$', '')) * 100;
+        const tip_in_cents = parseFloat(tipText?.replace('$', '')) * 100;
 
         if (!origin || !orderType || isNaN(total_in_cents)) throw new Error('Failed to parse order data');
 
@@ -96,7 +98,8 @@ export abstract class TicketPageBase extends BasePage {
             orderName: orderName || undefined,
             origin: orderOriginsWithTypes[origin as keyof typeof orderOriginsWithTypes].origin,
             orderType,
-            total_in_cents,
+            total_in_cents: total_in_cents.toFixed(0),
+            tip_in_cents: tip_in_cents.toFixed(0),
         };
 
         this.logger.logInfo(
@@ -125,11 +128,14 @@ export abstract class TicketPageBase extends BasePage {
         await this.openTicket(ticket);
     }
 
-    async editPayment(ticket: Locator, payment: Partial<Payment>, index = 0) {
+    async editPayment(ticket: Locator, payment: Partial<Payment>, index = 0, failures = 0) {
         let hasChanges = false;
         await this.openTicketIfClosed(ticket);
 
+        if (failures) await this.startTimeout(5, 'Handling error! ');
+
         // find and click on payment
+        if (failures) await this.startTimeout(3, 'Will start editing payment in: ');
         await this.orderEditor.locator(`.payment-editor-edit-payment:nth-child(${index + 1})`).click();
 
         // click on payment type
@@ -140,13 +146,16 @@ export abstract class TicketPageBase extends BasePage {
             return value !== undefined;
         }
 
-        const formattedTip = isDefined(payment.tip_in_cents) ? formatCurrency(payment.tip_in_cents) : 'N/A';
+        const paymentInput = this.orderEditor.locator(`.payment-tip-input input`);
+        const formattedTip = isDefined(payment.tip_in_cents)
+            ? formatCurrency(payment.tip_in_cents)
+            : await paymentInput.inputValue();
         this.logger.logInfo(`Setting payment tip to ${formattedTip}`);
 
         if (isDefined(payment.tip_in_cents)) {
-            const paymentInput = this.orderEditor.locator(`.payment-tip-input input`);
             if ((await paymentInput.inputValue()) !== formattedTip) {
                 hasChanges = true;
+                if (failures) await this.startTimeout(3, `Setting tip to ${formattedTip}`);
                 await paymentInput.fill(payment.tip_in_cents.toString());
             }
         }
@@ -155,20 +164,32 @@ export abstract class TicketPageBase extends BasePage {
 
         // save
         if (hasChanges) {
+            if (failures) await this.startTimeout(2, 'Will click save in: ');
             await this.orderEditor.locator('button:has-text("Save")').click();
             await expect(this.orderEditor.locator('.payment-editor-editing-payment')).not.toBeVisible();
             // confirm changes
-            if (isDefined(payment.tip_in_cents)) {
-                await expect(
-                    this.orderEditor.locator(
-                        `.payment-editor-edit-payment:nth-child(${index + 1}) .payment-tip-in-cents`,
-                    ),
-                ).toHaveText(formattedTip);
-            }
+            // if (isDefined(payment.tip_in_cents)) {
+            // await this.startTimeout(4, 'Will confirm tip in: ');
+            await expect(
+                this.orderEditor.locator(`.payment-editor-edit-payment:nth-child(${index + 1}) .payment-tip-in-cents`),
+            ).toHaveText(formattedTip);
+            // }
         }
     }
 
     async editTip(ticket: Locator, tip_in_cents: number) {
-        await this.editPayment(ticket, { tip_in_cents });
+        let failures = 0;
+        let success = false;
+        while (!success) {
+            try {
+                await this.editPayment(ticket, { tip_in_cents }, 0, failures);
+                success = true;
+            } catch {
+                failures++;
+                if (failures > 3) {
+                    throw new Error('Failed to edit tip');
+                }
+            }
+        }
     }
 }

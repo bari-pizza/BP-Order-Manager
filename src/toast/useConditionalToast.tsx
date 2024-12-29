@@ -1,7 +1,6 @@
 import { toast } from 'react-toastify';
 import { Profile } from '../typesAndValidators';
 import { useSession } from '../hooks/data/useSession';
-import { useLayoutContext } from '../hooks/data/useContextData';
 
 // const myCallback = ({ profile, driver }) => {
 //     console.log({ profile, driver });
@@ -10,6 +9,7 @@ import { useLayoutContext } from '../hooks/data/useContextData';
 type ConditionalContext = {
     profile: Profile | null;
     isMobile: boolean;
+    profileFullName: string;
 };
 
 type Comparison = 'eq' | 'neq' | 'lt' | 'lte' | 'gt' | 'gte';
@@ -63,10 +63,7 @@ const evaluateConditions = <T,>(conditions: Condition[], context: ConditionalCon
         }
 
         const result = compareValues(leftSide, rightSide, condition.comparison);
-        // toast.info(JSON.stringify({ result, leftSide, rightSide, condition }, null, 2), {
-        //     autoClose: false,
-        //     closeOnClick: true,
-        // });
+        // toast.info(JSON.stringify({ result, leftSide, rightSide, condition }, null, 2));
         return result;
     });
 };
@@ -75,9 +72,9 @@ const evaluateConditions = <T,>(conditions: Condition[], context: ConditionalCon
 const compareValues = (left: unknown, right: unknown, comparison: Comparison): boolean => {
     switch (comparison) {
         case 'eq':
-            return left === right;
+            return JSON.stringify(left) === JSON.stringify(right);
         case 'neq':
-            return left !== right;
+            return JSON.stringify(left) !== JSON.stringify(right);
         // case 'lt':
         //     return left < right;
         // case 'lte':
@@ -91,17 +88,16 @@ const compareValues = (left: unknown, right: unknown, comparison: Comparison): b
     }
 };
 
-export const useConditionalToast = () => {
+export const useConditionalToast = ({ isMobile }: { isMobile: boolean }) => {
     const { profile } = useSession();
-    const { isMobile } = useLayoutContext();
-    const context = { profile, isMobile };
+    const profileFullName = profile ? `${profile.first_name} ${profile.last_name}` : '';
+    const context = { profile, isMobile, profileFullName };
     const handleConditions = <T,>(params: ConditionalToastParams<T>) => {
         const { scenario, payload } = params;
         scenario.forEach((s) => {
             const { conditions, getMessage } = s;
-            // toast.error(getMessage(context));
             if (evaluateConditions(conditions, context, payload)) {
-                toast.info(getMessage(context), { autoClose: false, closeOnClick: true });
+                toast.info(getMessage(context));
             }
         });
     };

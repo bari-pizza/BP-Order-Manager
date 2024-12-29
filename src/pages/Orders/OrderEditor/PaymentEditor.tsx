@@ -324,6 +324,7 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                             if (variant === 'standard') {
                                 return (
                                     <Button
+                                        className={`payment-type-${option.value} ${isSelected ? 'selected' : ''}`}
                                         key={option.value}
                                         variant={isSelected ? 'contained' : 'outlined'}
                                         onClick={() => {

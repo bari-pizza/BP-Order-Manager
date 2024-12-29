@@ -31,7 +31,9 @@ export function Login() {
 
     const onResetPassword = async (data: FormValues) => {
         toastRef.current = toast.loading(`Sending password reset email to ${data.email}`);
-        const { error } = await supaClient.auth.resetPasswordForEmail(data.email);
+        const { error } = await supaClient.auth.resetPasswordForEmail(data.email, {
+            redirectTo: '/myaccount',
+        });
         if (error) {
             toast.update(toastRef.current, {
                 render: error.message,

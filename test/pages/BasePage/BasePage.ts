@@ -47,8 +47,8 @@ export abstract class BasePage {
         await expect(link).toBeVisible();
         await link.click();
         await expect(this.page).toHaveURL(href);
-        await this.page.mouse.move(0, 0);
         this.logger.logInfo(`Navigated to ${href}`);
+        await this.page.mouse.move(0, 0);
     }
 
     async navigateToHome() {
@@ -61,7 +61,7 @@ export abstract class BasePage {
         await expect(this.page.locator('_react=OrderDashboard').nth(0)).toBeVisible();
     }
 
-    async login() {
+    protected async loginWithCredentials(isMobile: boolean) {
         await this.page.goto('/login');
 
         const emailInput = this.page.locator('input[name="email"]');
@@ -74,8 +74,11 @@ export abstract class BasePage {
         await expect(passwordInput).toBeVisible();
         await expect(loginButton).toBeVisible();
 
-        await emailInput.fill('ccata002@gmail.com');
-        await passwordInput.fill('12345678');
+        const email = isMobile ? 'ccata002@gmail.com' : 'jrajulialmeida@gmail.com';
+        const pw = '12345678';
+
+        await emailInput.fill(email);
+        await passwordInput.fill(pw);
         await loginButton.click();
         this.logger.logInfo('Logged in');
     }
@@ -86,5 +89,47 @@ export abstract class BasePage {
 
     async takeScreenshot(filename: string): Promise<void> {
         await this.page.screenshot({ path: filename });
+    }
+
+    async startTimeout(seconds: number, message = 'Time remaining:') {
+        // Inject a timer element into the DOM
+        await this.page.evaluate(() => {
+            const timerDiv = document.createElement('div');
+            timerDiv.id = 'playwright-timer';
+            timerDiv.style.position = 'fixed';
+            timerDiv.style.top = '10px';
+            timerDiv.style.right = '10px';
+            timerDiv.style.backgroundColor = '#000';
+            timerDiv.style.color = '#fff';
+            timerDiv.style.padding = '10px';
+            timerDiv.style.borderRadius = '5px';
+            timerDiv.style.fontSize = '16px';
+            timerDiv.style.zIndex = '10000';
+            document.body.appendChild(timerDiv);
+        });
+
+        // Countdown logic with optional message
+        for (let i = seconds; i > 0; i -= 0.1) {
+            await this.page.evaluate(
+                (args: { timeLeft: number; msg: string }) => {
+                    const timerDiv = document.getElementById('playwright-timer');
+                    if (timerDiv) {
+                        timerDiv.textContent = `${args.msg ? args.msg + ' ' : ''} ${args.timeLeft.toFixed(1)}s`;
+                    }
+                },
+                { timeLeft: i, msg: message },
+            );
+
+            // Wait for 1 second
+            await this.page.waitForTimeout(100);
+        }
+
+        // Cleanup the timer element after timeout
+        await this.page.evaluate(() => {
+            const timerDiv = document.getElementById('playwright-timer');
+            if (timerDiv) {
+                timerDiv.remove();
+            }
+        });
     }
 }

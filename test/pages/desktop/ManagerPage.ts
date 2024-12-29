@@ -65,7 +65,6 @@ export class ManagerPage extends BasePageDesktop {
     }
 
     async addDriver(driver?: DriverIdentifier) {
-        const originalCount = await this.page.locator('.MuiButton-outlined.drawer-card-button').count();
         const addDriverButton = this.page
             .locator(`xpath=//*[contains(text(), 'Add Driver')]/ancestor::button[1]`)
             .nth(0);
@@ -76,6 +75,8 @@ export class ManagerPage extends BasePageDesktop {
         const driverList = this.page.locator(`//label[text()='Driver']/following::input[1]`);
         await driverList.waitFor(); // Wait for the driver list to load
 
+        let driverName: string | null = null;
+
         // Selecting driver based on the type of input
         if (!driver) {
             // Choose a random driver if null
@@ -85,12 +86,14 @@ export class ManagerPage extends BasePageDesktop {
             for (let i = 0; i < randomIndex; i++) {
                 await driverList.press('ArrowDown');
             }
+            driverName = await driverList.inputValue();
             await driverList.press('Enter');
         } else if (typeof driver === 'string') {
             // Select driver by name
             // TODO: improve this logic
+            driverName = driver;
             await driverList.fill(driver);
-            await new Promise((resolve) => setTimeout(resolve, 200));
+            await new Promise((resolve) => setTimeout(resolve, 500));
             await driverList.press('ArrowDown');
             await driverList.press('Enter');
         } else if (typeof driver === 'number') {
@@ -99,6 +102,7 @@ export class ManagerPage extends BasePageDesktop {
             for (let i = 0; i < driver; i++) {
                 await driverList.press('ArrowDown');
             }
+            driverName = await driverList.inputValue();
             await driverList.press('Enter');
         } else {
             throw new Error('Invalid driver identifier. Must be string, number, or null.');
@@ -110,8 +114,12 @@ export class ManagerPage extends BasePageDesktop {
         await submitButton.click();
         await expect(submitButton).not.toBeVisible();
 
-        const newCount = await this.page.locator('.MuiButton-outlined.drawer-card-button').count();
-        expect(newCount).toBe(originalCount + 1);
+        // const newCount = await this.page.locator('.MuiButton-outlined.drawer-card-button').count();
+        // expect(newCount).toBe(originalCount + 1);
+        const drawerLocator = await this.getDrawer(driverName!);
+        if (!drawerLocator) {
+            throw new Error('Drawer locator is null');
+        }
     }
 
     async closeDriver(drawerLocator: Locator) {

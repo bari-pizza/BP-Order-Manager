@@ -14,6 +14,7 @@ import { PaymentTypeIcon } from './PaymentTypeIcon';
 import { formatCurrency } from '../../utils';
 import { LockLottieIcon } from '../../rickcedlib/LottieIcons';
 import { useMobile } from '../../hooks/data/useMobile';
+import { motion } from 'framer-motion';
 
 interface OrderTicketMobileProps {
     order: Order_Payment;
@@ -86,9 +87,15 @@ const OrderTicketMobile = ({ order }: OrderTicketMobileProps) => {
                         {formatCurrency(order.total_in_cents)}
                     </Typography>
                     <Divider orientation="vertical" />
-                    <Typography variant="body1" color={totalTips > 0 ? 'primary' : 'error'} className="order-tips">
-                        {formatCurrency(totalTips)}
-                    </Typography>
+                    <motion.div
+                        key={totalTips} // Changes key when the value changes, triggering re-render and animation
+                        initial={{ backgroundColor: '#fffa8b' }}
+                        animate={{ backgroundColor: '#ffffff' }}
+                        transition={{ duration: 2 }}>
+                        <Typography variant="body1" color={totalTips > 0 ? 'primary' : 'error'} className="order-tips">
+                            {formatCurrency(totalTips)}
+                        </Typography>
+                    </motion.div>
                 </Stack>
             </CardActionArea>
             {isLocked && (

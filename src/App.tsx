@@ -28,6 +28,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ManagerDashboard, ManagerDashboardSkeleton } from './pages/Manager/ManagerDashboard.tsx';
 import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
+import { useSetupOrderPaymentSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
+import { useBusinessDate } from './hooks/data/useBusinessDate.tsx';
 
 const router = createBrowserRouter([
     {
@@ -94,6 +96,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+    console.log('rendering app.tsx');
     return (
         <ErrorBoundary>
             <QueryClientProvider client={queryClient}>
@@ -154,6 +157,11 @@ function Layout() {
             },
         ],
     });
+    const [businessDate] = useBusinessDate();
+
+    useSetupOrderPaymentSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
+
+    console.log('rendering layout.tsx');
 
     return (
         // <APIProvider

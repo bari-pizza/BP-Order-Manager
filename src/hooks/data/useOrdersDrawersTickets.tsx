@@ -2,6 +2,8 @@ import { useRef, useState, RefObject } from 'react';
 import {
     BusinessDayDrawerSummary,
     BusinessDaySummary,
+    Order,
+    Payment,
     type CashTransfer,
     type Drawer,
     type Driver_Drawer,
@@ -15,11 +17,13 @@ import { RPCPayload } from '../../api/helpers';
 import {
     useSubscribeToTable,
     // useSubscribeToPayments,
-    useSubscribeToOrderPayments,
+    // useSubscribeToOrderPayments,
 } from './useSubscribeToTable';
 import { useCashTransferAPI } from '../../api/cashTransfer';
 import { useBusinessDaySummaryAPI } from '../../api/businessDateSummary';
 import { useDocumentTitle } from 'usehooks-ts';
+import { useQueryClient } from '@tanstack/react-query';
+import { sortOrders } from '../../utils';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -55,7 +59,17 @@ export const useOrdersDrawersTickets = () => {
     //     showToast: ['delete', 'insert', 'update'],
     // });
     // const allOrders = useSubscribeToPayments(orderPayments, ['orders', businessDate.format('YYYY-MM-DD')]);
-    const allOrders = useSubscribeToOrderPayments({ businessDate, showToast: ['insert', 'update'] });
+    // const allOrders = useSubscribeToOrderPayments({ businessDate, showToast: ['insert', 'update'] });
+    const queryClient = useQueryClient();
+    const ordersWithoutPayments = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
+    const payments = queryClient.getQueryData(['payments', businessDate.format('YYYY-MM-DD')]) as Payment[];
+    const allOrderPayments: Order_Payment[] =
+        ordersWithoutPayments?.map((order) => ({
+            ...order,
+            payments: payments?.filter((payment) => payment.order_id === order.order_id),
+        })) || [];
+
+    allOrderPayments.sort(sortOrders);
 
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
@@ -78,7 +92,7 @@ export const useOrdersDrawersTickets = () => {
         queryKey: ['cashTransfers', businessDate.format('YYYY-MM-DD')],
     });
 
-    const allPayments = allOrders.flatMap((order) => order.payments);
+    const allPayments = allOrderPayments.flatMap((order) => order.payments);
     const ticketRefs = useRef<{ [key: string]: RefObject<SVGSVGElement> }>({});
     const drawerRefs = useRef<{ [key: string]: RefObject<HTMLDivElement> }>({});
 
@@ -87,11 +101,11 @@ export const useOrdersDrawersTickets = () => {
         unassignedDrawer,
     );
 
-    const orders = allOrders?.filter(
+    const orders = allOrderPayments?.filter(
         (order) => order.drawer_id === (openDrawer.drawer_id === 'unassigned' ? null : openDrawer.drawer_id),
     );
 
-    const ordersByDrawer = allOrders?.reduce((acc: { [key: string]: Order_Payment[] }, order) => {
+    const ordersByDrawer = allOrderPayments?.reduce((acc: { [key: string]: Order_Payment[] }, order) => {
         const key = order.drawer_id ?? 'unassigned';
         if (!acc[key]) {
             acc[key] = [];
@@ -280,7 +294,7 @@ export const useOrdersDrawersTickets = () => {
         orderNames: new Set<string>(),
     };
 
-    allOrders.forEach((order) => {
+    allOrderPayments.forEach((order) => {
         if (order.order_number) {
             if (orderDictionary.orderNumbers.has(order.order_number)) {
                 repeats.orderNumbers.add(order.order_number);
@@ -344,7 +358,7 @@ export const useOrdersDrawersTickets = () => {
         },
         orders: {
             forCurrentDrawer: orders,
-            all: allOrders,
+            all: allOrderPayments,
             byDrawerID: getOrdersByDrawerID,
             isRepeat,
             delete: orderAPI.delete,

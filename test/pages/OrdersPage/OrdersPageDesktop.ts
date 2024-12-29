@@ -14,6 +14,10 @@ export class OrdersPageDesktop extends OrdersPageBase {
         this.ticketPage = new TicketPageDesktop(page);
     }
 
+    async login() {
+        await this.loginWithCredentials(false);
+    }
+
     async clickAddOrder() {
         await this.page.locator('.MuiButton-contained:has-text("Add Order")').isVisible();
         await this.page.locator('.MuiButton-contained:has-text("Add Order")').click();

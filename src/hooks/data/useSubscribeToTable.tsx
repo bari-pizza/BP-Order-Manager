@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { supaClient } from '../../supaClient';
 import { toast } from 'react-toastify';
-import { Order, Order_Payment, Payment } from '../../typesAndValidators';
+import { Order, Payment } from '../../typesAndValidators';
 import { useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { sortOrders } from '../../utils';
 import { useConditionalToast } from '../../toast/useConditionalToast';
 
 type ShowToastOptions = ('insert' | 'update' | 'delete')[];
+
+// TODO: make this use context instead
 
 export const useSubscribeToTable = <T extends Record<string, unknown>>({
     tableName,
@@ -170,12 +171,14 @@ const getAllDaysPayments = async ({ businessDate }: { businessDate: dayjs.Dayjs 
 // [ ] - let driver know when changes are made to their order or payment (isMobile && lastUpdatedBy !== 'driver')
 // [ ] - let manager know when changes are made to any order or payment (!isMobile && lastUpdatedBy !== 'manager')
 
-export const useSubscribeToOrderPayments = ({
+export const useSetupOrderPaymentSubscriptions = ({
     businessDate,
     showToast,
+    isMobile,
 }: {
     businessDate: dayjs.Dayjs;
     showToast?: ShowToastOptions;
+    isMobile: boolean;
 }) => {
     // useSuspenseQuery({
     //     queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
@@ -210,14 +213,17 @@ export const useSubscribeToOrderPayments = ({
 
     const queryClient = useQueryClient();
 
-    const conditionalToast = useConditionalToast();
+    const conditionalToast = useConditionalToast({ isMobile });
 
     useEffect(() => {
         // const currentData = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
         // let newData = currentData;
         // Set up the subscription with a filter
+
+        // console.log('subscribing to order changes ' + businessDate.format('YYYY-MM-DD'));
+
         const channel = supaClient
-            .channel('order-changes')
+            .channel('order-changes-' + businessDate.format('YYYY-MM-DD'))
             .on(
                 'postgres_changes',
                 {
@@ -238,7 +244,13 @@ export const useSubscribeToOrderPayments = ({
                                             scenario: [
                                                 {
                                                     conditions: [
-                                                        { ctxField: 'isMobile', ctxValue: true, comparison: 'eq' },
+                                                        // order belongs to driver
+                                                        {
+                                                            ctxField: 'profile.id',
+                                                            payloadField: 'drawer_id',
+                                                            comparison: 'eq',
+                                                        },
+                                                        // lastUpdatedBy someone else
                                                         {
                                                             ctxField: 'profile.id',
                                                             payloadField: 'last_updated_by',
@@ -246,24 +258,14 @@ export const useSubscribeToOrderPayments = ({
                                                         },
                                                     ],
                                                     getMessage: (context) => {
-                                                        return `A new order was added to ${context.profile?.first_name}'s drawer.`;
+                                                        const orderNameOrNumber =
+                                                            payload.new.order_name || payload.new.order_number;
+                                                        return `New order ${orderNameOrNumber} added by ${context.profileFullName}`;
                                                     },
                                                 },
                                             ],
-                                            payload,
+                                            payload: payload.new as Order,
                                         });
-                                        // toast.info(
-                                        //     `Order ${payload.new.order_number || payload.new.order_name} was added`,
-                                        //     {
-                                        //         onClick: () => {
-                                        //             toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                        //                 autoClose: false,
-                                        //                 closeOnClick: true,
-                                        //             });
-                                        //         },
-                                        //         autoClose: 500,
-                                        //     },
-                                        // );
                                     }
                                     const newOrder = payload.new as Order;
                                     newData = [...currentData, newOrder];
@@ -272,18 +274,57 @@ export const useSubscribeToOrderPayments = ({
                             case 'UPDATE':
                                 {
                                     if (showToast?.includes('update')) {
-                                        toast.info(
-                                            `Order ${payload.new.order_number || payload.new.order_name} was updated`,
-                                            {
-                                                onClick: () => {
-                                                    toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                        autoClose: false,
-                                                        closeOnClick: true,
-                                                    });
+                                        conditionalToast({
+                                            scenario: [
+                                                {
+                                                    conditions: [
+                                                        {
+                                                            ctxField: 'isMobile',
+                                                            ctxValue: true,
+                                                            comparison: 'eq',
+                                                        },
+                                                        // order belongs to driver
+                                                        {
+                                                            ctxField: 'profile.id',
+                                                            payloadField: 'drawer_id',
+                                                            comparison: 'eq',
+                                                        },
+                                                        // lastUpdatedBy someone else
+                                                        {
+                                                            ctxField: 'profile.id',
+                                                            payloadField: 'last_updated_by',
+                                                            comparison: 'neq',
+                                                        },
+                                                    ],
+                                                    getMessage: () => {
+                                                        const orderNameOrNumber =
+                                                            payload.new.order_name || payload.new.order_number;
+                                                        return `A change was made to order ${orderNameOrNumber} by someone else.`;
+                                                    },
                                                 },
-                                                autoClose: 500,
-                                            },
-                                        );
+                                                {
+                                                    conditions: [
+                                                        {
+                                                            ctxField: 'isMobile',
+                                                            ctxValue: false,
+                                                            comparison: 'eq',
+                                                        },
+                                                        // lastUpdatedBy someone else
+                                                        {
+                                                            ctxField: 'profile.id',
+                                                            payloadField: 'last_updated_by',
+                                                            comparison: 'neq',
+                                                        },
+                                                    ],
+                                                    getMessage: () => {
+                                                        const orderNameOrNumber =
+                                                            payload.new.order_name || payload.new.order_number;
+                                                        return `A change was made to order ${orderNameOrNumber} by someone else.`;
+                                                    },
+                                                },
+                                            ],
+                                            payload: payload.new as Order,
+                                        });
                                     }
                                     newData = currentData.map((item) => {
                                         const newOrder = payload.new as Order;
@@ -295,18 +336,34 @@ export const useSubscribeToOrderPayments = ({
                                     });
                                 }
                                 break;
-                            // TODO: give access to all orders to all drivers (otherwise they can't see updates to orders)
                             case 'DELETE':
                                 {
                                     if (showToast?.includes('delete')) {
-                                        toast.info(`A record was deleted from Orders table`, {
-                                            onClick: () => {
-                                                toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                    autoClose: false,
-                                                    closeOnClick: true,
-                                                });
-                                            },
-                                            autoClose: 500,
+                                        conditionalToast({
+                                            scenario: [
+                                                {
+                                                    conditions: [
+                                                        // order belongs to driver
+                                                        {
+                                                            ctxField: 'profile.id',
+                                                            payloadField: 'drawer_id',
+                                                            comparison: 'eq',
+                                                        },
+                                                        // lastUpdatedBy someone else
+                                                        {
+                                                            ctxField: 'profile.id',
+                                                            payloadField: 'last_updated_by',
+                                                            comparison: 'neq',
+                                                        },
+                                                    ],
+                                                    getMessage: (context) => {
+                                                        const orderNameOrNumber =
+                                                            payload.old.order_name || payload.old.order_number;
+                                                        return `Order ${orderNameOrNumber} was deleted by ${context.profileFullName}.`;
+                                                    },
+                                                },
+                                            ],
+                                            payload: payload.old as Order,
                                         });
                                     }
                                     const orderID = (payload.old as Order).order_id;
@@ -331,6 +388,7 @@ export const useSubscribeToOrderPayments = ({
         // Cleanup subscription on component unmount
         return () => {
             channel.unsubscribe();
+            // console.log('Unsubscribing from order changes ' + businessDate.format('YYYY-MM-DD'));
         };
     }, [businessDate, showToast, queryClient, conditionalToast]);
 
@@ -340,8 +398,10 @@ export const useSubscribeToOrderPayments = ({
         // const currentData = (queryClient.getQueryData(['payments', businessDate.format('YYYY-MM-DD')]) ||
         //     []) as Payment[];
         // let newData = currentData;
+        // console.log('subscribing to payment changes ' + businessDate.format('YYYY-MM-DD'));
+
         const channel = supaClient
-            .channel('payment-changes')
+            .channel('payment-changes-' + businessDate.format('YYYY-MM-DD'))
             .on(
                 'postgres_changes',
                 {
@@ -368,16 +428,34 @@ export const useSubscribeToOrderPayments = ({
                                 newData = [...currentData, newPayment];
                             }
 
+                            // TODO: lets see if I can get orders from queryClient and check them to see if a payment belongs to this user or not
                             if (eventType === 'UPDATE') {
                                 if (showToast?.includes('update')) {
-                                    toast.info(`Payment for order ${newPayment.order_id} was updated`, {
-                                        onClick: () => {
-                                            toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                autoClose: false,
-                                                closeOnClick: true,
-                                            });
-                                        },
-                                        autoClose: 500,
+                                    conditionalToast({
+                                        scenario: [
+                                            {
+                                                conditions: [
+                                                    // order belongs to driver
+                                                    {
+                                                        ctxField: 'profile.id',
+                                                        payloadField: 'drawer_id',
+                                                        comparison: 'eq',
+                                                    },
+                                                    // lastUpdatedBy someone else
+                                                    {
+                                                        ctxField: 'profile.id',
+                                                        payloadField: 'last_updated_by',
+                                                        comparison: 'neq',
+                                                    },
+                                                ],
+                                                getMessage: (context) => {
+                                                    const orderNameOrNumber =
+                                                        payload.new.order_name || payload.new.order_number;
+                                                    return `A change was made to order ${orderNameOrNumber} by ${context.profileFullName}.`;
+                                                },
+                                            },
+                                        ],
+                                        payload: payload.new as Payment,
                                     });
                                 }
                                 newData = currentData.map((payment) => {
@@ -470,18 +548,18 @@ export const useSubscribeToOrderPayments = ({
         return () => {
             channel.unsubscribe();
         };
-    }, [businessDate, showToast, queryClient]);
+    }, [businessDate, showToast, queryClient, conditionalToast]);
 
-    const orders = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
-    const payments = queryClient.getQueryData(['payments', businessDate.format('YYYY-MM-DD')]) as Payment[];
-    const orderPayments: Order_Payment[] = orders.map((order) => ({
-        ...order,
-        payments: payments.filter((payment) => payment.order_id === order.order_id),
-    }));
+    // const orders = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
+    // const payments = queryClient.getQueryData(['payments', businessDate.format('YYYY-MM-DD')]) as Payment[];
+    // const orderPayments: Order_Payment[] = orders.map((order) => ({
+    //     ...order,
+    //     payments: payments.filter((payment) => payment.order_id === order.order_id),
+    // }));
 
-    orderPayments.sort(sortOrders);
+    // orderPayments.sort(sortOrders);
 
-    return orderPayments;
+    // return orderPayments;
 };
 
 // custom solution since Order_Payments has to subscribe to both Order and Payment
