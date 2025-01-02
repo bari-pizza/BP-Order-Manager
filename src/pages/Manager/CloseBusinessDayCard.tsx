@@ -58,7 +58,7 @@ export const CloseBusinessDayCard = () => {
     orders.all.forEach((order) => {
         grandSummary.total_in_cents += order.total_in_cents;
         grandSummary.orders += 1;
-        order.payments.forEach((payment) => {
+        order.payments?.forEach((payment) => {
             if (payment.payment_type === 'cash') grandSummary.cash_in_cents += payment.amount_in_cents;
             if (payment.payment_type === 'card')
                 grandSummary.card_in_cents += payment.amount_in_cents + payment.tip_in_cents;

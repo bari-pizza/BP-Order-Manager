@@ -97,32 +97,9 @@ export const useConditionalToast = ({ isMobile }: { isMobile: boolean }) => {
         scenario.forEach((s) => {
             const { conditions, getMessage } = s;
             if (evaluateConditions(conditions, context, payload)) {
-                toast.info(getMessage(context));
+                toast.info(getMessage(context), { autoClose: 1000 });
             }
         });
     };
     return handleConditions;
 };
-
-// const ExampleUsage = () => {
-//     const { handleConfirmation } = useConfirmationToast({
-//         message: 'Are you sure?',
-//         confirmProps: {
-//             handler: () => {
-//                 alert('Confirmed');
-//             },
-//             buttonText: 'Do it!',
-//         },
-//         cancelProps: {
-//             handler: () => {
-//                 alert('Cancelled');
-//             },
-//             buttonText: 'Cancel',
-//         },
-//     });
-//     const handleClick = () => {
-//         handleConfirmation();
-//     };
-
-//     return <Button onClick={handleClick}>Confirm</Button>;
-// };

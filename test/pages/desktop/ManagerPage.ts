@@ -176,7 +176,7 @@ export class ManagerPage extends BasePageDesktop {
         this.logInfo('Adding drivers');
         await this.navigateToManager();
         await this.navigateToTab('Drawers');
-        await this.addDriver('Julia Catalan');
+        await this.addDriver('Faker Test');
         await this.addDriver('Cedrick Catalan');
     }
 

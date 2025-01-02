@@ -2,22 +2,22 @@ import dayjs from 'dayjs';
 import { supaClient } from '../supaClient';
 import { CashTransfer, NewCashTransfer } from '../typesAndValidators';
 import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } from './helpers';
-import { useSuspenseQuery } from '@tanstack/react-query';
+// import { useSuspenseQuery } from '@tanstack/react-query';
 
-const getAllDaysCashTransfers = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const { data, error } = await supaClient
-        .from('CashTransfer')
-        .select('*')
-        .eq('business_date', businessDate.format('YYYY-MM-DD'));
+// const getAllDaysCashTransfers = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+//     const { data, error } = await supaClient
+//         .from('CashTransfer')
+//         .select('*')
+//         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
-    if (error) {
-        console.error(error);
-        return [];
-    }
-    if (!data || data.length === 0) return [];
+//     if (error) {
+//         console.error(error);
+//         return [];
+//     }
+//     if (!data || data.length === 0) return [];
 
-    return data as unknown as CashTransfer[];
-};
+//     return data as unknown as CashTransfer[];
+// };
 
 const createNewCashTransfer: SupabaseInteractor<NewCashTransfer, CashTransfer> = async (newCashTransfer) => {
     const payload = (await supaClient
@@ -45,14 +45,14 @@ const deleteCashTransfer: SupabaseInteractor<CashTransfer, CashTransfer> = async
     return handlePayload<CashTransfer>(payload);
 };
 
-const useGetAllDaysCashTransfers = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    return useSuspenseQuery({
-        queryKey: ['cashTransfers', businessDate.format('YYYY-MM-DD')],
-        queryFn: () => getAllDaysCashTransfers({ businessDate }),
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 30,
-    });
-};
+// const useGetAllDaysCashTransfers = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+//     return useSuspenseQuery({
+//         queryKey: ['cashTransfers', businessDate.format('YYYY-MM-DD')],
+//         queryFn: () => getAllDaysCashTransfers({ businessDate }),
+//         refetchOnWindowFocus: false,
+//         staleTime: 1000 * 60 * 30,
+//     });
+// };
 
 const useCreateNewCashTransfer = ({ queryKey }: { queryKey: string[] }) => {
     return useInteractionHandler<NewCashTransfer, CashTransfer>({
@@ -100,7 +100,7 @@ export const useCashTransferAPI = ({ businessDate }: { businessDate: dayjs.Dayjs
     const queryKey = ['cashTransfers', businessDate.format('YYYY-MM-DD')];
     return {
         cashTransferAPI: {
-            getAll: useGetAllDaysCashTransfers({ businessDate }),
+            // getAll: useGetAllDaysCashTransfers({ businessDate }),
             create: useCreateNewCashTransfer({ queryKey }).mutate,
             update: useUpdateCashTransfer({ queryKey }).mutate,
             delete: useDeleteCashTransfer({ queryKey }).mutate,

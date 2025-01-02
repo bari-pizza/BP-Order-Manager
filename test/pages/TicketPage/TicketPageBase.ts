@@ -184,10 +184,11 @@ export abstract class TicketPageBase extends BasePage {
             try {
                 await this.editPayment(ticket, { tip_in_cents }, 0, failures);
                 success = true;
-            } catch {
+            } catch (e) {
                 failures++;
                 if (failures > 3) {
-                    throw new Error('Failed to edit tip');
+                    this.logError(e, 'failed to edit tip');
+                    return;
                 }
             }
         }

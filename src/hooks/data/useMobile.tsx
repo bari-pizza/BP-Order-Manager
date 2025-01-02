@@ -10,7 +10,7 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
     [ ] fix scrolling in orders area
     [x] Add a way for admin to create a new driver
     [x] Send password reset email
-    [ ] Add a way to update your password
+    [x] Add a way to update your password
     [ ] Choose a prettier secondary color
     [x] - info telling manager to delete order they must first:
             - delete all payments
@@ -23,12 +23,12 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
     [ ] - order ticket stretches when a row is added or removed from order ticket area (motion issues)
     [ ] - add new lottie icons
         [ ] - For tabs (Orders, Drivers, Cards, Sales)
-    [ ] - check issues with subscriptions
-        [ ] - mobile is not seeing new orders applied
-        [ ] - not all changes to orders are being shown to a second instance of desktop
-        [ ] - some orders that driver add dont show up until a payment is recorded
-        [ ] - only some orders show as locked even though all are
-    [ ] - Order Editor should only use today's drawers not all drawers
+    [x] - check issues with subscriptions
+        [x] - mobile is not seeing new orders applied
+        [x] - not all changes to orders are being shown to a second instance of desktop
+        [x] - some orders that driver add dont show up until a payment is recorded
+        [x] - only some orders show as locked even though all are
+    [x] - Order Editor should only use today's drawers not all drawers
         */
 
 export const useMobile = () => {

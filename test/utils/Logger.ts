@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import dayjs from 'dayjs';
-import { chromium } from '@playwright/test';
+import { exec } from 'child_process';
+// import { chromium } from '@playwright/test';
 
 export class Logger {
     private filePath: string;
@@ -79,10 +80,19 @@ export class Logger {
     }
 
     async openLogFile() {
-        const browser = await chromium.launch({ headless: false });
-        const context = await browser.newContext();
-        const page = await context.newPage();
-        await page.goto(`file://${this.filePath}`);
-        console.log(`Log file opened in Playwright: file://${this.filePath}`);
+        const fileUrl = `${this.filePath.replace(/\\/g, '/')}`;
+        console.log(`Open log file: ${fileUrl}`);
+        const chromePath = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"`;
+
+        // Launch Chrome with the file URL
+        exec(`${chromePath} "${fileUrl}"`, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error opening Chrome: ${error.message}`);
+            }
+            if (stderr) {
+                console.error(`Chrome stderr: ${stderr}`);
+            }
+            console.log(stdout);
+        });
     }
 }

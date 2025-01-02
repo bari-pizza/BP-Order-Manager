@@ -1,6 +1,9 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from '@mui/material';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { getAllEmployees } from '../../../supabaseQueries';
+import {
+    useQueryClient,
+    //  useSuspenseQuery
+} from '@tanstack/react-query';
+// import { getAllEmployees } from '../../../supabaseQueries';
 import { EmployeesTable } from '../Tables/EmployeesTable';
 import { Profile } from '../../../typesAndValidators';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
@@ -10,7 +13,7 @@ import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
-import { useSubscribeToTable } from '../../../hooks/data/useSubscribeToTable';
+// import { useSubscribeToTable } from '../../../hooks/data/useSubscribeToTable';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';
@@ -60,18 +63,21 @@ export const EmployeesTab = () => {
             phone: '',
         },
     });
-    const { data: initialProfiles } = useSuspenseQuery({
-        queryKey: ['profiles'],
-        queryFn: () => getAllEmployees(),
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 30,
-    });
-    const profiles = useSubscribeToTable({
-        tableName: 'Profile',
-        initialData: initialProfiles,
-        primaryKeys: ['id'],
-        queryKey: ['profiles'],
-    });
+    // const { data: initialProfiles } = useSuspenseQuery({
+    //     queryKey: ['profiles'],
+    //     queryFn: () => getAllEmployees(),
+    //     refetchOnWindowFocus: false,
+    //     staleTime: 1000 * 60 * 30,
+    // });
+    // const profiles = useSubscribeToTable({
+    //     tableName: 'Profile',
+    //     initialData: initialProfiles,
+    //     primaryKeys: ['id'],
+    //     queryKey: ['profiles'],
+    // });
+    const queryClient = useQueryClient();
+
+    const profiles = (queryClient.getQueryData(['profiles']) ?? []) as Profile[];
     const employees = profiles
         .map((employee) => {
             const driver = drivers.find((driver) => {

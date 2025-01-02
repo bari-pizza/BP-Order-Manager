@@ -204,10 +204,8 @@ export abstract class OrdersPageBase extends BasePage {
         let orderName: string | undefined;
         if (origin.has_order_number) {
             orderNumber = OrdersPageBase.generateOrderNumber();
-            await this.setOrderNumber(orderNumber);
         } else {
             orderName = OrdersPageBase.generateUniqueOrderName();
-            await this.setOrderName(orderName);
         }
 
         this.logger.logInfo(`${isMobile ? 'Driver' : 'Manager'} creating order`, {

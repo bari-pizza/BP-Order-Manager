@@ -1,37 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { supaClient } from '../../supaClient';
 import { toast } from 'react-toastify';
-import { Order, Payment } from '../../typesAndValidators';
+import {
+    BusinessDayDrawerSummary,
+    BusinessDayDriver,
+    BusinessDaySummary,
+    CashTransfer,
+    Order,
+    Payment,
+    Profile,
+} from '../../typesAndValidators';
 import { useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useConditionalToast } from '../../toast/useConditionalToast';
+import { getAllDaysDrivers, getAllEmployees } from '../../supabaseQueries';
 
 type ShowToastOptions = ('insert' | 'update' | 'delete')[];
 
 // TODO: make this use context instead
 
-export const useSubscribeToTable = <T extends Record<string, unknown>>({
+const useSubscribeToTable = <T extends Record<string, unknown>>({
     tableName,
-    initialData,
     primaryKeys,
     queryKey,
+    isMobile,
     showToast = [],
 }: {
     tableName: string;
-    initialData: T[];
     primaryKeys: (keyof T)[];
     queryKey: string[];
+    isMobile: boolean;
     showToast?: ShowToastOptions;
 }) => {
-    const [data, setData] = useState<T[]>([]);
-
     const queryClient = useQueryClient();
 
-    useEffect(() => {
-        if (initialData) {
-            setData(initialData);
-        }
-    }, [initialData]);
+    const conditionalToast = useConditionalToast({ isMobile });
 
     useEffect(() => {
         const isMatch = (a: T, b: T) => {
@@ -50,60 +53,100 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
                 },
                 (payload) => {
                     const eventType = payload.eventType;
-                    const newData = payload.new as T;
-                    const oldData = payload.old as T;
-                    setData((currentData) => {
+                    // const newData = payload.new as T;
+                    // const oldData = payload.old as T;
+                    // setData((currentData) => {
+                    queryClient.setQueryData(queryKey, (currentData: T[]) => {
+                        let newData = currentData;
                         switch (eventType) {
                             case 'INSERT':
-                                if (showToast.includes('insert')) {
-                                    toast.info(`A new record was added in ${tableName}s table`, {
-                                        onClick: () => {
-                                            // toast.info(JSON.stringify(payload, null, 2), {
-                                            //     autoClose: false,
-                                            //     closeOnClick: true,
-                                            // });
-                                            toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                autoClose: false,
-                                                closeOnClick: true,
-                                            });
-                                        },
-                                    });
-                                }
-                                return [...currentData, newData];
-                            case 'UPDATE':
-                                if (showToast.includes('update')) {
-                                    toast.info(`A record was updated in ${tableName}s table`, {
-                                        onClick: () => {
-                                            toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                autoClose: false,
-                                                closeOnClick: true,
-                                            });
-                                        },
-                                    });
-                                }
-                                return currentData.map((item) => {
-                                    if (isMatch(item, newData)) {
-                                        return newData;
+                                {
+                                    if (showToast.includes('insert')) {
+                                        // toast.info(`A new record was added in ${tableName}s table`, {
+                                        //     onClick: () => {
+                                        //         // toast.info(JSON.stringify(payload, null, 2), {
+                                        //         //     autoClose: false,
+                                        //         //     closeOnClick: true,
+                                        //         // });
+                                        //         toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                                        //             autoClose: false,
+                                        //             closeOnClick: true,
+                                        //         });
+                                        //     },
+                                        // });
+                                        conditionalToast({
+                                            scenario: [
+                                                {
+                                                    conditions: [],
+                                                    getMessage: () => {
+                                                        // const orderNameOrNumber =
+                                                        //     payload.new.order_name || payload.new.order_number;
+                                                        // const last_updated_by = payload.new.last_updated_by;
+                                                        // const fullName = getLastUpdatedByFullName(last_updated_by);
+                                                        // return `New order ${orderNameOrNumber} added by ${fullName}.`;
+                                                        return `A new record was added in ${tableName}s table`;
+                                                    },
+                                                },
+                                            ],
+                                            payload: payload.new as T,
+                                        });
                                     }
-                                    return item;
-                                });
+                                    // return [...currentData, newData];
+                                    const newRecord = payload.new as T;
+                                    newData = [...currentData, newRecord];
+                                }
+                                break;
+                            case 'UPDATE':
+                                {
+                                    if (showToast.includes('update')) {
+                                        toast.info(`A record was updated in ${tableName}s table`, {
+                                            onClick: () => {
+                                                toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                                                    autoClose: false,
+                                                    closeOnClick: true,
+                                                });
+                                            },
+                                        });
+                                    }
+                                    // return currentData.map((item) => {
+                                    //     if (isMatch(item, newData)) {
+                                    //         return newData;
+                                    //     }
+                                    //     return item;
+                                    // });
+                                    newData = currentData.map((item) => {
+                                        const newRecord = payload.new as T;
+                                        if (isMatch(item, newRecord)) {
+                                            return newRecord;
+                                        }
+                                        return item;
+                                    });
+                                }
+                                break;
                             // TODO: give access to all orders to all drivers (otherwise they can't see updates to orders)
                             case 'DELETE':
-                                if (showToast.includes('delete')) {
-                                    toast.info(`A record was deleted from ${tableName}s table`, {
-                                        onClick: () => {
-                                            toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                                                autoClose: false,
-                                                closeOnClick: true,
-                                            });
-                                        },
-                                    });
+                                {
+                                    if (showToast.includes('delete')) {
+                                        toast.info(`A record was deleted from ${tableName}s table`, {
+                                            onClick: () => {
+                                                toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
+                                                    autoClose: false,
+                                                    closeOnClick: true,
+                                                });
+                                            },
+                                        });
+                                    }
+                                    const deletedRecord = payload.old as T;
+                                    newData = currentData.filter((item) => !isMatch(item, deletedRecord));
                                 }
-                                return currentData.filter((item) => !isMatch(item, oldData));
+                                break;
+                            // return currentData.filter((item) => !isMatch(item, oldData));
                             // return currentData.filter((item) => item[rowIDField] !== rowIDValue);
                             default:
-                                return currentData;
+                                // return currentData;
+                                newData = currentData;
                         }
+                        return newData;
                     });
                     queryClient.invalidateQueries({ queryKey });
                 },
@@ -114,31 +157,18 @@ export const useSubscribeToTable = <T extends Record<string, unknown>>({
         return () => {
             channel.unsubscribe();
         };
-    }, [tableName, showToast, primaryKeys, queryClient, queryKey]);
+    }, [tableName, showToast, primaryKeys, queryClient, queryKey, conditionalToast]);
 
-    return data;
+    // return data;
 };
 
 const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    console.log('getAllDaysOrders');
     const formattedDate = businessDate.format('YYYY-MM-DD');
     const { data, error } = await supaClient
         .from('Order')
         .select('*')
         .eq('business_date', formattedDate)
         .order('order_number', { ascending: true });
-    // const { data, error } = await supaClient
-    //     .from('Order')
-    //     .select(
-    //         `
-    //     *,
-    //     payments:Payment (
-    //       *
-    //     )
-    //   `,
-    //     )
-    //     .eq('business_date', formattedDate)
-    //     .order('order_number', { ascending: true });
 
     if (error) {
         console.error(error);
@@ -162,6 +192,52 @@ const getAllDaysPayments = async ({ businessDate }: { businessDate: dayjs.Dayjs 
     return data as unknown as Payment[];
 };
 
+const getBusinessDaySummary = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+    const { data, error } = await supaClient
+        .from('BusinessDaySummary')
+        .select('*')
+        .eq('business_date', businessDate.format('YYYY-MM-DD'));
+
+    if (error) {
+        console.error(error);
+        return [] as BusinessDaySummary[];
+    }
+    if (!data || data.length === 0) return [] as BusinessDaySummary[];
+
+    return [data[0] as unknown as BusinessDaySummary];
+};
+
+const getBusinessDayDrawerSummaries = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+    const { data, error } = await supaClient
+        .from('BusinessDayDrawer')
+        .select('*')
+        .eq('business_date', businessDate.format('YYYY-MM-DD'));
+
+    if (error) {
+        console.error(error);
+        return [] as BusinessDayDrawerSummary[];
+    }
+    if (!data || data.length === 0) return [] as BusinessDayDrawerSummary[];
+
+    return data as unknown as BusinessDayDrawerSummary[];
+};
+
+const getCashTransfers = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+    const { data, error } = await supaClient
+        .from('CashTransfer')
+        .select('*')
+        .eq('business_date', businessDate.format('YYYY-MM-DD'));
+
+    if (error) {
+        console.error(error);
+        return [] as CashTransfer[];
+    }
+
+    if (!data || data.length === 0) return [] as CashTransfer[];
+
+    return data as unknown as CashTransfer[];
+};
+
 // THIS WORKED
 // by using setQueryData instead of invalidating the query, we can keep the data in the cache without refetching it
 // TODO: look to do something similar in the api (its causing it to invalidate the query and refetch instead of just updating the cache)
@@ -171,7 +247,7 @@ const getAllDaysPayments = async ({ businessDate }: { businessDate: dayjs.Dayjs 
 // [ ] - let driver know when changes are made to their order or payment (isMobile && lastUpdatedBy !== 'driver')
 // [ ] - let manager know when changes are made to any order or payment (!isMobile && lastUpdatedBy !== 'manager')
 
-export const useSetupOrderPaymentSubscriptions = ({
+export const useSetupAllSubscriptions = ({
     businessDate,
     showToast,
     isMobile,
@@ -180,24 +256,55 @@ export const useSetupOrderPaymentSubscriptions = ({
     showToast?: ShowToastOptions;
     isMobile: boolean;
 }) => {
-    // useSuspenseQuery({
-    //     queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
-    //     queryFn: () => getAllDaysOrders({ businessDate }),
-    //     refetchOnWindowFocus: false,
-    //     staleTime: 1000 * 60 * 30,
-    // });
     useSuspenseQueries({
         queries: [
             {
                 queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
                 queryFn: () => getAllDaysOrders({ businessDate }),
                 refetchOnWindowFocus: false,
+                refetchOnMount: true,
                 staleTime: 1000 * 60 * 30,
             },
             {
                 queryKey: ['payments', businessDate.format('YYYY-MM-DD')],
                 queryFn: () => getAllDaysPayments({ businessDate }),
                 refetchOnWindowFocus: false,
+                refetchOnMount: true,
+                staleTime: 1000 * 60 * 30,
+            },
+            {
+                queryKey: ['profiles'],
+                queryFn: () => getAllEmployees(),
+                refetchOnWindowFocus: false,
+                refetchOnMount: true,
+                staleTime: 1000 * 60 * 30,
+            },
+            {
+                queryKey: ['businessDaySummaries', businessDate.format('YYYY-MM-DD')],
+                queryFn: () => getBusinessDaySummary({ businessDate }),
+                refetchOnWindowFocus: false,
+                refetchOnMount: true,
+                staleTime: 1000 * 60 * 30,
+            },
+            {
+                queryKey: ['businessDayDrawerSummaries', businessDate.format('YYYY-MM-DD')],
+                queryFn: () => getBusinessDayDrawerSummaries({ businessDate }),
+                refetchOnWindowFocus: false,
+                refetchOnMount: true,
+                staleTime: 1000 * 60 * 30,
+            },
+            {
+                queryKey: ['cashTransfers', businessDate.format('YYYY-MM-DD')],
+                queryFn: () => getCashTransfers({ businessDate }),
+                refetchOnWindowFocus: false,
+                refetchOnMount: true,
+                staleTime: 1000 * 60 * 30,
+            },
+            {
+                queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')],
+                queryFn: () => getAllDaysDrivers(businessDate),
+                refetchOnWindowFocus: false,
+                refetchOnMount: true,
                 staleTime: 1000 * 60 * 30,
             },
         ],
@@ -215,12 +322,14 @@ export const useSetupOrderPaymentSubscriptions = ({
 
     const conditionalToast = useConditionalToast({ isMobile });
 
+    // Effect for orders
     useEffect(() => {
-        // const currentData = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
-        // let newData = currentData;
-        // Set up the subscription with a filter
-
-        // console.log('subscribing to order changes ' + businessDate.format('YYYY-MM-DD'));
+        const getLastUpdatedByFullName = (lastUpdatedBy: string) => {
+            const users = queryClient.getQueryData(['profiles']) as Profile[];
+            const lastUpdatedByUser = users?.find((user) => user.id === lastUpdatedBy);
+            if (!lastUpdatedByUser) return 'someone';
+            return lastUpdatedByUser?.first_name + ' ' + lastUpdatedByUser?.last_name;
+        };
 
         const channel = supaClient
             .channel('order-changes-' + businessDate.format('YYYY-MM-DD'))
@@ -257,10 +366,36 @@ export const useSetupOrderPaymentSubscriptions = ({
                                                             comparison: 'neq',
                                                         },
                                                     ],
-                                                    getMessage: (context) => {
+                                                    getMessage: () => {
                                                         const orderNameOrNumber =
                                                             payload.new.order_name || payload.new.order_number;
-                                                        return `New order ${orderNameOrNumber} added by ${context.profileFullName}`;
+                                                        const last_updated_by = payload.new.last_updated_by;
+                                                        const fullName = getLastUpdatedByFullName(last_updated_by);
+                                                        return `New order ${orderNameOrNumber} added by ${fullName}.`;
+                                                    },
+                                                },
+                                                {
+                                                    conditions: [
+                                                        // working on desktop
+                                                        {
+                                                            ctxField: 'isMobile',
+                                                            ctxValue: false,
+                                                            comparison: 'eq',
+                                                        },
+                                                        // lastUpdatedBy someone else
+                                                        {
+                                                            ctxField: 'profile.id',
+                                                            payloadField: 'last_updated_by',
+                                                            comparison: 'neq',
+                                                        },
+                                                    ],
+                                                    getMessage: () => {
+                                                        const orderNameOrNumber =
+                                                            payload.new.order_name || payload.new.order_number;
+                                                        // return `New order ${orderNameOrNumber} was added by someone else.`;
+                                                        const last_updated_by = payload.new.last_updated_by;
+                                                        const fullName = getLastUpdatedByFullName(last_updated_by);
+                                                        return `New order ${orderNameOrNumber} added by ${fullName}.`;
                                                     },
                                                 },
                                             ],
@@ -299,11 +434,14 @@ export const useSetupOrderPaymentSubscriptions = ({
                                                     getMessage: () => {
                                                         const orderNameOrNumber =
                                                             payload.new.order_name || payload.new.order_number;
-                                                        return `A change was made to order ${orderNameOrNumber} by someone else.`;
+                                                        const last_updated_by = payload.new.last_updated_by;
+                                                        const fullName = getLastUpdatedByFullName(last_updated_by);
+                                                        return `A change was made to order ${orderNameOrNumber} by ${fullName}.`;
                                                     },
                                                 },
                                                 {
                                                     conditions: [
+                                                        // working on desktop
                                                         {
                                                             ctxField: 'isMobile',
                                                             ctxValue: false,
@@ -319,7 +457,9 @@ export const useSetupOrderPaymentSubscriptions = ({
                                                     getMessage: () => {
                                                         const orderNameOrNumber =
                                                             payload.new.order_name || payload.new.order_number;
-                                                        return `A change was made to order ${orderNameOrNumber} by someone else.`;
+                                                        const last_updated_by = payload.new.last_updated_by;
+                                                        const fullName = getLastUpdatedByFullName(last_updated_by);
+                                                        return `A change was made to order ${orderNameOrNumber} by ${fullName}.`;
                                                     },
                                                 },
                                             ],
@@ -356,10 +496,12 @@ export const useSetupOrderPaymentSubscriptions = ({
                                                             comparison: 'neq',
                                                         },
                                                     ],
-                                                    getMessage: (context) => {
+                                                    getMessage: () => {
                                                         const orderNameOrNumber =
                                                             payload.old.order_name || payload.old.order_number;
-                                                        return `Order ${orderNameOrNumber} was deleted by ${context.profileFullName}.`;
+                                                        const last_updated_by = payload.old.last_updated_by;
+                                                        const fullName = getLastUpdatedByFullName(last_updated_by);
+                                                        return `Order ${orderNameOrNumber} was deleted by ${fullName}.`;
                                                     },
                                                 },
                                             ],
@@ -376,11 +518,6 @@ export const useSetupOrderPaymentSubscriptions = ({
                         }
                         return newData;
                     });
-
-                    // queryClient.setQueryData(['orders', businessDate.format('YYYY-MM-DD')], newData);
-
-                    // });
-                    // queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
                 },
             )
             .subscribe();
@@ -394,12 +531,6 @@ export const useSetupOrderPaymentSubscriptions = ({
 
     // Effect for payments
     useEffect(() => {
-        // Set up the subscription with a filter
-        // const currentData = (queryClient.getQueryData(['payments', businessDate.format('YYYY-MM-DD')]) ||
-        //     []) as Payment[];
-        // let newData = currentData;
-        // console.log('subscribing to payment changes ' + businessDate.format('YYYY-MM-DD'));
-
         const channel = supaClient
             .channel('payment-changes-' + businessDate.format('YYYY-MM-DD'))
             .on(
@@ -420,43 +551,38 @@ export const useSetupOrderPaymentSubscriptions = ({
                         (currentData: Payment[]) => {
                             let newData = currentData;
                             if (eventType === 'INSERT') {
-                                // if (showToast?.includes('insert')) {
-                                //     toast.info(`Payment added`, {
-                                //         autoClose: 500,
-                                //     });
-                                // }
                                 newData = [...currentData, newPayment];
                             }
 
                             // TODO: lets see if I can get orders from queryClient and check them to see if a payment belongs to this user or not
                             if (eventType === 'UPDATE') {
                                 if (showToast?.includes('update')) {
-                                    conditionalToast({
-                                        scenario: [
-                                            {
-                                                conditions: [
-                                                    // order belongs to driver
-                                                    {
-                                                        ctxField: 'profile.id',
-                                                        payloadField: 'drawer_id',
-                                                        comparison: 'eq',
-                                                    },
-                                                    // lastUpdatedBy someone else
-                                                    {
-                                                        ctxField: 'profile.id',
-                                                        payloadField: 'last_updated_by',
-                                                        comparison: 'neq',
-                                                    },
-                                                ],
-                                                getMessage: (context) => {
-                                                    const orderNameOrNumber =
-                                                        payload.new.order_name || payload.new.order_number;
-                                                    return `A change was made to order ${orderNameOrNumber} by ${context.profileFullName}.`;
-                                                },
-                                            },
-                                        ],
-                                        payload: payload.new as Payment,
-                                    });
+                                    // conditionalToast({
+                                    //     scenario: [
+                                    //         {
+                                    //             conditions: [
+                                    //                 // order belongs to driver
+                                    //                 {
+                                    //                     ctxField: 'profile.id',
+                                    //                     payloadField: 'drawer_id',
+                                    //                     comparison: 'eq',
+                                    //                 },
+                                    //                 // lastUpdatedBy someone else
+                                    //                 {
+                                    //                     ctxField: 'profile.id',
+                                    //                     payloadField: 'last_updated_by',
+                                    //                     comparison: 'neq',
+                                    //                 },
+                                    //             ],
+                                    //             getMessage: (context) => {
+                                    //                 const orderNameOrNumber =
+                                    //                     payload.new.order_name || payload.new.order_number;
+                                    //                 return `A change was made to order ${orderNameOrNumber} by ${context.profileFullName}.`;
+                                    //             },
+                                    //         },
+                                    //     ],
+                                    //     payload: payload.new as Payment,
+                                    // });
                                 }
                                 newData = currentData.map((payment) => {
                                     // Skip orders that aren't affected by this event
@@ -482,62 +608,6 @@ export const useSetupOrderPaymentSubscriptions = ({
                                 newData = currentData.filter((payment) => payment.payment_id !== oldPaymentID);
                             }
                             return newData;
-                            // newData = currentData.map((payment) => {
-                            //     // Skip orders that aren't affected by this event
-                            //     if (newPayment?.order_id !== payment.order_id && eventType !== 'DELETE') {
-                            //         return payment;
-                            //     }
-
-                            //     if (eventType === 'INSERT') {
-                            //         // Add the new payment to the payments list
-                            //         if (showToast?.includes('insert')) {
-                            //             toast.info(`Payment added`);
-                            //         }
-                            //         return {
-                            //             ...payment,
-                            //             payments: [...payments, newPayment],
-                            //         };
-                            //     }
-
-                            //     if (eventType === 'UPDATE') {
-                            //         // Update the existing payment
-                            //         console.log(`Payment for order ${order.order_number || order.order_name} was updated`);
-                            //         // if (showToast?.includes('update')) {
-                            //         //     toast.info(
-                            //         //         `Payment for order ${order.order_number || order.order_name} was updated`,
-                            //         //         {
-                            //         //             onClick: () => {
-                            //         //                 toast.info(<pre>{JSON.stringify(payload, null, 2)}</pre>, {
-                            //         //                     autoClose: false,
-                            //         //                     closeOnClick: true,
-                            //         //                 });
-                            //         //             },
-                            //         //             autoClose: 500,
-                            //         //         },
-                            //         //     );
-                            //         // }
-                            //         return {
-                            //             ...order,
-                            //             payments: payments.map((payment) =>
-                            //                 payment.payment_id === newPayment.payment_id ? newPayment : payment,
-                            //             ),
-                            //         };
-                            //     }
-
-                            //     if (eventType === 'DELETE' && oldPaymentID) {
-                            //         // Remove the deleted payment
-                            //         return {
-                            //             ...order,
-                            //             payments: payments.filter((payment) => payment.payment_id !== oldPaymentID),
-                            //         };
-                            //     }
-
-                            //     // If no changes are needed, return the original order
-                            //     return order;
-                            // });
-                            // });
-                            // queryClient.invalidateQueries({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
-                            // queryClient.setQueryData(['payments', businessDate.format('YYYY-MM-DD')], newData);
                         },
                     );
                 },
@@ -550,100 +620,34 @@ export const useSetupOrderPaymentSubscriptions = ({
         };
     }, [businessDate, showToast, queryClient, conditionalToast]);
 
-    // const orders = queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) as Order[];
-    // const payments = queryClient.getQueryData(['payments', businessDate.format('YYYY-MM-DD')]) as Payment[];
-    // const orderPayments: Order_Payment[] = orders.map((order) => ({
-    //     ...order,
-    //     payments: payments.filter((payment) => payment.order_id === order.order_id),
-    // }));
+    useSubscribeToTable<BusinessDaySummary>({
+        tableName: 'BusinessDaySummary',
+        primaryKeys: ['business_date'],
+        queryKey: ['businessDaySummaries', businessDate.format('YYYY-MM-DD')],
+        isMobile,
+        showToast,
+    });
 
-    // orderPayments.sort(sortOrders);
+    useSubscribeToTable<BusinessDayDrawerSummary>({
+        tableName: 'BusinessDayDrawer',
+        primaryKeys: ['business_date', 'drawer_id'],
+        queryKey: ['businessDayDrawerSummaries', businessDate.format('YYYY-MM-DD')],
+        isMobile,
+        showToast,
+    });
 
-    // return orderPayments;
+    useSubscribeToTable<CashTransfer>({
+        tableName: 'CashTransfer',
+        primaryKeys: ['cash_transfer_id'],
+        queryKey: ['cashTransfers', businessDate.format('YYYY-MM-DD')],
+        isMobile,
+        showToast,
+    });
+    useSubscribeToTable<BusinessDayDriver>({
+        tableName: 'BusinessDayDriver',
+        primaryKeys: ['business_date', 'drawer_id'],
+        queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')],
+        isMobile,
+        showToast,
+    });
 };
-
-// custom solution since Order_Payments has to subscribe to both Order and Payment
-// export const useSubscribeToPayments = (orders: Order_Payment[], queryKey: string[]) => {
-//     const [updatedOrders, setUpdatedOrders] = useState<Order_Payment[]>([]);
-
-//     const queryClient = useQueryClient();
-
-//     useEffect(() => {
-//         if (orders) {
-//             setUpdatedOrders(orders);
-//         }
-//     }, [orders]);
-
-//     useEffect(() => {
-//         const paymentChannel = supaClient
-//             .channel('payment-changes')
-//             .on(
-//                 'postgres_changes',
-//                 {
-//                     event: '*',
-//                     schema: 'public',
-//                     table: 'Payment',
-//                 },
-//                 (payload) => {
-//                     const eventType = payload.eventType;
-//                     const newPayment = payload.new as Payment;
-//                     const oldPayment = payload.old as Payment;
-
-//                     // console.log(`Change detected in Payment:`, payload);
-
-//                     setUpdatedOrders((currentOrders) => {
-//                         // probably improve this by searching for the order and then updating that order.payments
-//                         return currentOrders.map((order) => {
-//                             // Skip orders that aren't affected by this event
-//                             if (newPayment?.order_id !== order.order_id && eventType !== 'DELETE') {
-//                                 return order;
-//                             }
-
-//                             // Ensure the `payments` array exists
-//                             const payments = order.payments || [];
-
-//                             if (eventType === 'INSERT') {
-//                                 // Add the new payment to the payments list
-//                                 return {
-//                                     ...order,
-//                                     payments: [...payments, newPayment],
-//                                 };
-//                             }
-
-//                             if (eventType === 'UPDATE') {
-//                                 // Update the existing payment
-//                                 return {
-//                                     ...order,
-//                                     payments: payments.map((payment) =>
-//                                         payment.payment_id === newPayment.payment_id ? newPayment : payment,
-//                                     ),
-//                                 };
-//                             }
-
-//                             if (eventType === 'DELETE' && oldPayment) {
-//                                 // Remove the deleted payment
-//                                 return {
-//                                     ...order,
-//                                     payments: payments.filter(
-//                                         (payment) => payment.payment_id !== oldPayment.payment_id,
-//                                     ),
-//                                 };
-//                             }
-
-//                             // If no changes are needed, return the original order
-//                             return order;
-//                         });
-//                     });
-
-//                     queryClient.invalidateQueries({ queryKey });
-//                 },
-//             )
-//             .subscribe();
-
-//         return () => {
-//             paymentChannel.unsubscribe();
-//         };
-//     }, [orders, queryKey, queryClient]);
-
-//     return updatedOrders;
-// };

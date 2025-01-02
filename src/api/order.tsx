@@ -11,7 +11,7 @@ import {
     useInteractionHandler,
     useRPCInteractionHandler,
 } from './helpers';
-import { useSuspenseQuery } from '@tanstack/react-query';
+// import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { PostgrestError } from '@supabase/supabase-js';
 import { removeOrdersFromDrawer } from '../supabaseQueries';
@@ -69,29 +69,29 @@ const subscribeToOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
     return channel;
 };
 
-const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const formattedDate = businessDate.format('YYYY-MM-DD');
-    const { data, error } = await supaClient
-        .from('Order')
-        .select(
-            `
-        *,
-        payments:Payment (
-          *
-        )
-      `,
-        )
-        .eq('business_date', formattedDate)
-        .order('order_number', { ascending: true });
+// const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+//     const formattedDate = businessDate.format('YYYY-MM-DD');
+//     const { data, error } = await supaClient
+//         .from('Order')
+//         .select(
+//             `
+//         *,
+//         payments:Payment (
+//           *
+//         )
+//       `,
+//         )
+//         .eq('business_date', formattedDate)
+//         .order('order_number', { ascending: true });
 
-    if (error) {
-        console.error(error);
-        return [];
-    }
-    if (!data || data.length === 0) return [];
+//     if (error) {
+//         console.error(error);
+//         return [];
+//     }
+//     if (!data || data.length === 0) return [];
 
-    return data as unknown as Order_Payment[];
-};
+//     return data as unknown as Order_Payment[];
+// };
 
 // const useSubscribeToAllDaysOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
 //     const tableName = 'Order';
@@ -130,14 +130,14 @@ const addOrdersToDrawer: SupabaseRPCInteractor<{ orderIDs: string[]; drawerID: s
     return data as unknown as RPCPayload;
 };
 
-const useGetAllDaysOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    return useSuspenseQuery({
-        queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
-        queryFn: () => getAllDaysOrders({ businessDate }),
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 30,
-    });
-};
+// const useGetAllDaysOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+//     return useSuspenseQuery({
+//         queryKey: ['orders', businessDate.format('YYYY-MM-DD')],
+//         queryFn: () => getAllDaysOrders({ businessDate }),
+//         refetchOnWindowFocus: false,
+//         staleTime: 1000 * 60 * 30,
+//     });
+// };
 
 const useCreateNewOrder = ({ queryKey }: { queryKey: string[] }) => {
     return useInteractionHandler<NewOrder, Order>({
@@ -282,7 +282,7 @@ export const useOrderAPI = ({ businessDate }: { businessDate: dayjs.Dayjs }) => 
     return {
         orderAPI: {
             subscribe: () => subscribeToOrders({ businessDate }),
-            getAll: useGetAllDaysOrders({ businessDate }),
+            // getAll: useGetAllDaysOrders({ businessDate }),
             create: useCreateNewOrder({ queryKey }).mutate,
             update: useUpdateOrder({ queryKey }).mutate,
             delete: useDeleteOrder({ queryKey }).mutate,

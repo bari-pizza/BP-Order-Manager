@@ -38,6 +38,7 @@ export abstract class BasePage {
                     return await originalMethod.apply(this, args);
                 } catch (error) {
                     this.logError(error, methodName);
+                    this.openLogger();
                     throw error; // Rethrow the error
                 }
             };

@@ -27,6 +27,7 @@ import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask'
 import { motion } from 'framer-motion';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { useSession } from '../../../hooks/data/useSession';
+import { useDrivers } from '../../../hooks/data/useDrivers';
 
 const isValidDrawer = (
     drawer: Drawer | null,
@@ -99,7 +100,10 @@ export const OrderEditor = ({
     forNewOrder = false,
 }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
-    const { origins, drawers, drivers, constants } = useBariPizzaContext();
+    const { origins, drawers, constants } = useBariPizzaContext();
+    const {
+        drivers: { todays: todaysDrivers },
+    } = useDrivers();
     const { profile } = useSession();
     const driverIsEditing = !!driverDrawerID;
 
@@ -141,10 +145,6 @@ export const OrderEditor = ({
             console.log({ data });
             close();
             reset();
-            // const oldOrders = queryClient.getQueryData(['orders', data[0].business_date]) as Order_Payment[];
-            // oldOrders.push(data[0] as Order_Payment);
-            // queryClient.setQueryData(['orders', data[0].business_date], oldOrders.sort(sortOrders));
-            // queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
 
         onError: (error) => {
@@ -156,12 +156,7 @@ export const OrderEditor = ({
     const updateOrderMutation = useMutation({
         mutationFn: updateOrder,
         onSuccess: (data) => {
-            // close();
             reset(data[0]);
-            // const oldOrders = queryClient.getQueryData(['orders', data[0].business_date]) as Order_Payment[];
-            // const newOrders = oldOrders.map((order) => (order.order_id === data[0].order_id ? data[0] : order));
-            // queryClient.setQueryData(['orders', data[0].business_date], newOrders);
-            // queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
         onError: (error) => {
             console.error(`Issue updating order: "${order?.order_id}`, error);
@@ -170,7 +165,9 @@ export const OrderEditor = ({
         },
     });
 
-    const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...drivers];
+    // TODO: showing default driver but not adding them as drawer
+
+    const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...todaysDrivers];
 
     const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'))!;
     const currentOrderName = watch('order_name');

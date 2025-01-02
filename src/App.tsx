@@ -28,7 +28,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ManagerDashboard, ManagerDashboardSkeleton } from './pages/Manager/ManagerDashboard.tsx';
 import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
-import { useSetupOrderPaymentSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
+import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
 import { useBusinessDate } from './hooks/data/useBusinessDate.tsx';
 
 const router = createBrowserRouter([
@@ -159,9 +159,7 @@ function Layout() {
     });
     const [businessDate] = useBusinessDate();
 
-    useSetupOrderPaymentSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
-
-    console.log('rendering layout.tsx');
+    useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
     return (
         // <APIProvider
