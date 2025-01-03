@@ -23,6 +23,23 @@ export const useBusinessDate = (): [dayjs.Dayjs, (date: dayjs.Dayjs) => void] =>
         }
     }, [searchParams, setSearchParams]);
 
+    useEffect(() => {
+        const now = dayjs();
+        const nextMidnight = now.add(1, 'day').startOf('day'); // Add 1 day and set time to midnight
+
+        const timeUntilMidnight = nextMidnight.diff(now); // Calculate time difference in milliseconds
+
+        const timeout = setTimeout(() => {
+            const dateString = searchParams.get('businessDate');
+            if (!dateString) {
+                const yesterday = dayjs().subtract(1, 'day');
+                setSearchParams({ businessDate: yesterday.format('YYYY-MM-DD') });
+            }
+        }, timeUntilMidnight);
+
+        return () => clearTimeout(timeout); // Cleanup on unmount
+    }, [searchParams, setSearchParams]);
+
     const updateBusinessDate = (date: dayjs.Dayjs) => {
         if (date.isSame(today, 'day')) {
             const urlSearchParams = new URLSearchParams(searchParams);

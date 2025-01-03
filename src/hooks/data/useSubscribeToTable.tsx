@@ -244,8 +244,8 @@ const getCashTransfers = async ({ businessDate }: { businessDate: dayjs.Dayjs })
 
 // TODO: might be smart to make all drawers automatically use profile.id as their default drawer.id
 // TODO:conditional toast
-// [ ] - let driver know when changes are made to their order or payment (isMobile && lastUpdatedBy !== 'driver')
-// [ ] - let manager know when changes are made to any order or payment (!isMobile && lastUpdatedBy !== 'manager')
+// [x] - let driver know when changes are made to their order or payment (isMobile && lastUpdatedBy !== 'driver')
+// [x] - let manager know when changes are made to any order or payment (!isMobile && lastUpdatedBy !== 'manager')
 
 export const useSetupAllSubscriptions = ({
     businessDate,
