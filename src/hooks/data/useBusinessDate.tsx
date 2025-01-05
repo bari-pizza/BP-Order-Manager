@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
 
 const today = dayjs();
 
@@ -25,15 +26,17 @@ export const useBusinessDate = (): [dayjs.Dayjs, (date: dayjs.Dayjs) => void] =>
 
     useEffect(() => {
         const now = dayjs();
-        const nextMidnight = now.add(1, 'day').startOf('day'); // Add 1 day and set time to midnight
-
-        const timeUntilMidnight = nextMidnight.diff(now); // Calculate time difference in milliseconds
+        const midnight = dayjs().endOf('day');
+        const timeUntilMidnight = midnight.diff(now);
+        const oldDate = now.format('YYYY-MM-DD');
 
         const timeout = setTimeout(() => {
             const dateString = searchParams.get('businessDate');
+            toast.info('It is now a new day!');
+
             if (!dateString) {
-                const yesterday = dayjs().subtract(1, 'day');
-                setSearchParams({ businessDate: yesterday.format('YYYY-MM-DD') });
+                toast.info('Updating the business date to yesterday.');
+                setSearchParams({ businessDate: oldDate });
             }
         }, timeUntilMidnight);
 

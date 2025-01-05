@@ -89,6 +89,7 @@ export const SettingsTab = () => {
         reset(rawData);
         queryClient.invalidateQueries({ queryKey: ['constants'] });
         queryClient.invalidateQueries({ queryKey: ['origins'] });
+        // TODO: make a global listener that refreshes all queries so that each client has the latest data
         /*
          [
   {

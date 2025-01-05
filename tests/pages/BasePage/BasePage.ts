@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { Logger } from '../../utils/Logger';
-
+import dayjs from 'dayjs';
 export abstract class BasePage {
     protected page: Page;
     protected logger: Logger;
@@ -9,6 +9,24 @@ export abstract class BasePage {
         this.page = page;
         this.logger = new Logger();
         this.wrapMethodsWithErrorHandling();
+    }
+
+    async mockSystemTime(fakeNow: number): Promise<void> {
+        await this.page.addInitScript(`{
+          Date = class extends Date {
+            constructor(...args) {
+              if (args.length === 0) {
+                super(${fakeNow});
+              } else {
+                super(...args);
+              }
+            }
+          }
+    
+          const __DateNowOffset = ${fakeNow} - Date.now();
+          const __DateNow = Date.now;
+          Date.now = () => __DateNow() + __DateNowOffset;
+        }`);
     }
 
     logInfo(message: string, details?: object) {
@@ -136,5 +154,65 @@ export abstract class BasePage {
                 timerDiv.remove();
             }
         });
+    }
+
+    getURL() {
+        return this.page.url();
+    }
+
+    async setDateInDatePicker(date: dayjs.Dayjs) {
+        const [yyyy, mmmm, d] = date.format('YYYY-MMMM-D').split('-');
+
+        await this.page.locator('.date-picker-button').click();
+        const calendarHeader = await this.page.locator('.MuiPickersCalendarHeader-label').textContent();
+        expect(calendarHeader).not.toBeNull();
+        const [month, year] = calendarHeader!.split(' ');
+        const day = await this.page.locator('.MuiPickersDay-root.Mui-selected').textContent();
+        expect(day).not.toBeNull();
+
+        if (year !== yyyy) {
+            await this.page.locator('.MuiPickersCalendarHeader-switchViewButton').click();
+            await this.page.locator(`.MuiPickersYear-yearButton >> text=${yyyy}`).click();
+            await this.setDateInDatePicker(date);
+            console.log(`set year to ${yyyy}`);
+            return;
+        }
+
+        if (month !== mmmm) {
+            const months = [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            ];
+            const nextCount = months.indexOf(mmmm) - months.indexOf(month);
+            if (nextCount > 0) {
+                // go forward x months
+                for (let i = 0; i < nextCount; i++) {
+                    await this.page.locator('.MuiPickersArrowSwitcher-nextIconButton').click();
+                }
+            } else {
+                // go back x months
+                for (let i = 0; i > nextCount; i--) {
+                    await this.page.locator('.MuiPickersArrowSwitcher-previousIconButton').click();
+                }
+            }
+            console.log(`went back one month`);
+        }
+        if (day !== d) {
+            // click on day
+            const timestamp = date.valueOf();
+            await this.page.locator(`.MuiPickersDay-root[data-timestamp="${timestamp}"]`).click();
+            console.log(`clicked on day ${d}`);
+            return;
+        }
     }
 }

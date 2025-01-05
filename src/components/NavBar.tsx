@@ -23,6 +23,7 @@ interface NavBarItem {
     icon: JSX.Element;
     text: string;
     forMobile: boolean;
+    className?: string;
     onClick?: () => void;
 }
 
@@ -35,6 +36,8 @@ export function NavBar() {
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
     const version = import.meta.env.VITE_REACT_APP_VERSION || process.env.VITE_REACT_APP_VERSIONS;
+
+    const todaysDate = dayjs().format('YYYY-MM-DD');
 
     const drawerWidth = isMobile ? 65 : 200;
 
@@ -54,6 +57,7 @@ export function NavBar() {
             icon: <TimeLottieIcon />,
             onClick: showBusinessDatePicker,
             forMobile: true,
+            className: 'date-picker-button',
         },
         { path: '/search', icon: <SearchLottieIcon />, text: 'Search', forMobile: false },
         profile?.is_admin && {
@@ -99,7 +103,7 @@ export function NavBar() {
                 }}>
                 {listItems.map((item) => (
                     <ListItem
-                        className="lottie-icon-container"
+                        className={`lottie-icon-container ${item.className || ''}`}
                         {...(item.path
                             ? {
                                   component: SmartLink,
@@ -123,6 +127,7 @@ export function NavBar() {
                 </ListItem>
                 <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
                     <ListItemText>{version}</ListItemText>
+                    <ListItemText>{todaysDate}</ListItemText>
                 </ListItem>
             </List>
 
