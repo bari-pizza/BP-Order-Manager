@@ -6,8 +6,33 @@ import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
+import { OrderOrigin } from '../../../typesAndValidators';
 
 type FormValues = { name: string };
+
+const sortOrigins = (a: OrderOrigin, b: OrderOrigin) => {
+    const aName = a.name?.toLowerCase() || '';
+    const bName = b.name?.toLowerCase() || '';
+    const aIsDeleted = a.is_deleted || false;
+    const bIsDeleted = b.is_deleted || false;
+
+    if (aIsDeleted && !bIsDeleted) {
+        return 1;
+    }
+    if (!aIsDeleted && bIsDeleted) {
+        return -1;
+    }
+
+    if (aName < bName) {
+        return -1;
+    }
+
+    if (aName > bName) {
+        return 1;
+    }
+
+    return 0;
+};
 
 export const OriginsTab = () => {
     const toastRef = useRef<Id>('');
@@ -45,9 +70,11 @@ export const OriginsTab = () => {
         close();
     };
 
+    const sortedOrigins = [...origins].sort(sortOrigins);
+
     return (
         <Stack direction="column" alignItems={'center'} gap={2}>
-            <OriginsTable origins={origins} />
+            <OriginsTable origins={sortedOrigins} />
             <Button onClick={open} variant="contained">
                 Add New Order Origin
             </Button>

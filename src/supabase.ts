@@ -266,6 +266,21 @@ export type Database = {
         }
         Relationships: []
       }
+      GlobalChangeTracker: {
+        Row: {
+          table_name: string
+          updated_at: string
+        }
+        Insert: {
+          table_name: string
+          updated_at?: string
+        }
+        Update: {
+          table_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       Order: {
         Row: {
           business_date: string
@@ -343,6 +358,7 @@ export type Database = {
           default_is_prepaid: boolean
           has_order_number: boolean
           icon: string | null
+          is_deleted: boolean
           is_prepaid_toggleable: boolean
           is_third_party: boolean
           name: string
@@ -354,6 +370,7 @@ export type Database = {
           default_is_prepaid?: boolean
           has_order_number?: boolean
           icon?: string | null
+          is_deleted?: boolean
           is_prepaid_toggleable?: boolean
           is_third_party?: boolean
           name: string
@@ -365,6 +382,7 @@ export type Database = {
           default_is_prepaid?: boolean
           has_order_number?: boolean
           icon?: string | null
+          is_deleted?: boolean
           is_prepaid_toggleable?: boolean
           is_third_party?: boolean
           name?: string

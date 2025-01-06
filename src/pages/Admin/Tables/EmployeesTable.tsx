@@ -10,7 +10,7 @@ import {
 } from '@mui/x-data-grid';
 import { Profile } from '../../../typesAndValidators';
 import { updateEmployee } from '../../../supabaseQueries';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { CellEditCheckbox, CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
 import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
 import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
@@ -82,7 +82,19 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         confirmProps: {
             color: 'error',
             variant: 'outlined',
-            handler: (...args: unknown[]) => deleteEmployee(args[0] as string),
+            handler: (...args: unknown[]) => {
+                const id = args[0] as string;
+                if (!id) {
+                    toast.error('Operation failed - try again!');
+                    return;
+                }
+                toast.info(`deleting employee`);
+                deleteEmployee(id);
+                setRowModesModel({
+                    ...rowModesModel,
+                    [id]: { mode: GridRowModes.View, ignoreModifications: true },
+                });
+            },
             buttonText: 'Delete',
         },
     });
@@ -92,7 +104,19 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         confirmProps: {
             color: 'primary',
             variant: 'contained',
-            handler: (...args: unknown[]) => restoreEmployee(args[0] as string),
+            handler: (...args: unknown[]) => {
+                const id = args[0] as string;
+                if (!id) {
+                    toast.error('Operation failed - try again!');
+                    return;
+                }
+                toast.info(`restoring employee`);
+                restoreEmployee(id);
+                setRowModesModel({
+                    ...rowModesModel,
+                    [id]: { mode: GridRowModes.View, ignoreModifications: true },
+                });
+            },
             buttonText: 'Restore',
         },
     });
@@ -102,8 +126,6 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             event.defaultMuiPrevented = true;
         }
     };
-
-    const queryClient = useQueryClient();
 
     const updateEmployeeMutation = useMutation({
         mutationFn: (employee: Employee) => {
@@ -120,8 +142,6 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             };
             console.log({ updatedRow });
             setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
-            queryClient.invalidateQueries({ queryKey: ['profiles'] });
-            queryClient.invalidateQueries({ queryKey: ['drivers'] }); // could change if driver is deleted
         },
         onError: (error) => {
             console.log({ error });
@@ -132,7 +152,6 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         console.log('processRowUpdate', newRow);
         const updatedRow = {
             ...(newRow as Employee),
-            // isNew: false
         };
         updateEmployeeMutation.mutate(updatedRow);
         setRows((prev) => prev.map((row) => (row.id === newRow.id ? updatedRow : row)));

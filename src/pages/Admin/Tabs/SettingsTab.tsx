@@ -7,7 +7,6 @@ import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { supaClient } from '../../../supaClient';
 import { Id, toast } from 'react-toastify';
 import { useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 type FormValues = {
     default_delivery_fee_in_cents: number;
@@ -38,8 +37,6 @@ export const SettingsTab = () => {
 
     const toastRef = useRef<Id>('');
 
-    const queryClient = useQueryClient();
-
     const onSubmit: SubmitHandler<FormValues> = async (rawData) => {
         console.log(rawData);
         const settingsMap = {
@@ -51,33 +48,36 @@ export const SettingsTab = () => {
             default_register_for_cash_transfers: 'register_for_cash_transfers',
         };
         toastRef.current = toast.loading('Saving settings...');
+        const updates = Object.entries(rawData)
+            .filter(([key]) => {
+                return dirtyFields[key as keyof FormValues];
+            })
+            .map(async ([key, value]) => {
+                const settingName = settingsMap[key as keyof FormValues];
+                if (!settingName) return null;
 
-        const updates = Object.entries(rawData).map(async ([key, value]) => {
-            const settingName = settingsMap[key as keyof FormValues];
-            if (!settingName) return null;
+                const settingValue = typeof value === 'number' ? value.toString() : value;
 
-            const settingValue = typeof value === 'number' ? value.toString() : value;
+                // Update the specific setting in the table
+                const { error } = await supaClient
+                    .from('AppSetting')
+                    .update({ setting_value: settingValue })
+                    .eq('setting_name', settingName);
 
-            // Update the specific setting in the table
-            const { error } = await supaClient
-                .from('AppSetting')
-                .update({ setting_value: settingValue })
-                .eq('setting_name', settingName);
+                if (error) {
+                    console.error(`Failed to update setting: ${settingName}`, error);
+                    toast.update(toastRef.current, {
+                        type: 'error',
+                        render: `Could not update ${settingName}: ${error.message}`,
+                        isLoading: false,
+                        autoClose: 5000,
+                    });
+                    return null;
+                }
 
-            if (error) {
-                console.error(`Failed to update setting: ${settingName}`, error);
-                toast.update(toastRef.current, {
-                    type: 'error',
-                    render: `Could not update ${settingName}: ${error.message}`,
-                    isLoading: false,
-                    autoClose: 5000,
-                });
-                return null;
-            }
-
-            console.log(`Updated setting: ${settingName}`);
-            return settingName;
-        });
+                console.log(`Updated setting: ${settingName}`);
+                return settingName;
+            });
 
         await Promise.all(updates);
         toast.update(toastRef.current, {
@@ -87,9 +87,6 @@ export const SettingsTab = () => {
             autoClose: 5000,
         });
         reset(rawData);
-        queryClient.invalidateQueries({ queryKey: ['constants'] });
-        queryClient.invalidateQueries({ queryKey: ['origins'] });
-        // TODO: make a global listener that refreshes all queries so that each client has the latest data
         /*
          [
   {

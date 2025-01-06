@@ -29,6 +29,10 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
         [x] - some orders that driver add dont show up until a payment is recorded
         [x] - only some orders show as locked even though all are
     [x] - Order Editor should only use today's drawers not all drawers
+
+    [x] - set up businessDate at app level and then access it through queryClient (or maybe just make the effect at midnight its own hook)
+
+    [ ] - set up supabase global table that invalidates all queries when a new row is added
         */
 
 export const useMobile = () => {

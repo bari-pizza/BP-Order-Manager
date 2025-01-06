@@ -6,6 +6,7 @@ import {
     BusinessDayDriver,
     BusinessDaySummary,
     CashTransfer,
+    GlobalChangeTracker,
     Order,
     Payment,
     Profile,
@@ -42,7 +43,7 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
         };
 
         // Set up the subscription with a filter
-        const channel = supaClient
+        const subscription = supaClient
             .channel(tableName + '-changes')
             .on(
                 'postgres_changes',
@@ -155,7 +156,8 @@ const useSubscribeToTable = <T extends Record<string, unknown>>({
 
         // Cleanup subscription on component unmount
         return () => {
-            channel.unsubscribe();
+            // channel.unsubscribe();
+            supaClient.removeChannel(subscription);
         };
     }, [tableName, showToast, primaryKeys, queryClient, queryKey, conditionalToast]);
 
@@ -310,14 +312,6 @@ export const useSetupAllSubscriptions = ({
         ],
     });
 
-    // const [data, setData] = useState<Order_Payment[]>([]);
-
-    // useEffect(() => {
-    //     if (initialOrderData) {
-    //         setData(initialOrderData);
-    //     }
-    // }, [initialOrderData]);
-
     const queryClient = useQueryClient();
 
     const conditionalToast = useConditionalToast({ isMobile });
@@ -331,7 +325,7 @@ export const useSetupAllSubscriptions = ({
             return lastUpdatedByUser?.first_name + ' ' + lastUpdatedByUser?.last_name;
         };
 
-        const channel = supaClient
+        const subscription = supaClient
             .channel('order-changes-' + businessDate.format('YYYY-MM-DD'))
             .on(
                 'postgres_changes',
@@ -524,14 +518,15 @@ export const useSetupAllSubscriptions = ({
 
         // Cleanup subscription on component unmount
         return () => {
-            channel.unsubscribe();
+            // channel.unsubscribe();
+            supaClient.removeChannel(subscription);
             // console.log('Unsubscribing from order changes ' + businessDate.format('YYYY-MM-DD'));
         };
     }, [businessDate, showToast, queryClient, conditionalToast]);
 
     // Effect for payments
     useEffect(() => {
-        const channel = supaClient
+        const subscription = supaClient
             .channel('payment-changes-' + businessDate.format('YYYY-MM-DD'))
             .on(
                 'postgres_changes',
@@ -616,9 +611,39 @@ export const useSetupAllSubscriptions = ({
 
         // Cleanup subscription on component unmount
         return () => {
-            channel.unsubscribe();
+            // channel.unsubscribe();
+            supaClient.removeChannel(subscription);
         };
     }, [businessDate, showToast, queryClient, conditionalToast]);
+
+    // Effect of GlobalChangeTracker
+    useEffect(() => {
+        const queryKeys = {
+            AppSetting: 'constants',
+            Drawer: 'drawers',
+            Driver: 'drivers',
+            OrderOrigin: 'origins',
+            Profile: 'profiles',
+        };
+
+        const subscription = supaClient
+            .channel('public:GlobalChangeTracker')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'GlobalChangeTracker' }, (payload) => {
+                const { table_name } = payload.new as GlobalChangeTracker;
+
+                // Invalidate queries for the specific table
+                if (table_name in queryKeys) {
+                    toast.info(`A change was detected to ${table_name} - invalidating related queries...`);
+                    console.log({ payload });
+                    queryClient.invalidateQueries({ queryKey: [queryKeys[table_name as keyof typeof queryKeys]] });
+                }
+            })
+            .subscribe();
+
+        return () => {
+            supaClient.removeChannel(subscription);
+        };
+    }, [queryClient]);
 
     useSubscribeToTable<BusinessDaySummary>({
         tableName: 'BusinessDaySummary',

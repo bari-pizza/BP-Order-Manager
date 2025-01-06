@@ -1,6 +1,6 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
 import { LabeledStack } from '../../../rickcedlib/components/LabeledStack';
-import { NewPayment, Payment, PaymentType, validators } from '../../../typesAndValidators';
+import { NewPayment, OrderType, Payment, PaymentType, validators } from '../../../typesAndValidators';
 import { Button, ButtonGroup, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useEffect } from 'react';
 import { usePaymentCRUD } from '../../../api/payment';
@@ -13,6 +13,7 @@ import { useLayoutContext } from '../../../hooks/data/useContextData';
 import { useMutation } from '@tanstack/react-query';
 import { handleResponse } from '../../../supabaseQueries';
 import { supaClient } from '../../../supaClient';
+import { OrderTypeIcon } from '../../../components/Order/OrderTypeIcon';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -350,5 +351,82 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                 );
             }}
         />
+    );
+};
+
+export const ExamplePaymentSelector = ({
+    cash,
+    card,
+    thirdParty,
+    selected,
+}: {
+    cash: boolean;
+    card: boolean;
+    thirdParty: boolean;
+    selected: 'cash' | 'card' | 'third_party';
+}) => {
+    const validPaymentTypes: {
+        value: PaymentType;
+        label: string;
+    }[] = [];
+
+    if (cash) {
+        validPaymentTypes.push({ value: 'cash', label: 'Cash' });
+    }
+    if (card) {
+        validPaymentTypes.push({ value: 'card', label: 'Card' });
+    }
+    if (thirdParty) {
+        validPaymentTypes.push({ value: 'third_party', label: '3rd Party' });
+    }
+
+    return (
+        <ButtonGroup
+            orientation="horizontal"
+            fullWidth
+            color="primary"
+            sx={{ width: '100%' }}
+            aria-label="Payment Type">
+            {validPaymentTypes.map((option) => {
+                const isSelected = option.value === selected;
+                return (
+                    <Button
+                        className={`payment-type-${option.value} ${isSelected ? 'selected' : ''}`}
+                        key={option.value}
+                        variant={isSelected ? 'contained' : 'outlined'}
+                        startIcon={<PaymentTypeIcon paymentType={option.value} />}>
+                        {option.label}
+                    </Button>
+                );
+            })}
+        </ButtonGroup>
+    );
+};
+
+export const ExampleOrderTypeSelector = ({ delivery }: { delivery: boolean }) => {
+    const validOrderTypes: {
+        value: OrderType;
+        label: string;
+    }[] = [{ value: 'pickup', label: 'Pickup' }];
+
+    if (delivery) {
+        validOrderTypes.push({ value: 'delivery', label: 'Delivery' });
+    }
+
+    return (
+        <ButtonGroup orientation="horizontal" fullWidth color="primary" sx={{ width: '100%' }} aria-label="Order Type">
+            {validOrderTypes.map((option) => {
+                const isSelected = option.value === 'pickup';
+                return (
+                    <Button
+                        className={`payment-type-${option.value} ${isSelected ? 'selected' : ''}`}
+                        key={option.value}
+                        variant={isSelected ? 'contained' : 'outlined'}
+                        startIcon={<OrderTypeIcon orderType={option.value} />}>
+                        {option.label}
+                    </Button>
+                );
+            })}
+        </ButtonGroup>
     );
 };

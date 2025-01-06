@@ -3,8 +3,8 @@
 // TODO: create a toast.confirmation wrapper - should have an onConfirm function
 
 import { Button, ButtonProps, Stack, Typography } from '@mui/material';
-import { useRef, useState } from 'react';
-import { Id, toast } from 'react-toastify';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 type useConfirmationToastProps = {
     message: string;
@@ -23,21 +23,23 @@ export const useConfirmationToast = ({ message, confirmProps, cancelProps }: use
     const { handler: cancelHandler, buttonText: cancelButtonText, ...cancelButtonProps } = cancelProps || {};
     const [payload, setPayload] = useState<unknown[]>([]);
 
-    const toastRef = useRef<Id>('');
+    const toastId = 'confirmation-toast';
     const handleConfirm = () => {
         confirmHandler(...payload);
-        if (toastRef.current) {
-            toast.dismiss(toastRef.current);
-        }
+        // if (toastRef.current) {
+        //     toast.dismiss(toastRef.current);
+        // }
+        toast.dismiss(toastId);
     };
 
     const handleCancel = () => {
         if (cancelHandler) {
             cancelHandler();
         }
-        if (toastRef.current) {
-            toast.dismiss(toastRef.current);
-        }
+        // if (toastRef.current) {
+        //     toast.dismiss(toastRef.current);
+        // }
+        toast.dismiss(toastId);
     };
 
     const content = (
@@ -56,10 +58,23 @@ export const useConfirmationToast = ({ message, confirmProps, cancelProps }: use
 
     const handleConfirmation = (...args: unknown[]) => {
         setPayload(args);
-        toastRef.current = toast(content, {
-            type: 'info',
-            autoClose: false,
-        });
+        // toastRef.current = toast(content, {
+        //     type: 'info',
+        //     autoClose: false,
+        // });
+        if (!toast.isActive(toastId)) {
+            toast(content, {
+                toastId, // Use the same ID
+                type: 'info',
+                autoClose: false,
+            });
+        } else {
+            toast.update(toastId, {
+                render: content,
+                type: 'info',
+                autoClose: false,
+            });
+        }
     };
 
     return { handleConfirmation };

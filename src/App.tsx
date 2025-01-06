@@ -29,7 +29,7 @@ import { ManagerDashboard, ManagerDashboardSkeleton } from './pages/Manager/Mana
 import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
-import { useBusinessDate } from './hooks/data/useBusinessDate.tsx';
+import { useBusinessDate, useMidnightEffect } from './hooks/data/useBusinessDate.tsx';
 
 const router = createBrowserRouter([
     {
@@ -97,6 +97,7 @@ const router = createBrowserRouter([
 
 function App() {
     console.log('rendering app.tsx');
+
     return (
         <ErrorBoundary>
             <QueryClientProvider client={queryClient}>
@@ -127,6 +128,7 @@ function Layout() {
     const isMobile = useMediaQuery(
         '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
     );
+    useMidnightEffect();
     // MAYBE include useSubscribeToTable here but these shouldnt be changed often
     const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }] = useSuspenseQueries({
         queries: [
