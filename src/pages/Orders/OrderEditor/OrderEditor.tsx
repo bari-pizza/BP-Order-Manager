@@ -18,7 +18,7 @@ import {
     FieldErrors,
     UseFormHandleSubmit,
 } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
@@ -507,8 +507,16 @@ const OrderEditorDialog = ({
     const [editablePaymentID, setEditablePaymentID] = useState<string | null>(null);
     const payments = order.payments?.sort((a, b) => b.created_at.localeCompare(a.created_at)) || [];
 
+    const queryClient = useQueryClient();
+
+    const orderOrigins = (queryClient.getQueryData<OrderOrigin>(['origins']) ?? []) as OrderOrigin[];
+
+    const orderOrigin = orderOrigins.find((origin) => order.origin_id === origin.origin_id);
+
+    const thirdPartyCanTip = (orderOrigin?.is_third_party && orderOrigin?.can_tip) || false;
+
     const paymentsTotalInCents = payments.reduce((total, payment) => total + payment.amount_in_cents, 0);
-    const missingPaymentInCents = order.total_in_cents - paymentsTotalInCents;
+    const missingPaymentInCents = Math.max(order.total_in_cents - paymentsTotalInCents, 0);
 
     const activePayment = editablePaymentID
         ? payments?.find((payment) => payment.payment_id === editablePaymentID)
@@ -527,6 +535,7 @@ const OrderEditorDialog = ({
                 defaultAmount={missingPaymentInCents}
                 isEditing={true}
                 setIsEditing={(bool) => setEditablePaymentID(bool ? 'newPayment' : null)}
+                thirdPartyCanTip={thirdPartyCanTip}
             />
         ) : (
             <PaymentEditor
@@ -536,6 +545,7 @@ const OrderEditorDialog = ({
                 validPaymentTypes={validPaymentTypes}
                 isEditing={editablePaymentID === activePayment!.payment_id}
                 setIsEditing={(bool) => setEditablePaymentID(bool ? activePayment!.payment_id : null)}
+                thirdPartyCanTip={thirdPartyCanTip}
             />
         )
     ) : null;

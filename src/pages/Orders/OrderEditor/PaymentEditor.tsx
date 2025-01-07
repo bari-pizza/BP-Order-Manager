@@ -25,6 +25,7 @@ interface PaymentEditorProps {
     isEditing: boolean;
     setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
     disabled?: boolean;
+    thirdPartyCanTip?: boolean;
 }
 
 const allPaymentTypes: { value: PaymentType; label: string }[] = [
@@ -63,6 +64,7 @@ export const PaymentEditor = ({
     isEditing = false,
     setIsEditing,
     disabled = false,
+    thirdPartyCanTip = true,
 }: PaymentEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { isMobile } = useLayoutContext();
@@ -98,8 +100,7 @@ export const PaymentEditor = ({
         mutationFn: createNewPayment,
         onSuccess: (data) => {
             console.log({ data });
-            // I dont think anything needs to be done since a subscription was already made
-            // queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
+            // reset the form
         },
 
         onError: (error) => {
@@ -111,8 +112,6 @@ export const PaymentEditor = ({
         mutationFn: updatePayment,
         onSuccess: (data) => {
             console.log({ data });
-            // I dont think anything needs to be done since a subscription was already made
-            // queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
 
         onError: (error) => {
@@ -121,6 +120,10 @@ export const PaymentEditor = ({
     });
 
     const onSubmit = (data: FormValues) => {
+        if (paymentTypeName === 'third party' && !thirdPartyCanTip) {
+            // make sure tip is 0 if third party can't tip
+            data.tip_in_cents = 0;
+        }
         if (forNewPayment) {
             // paymentMutations.create(data);
             createNewPaymentMutation.mutate(data);
@@ -176,11 +179,11 @@ export const PaymentEditor = ({
                     onClick={() => setIsEditing(true)}
                     sx={{ padding: 0, width: '100%' }}
                     disabled={disabled}
-                    className={`payment-editor-edit-payment payment-id-${payment.payment_id}`}>
+                    className={`payment-editor-edit-payment payment-id-${payment.payment_id} lottie-icon-container`}>
                     <LabeledStack
                         style={{ cursor: 'pointer', width: '100%' }}
                         label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
-                        color={invalidPaymentType ? theme.palette.error.main : ''}
+                        color={invalidPaymentType ? theme.palette.error.main : theme.palette.primary.main}
                         direction="row"
                         spacing={2}
                         height={60}
@@ -216,7 +219,7 @@ export const PaymentEditor = ({
             className={`payment-editor-editing-payment payment-id-${payment?.payment_id || 'new'}`}>
             <LabeledStack
                 label={paymentTypeName}
-                color={isDirty || forNewPayment ? theme.palette.primary.main : ''}
+                color={isDirty || forNewPayment ? theme.palette.primary.main : 'black'}
                 direction="column"
                 justifyContent="space-between"
                 mt={1}
@@ -262,6 +265,7 @@ export const PaymentEditor = ({
                                         setValue('tip_in_cents', value, { shouldDirty })
                                     }
                                     isDirty={dirtyFields.tip_in_cents || forNewPayment}
+                                    disabled={paymentTypeName === 'third party' && !thirdPartyCanTip}
                                 />
                             );
                         }}
@@ -307,6 +311,8 @@ export const PaymentTypeSelector = <T extends FieldValues>({
     name = 'payment_type' as Path<T>,
     variant = 'standard',
 }: PaymentTypeSelectorProps<T>) => {
+    const theme = useTheme();
+
     return (
         <Controller
             name={name}
@@ -316,8 +322,12 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                     <ButtonGroup
                         orientation="horizontal"
                         fullWidth
-                        color={isDirty ? 'secondary' : 'primary'}
-                        sx={{ width: '100%' }}
+                        color="primary"
+                        sx={{
+                            width: '100%',
+                            border: '2px solid',
+                            borderColor: isDirty ? `${theme.palette.primary.main}` : 'white',
+                        }}
                         aria-label="Payment Type"
                         {...field}>
                         {validPaymentTypes.map((option) => {
@@ -331,6 +341,14 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                                         onClick={() => {
                                             handleChange(option.value);
                                         }}
+                                        sx={
+                                            isDirty && isSelected
+                                                ? {
+                                                      fontStyle: 'italic',
+                                                      fontWeight: 'bold',
+                                                  }
+                                                : {}
+                                        }
                                         startIcon={<PaymentTypeIcon paymentType={option.value} />}>
                                         {option.label}
                                     </Button>
@@ -342,7 +360,15 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                                     variant={isSelected ? 'contained' : 'outlined'}
                                     onClick={() => {
                                         handleChange(option.value);
-                                    }}>
+                                    }}
+                                    sx={
+                                        isDirty && isSelected
+                                            ? {
+                                                  fontStyle: 'italic',
+                                                  fontWeight: 'bold',
+                                              }
+                                            : {}
+                                    }>
                                     {option.label}
                                 </Button>
                             );

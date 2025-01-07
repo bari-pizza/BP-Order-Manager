@@ -119,8 +119,8 @@ const paymentValidators = {
             if (isNaN(value)) {
                 return 'Must be a number';
             }
-            if (value < 1) {
-                return 'Must be greater than 0';
+            if (value < 0) {
+                return 'Cannot be negative';
             }
             return true;
         },
