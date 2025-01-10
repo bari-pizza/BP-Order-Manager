@@ -4,7 +4,6 @@ import {
     GridColDef,
     GridEventListener,
     GridRowEditStopReasons,
-    GridRowModel,
     GridRowModes,
     GridRowModesModel,
 } from '@mui/x-data-grid';
@@ -22,6 +21,7 @@ import { useRef } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';
 
 const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
+    if (!origin) return null;
     let cash = true,
         card = true,
         thirdParty = false,
@@ -37,9 +37,6 @@ const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
         thirdParty = true;
     }
 
-    // TODO: Don't allow tipping when origin.can_tip is false
-    // if too complicated, just remove .can_tip all together
-
     return (
         <Stack direction="column" spacing={1} width={400} textAlign="center">
             <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
@@ -54,8 +51,12 @@ const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     );
 };
 
+// TODO: useConfirmationToast to confirm changes (add body to toast, allow for centering)
+
+type OriginRow = OrderOrigin & { is_pending?: boolean };
+
 export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
-    const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<OrderOrigin>({ data: origins });
+    const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<OriginRow>({ data: origins });
     const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['origins'] });
     const toastRef = useRef<Id>('');
 
@@ -65,22 +66,55 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         }
     };
 
-    const processRowUpdate = (newRow: GridRowModel) => {
-        const updatedRow = {
-            ...(newRow as OrderOrigin),
+    const { handleConfirmation: confirmEdit } = useConfirmationToast({
+        message: 'Origin Preview',
+        renderBody: (...args: unknown[]) => {
+            const origin = args[1] as OrderOrigin;
+            return <ExampleOrigin origin={origin} />;
+        },
+        confirmProps: {
+            color: 'primary',
+            variant: 'contained',
+            handler: (...args: unknown[]) => {
+                const newRow = args[0] as OriginRow;
+                const id = newRow.origin_id;
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { is_pending, ...origin } = newRow;
+                if (!id) {
+                    toast.error('Operation failed - try again!');
+                    return;
+                }
+                orderOriginMutations.update(origin);
+                setRowModesModel({
+                    ...rowModesModel,
+                    [id]: { mode: GridRowModes.View, ignoreModifications: true },
+                });
+            },
+            buttonText: 'Save Changes',
+        },
+        cancelProps: {
+            handler: (...args: unknown[]) => {
+                const oldRow = args[1] as OriginRow;
+                const id = oldRow.origin_id;
+                oldRow.is_pending = false;
+                setRows((prev) => prev.map((row) => (row.origin_id === id ? oldRow : row)));
+            },
+        },
+    });
+
+    const processRowUpdate = (newRow: OriginRow, oldRow: OriginRow) => {
+        if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
+            toast.info('No changes to save');
+            return {
+                ...newRow,
+                is_pending: false,
+            };
+        }
+        confirmEdit(newRow, oldRow);
+        return {
+            ...newRow,
+            is_pending: true,
         };
-        // TODO: alert('this should open a dialog with a preview of the changes, allowing admin to accept or reject');
-        toastRef.current = toast.loading(`Updating origin ${updatedRow.name}`);
-        toast.update(toastRef.current, {
-            render: <ExampleOrigin origin={updatedRow} />,
-            type: 'info',
-            isLoading: false,
-            autoClose: false,
-            closeButton: true,
-        });
-        orderOriginMutations.update(updatedRow as OrderOrigin);
-        setRows((prev) => prev.map((row) => (row.origin_id === newRow.id ? updatedRow : row)));
-        return updatedRow;
     };
 
     const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
@@ -178,7 +212,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
     });
 
-    const columns: GridColDef<OrderOrigin>[] = [
+    const columns: GridColDef<OriginRow>[] = [
         {
             field: 'actions',
             type: 'actions',
@@ -307,6 +341,11 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                         '& .actions .MuiButtonBase-root': { color: 'primary.main' },
                     },
                     '& .MuiDataGrid-cell--editing': { padding: 0 },
+                    '& .row-is-pending': {
+                        color: 'text.disabled',
+                        '& .MuiButtonBase-root': { color: 'text.disabled' },
+                        '& .actions .MuiButtonBase-root': { color: 'primary.main' },
+                    },
                 }}
                 disableVirtualization
                 rows={rows}
@@ -320,6 +359,8 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                 getRowId={(row) => row.origin_id}
                 getRowClassName={(params) => {
                     const isDeleted = params.row.is_deleted;
+                    const isPending = params.row.is_pending;
+                    if (isPending) return 'row-is-pending';
                     if (isDeleted) return 'row-is-deleted';
                     const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
                     return isEditing ? 'row-is-edit' : '';
