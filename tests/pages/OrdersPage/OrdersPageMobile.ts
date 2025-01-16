@@ -37,12 +37,13 @@ export class OrdersPageMobile extends OrdersPageBase {
         for (let i = 0; i < orderTicketsCount; i++) {
             const tip = OrdersPageBase.generateRandomTip();
             const { nthTicket, orderData } = await this.ticketPage.getNthTicketAndOrder(i + 1);
-            await this.ticketPage.editTip(nthTicket, tip);
-            // await this.startTimeout(5, 'Closing ticket in:');
-            await this.ticketPage.closeTicket();
-            this.logger.logInfo(
-                `Edited tip for order ${orderData.orderNumber || orderData.orderName} to ${formatCurrency(tip)}`,
-            );
+            if (orderData.origin.can_tip) {
+                await this.ticketPage.editTip(nthTicket, tip);
+                await this.ticketPage.closeTicket();
+                this.logger.logInfo(
+                    `Edited tip for order ${orderData.orderNumber || orderData.orderName} to ${formatCurrency(tip)}`,
+                );
+            }
         }
     }
 
