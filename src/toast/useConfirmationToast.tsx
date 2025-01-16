@@ -18,9 +18,16 @@ type useConfirmationToastProps = {
         handler?: (...args: unknown[]) => void;
         buttonText?: string;
     };
+    position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
 };
 
-export const useConfirmationToast = ({ message, renderBody, confirmProps, cancelProps }: useConfirmationToastProps) => {
+export const useConfirmationToast = ({
+    message,
+    renderBody,
+    confirmProps,
+    cancelProps,
+    position = 'top-right',
+}: useConfirmationToastProps) => {
     const { handler: confirmHandler, buttonText: confirmButtonText, ...confirmButtonProps } = confirmProps;
     const { handler: cancelHandler, buttonText: cancelButtonText, ...cancelButtonProps } = cancelProps || {};
 
@@ -60,6 +67,7 @@ export const useConfirmationToast = ({ message, renderBody, confirmProps, cancel
             toastId, // Use the same ID
             type: 'info',
             autoClose: false,
+            position,
             closeButton: () => <CustomCloseButton onClose={handleCancel} />,
         });
     };

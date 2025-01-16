@@ -45,7 +45,7 @@ export const AvatarUploader = ({ profile, onUpload, onSuccess, onError, disabled
         bucketName: 'avatars' as BucketName,
         basePath: profile?.id || '',
         fileName: 'avatar',
-        originalURL: profile?.avatar_src || '',
+        originalURL: profile?.avatar_src || 'src/assets/add-user.png',
         imgProps: {
             width: 125,
             height: 125,

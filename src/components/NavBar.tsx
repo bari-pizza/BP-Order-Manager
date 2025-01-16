@@ -1,4 +1,4 @@
-import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon } from '@mui/material';
+import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon, Badge } from '@mui/material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
 import { UserAvatar } from './Base/UserAvatar';
@@ -17,6 +17,8 @@ import {
     UserProfileLottieIcon,
 } from '../rickcedlib/LottieIcons';
 import { Phone as PhoneIcon, Computer as ComputerIcon } from '@mui/icons-material';
+import { useQueryClient } from '@tanstack/react-query';
+import { Order_Payment } from '../typesAndValidators';
 
 interface NavBarItem {
     path?: string;
@@ -36,6 +38,12 @@ export function NavBar() {
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
     const version = import.meta.env.VITE_REACT_APP_VERSION || process.env.VITE_REACT_APP_VERSIONS;
+
+    const queryClient = useQueryClient();
+    const orders = (
+        profile ? (queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) ?? []) : []
+    ) as Order_Payment[];
+    const orderCount = (isMobile ? orders.filter((o) => o.drawer_id === profile?.id) : orders).length;
 
     const todaysDate = dayjs().format('YYYY-MM-DD');
 
@@ -67,7 +75,16 @@ export function NavBar() {
             forMobile: false,
         },
         profile?.is_manager && { path: '/manager', icon: <StaffLottieIcon />, text: 'Manager', forMobile: false },
-        { path: '/orders', icon: <MarketPlaceLottieIcon />, text: 'Orders', forMobile: true },
+        {
+            path: '/orders',
+            icon: (
+                <Badge badgeContent={orderCount} color="primary">
+                    <MarketPlaceLottieIcon />
+                </Badge>
+            ),
+            text: 'Orders',
+            forMobile: true,
+        },
         userListItem,
     ].filter((item) => item && (!isMobile || item.forMobile)) as NavBarItem[];
 

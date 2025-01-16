@@ -97,7 +97,7 @@ export const useConditionalToast = ({ isMobile }: { isMobile: boolean }) => {
         scenario.forEach((s) => {
             const { conditions, getMessage } = s;
             if (evaluateConditions(conditions, context, payload)) {
-                toast.info(getMessage(context), { autoClose: 1000 });
+                toast.info(getMessage(context), { autoClose: 1000, position: isMobile ? 'top-center' : 'top-right' });
             }
         });
     };

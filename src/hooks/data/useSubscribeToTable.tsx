@@ -633,8 +633,6 @@ export const useSetupAllSubscriptions = ({
 
                 // Invalidate queries for the specific table
                 if (table_name in queryKeys) {
-                    toast.info(`A change was detected to ${table_name} - invalidating related queries...`);
-                    console.log({ payload });
                     queryClient.invalidateQueries({ queryKey: [queryKeys[table_name as keyof typeof queryKeys]] });
                 }
             })

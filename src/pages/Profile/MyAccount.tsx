@@ -1,6 +1,6 @@
 import { Stack, Button, Typography, TextField, Divider, Skeleton } from '@mui/material';
 import { supaClient } from '../../supaClient';
-import { useUserContext } from '../../hooks/data/useContextData';
+import { useLayoutContext, useUserContext } from '../../hooks/data/useContextData';
 import { AvatarUploader } from './AvatarUploader';
 import { Controller, useForm } from 'react-hook-form';
 import { useRef } from 'react';
@@ -22,7 +22,8 @@ type FormValues = {
 export const MyAccount = () => {
     const { profile } = useUserContext();
     const toastRef = useRef<Id>('');
-    // const { isMobile } = useUserContext();
+    const { isMobile } = useLayoutContext();
+
     const {
         handleSubmit,
         control,
@@ -150,7 +151,12 @@ export const MyAccount = () => {
             justifyContent="space-between">
             <Typography variant="h3">My Account</Typography>
 
-            <Stack direction="row" height="-webkit-fill-available" spacing={2} m={4} flexGrow={1}>
+            <Stack
+                direction={isMobile ? 'column' : 'row'}
+                height="-webkit-fill-available"
+                spacing={2}
+                m={4}
+                flexGrow={1}>
                 <Stack direction="column" alignItems="center" width="300px" p={2} spacing={4}>
                     <AvatarUploader profile={profile} />
                     {isEditing ? (
@@ -211,7 +217,7 @@ export const MyAccount = () => {
                         }}
                     />
                 </Stack>
-                <Divider orientation="vertical" flexItem />
+                {!isMobile && <Divider orientation="vertical" flexItem />}
                 <Stack direction="column" gap={2} width="300px" p={2} justifyContent="space-evenly" alignItems="center">
                     <Stack direction="column" alignItems="center" gap={2}>
                         {updatingPassword && (
