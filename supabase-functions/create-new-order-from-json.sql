@@ -4,7 +4,15 @@ DECLARE
     v_order_json JSONB;
     v_payment_json JSONB;
     v_is_locked BOOLEAN;
+    v_created_at TIMESTAMPTZ;
 BEGIN
+    -- Determine created_at values
+    v_created_at := 
+        CASE 
+            WHEN p_order_json ? 'created_at' THEN (p_order_json->>'created_at')::TIMESTAMPTZ
+            ELSE NOW()
+        END;
+
     -- Check if the business day is locked
     SELECT is_locked INTO v_is_locked
     FROM public."BusinessDaySummary"
@@ -13,6 +21,7 @@ BEGIN
     IF v_is_locked THEN
         RAISE EXCEPTION 'Cannot process order: Business day is locked';
     END IF;
+
     -- Insert into Orders table
     INSERT INTO public."Order" (
         order_id,
@@ -29,7 +38,7 @@ BEGIN
         last_updated_by
     ) VALUES (
         v_order_id,
-        NOW(),
+        v_created_at,
         (p_order_json->>'order_type')::order_type,
         (p_order_json->>'business_date')::DATE,
         (p_order_json->>'drawer_id')::UUID,
@@ -54,7 +63,7 @@ BEGIN
         last_updated_by
     ) VALUES (
         v_payment_id,
-        NOW(),
+        v_created_at,
         v_order_id,
         (p_order_json->>'initial_payment_type')::payment_type,
         (p_order_json->>'total_in_cents')::INTEGER,

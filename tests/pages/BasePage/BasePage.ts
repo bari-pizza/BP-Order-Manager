@@ -1,14 +1,44 @@
 import { Page, expect } from '@playwright/test';
 import { Logger } from '../../utils/Logger';
 import dayjs from 'dayjs';
+import { Order } from '../../../src/typesAndValidators';
 export abstract class BasePage {
     protected page: Page;
     protected logger: Logger;
+    private static mockedCreatedAt: dayjs.Dayjs;
+    private static dayStart: dayjs.Dayjs;
+    private static dayEnd: dayjs.Dayjs;
 
     constructor(page: Page) {
         this.page = page;
         this.logger = new Logger();
         this.wrapMethodsWithErrorHandling();
+        this.initMockedCreatedAt();
+    }
+
+    initMockedCreatedAt() {
+        console.log('initMockedCreatedAt');
+        const day = dayjs().day();
+        if (day === 0) {
+            BasePage.dayStart = dayjs().set('hour', 12).set('minute', 0).set('second', 0).set('millisecond', 0);
+            BasePage.dayEnd = dayjs().set('hour', 22).set('minute', 0).set('second', 0).set('millisecond', 0);
+        } else {
+            BasePage.dayStart = dayjs().set('hour', 11).set('minute', 0).set('second', 0).set('millisecond', 0);
+            BasePage.dayEnd = dayjs().set('hour', 23).set('minute', 0).set('second', 0).set('millisecond', 0);
+        }
+        BasePage.mockedCreatedAt = BasePage.dayStart;
+    }
+
+    jumpMockCreatedAt(minutes: number) {
+        // add minutes to the mocked created_at timestamp
+        const lastTime = BasePage.mockedCreatedAt;
+        const newTime = lastTime.add(minutes, 'minute');
+        if (newTime > BasePage.dayEnd) {
+            BasePage.mockedCreatedAt = BasePage.dayStart;
+        } else {
+            BasePage.mockedCreatedAt = newTime;
+        }
+        console.log(`jumped mock created_at from ${lastTime} to ${BasePage.mockedCreatedAt}`);
     }
 
     async mockSystemTime(fakeNow: number): Promise<void> {
@@ -27,6 +57,62 @@ export abstract class BasePage {
           const __DateNow = Date.now;
           Date.now = () => __DateNow() + __DateNowOffset;
         }`);
+    }
+
+    async mockRpcCreatedAt() {
+        console.log('mocking created_at');
+        const rpcUrlRegex = /\/rest\/v1\/rpc\/create_new_order_from_json$/;
+
+        await this.page.route(rpcUrlRegex, async (route, request) => {
+            // Use page.route()
+            if (request.method() === 'POST') {
+                try {
+                    const { p_order_json }: { p_order_json: Order } = await request.postDataJSON();
+                    console.log({ p_order_json });
+
+                    if (p_order_json) {
+                        const modifiedData = {
+                            p_order_json: {
+                                ...p_order_json,
+                                created_at: BasePage.mockedCreatedAt.toISOString(),
+                            },
+                        };
+
+                        await route.continue({
+                            // Use route.continue()
+                            postData: JSON.stringify(modifiedData),
+                        });
+                        console.log(
+                            `Mocked created_at for order ${p_order_json.order_name || p_order_json.order_number} as: ${BasePage.mockedCreatedAt.toISOString()}`,
+                        );
+                    } else {
+                        console.warn('Request to create_new_order_from_json had no postData.');
+                        await route.continue();
+                    }
+                } catch (error) {
+                    console.error('Error modifying request body:', error);
+                    await route.continue();
+                }
+            } else {
+                await route.continue(); // Important: Let non-POST requests continue
+            }
+        });
+        // await this.page.route('**/rest/v1/rpc/create_new_order_from_json', async (route) => {
+        //     const request = route.request();
+        //     const postData = await request.postDataJSON();
+
+        //     // Modify the request body to add a mock created_at timestamp
+        //     const modifiedData = {
+        //         ...postData,
+        //         created_at: this.mockedCreatedAt, // Use the stored timestamp
+        //     };
+
+        //     // Continue the request with the modified body
+        //     await route.continue({ postData: JSON.stringify(modifiedData) });
+        //     console.log(`Mocked created_at: ${this.mockedCreatedAt}`);
+
+        //     // console.log(`Mocked created_at: ${this.mockedCreatedAt}, modifiedData: ${JSON.stringify(modifiedData)}`);
+        // });
     }
 
     logInfo(message: string, details?: object) {

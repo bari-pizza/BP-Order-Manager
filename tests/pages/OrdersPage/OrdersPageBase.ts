@@ -109,6 +109,7 @@ export abstract class OrdersPageBase extends BasePage {
         this.logger.logInfo(`${isMobile ? 'Driver' : 'Manager'} creating ${randomNumber} orders`);
         for (let i = 0; i < randomNumber; i++) {
             await this.addOrder(isMobile);
+            this.jumpMockCreatedAt(7);
         }
     }
 

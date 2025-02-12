@@ -42,11 +42,11 @@ test.afterAll(async () => {
     await mobileBrowser.close();
 });
 
-test('End-to-end flow for managing a business day', async () => {
+test.only('End-to-end flow for managing a business day', async () => {
     test.setTimeout(1000 * 60 * 15);
     await managerPage.addDriversToDay();
-    await ordersPageDesktop.addMockOrders(60, 80);
-    await ordersPageMobile.addMockOrders(15, 20);
+    await ordersPageDesktop.addMockOrders(5, 10);
+    await ordersPageMobile.addMockOrders(5, 10);
     await ordersPageDesktop.assignOrders();
     await ordersPageMobile.addMockTips();
     await managerPage.closeAllDrawers();

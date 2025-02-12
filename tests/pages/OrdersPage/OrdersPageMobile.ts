@@ -49,6 +49,7 @@ export class OrdersPageMobile extends OrdersPageBase {
 
     async addMockOrders(min = 8, max = 15) {
         this.logInfo(`Driver adding mock orders`);
+        await this.mockRpcCreatedAt();
         await this.navigateToOrders();
         await this.createOrders(min, max);
     }

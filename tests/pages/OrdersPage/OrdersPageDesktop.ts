@@ -133,6 +133,7 @@ export class OrdersPageDesktop extends OrdersPageBase {
 
     async addMockOrders(min = 30, max = 50) {
         this.logInfo(`Manager adding mock orders`);
+        await this.mockRpcCreatedAt();
         await this.navigateToOrders();
         await this.createOrders(min, max);
     }
