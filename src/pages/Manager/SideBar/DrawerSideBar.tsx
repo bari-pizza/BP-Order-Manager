@@ -1,4 +1,14 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, Stack, Typography } from '@mui/material';
+import {
+    Button,
+    ButtonGroup,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Skeleton,
+    Stack,
+    Typography,
+} from '@mui/material';
 import { useBariPizzaContext, useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { SideBar, SideBarSkeleton } from '../../../components/SideBar';
 import { DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../../components/Base/DrawerCardBase';
@@ -30,6 +40,7 @@ export const DrawerSideBar = () => {
     const [businessDate] = useBusinessDate();
     const { constants } = useBariPizzaContext();
     const { orders, drawers, summaries, cashTransfers, drivers, businessDay } = useManagerDashboardContext();
+    const [activeSummaryTab, setActiveSummaryTab] = useState(0);
 
     const [editableCashTransferID, setEditableCashTransferID] = useState<string | null>(null);
 
@@ -212,6 +223,7 @@ export const DrawerSideBar = () => {
         0,
     );
     const items = [];
+    const hungerRushItems = [];
     switch (currentDrawer.drawer_type) {
         case 'driver':
             items.push(
@@ -257,8 +269,18 @@ export const DrawerSideBar = () => {
                     label: 'Payments',
                     value: payments,
                     details: closingPmtTransfer
-                        ? `Closing Payment: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
+                        ? `Closing Payment Paid ${closingPmtTransfer.source === currentDrawer.drawer_id ? 'By' : 'To'} ${currentDrawer.name}: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
                         : 'No Closing Payment',
+                },
+            );
+            hungerRushItems.push(
+                {
+                    label: 'Total',
+                    value: total,
+                },
+                {
+                    label: 'Bank',
+                    value: bank,
                 },
             );
             break;
@@ -308,6 +330,9 @@ export const DrawerSideBar = () => {
     return (
         <SideBar width="350px">
             <Stack direction="column" height="100vh" spacing={2} alignItems="center" mt={2}>
+                <Typography variant="h6">
+                    {hours} vs {drawerSummary.hours_in_cents}
+                </Typography>
                 <Stack direction="column" alignItems="center" gap={2}>
                     <AnimatePresence>
                         <ContextMenu openOnType="click">
@@ -329,7 +354,27 @@ export const DrawerSideBar = () => {
                                     forSideBar
                                 />
                             )}
-                            {isDriver && <SummaryStack items={items} />}
+                            {/* {isDriver && <SummaryStack items={items} />} */}
+                            {(isDriver || currentDrawer.drawer_type === 'register') && (
+                                <>
+                                    {activeSummaryTab === 0 && <SummaryStack items={items} />}
+                                    {activeSummaryTab === 1 && <SummaryStack items={hungerRushItems} />}
+
+                                    <ButtonGroup>
+                                        <Button
+                                            onClick={() => setActiveSummaryTab(0)}
+                                            variant={activeSummaryTab === 0 ? 'contained' : 'outlined'}>
+                                            Closing Summary
+                                        </Button>
+                                        <Button
+                                            onClick={() => setActiveSummaryTab(1)}
+                                            variant={activeSummaryTab === 1 ? 'contained' : 'outlined'}>
+                                            Hunger Rush
+                                        </Button>
+                                    </ButtonGroup>
+                                </>
+                            )}
+
                             {currentDrawer.drawer_type === 'third_party' && (
                                 <ThirdPartySummary thirdPartySummary={thirdPartySummary} />
                             )}

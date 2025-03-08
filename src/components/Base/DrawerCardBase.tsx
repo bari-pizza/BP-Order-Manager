@@ -127,6 +127,7 @@ export const DrawerCardBase = ({
                 'drawer-card-button-' +
                 (drawer.drawer_id === 'add-driver' ? 'add-driver' : drawer.drawer_type)
             }
+            data-user-email={'driver' in drawer ? drawer.driver.email : ''}
             onClick={handleClick}
             variant="outlined"
             color="primary"

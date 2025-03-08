@@ -1,19 +1,28 @@
-import { Page, expect } from '@playwright/test';
+import { Browser, BrowserContext, Page, expect } from '@playwright/test';
 import { Logger } from '../../utils/Logger';
 import dayjs from 'dayjs';
 import { Order } from '../../../src/typesAndValidators';
 export abstract class BasePage {
     protected page: Page;
-    protected logger: Logger;
+    protected context: BrowserContext;
+    protected browser: Browser;
     private static mockedCreatedAt: dayjs.Dayjs;
     private static dayStart: dayjs.Dayjs;
     private static dayEnd: dayjs.Dayjs;
+    public static todaysDrivers: { email: string; name: string }[] = [];
 
-    constructor(page: Page) {
+    constructor(page: Page, context: BrowserContext, browser: Browser) {
         this.page = page;
-        this.logger = new Logger();
+        this.context = context;
+        this.browser = browser;
         this.wrapMethodsWithErrorHandling();
         this.initMockedCreatedAt();
+        this.mockRpcCreatedAt();
+    }
+
+    async quitBrowser() {
+        await this.context.close();
+        await this.browser.close();
     }
 
     initMockedCreatedAt() {
@@ -116,15 +125,15 @@ export abstract class BasePage {
     }
 
     logInfo(message: string, details?: object) {
-        this.logger.logInfo(message, details);
+        Logger.logInfo(message, details);
     }
 
     logError(error: Error, context?: string) {
-        this.logger.logError(`Error in ${context}: ${error.message}`, { stack: error.stack });
+        Logger.logError(`Error in ${context}: ${error.message}`, { stack: error.stack });
     }
 
     openLogger() {
-        this.logger.openLogFile();
+        Logger.openLogFile();
     }
 
     // Method to wrap all class methods with error handling
@@ -152,11 +161,13 @@ export abstract class BasePage {
     // Common navigation methods
 
     protected async navigateToHref(href: string) {
+        // check if already on the right page
+        if (this.page.url() === href) return;
         const link = this.page.locator(`a[href="${href}"]`);
         await expect(link).toBeVisible();
         await link.click();
         await expect(this.page).toHaveURL(href);
-        this.logger.logInfo(`Navigated to ${href}`);
+        Logger.logInfo(`Navigated to ${href}`);
         await this.page.mouse.move(0, 0);
     }
 
@@ -170,26 +181,21 @@ export abstract class BasePage {
         await expect(this.page.locator('_react=OrderDashboard').nth(0)).toBeVisible();
     }
 
-    protected async loginWithCredentials(isMobile: boolean) {
+    async loginWithCredentials(email: string, password: string) {
         await this.page.goto('/login');
 
         const emailInput = this.page.locator('input[name="email"]');
         const passwordInput = this.page.locator('input[name="password"]');
-        // const loginButton = this.page.locator('button[text="Login"]');
-        // button that has text Sign In
         const loginButton = this.page.locator('button:has-text("Sign In")');
 
         await expect(emailInput).toBeVisible();
         await expect(passwordInput).toBeVisible();
         await expect(loginButton).toBeVisible();
 
-        const email = isMobile ? 'ccata002@gmail.com' : 'jrajulialmeida@gmail.com';
-        const pw = '12345678';
-
         await emailInput.fill(email);
-        await passwordInput.fill(pw);
+        await passwordInput.fill(password);
         await loginButton.click();
-        this.logger.logInfo('Logged in');
+        Logger.logInfo(`Logged in as ${email}`);
     }
 
     async getTitle(): Promise<string> {

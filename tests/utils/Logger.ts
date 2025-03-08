@@ -5,18 +5,19 @@ import { exec } from 'child_process';
 // import { chromium } from '@playwright/test';
 
 export class Logger {
-    private filePath: string;
-    constructor(filePath = 'test-log.html') {
-        const timestamp = dayjs().format('YYYY-MM-DD-HH-mm');
-        this.filePath = path.resolve('./test-results/' + timestamp + '-' + filePath);
-        // Initialize the log file by clearing or creating it
-        const styleTag = `<style>body { font-family: monospace; } .error { color: red; }</style>`;
-        fs.writeFileSync(this.filePath, styleTag);
+    private static filePath: string;
+    constructor() {}
+
+    public static startLog() {
+        const timestamp = dayjs().format('YYYY-MM-DD-HH-mm-ss');
+        Logger.filePath = path.resolve('./test-results/' + timestamp + '-' + 'test-log.html');
+        const styleTag = `<style>body { font-family: monospace; } .error { color: red; }</style><h1>Test Log</h1>`;
+        fs.writeFileSync(Logger.filePath, styleTag);
     }
 
-    log(message: string) {
-        const timestamp = new Date().toISOString();
-        fs.appendFileSync(this.filePath, `[LOG] [${timestamp}] ${message}\n`);
+    public static log(message: string) {
+        const timestamp = dayjs().format('HH-mm-ss');
+        fs.appendFileSync(Logger.filePath, `[LOG] [${timestamp}] ${message}\n`);
     }
 
     // logInfo(message: string, details?: object) {
@@ -28,8 +29,8 @@ export class Logger {
     //     }
     // }
 
-    logInfo(message: string, details?: object) {
-        const timestamp = new Date().toISOString();
+    public static logInfo(message: string, details?: object) {
+        const timestamp = dayjs().format('HH-mm-ss');
         const logMessage = `
             <div style="margin-bottom: 1em; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                 <div><strong>[INFO] [${timestamp}]</strong> ${message}</div>
@@ -45,11 +46,11 @@ export class Logger {
                 }
             </div>
         `;
-        fs.appendFileSync(this.filePath, logMessage);
+        fs.appendFileSync(Logger.filePath, logMessage);
     }
 
-    logError(message: string, stack: object) {
-        const timestamp = new Date().toISOString();
+    public static logError(message: string, stack: object) {
+        const timestamp = dayjs().format('HH-mm-ss');
         const logMessage = `
             <div style="margin-bottom: 1em; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                 <div class="error"><strong>[ERROR] [${timestamp}]</strong> ${message}</div>
@@ -65,22 +66,22 @@ export class Logger {
                 }
             </div>
         `;
-        fs.appendFileSync(this.filePath, logMessage);
+        fs.appendFileSync(Logger.filePath, logMessage);
         // fs.appendFileSync(this.filePath, `[ERROR] [${timestamp}] ${message}\n`);
     }
 
-    logRequest(method: string, url: string) {
-        const timestamp = new Date().toISOString();
-        fs.appendFileSync(this.filePath, `[REQUEST] [${timestamp}] ${method} ${url}\n`);
+    public static logRequest(method: string, url: string) {
+        const timestamp = dayjs().format('HH-mm-ss');
+        fs.appendFileSync(Logger.filePath, `[REQUEST] [${timestamp}] ${method} ${url}\n`);
     }
 
-    logResponse(status: number, url: string) {
-        const timestamp = new Date().toISOString();
-        fs.appendFileSync(this.filePath, `[RESPONSE] [${timestamp}] Status: ${status}, URL: ${url}\n`);
+    public static logResponse(status: number, url: string) {
+        const timestamp = dayjs().format('HH-mm-ss');
+        fs.appendFileSync(Logger.filePath, `[RESPONSE] [${timestamp}] Status: ${status}, URL: ${url}\n`);
     }
 
-    async openLogFile() {
-        const fileUrl = `${this.filePath.replace(/\\/g, '/')}`;
+    public static async openLogFile() {
+        const fileUrl = `${Logger.filePath.replace(/\\/g, '/')}`;
         console.log(`Open log file: ${fileUrl}`);
         const chromePath = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"`;
 

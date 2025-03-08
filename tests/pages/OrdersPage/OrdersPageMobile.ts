@@ -1,7 +1,9 @@
-import { Locator, Page } from '@playwright/test';
+import { Browser, BrowserContext, Locator, Page } from '@playwright/test';
 import { OrdersPageBase } from './OrdersPageBase';
 import { TicketPageMobile } from '../TicketPage/TicketPageMobile';
 import { formatCurrency } from '../../../src/utils';
+import { CombinedPages } from './CombinedOrdersPages';
+import { Logger } from '../../utils/Logger';
 
 // type OrderIdentifier = string | number;
 
@@ -10,13 +12,18 @@ export class OrdersPageMobile extends OrdersPageBase {
     private speedDial: Locator = this.page.locator('[aria-label="SpeedDial"]');
     private addOrderButton: Locator = this.page.locator('[aria-label="Add Order"]');
     private speedDialExpanded: Locator = this.page.locator('[aria-label="SpeedDial"][aria-expanded="true"]');
-    constructor(page: Page) {
-        super(page);
+    constructor(
+        page: Page,
+        context: BrowserContext,
+        browser: Browser,
+        combinedOrdersPages: CombinedPages,
+        driver: {
+            email: string;
+            name: string;
+        },
+    ) {
+        super(page, context, browser, combinedOrdersPages, driver);
         this.ticketPage = new TicketPageMobile(page);
-    }
-
-    async login() {
-        await this.loginWithCredentials(true);
     }
 
     async clickAddOrder() {
@@ -40,16 +47,22 @@ export class OrdersPageMobile extends OrdersPageBase {
             if (orderData.origin.can_tip) {
                 await this.ticketPage.editTip(nthTicket, tip);
                 await this.ticketPage.closeTicket();
-                this.logger.logInfo(
+                Logger.logInfo(
                     `Edited tip for order ${orderData.orderNumber || orderData.orderName} to ${formatCurrency(tip)}`,
                 );
             }
         }
     }
 
+    async addMockOrder() {
+        // make sure we're on the right page
+        await this.navigateToOrders();
+        await this.createRandomOrders(1, 1, true);
+    }
+
     async addMockOrders(min = 8, max = 15) {
         this.logInfo(`Driver adding mock orders`);
-        await this.mockRpcCreatedAt();
+        // await this.mockRpcCreatedAt();
         await this.navigateToOrders();
         await this.createOrders(min, max);
     }

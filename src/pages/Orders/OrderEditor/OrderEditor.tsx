@@ -455,7 +455,7 @@ export const OrderEditor = ({
 
     if (isOpen) {
         return (
-            <Stack direction="column" m={2}>
+            <Stack direction="column" m={2} height="100%">
                 <Typography variant="h5" textAlign={'center'}>
                     Order Editor
                 </Typography>
@@ -472,8 +472,14 @@ export const OrderEditor = ({
                         name="initial_payment_type"
                     />
                 </Stack>
-                <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
-                <Button onClick={handleCancel}>Cancel</Button>
+                <Stack direction="column" spacing={2} mt={2} justifyContent="space-between" height="100%">
+                    <Button onClick={handleSubmit(onSubmit, onError)} variant="contained" sx={{ height: '75px' }}>
+                        Save
+                    </Button>
+                    <Button onClick={handleCancel} variant="outlined" color="error" sx={{ height: '75px' }}>
+                        Cancel
+                    </Button>
+                </Stack>
             </Stack>
         );
     }

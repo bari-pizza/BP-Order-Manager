@@ -1,21 +1,18 @@
-import { Locator, Page } from '@playwright/test';
+import { Browser, BrowserContext, Locator, Page } from '@playwright/test';
 import { OrderData } from '../../utils/data';
 import { faker } from '@faker-js/faker/locale/en_US';
 import { OrdersPageBase } from './OrdersPageBase';
 import { TicketPageDesktop } from '../TicketPage/TicketPageDesktop';
+import { CombinedPages } from './CombinedOrdersPages';
 
 type DrawerIndentifier = string | number;
 type OrderIdentifier = string | number;
 
 export class OrdersPageDesktop extends OrdersPageBase {
     protected ticketPage: TicketPageDesktop;
-    constructor(page: Page) {
-        super(page);
+    constructor(page: Page, context: BrowserContext, browser: Browser, combinedOrdersPages: CombinedPages) {
+        super(page, context, browser, combinedOrdersPages);
         this.ticketPage = new TicketPageDesktop(page);
-    }
-
-    async login() {
-        await this.loginWithCredentials(false);
     }
 
     async clickAddOrder() {
@@ -131,9 +128,15 @@ export class OrdersPageDesktop extends OrdersPageBase {
         await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
+    async addMockOrder() {
+        // make sure we're on the right page
+        await this.navigateToOrders();
+        await this.createRandomOrders(1, 1, false);
+    }
+
     async addMockOrders(min = 30, max = 50) {
         this.logInfo(`Manager adding mock orders`);
-        await this.mockRpcCreatedAt();
+        // await this.mockRpcCreatedAt();
         await this.navigateToOrders();
         await this.createOrders(min, max);
     }

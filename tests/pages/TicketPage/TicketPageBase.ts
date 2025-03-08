@@ -1,15 +1,18 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Browser, BrowserContext, expect, Locator, Page } from '@playwright/test';
 import { BasePage } from '../BasePage/BasePage';
 import { OrderData, orderOriginsWithTypes } from '../../utils/data';
 import { Payment } from '../../../src/typesAndValidators';
 import { formatCurrency } from '../../../src/utils';
+import { Logger } from '../../utils/Logger';
 
 export abstract class TicketPageBase extends BasePage {
     // protected orderEditor: Locator = this.page.locator('text=Order Editor').locator('..');
     protected orderEditor: Locator = this.page.locator('_react=OrderEditor');
     protected backDrop: Locator = this.page.locator('.MuiBackdrop-root.MuiModal-backdrop');
-    constructor(page: Page) {
-        super(page);
+    protected driver: { email: string; name: string };
+    constructor(page: Page, context: BrowserContext, browser: Browser, driver?: { email: string; name: string }) {
+        super(page, context, browser);
+        this.driver = driver || { email: 'email@missing.com', name: 'Name Missing' };
     }
 
     // Find ticket based on order info (order_number, order_name, origin, order_type, payment_type, total_in_cents)
@@ -102,10 +105,7 @@ export abstract class TicketPageBase extends BasePage {
             tip_in_cents: tip_in_cents.toFixed(0),
         };
 
-        this.logger.logInfo(
-            `Scraped order data for order ${orderData?.orderNumber || orderData?.orderName}:`,
-            orderData,
-        );
+        Logger.logInfo(`Scraped order data for order ${orderData?.orderNumber || orderData?.orderName}:`, orderData);
 
         return { nthTicket, orderData };
     }
@@ -115,6 +115,7 @@ export abstract class TicketPageBase extends BasePage {
         // can click on ticket total to open
         await ticket.locator('.order-total').click();
         await expect(this.orderEditor).toBeVisible();
+        await this.page.waitForTimeout(500);
     }
 
     async closeTicket() {
@@ -132,10 +133,10 @@ export abstract class TicketPageBase extends BasePage {
         let hasChanges = false;
         await this.openTicketIfClosed(ticket);
 
-        if (failures) await this.startTimeout(5, 'Handling error! ');
+        if (failures) await this.startTimeout(2, 'Handling error! ');
 
         // find and click on payment
-        if (failures) await this.startTimeout(3, 'Will start editing payment in: ');
+        if (failures) await this.startTimeout(2, 'Will start editing payment in: ');
         await this.orderEditor.locator(`.payment-editor-edit-payment:nth-child(${index + 1})`).click();
 
         // click on payment type
@@ -150,12 +151,12 @@ export abstract class TicketPageBase extends BasePage {
         const formattedTip = isDefined(payment.tip_in_cents)
             ? formatCurrency(payment.tip_in_cents)
             : await paymentInput.inputValue();
-        this.logger.logInfo(`Setting payment tip to ${formattedTip}`);
+        Logger.logInfo(`${this.driver.name} is Setting tip to ${formattedTip} (attempt: ${failures + 1})`);
 
         if (isDefined(payment.tip_in_cents)) {
             if ((await paymentInput.inputValue()) !== formattedTip) {
                 hasChanges = true;
-                if (failures) await this.startTimeout(3, `Setting tip to ${formattedTip}`);
+                if (failures) await this.startTimeout(3, `Setting tip to ${formattedTip} (attempt: ${failures + 1})`);
                 await paymentInput.fill(payment.tip_in_cents.toString());
             }
         }
@@ -187,7 +188,7 @@ export abstract class TicketPageBase extends BasePage {
             } catch (e) {
                 failures++;
                 if (failures > 3) {
-                    this.logError(e, 'failed to edit tip');
+                    this.logError(e, `${this.driver.name} failed to edit tip`);
                     return;
                 }
             }

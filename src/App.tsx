@@ -34,7 +34,11 @@ import { useBusinessDate, useMidnightEffect } from './hooks/data/useBusinessDate
 const router = createBrowserRouter([
     {
         path: '/',
-        element: <Layout />,
+        element: (
+            <ErrorBoundary>
+                <Layout />
+            </ErrorBoundary>
+        ),
         children: [
             {
                 path: '*',
@@ -99,17 +103,15 @@ function App() {
     console.log('rendering app.tsx');
 
     return (
-        <ErrorBoundary>
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider
-                    router={router}
-                    future={{
-                        v7_startTransition: true,
-                    }}
-                />
-                <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-            </QueryClientProvider>
-        </ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider
+                router={router}
+                future={{
+                    v7_startTransition: true,
+                }}
+            />
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
+        </QueryClientProvider>
     );
 }
 

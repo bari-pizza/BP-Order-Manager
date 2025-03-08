@@ -32,7 +32,7 @@ import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
 
     [x] - set up businessDate at app level and then access it through queryClient (or maybe just make the effect at midnight its own hook)
 
-    [ ] - set up supabase global table that invalidates all queries when a new row is added
+    [x] - set up supabase global table that invalidates all queries when a new row is added
         */
 
 export const useMobile = () => {

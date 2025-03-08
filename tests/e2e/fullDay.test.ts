@@ -1,57 +1,34 @@
-import { test, chromium, Browser, BrowserContext, devices } from '@playwright/test';
-import { ManagerPage } from '../pages/Desktop/ManagerPage';
-import { OrdersPageDesktop } from '../pages/OrdersPage/OrdersPageDesktop';
-import { OrdersPageMobile } from '../pages/OrdersPage/OrdersPageMobile';
+import { test } from '@playwright/test';
+import { CombinedPages } from '../pages/OrdersPage/CombinedOrdersPages';
+import { Logger } from '../utils/Logger';
 
-let desktopBrowser: Browser;
-let desktopContext: BrowserContext;
-let mobileBrowser: Browser;
-let mobileContext: BrowserContext;
-let managerPage: ManagerPage;
-let ordersPageDesktop: OrdersPageDesktop;
-let ordersPageMobile: OrdersPageMobile;
-
-const iPhone = devices['iPhone 11']; // Mobile emulation for iPhone 11
+let combinedPages: CombinedPages;
 
 // npx playwright test
 
 test.beforeAll(async () => {
-    // Start a single browser instance and context
-    desktopBrowser = await chromium.launch(); // or `chromium.launch({ headless: false })` for a visible browser
-    desktopContext = await desktopBrowser.newContext();
-    const desktopPage = await desktopContext.newPage();
-    managerPage = new ManagerPage(desktopPage);
-    ordersPageDesktop = new OrdersPageDesktop(desktopPage);
-    await ordersPageDesktop.login();
-
-    mobileBrowser = await chromium.launch({ headless: false });
-    mobileContext = await mobileBrowser.newContext({
-        ...iPhone,
-    });
-    const mobilePage = await mobileContext.newPage();
-    ordersPageMobile = new OrdersPageMobile(mobilePage);
-    await ordersPageMobile.login();
+    Logger.startLog();
+    combinedPages = await CombinedPages.create();
+    await combinedPages.loginWithCredentials('jrajulialmeida@gmail.com', 'Password1234!');
 });
 
 test.afterAll(async () => {
-    // Close the browser after all tests
-    await desktopContext.close();
-    await desktopBrowser.close();
-
-    await mobileContext.close();
-    await mobileBrowser.close();
+    // Close all browsers after all tests
+    await combinedPages.quitAllBrowsers();
 });
 
 test.only('End-to-end flow for managing a business day', async () => {
     test.setTimeout(1000 * 60 * 15);
-    await managerPage.addDriversToDay();
-    await ordersPageDesktop.addMockOrders(5, 10);
-    await ordersPageMobile.addMockOrders(5, 10);
-    await ordersPageDesktop.assignOrders();
-    await ordersPageMobile.addMockTips();
-    await managerPage.closeAllDrawers();
-    await managerPage.closeDay();
-    managerPage.openLogger();
+    // add these methods to combined pages to make them prettier
+    // maybe set managerPage and ordersPageMobile to protected
+    await combinedPages.addDriversToDay(['Faker Test', 'Cedrick Catalan']);
+    await combinedPages.initMobileBrowsers();
+    await combinedPages.addMockOrders(20, 40);
+    await combinedPages.assignOrders();
+    await combinedPages.addMockTips();
+    await combinedPages.closeAllDrawers();
+    await combinedPages.closeDay();
+    Logger.openLogFile();
 });
 
 // check that the UI matches the end state

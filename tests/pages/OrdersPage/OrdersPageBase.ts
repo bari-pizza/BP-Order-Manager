@@ -1,17 +1,28 @@
-import { expect, Page } from '@playwright/test';
+import { Browser, BrowserContext, expect, Page } from '@playwright/test';
 import { BasePage } from '../BasePage/BasePage';
 import { faker } from '@faker-js/faker/locale/en_US';
 import { OrderData, orderOriginsWithTypes } from '../../utils/data';
 import { TicketPageBase } from '../TicketPage/TicketPageBase';
 import { formatCurrency } from '../../../src/utils';
+import { CombinedPages } from './CombinedOrdersPages';
 
 export abstract class OrdersPageBase extends BasePage {
-    private static currentOrderNumber = 0;
-    private static generatedNames: Set<string> = new Set();
+    // private static currentOrderNumber = 0;
+    // private static generatedNames: Set<string> = new Set();
     protected ticketPage: TicketPageBase;
+    private combinedOrdersPages: CombinedPages;
+    private driver?: { email: string; name: string };
 
-    constructor(page: Page) {
-        super(page);
+    constructor(
+        page: Page,
+        context: BrowserContext,
+        browser: Browser,
+        combinedOrdersPages: CombinedPages,
+        driver: { email: string; name: string } | undefined = undefined,
+    ) {
+        super(page, context, browser);
+        this.combinedOrdersPages = combinedOrdersPages;
+        this.driver = driver;
     }
 
     abstract clickAddOrder(): Promise<void>;
@@ -20,33 +31,33 @@ export abstract class OrdersPageBase extends BasePage {
 
     abstract addMockOrders(min: number, max: number): Promise<void>;
 
-    public static generateOrderNumber() {
-        OrdersPageBase.currentOrderNumber += 1;
-        return OrdersPageBase.currentOrderNumber.toString();
-    }
+    // public static generateOrderNumber() {
+    //     OrdersPageBase.currentOrderNumber += 1;
+    //     return OrdersPageBase.currentOrderNumber.toString();
+    // }
 
-    public static generateUniqueOrderName(): string {
-        let orderName: string;
+    // public static generateUniqueOrderName(): string {
+    //     let orderName: string;
 
-        // Keep generating names until a unique one is found
-        do {
-            const firstName = faker.person.firstName();
-            const lastName = faker.person.lastName();
-            const lastInitial = lastName.charAt(0).toUpperCase();
-            orderName = `${firstName} ${lastInitial}.`;
-        } while (OrdersPageBase.generatedNames.has(orderName)); // Check for uniqueness
+    //     // Keep generating names until a unique one is found
+    //     do {
+    //         const firstName = faker.person.firstName();
+    //         const lastName = faker.person.lastName();
+    //         const lastInitial = lastName.charAt(0).toUpperCase();
+    //         orderName = `${firstName} ${lastInitial}.`;
+    //     } while (OrdersPageBase.generatedNames.has(orderName)); // Check for uniqueness
 
-        // Add the unique order name to the Set
-        OrdersPageBase.generatedNames.add(orderName);
+    //     // Add the unique order name to the Set
+    //     OrdersPageBase.generatedNames.add(orderName);
 
-        return orderName;
-    }
+    //     return orderName;
+    // }
 
     public static generateRandomOrder(isMobile: boolean) {
         if (isMobile) {
             const weightedOrderOrigins = [
-                { weight: 0.25, value: 'Pizzamico' },
-                { weight: 0.75, value: 'Bari Pizza' },
+                { weight: 0.2, value: 'Pizzamico' },
+                { weight: 0.8, value: 'Bari Pizza' },
             ];
             const randomOriginKey = faker.helpers.weightedArrayElement(weightedOrderOrigins);
             const origin = orderOriginsWithTypes[randomOriginKey].origin;
@@ -63,8 +74,8 @@ export abstract class OrdersPageBase extends BasePage {
         } else {
             const weightedOrderOrigins = [
                 { weight: 0.15, value: 'DoorDash' },
-                { weight: 0.1, value: 'Pizzamico' },
-                { weight: 0.75, value: 'Bari Pizza' },
+                { weight: 0.05, value: 'Pizzamico' },
+                { weight: 0.8, value: 'Bari Pizza' },
             ];
             const randomOriginKey = faker.helpers.weightedArrayElement(weightedOrderOrigins);
             const origin = orderOriginsWithTypes[randomOriginKey].origin;
@@ -106,7 +117,7 @@ export abstract class OrdersPageBase extends BasePage {
 
     protected async createRandomOrders(min: number, max: number, isMobile: boolean) {
         const randomNumber = faker.number.int({ min: min, max: max });
-        this.logger.logInfo(`${isMobile ? 'Driver' : 'Manager'} creating ${randomNumber} orders`);
+        this.logInfo(`${isMobile ? 'Driver' : 'Manager'} creating ${randomNumber} orders`);
         for (let i = 0; i < randomNumber; i++) {
             await this.addOrder(isMobile);
             this.jumpMockCreatedAt(7);
@@ -179,10 +190,14 @@ export abstract class OrdersPageBase extends BasePage {
         const initialClassList = await paymentTypeButton.getAttribute('class');
         if (initialClassList?.includes('selected')) return;
 
-        await paymentTypeButton.click();
-
-        // confirm that paymentType has changed
-        await expect(paymentTypeButton).toHaveClass(/selected/);
+        try {
+            await paymentTypeButton.click();
+            // confirm that paymentType has changed
+            await expect(paymentTypeButton).toHaveClass(/selected/);
+        } catch {
+            this.logError(new Error(`Failed to set paymentType to ${paymentType}`), 'setPaymentType');
+            await this.setPaymentType(paymentType);
+        }
     }
 
     async setTotalInCents(total_in_cents: number) {
@@ -204,12 +219,13 @@ export abstract class OrdersPageBase extends BasePage {
         let orderNumber: string | undefined;
         let orderName: string | undefined;
         if (origin.has_order_number) {
-            orderNumber = OrdersPageBase.generateOrderNumber();
+            orderNumber = this.combinedOrdersPages.generateOrderNumber();
         } else {
-            orderName = OrdersPageBase.generateUniqueOrderName();
+            orderName = this.combinedOrdersPages.generateUniqueOrderName();
         }
 
-        this.logger.logInfo(`${isMobile ? 'Driver' : 'Manager'} creating order`, {
+        // Driver or Manager will be chosen randomly
+        this.logInfo(`${isMobile ? this.driver?.name : 'Manager'} creating order`, {
             origin: origin.name,
             orderType,
             total_in_cents,
@@ -251,10 +267,10 @@ export abstract class OrdersPageBase extends BasePage {
         // save button should disappear
         try {
             await expect(this.page.locator('text=Save')).not.toBeVisible();
-            this.logger.logInfo('Order saved successfully');
+            this.logInfo('Order saved successfully');
             return true;
         } catch (e) {
-            this.logger.logError('Failed to save order', e);
+            this.logError(new Error('Failed to save order - ' + e.message), 'confirmOrder');
             return false;
         }
     }

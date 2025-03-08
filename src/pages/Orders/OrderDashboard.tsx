@@ -53,25 +53,29 @@ const OrderDashboardDesktop = () => {
             <SideBar width="300px">
                 <Stack alignContent="center" justifyContent="center" direction="column" height="100%">
                     <OrderEditor close={close} isOpen={isOpen} forNewOrder isRepeat={orders.isRepeat} />
-                    <Stack direction="column" m={2} gap={2}>
-                        {!isOpen && (
-                            <>
-                                {ticket.all.count > 0 && (
-                                    <>
-                                        <Button
-                                            variant="contained"
-                                            onClick={ticket.all.select}
-                                            disabled={businessDay.isLocked}>
-                                            {ticket.none.areSelected ? 'Select' : 'Unselect'} All
-                                        </Button>
-                                    </>
-                                )}
-                                <Button variant="contained" onClick={open} disabled={businessDay.isLocked}>
+                    {!isOpen && (
+                        <Stack direction="column" m={2} gap={2}>
+                            <Stack direction="row" justifyContent="space-between">
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={ticket.all.select}
+                                    disabled={businessDay.isLocked || ticket.all.count === 0}>
+                                    {ticket.none.areSelected ? 'Select' : 'Unselect'} All Tickets
+                                </Button>
+                            </Stack>
+                            <Stack direction="row" justifyContent="space-between" justifySelf={'center'}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={open}
+                                    disabled={businessDay.isLocked}
+                                    sx={{ height: '75px' }}>
                                     Add Order
                                 </Button>
-                            </>
-                        )}
-                    </Stack>
+                            </Stack>
+                        </Stack>
+                    )}
                 </Stack>
             </SideBar>
         </OrderDashboardContext.Provider>
