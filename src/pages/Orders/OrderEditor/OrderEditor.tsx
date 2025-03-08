@@ -177,7 +177,9 @@ export const OrderEditor = ({
 
     const { can_deliver, has_order_number, is_third_party } = currentOrigin;
 
-    const validOrigins = driverDrawerID ? origins.filter((origin) => origin.can_deliver) : origins;
+    const validOrigins = (driverDrawerID ? origins.filter((origin) => origin.can_deliver) : origins).filter(
+        (origin) => !origin.is_deleted,
+    );
 
     const invalidOrderType = currentOrderType === 'delivery' && can_deliver === false;
 

@@ -7,6 +7,7 @@ import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { OrderOrigin } from '../../../typesAndValidators';
+import { supaClient } from '../../../supaClient';
 
 type FormValues = { name: string };
 
@@ -41,32 +42,30 @@ export const OriginsTab = () => {
     const {
         control,
         handleSubmit,
+        reset,
         formState: { errors, dirtyFields, isSubmitting },
     } = useForm<FormValues>({ defaultValues: { name: '' } });
 
     const onSubmit = async (data: FormValues) => {
         console.log(data);
         toastRef.current = toast.loading('Adding new origin...');
-        await new Promise(() => {
-            setTimeout(() => {
-                toast.update(toastRef.current, {
-                    render: "This hasn't been implemented yet",
-                    type: 'info',
-                    isLoading: false,
-                    autoClose: 5000,
-                });
-            }, 1000);
+        const { error } = await supaClient.from('OrderOrigin').insert({ name: data.name });
+        if (error) {
+            toast.update(toastRef.current, {
+                render: error.message,
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            return;
+        }
+        toast.update(toastRef.current, {
+            render: `Origin ${data.name} added successfully`,
+            type: 'success',
+            isLoading: false,
+            autoClose: 5000,
         });
-        // TODO: implement add origin in backend?
-        // if (error) {
-        //     toast.update(toastRef.current, {
-        //         render: error.message,
-        //         type: 'error',
-        //         isLoading: false,
-        //         autoClose: 5000,
-        //     });
-        //     return;
-        // }
+        reset();
         close();
     };
 

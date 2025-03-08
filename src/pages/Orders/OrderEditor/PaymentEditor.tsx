@@ -411,7 +411,7 @@ export const ExamplePaymentSelector = ({
             orientation="horizontal"
             fullWidth
             color="primary"
-            sx={{ width: '100%' }}
+            sx={{ width: '100%', cursor: 'pointer' }}
             aria-label="Payment Type">
             {validPaymentTypes.map((option) => {
                 const isSelected = option.value === selected;

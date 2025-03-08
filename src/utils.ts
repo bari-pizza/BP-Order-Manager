@@ -57,3 +57,15 @@ export const nonZeroModulo = (a: number, b: number) => {
     const c = a % b;
     return c === 0 ? b : c;
 };
+
+export const getEnv = (variableName: string): string => {
+    if (variableName === 'MODE') {
+        return import.meta.env.MODE || (process.env.NODE_ENV as string);
+    }
+    if (import.meta.env.MODE === 'development') {
+        return import.meta.env[variableName] || process.env[variableName];
+    } else {
+        // In production, only check import.meta.env
+        return import.meta.env[variableName];
+    }
+};

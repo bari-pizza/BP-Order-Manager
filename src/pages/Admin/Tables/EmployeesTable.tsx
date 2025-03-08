@@ -27,11 +27,13 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<Employee>({ data: employees });
     const toastRef = useRef<Id>('');
 
-    const deleteEmployee = async (id: string) => {
+    const deleteEmployee = async (employee: Employee) => {
         // TODO: create a similar function and confirmation for each table with createCellActions
         // TODO: show deleted employees as greyed out or something
         // TODO: show deleted employees at the bottom
-        toastRef.current = toast.loading(`Deleting employee ${id}`);
+        const { id, first_name, last_name } = employee;
+        const fullName = `${first_name} ${last_name}`;
+        toastRef.current = toast.loading(`Deleting employee ${fullName}`);
         const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: true });
         if (error) {
             toast.update(toastRef.current, {
@@ -43,7 +45,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: 'Employee deleted successfully',
+                render: `Employee ${fullName} deleted successfully`,
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -56,8 +58,10 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         }
     };
 
-    const restoreEmployee = async (id: string) => {
-        toastRef.current = toast.loading(`Restoring employee ${id}`);
+    const restoreEmployee = async (employee: Employee) => {
+        const { id } = employee;
+        const fullName = `${employee.first_name} ${employee.last_name}`;
+        toastRef.current = toast.loading(`Restoring employee ${fullName}`);
         const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: false });
         if (error) {
             toast.update(toastRef.current, {
@@ -69,7 +73,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: 'Employee restored successfully',
+                render: `Employee ${fullName} restored successfully`,
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -77,19 +81,23 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         }
     };
 
-    const { handleConfirmation: confirmDelete } = useConfirmationToast({
-        message: 'Are you sure you want to delete this employee?',
+    const { handleConfirmation: confirmDelete } = useConfirmationToast<Employee>({
+        // message: 'Are you sure you want to delete this employee?',
+        message: (employee) => {
+            const { first_name, last_name } = employee;
+            const fullName = `${first_name} ${last_name}`;
+            return `Are you sure you want to delete ${fullName}?`;
+        },
         confirmProps: {
             color: 'error',
             variant: 'outlined',
-            handler: (...args: unknown[]) => {
-                const id = args[0] as string;
+            handler: (employee) => {
+                const { id } = employee;
                 if (!id) {
                     toast.error('Operation failed - try again!');
                     return;
                 }
-                toast.info(`deleting employee`);
-                deleteEmployee(id);
+                deleteEmployee(employee);
                 setRowModesModel({
                     ...rowModesModel,
                     [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -99,19 +107,22 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
     });
 
-    const { handleConfirmation: confirmRestore } = useConfirmationToast({
-        message: 'Are you sure you want to restore this employee?',
+    const { handleConfirmation: confirmRestore } = useConfirmationToast<Employee>({
+        message: (employee) => {
+            const { first_name, last_name } = employee;
+            const fullName = `${first_name} ${last_name}`;
+            return `Are you sure you want to restore ${fullName}?`;
+        },
         confirmProps: {
             color: 'primary',
             variant: 'contained',
-            handler: (...args: unknown[]) => {
-                const id = args[0] as string;
+            handler: (employee) => {
+                const { id } = employee;
                 if (!id) {
                     toast.error('Operation failed - try again!');
                     return;
                 }
-                toast.info(`restoring employee`);
-                restoreEmployee(id);
+                restoreEmployee(employee);
                 setRowModesModel({
                     ...rowModesModel,
                     [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -169,11 +180,18 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             headerName: 'Actions',
             width: 100,
             cellClassName: 'actions',
-            getActions: ({ id, row: { is_deleted } }) => {
+            getActions: ({ id, row }) => {
+                const { is_deleted } = row;
                 if (is_deleted) {
-                    return createCellActions(id, rowModesModel, setRowModesModel, () => confirmRestore(id), is_deleted);
+                    return createCellActions(
+                        id,
+                        rowModesModel,
+                        setRowModesModel,
+                        () => confirmRestore(row),
+                        is_deleted,
+                    );
                 }
-                return createCellActions(id, rowModesModel, setRowModesModel, () => confirmDelete(id), is_deleted);
+                return createCellActions(id, rowModesModel, setRowModesModel, () => confirmDelete(row), is_deleted);
             },
         },
         {

@@ -19,6 +19,7 @@ import {
 import { Phone as PhoneIcon, Computer as ComputerIcon } from '@mui/icons-material';
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
+import { getEnv } from '../utils';
 
 interface NavBarItem {
     path?: string;
@@ -37,7 +38,8 @@ export function NavBar() {
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
-    const version = import.meta.env.VITE_REACT_APP_VERSION || process.env.VITE_REACT_APP_VERSIONS;
+    const version = getEnv('VITE_REACT_APP_VERSION');
+    // const version = import.meta.env.VITE_REACT_APP_VERSION || process.env.VITE_REACT_APP_VERSION;
 
     const queryClient = useQueryClient();
     const orders = (

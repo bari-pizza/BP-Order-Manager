@@ -66,17 +66,17 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         }
     };
 
-    const { handleConfirmation: confirmEdit } = useConfirmationToast({
+    const { handleConfirmation: confirmEdit } = useConfirmationToast<OriginRow>({
         message: 'Origin Preview',
-        renderBody: (...args: unknown[]) => {
-            const origin = args[1] as OrderOrigin;
+        messageProps: { variant: 'h3' },
+        renderBody: (origin) => {
             return <ExampleOrigin origin={origin} />;
         },
         confirmProps: {
             color: 'primary',
             variant: 'contained',
-            handler: (...args: unknown[]) => {
-                const newRow = args[0] as OriginRow;
+            handler: (originRow) => {
+                const newRow = originRow;
                 const id = newRow.origin_id;
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { is_pending, ...origin } = newRow;
@@ -93,8 +93,8 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             buttonText: 'Save Changes',
         },
         cancelProps: {
-            handler: (...args: unknown[]) => {
-                const oldRow = args[1] as OriginRow;
+            handler: (originRow) => {
+                const oldRow = originRow!;
                 const id = oldRow.origin_id;
                 oldRow.is_pending = false;
                 setRows((prev) => prev.map((row) => (row.origin_id === id ? oldRow : row)));
@@ -121,8 +121,9 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         setRowModesModel(newRowModesModel);
     };
 
-    const deleteOrigin = async (id: string) => {
-        toastRef.current = toast.loading(`Deleting origin ${id}`);
+    const deleteOrigin = async (origin: OrderOrigin) => {
+        const { origin_id: id, name } = origin;
+        toastRef.current = toast.loading(`Deleting origin: ${name}`);
         const { error } = await supaClient.from('OrderOrigin').update({ is_deleted: true }).eq('origin_id', id);
         if (error) {
             toast.update(toastRef.current, {
@@ -134,7 +135,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: 'Origin deleted successfully',
+                render: `Origin ${name} deleted successfully`,
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -147,8 +148,9 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         }
     };
 
-    const restoreOrigin = async (id: string) => {
-        toastRef.current = toast.loading(`Restoring origin ${id}`);
+    const restoreOrigin = async (origin: OrderOrigin) => {
+        const { origin_id: id, name } = origin;
+        toastRef.current = toast.loading(`Restoring origin ${name}`);
         const { error } = await supaClient.from('OrderOrigin').update({ is_deleted: false }).eq('origin_id', id);
         if (error) {
             toast.update(toastRef.current, {
@@ -160,7 +162,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: 'Origin restored successfully',
+                render: `Origin ${name} restored successfully`,
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -168,19 +170,18 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         }
     };
 
-    const { handleConfirmation: confirmDelete } = useConfirmationToast({
-        message: 'Are you sure you want to delete this origin?',
+    const { handleConfirmation: confirmDelete } = useConfirmationToast<OriginRow>({
+        message: (origin) => `Are you sure you want to delete ${origin.name}?`,
         confirmProps: {
             color: 'error',
             variant: 'outlined',
-            handler: (...args: unknown[]) => {
-                const id = args[0] as string;
+            handler: (origin) => {
+                const { origin_id: id } = origin;
                 if (!id) {
                     toast.error('Operation failed - try again!');
                     return;
                 }
-                toast.info(`deleting origin`);
-                deleteOrigin(id);
+                deleteOrigin(origin);
                 setRowModesModel({
                     ...rowModesModel,
                     [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -190,19 +191,21 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
     });
 
-    const { handleConfirmation: confirmRestore } = useConfirmationToast({
-        message: 'Are you sure you want to restore this origin?',
+    const { handleConfirmation: confirmRestore } = useConfirmationToast<OriginRow>({
+        message: (origin) => {
+            const { name } = origin;
+            return `Are you sure you want to restore ${name}?`;
+        },
         confirmProps: {
             color: 'primary',
             variant: 'contained',
-            handler: (...args: unknown[]) => {
-                const id = args[0] as string;
+            handler: (origin) => {
+                const id = origin.origin_id;
                 if (!id) {
                     toast.error('Operation failed - try again!');
                     return;
                 }
-                toast.info(`restoring origin`);
-                restoreOrigin(id);
+                restoreOrigin(origin);
                 setRowModesModel({
                     ...rowModesModel,
                     [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -219,13 +222,14 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             headerName: 'Edit',
             width: 100,
             cellClassName: 'actions',
-            getActions: ({ row: { is_deleted, origin_id } }) => {
+            getActions: ({ row }) => {
+                const { origin_id, is_deleted } = row;
                 if (is_deleted) {
                     return createCellActions(
                         origin_id,
                         rowModesModel,
                         setRowModesModel,
-                        () => confirmRestore(origin_id),
+                        () => confirmRestore(row),
                         is_deleted,
                     );
                 }
@@ -233,7 +237,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                     origin_id,
                     rowModesModel,
                     setRowModesModel,
-                    () => confirmDelete(origin_id),
+                    () => confirmDelete(row),
                     is_deleted,
                 );
             },

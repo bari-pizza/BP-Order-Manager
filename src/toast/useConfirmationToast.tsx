@@ -2,55 +2,86 @@
 // TODO: create a simple toast.success wrapper that uses a happy pizza icon
 // TODO: create a toast.confirmation wrapper - should have an onConfirm function
 
-import { Button, ButtonProps, Stack, Typography } from '@mui/material';
+import { Button, ButtonProps, Stack, Typography, TypographyProps } from '@mui/material';
 
 import { toast } from 'react-toastify';
-import { CustomCloseButton } from './CustomCloseButton';
+// import { CustomCloseButton } from './CustomCloseButton';
 
-type useConfirmationToastProps = {
-    message: string;
-    renderBody?: (...args: unknown[]) => JSX.Element;
+// type useConfirmationToastProps = {
+//     message: string | ((...args: unknown[]) => string);
+//     renderBody?: (...args: unknown[]) => JSX.Element;
+//     confirmProps: ButtonProps & {
+//         handler: (...args: unknown[]) => void;
+//         buttonText?: string;
+//     };
+//     cancelProps?: ButtonProps & {
+//         handler?: (...args: unknown[]) => void;
+//         buttonText?: string;
+//     };
+//     position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+// };
+
+// // TODO: I think I could add a MessageParams and HandlerParams generic to this to not have to use ...args
+// export const useConfirmationToast = ({
+//     message,
+//     renderBody,
+//     confirmProps,
+//     cancelProps,
+//     position = 'top-right',
+// }: useConfirmationToastProps) => {
+
+type useConfirmationToastProps<T> = {
+    message: string | ((args: T) => string);
+    messageProps?: TypographyProps;
+    renderBody?: (args: T) => JSX.Element;
     confirmProps: ButtonProps & {
-        handler: (...args: unknown[]) => void;
+        handler: (args: T) => void;
         buttonText?: string;
     };
     cancelProps?: ButtonProps & {
-        handler?: (...args: unknown[]) => void;
+        handler?: (args?: T) => void;
         buttonText?: string;
     };
     position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
 };
 
-export const useConfirmationToast = ({
+export const useConfirmationToast = <T,>({
     message,
+    messageProps,
     renderBody,
     confirmProps,
     cancelProps,
     position = 'top-right',
-}: useConfirmationToastProps) => {
+}: useConfirmationToastProps<T>) => {
     const { handler: confirmHandler, buttonText: confirmButtonText, ...confirmButtonProps } = confirmProps;
     const { handler: cancelHandler, buttonText: cancelButtonText, ...cancelButtonProps } = cancelProps || {};
 
     const toastId = 'confirmation-toast';
 
-    const handleConfirmation = (...args: unknown[]) => {
-        const body = args && renderBody ? renderBody(...args) : null;
+    const handleConfirmation = (args: T, cancelArgs?: T) => {
+        const body = args && renderBody ? renderBody(args) : null;
 
         const handleConfirm = () => {
-            confirmHandler(...args);
+            confirmHandler(args);
             toast.dismiss(toastId);
         };
 
         const handleCancel = () => {
             if (cancelHandler) {
-                cancelHandler(...args);
+                cancelHandler(cancelArgs);
             }
             toast.dismiss(toastId);
         };
 
+        const messageString = typeof message === 'string' ? message : message(args);
+
         const content = (
-            <Stack direction="column" sx={{ height: '100%', width: '200', textAlign: 'center' }} alignItems="center">
-                <Typography>{message}</Typography>
+            <Stack
+                direction="column"
+                sx={{ height: '100%', width: '200', textAlign: 'center' }}
+                spacing={2}
+                alignItems="center">
+                <Typography {...messageProps}>{messageString}</Typography>
                 {body}
                 <Stack direction="row" spacing={2}>
                     <Button onClick={handleConfirm} variant="contained" color="success" {...confirmButtonProps}>
@@ -66,9 +97,11 @@ export const useConfirmationToast = ({
         toast(content, {
             toastId, // Use the same ID
             type: 'info',
+            icon: false,
             autoClose: false,
             position,
-            closeButton: () => <CustomCloseButton onClose={handleCancel} />,
+            closeButton: false,
+            // closeButton: () => <CustomCloseButton onClose={handleCancel} />,
         });
     };
 

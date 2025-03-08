@@ -13,6 +13,7 @@ import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
+import { getEnv } from '../../../utils';
 // import { useSubscribeToTable } from '../../../hooks/data/useSubscribeToTable';
 
 const sortEmployees = (a: Profile, b: Profile) => {
@@ -98,7 +99,8 @@ export const EmployeesTab = () => {
         const { error } = await supaClient.functions.invoke('create-user', {
             body: { email, first_name, last_name, phone },
             headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY}`,
+                Authorization: `Bearer ${getEnv('VITE_SUPABASE_ANON_KEY')}`,
+                // Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY}`,
             },
         });
 
