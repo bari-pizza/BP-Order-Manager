@@ -1,13 +1,12 @@
 {
     "name": "bari-pizza-order-manger",
     "private": true,
-    "version": "0.0.8",
+    "version": "0.0.7",
     "type": "module",
     "scripts": {
         "dev": "vite --host",
         "test": "vitest",
         "build": "tsc -b && vite build",
-        "check": "tsc -b",
         "serve": "npx serve -s dist",
         "start": "vite preview",
         "lint": "eslint . && tsc -b",
