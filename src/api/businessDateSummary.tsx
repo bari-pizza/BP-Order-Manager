@@ -2,23 +2,22 @@ import { supaClient } from '../supaClient';
 import { handlePayload, Payload, SupabaseInteractor, useInteractionHandler } from './helpers';
 import { BusinessDaySummary } from '../typesAndValidators';
 import dayjs from 'dayjs';
-import { useSuspenseQuery } from '@tanstack/react-query';
+// import { useSuspenseQuery } from '@tanstack/react-query';
 
-const getBusinessDaySummary = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const { data, error } = await supaClient
-        .from('BusinessDaySummary')
-        .select('*')
-        .eq('business_date', businessDate.format('YYYY-MM-DD'))
-        .single();
+// const getBusinessDaySummary = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+//     const { data, error } = await supaClient
+//         .from('BusinessDaySummary')
+//         .select('*')
+//         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
-    if (error) {
-        console.error(error);
-        return [];
-    }
-    if (!data || data.length === 0) return [];
+//     if (error) {
+//         console.error(error);
+//         return [] as BusinessDaySummary[];
+//     }
+//     if (!data || data.length === 0) return [] as BusinessDaySummary[];
 
-    return [data as unknown as BusinessDaySummary];
-};
+//     return [data[0] as unknown as BusinessDaySummary];
+// };
 
 const upsertBusinessDaySummary: SupabaseInteractor<BusinessDaySummary, BusinessDaySummary> = async (
     newBusinessDaySummary,
@@ -30,14 +29,14 @@ const upsertBusinessDaySummary: SupabaseInteractor<BusinessDaySummary, BusinessD
     return handlePayload<BusinessDaySummary>(payload);
 };
 
-const useGetToday = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    return useSuspenseQuery({
-        queryKey: ['businessDaySummary', businessDate.format('YYYY-MM-DD')],
-        queryFn: () => getBusinessDaySummary({ businessDate }),
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 30,
-    });
-};
+// const useGetToday = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
+//     return useSuspenseQuery({
+//         queryKey: ['businessDaySummary', businessDate.format('YYYY-MM-DD')],
+//         queryFn: () => getBusinessDaySummary({ businessDate }),
+//         refetchOnWindowFocus: false,
+//         staleTime: 1000 * 60 * 30,
+//     });
+// };
 
 const useUpsertBusinessDaySummary = ({ queryKey }: { queryKey: string[] }) => {
     return useInteractionHandler<BusinessDaySummary, BusinessDaySummary>({
@@ -69,7 +68,7 @@ export const useBusinessDaySummaryAPI = ({ businessDate }: { businessDate: dayjs
 
     return {
         businessDaySummaryAPI: {
-            getToday: useGetToday({ businessDate }),
+            // getToday: useGetToday({ businessDate }),
             open: () => upsert({ business_date: businessDate.format('YYYY-MM-DD'), is_locked: false }),
             close: () => upsert({ business_date: businessDate.format('YYYY-MM-DD'), is_locked: true }),
             // callRPC:

@@ -1,14 +1,18 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Browser, BrowserContext, expect, Locator, Page } from '@playwright/test';
 import { BasePage } from '../BasePage/BasePage';
 import { OrderData, orderOriginsWithTypes } from '../../utils/data';
 import { Payment } from '../../../src/typesAndValidators';
+import { formatCurrency } from '../../../src/utils';
+import { Logger } from '../../utils/Logger';
 
 export abstract class TicketPageBase extends BasePage {
     // protected orderEditor: Locator = this.page.locator('text=Order Editor').locator('..');
     protected orderEditor: Locator = this.page.locator('_react=OrderEditor');
     protected backDrop: Locator = this.page.locator('.MuiBackdrop-root.MuiModal-backdrop');
-    constructor(page: Page) {
-        super(page);
+    protected driver: { email: string; name: string };
+    constructor(page: Page, context: BrowserContext, browser: Browser, driver?: { email: string; name: string }) {
+        super(page, context, browser);
+        this.driver = driver || { email: 'email@missing.com', name: 'Name Missing' };
     }
 
     // Find ticket based on order info (order_number, order_name, origin, order_type, payment_type, total_in_cents)
@@ -81,11 +85,13 @@ export abstract class TicketPageBase extends BasePage {
         const originClass = await nthTicket.locator('[class*="origin-logo-"]').getAttribute('class');
         const orderTypeClass = await nthTicket.locator('[class*="order-type-"]').getAttribute('class');
         const totalText = (await nthTicket.locator('.order-total').textContent()) || '';
+        const tipText = (await nthTicket.locator('.order-tips').textContent()) || '';
 
         // Parse and format the scraped data
         const origin = originClass?.match(/origin-logo-(.*)/)?.[1]?.replace(/\./g, ' ');
         const orderType = orderTypeClass?.match(/order-type-(.*)-icon/)?.[1];
         const total_in_cents = parseFloat(totalText?.replace('$', '')) * 100;
+        const tip_in_cents = parseFloat(tipText?.replace('$', '')) * 100;
 
         if (!origin || !orderType || isNaN(total_in_cents)) throw new Error('Failed to parse order data');
 
@@ -95,8 +101,11 @@ export abstract class TicketPageBase extends BasePage {
             orderName: orderName || undefined,
             origin: orderOriginsWithTypes[origin as keyof typeof orderOriginsWithTypes].origin,
             orderType,
-            total_in_cents,
+            total_in_cents: total_in_cents.toFixed(0),
+            tip_in_cents: tip_in_cents.toFixed(0),
         };
+
+        Logger.logInfo(`Scraped order data for order ${orderData?.orderNumber || orderData?.orderName}:`, orderData);
 
         return { nthTicket, orderData };
     }
@@ -106,6 +115,7 @@ export abstract class TicketPageBase extends BasePage {
         // can click on ticket total to open
         await ticket.locator('.order-total').click();
         await expect(this.orderEditor).toBeVisible();
+        await this.page.waitForTimeout(500);
     }
 
     async closeTicket() {
@@ -119,32 +129,69 @@ export abstract class TicketPageBase extends BasePage {
         await this.openTicket(ticket);
     }
 
-    async editPayment(ticket: Locator, payment: Partial<Payment>, index = 0) {
+    async editPayment(ticket: Locator, payment: Partial<Payment>, index = 0, failures = 0) {
         let hasChanges = false;
         await this.openTicketIfClosed(ticket);
 
+        if (failures) await this.startTimeout(2, 'Handling error! ');
+
         // find and click on payment
+        if (failures) await this.startTimeout(2, 'Will start editing payment in: ');
         await this.orderEditor.locator(`.payment-editor-edit-payment:nth-child(${index + 1})`).click();
 
         // click on payment type
         // handle payment amount
+
         // handle payment tip
-        if (payment?.tip_in_cents !== undefined) {
-            const paymentInput = this.orderEditor.locator(`.payment-tip-input input`);
-            if ((await paymentInput.inputValue()) !== payment.tip_in_cents.toString()) {
+        function isDefined<T>(value: T | undefined | null): value is T {
+            return value !== undefined;
+        }
+
+        const paymentInput = this.orderEditor.locator(`.payment-tip-input input`);
+        const formattedTip = isDefined(payment.tip_in_cents)
+            ? formatCurrency(payment.tip_in_cents)
+            : await paymentInput.inputValue();
+        Logger.logInfo(`${this.driver.name} is Setting tip to ${formattedTip} (attempt: ${failures + 1})`);
+
+        if (isDefined(payment.tip_in_cents)) {
+            if ((await paymentInput.inputValue()) !== formattedTip) {
                 hasChanges = true;
+                if (failures) await this.startTimeout(3, `Setting tip to ${formattedTip} (attempt: ${failures + 1})`);
                 await paymentInput.fill(payment.tip_in_cents.toString());
             }
         }
+
         // handle payment type
+
         // save
         if (hasChanges) {
+            if (failures) await this.startTimeout(2, 'Will click save in: ');
             await this.orderEditor.locator('button:has-text("Save")').click();
             await expect(this.orderEditor.locator('.payment-editor-editing-payment')).not.toBeVisible();
+            // confirm changes
+            // if (isDefined(payment.tip_in_cents)) {
+            // await this.startTimeout(4, 'Will confirm tip in: ');
+            await expect(
+                this.orderEditor.locator(`.payment-editor-edit-payment:nth-child(${index + 1}) .payment-tip-in-cents`),
+            ).toHaveText(formattedTip);
+            // }
         }
     }
 
     async editTip(ticket: Locator, tip_in_cents: number) {
-        await this.editPayment(ticket, { tip_in_cents });
+        let failures = 0;
+        let success = false;
+        while (!success) {
+            try {
+                await this.editPayment(ticket, { tip_in_cents }, 0, failures);
+                success = true;
+            } catch (e) {
+                failures++;
+                if (failures > 3) {
+                    this.logError(e, `${this.driver.name} failed to edit tip`);
+                    return;
+                }
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 import { Stack } from '@mui/material';
 import { useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { OrdersTable } from '../Tables/OrdersTable';
-import { Todo } from '../../../components/Base/Todo';
 import { OrderWithFullDetails } from '../../../typesAndValidators';
 
 export const OrdersTab = () => {
@@ -21,7 +20,6 @@ export const OrdersTab = () => {
     return (
         <Stack direction="column">
             <OrdersTable orders={tableOrders} />
-            <Todo message="This may not be necessary">Add a button to add an employee</Todo>
         </Stack>
     );
 };

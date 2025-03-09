@@ -21,14 +21,17 @@ export const MotionWrapper = ({
 }: MotionWrapperProps) => {
     if (gridProps) {
         return (
-            <motion.div key={motionKey} {...motionProps} layoutId={layoutID}>
+            <motion.div key={motionKey} {...motionProps} layoutId={layoutID} layout>
                 <Grid {...gridProps}>{children}</Grid>
             </motion.div>
         );
     }
     return (
-        <motion.div key={motionKey} {...motionProps} layoutId={layoutID}>
+        <motion.div key={motionKey} {...motionProps} layoutId={layoutID} layout>
             <Stack {...stackProps}>{children}</Stack>
         </motion.div>
     );
 };
+
+// TODO: add notes
+// NOTE:added just "layout" - if this causes bugs, just remove that part and nothing else

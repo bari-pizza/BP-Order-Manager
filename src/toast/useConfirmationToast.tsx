@@ -2,85 +2,92 @@
 // TODO: create a simple toast.success wrapper that uses a happy pizza icon
 // TODO: create a toast.confirmation wrapper - should have an onConfirm function
 
-import { Button, ButtonProps, Stack, Typography } from '@mui/material';
-import { useRef } from 'react';
-import { Id, toast } from 'react-toastify';
+import { Button, ButtonProps, Stack, Typography, TypographyProps } from '@mui/material';
 
-type useConfirmationToastProps = {
-    message: string;
+import { toast } from 'react-toastify';
+
+type useConfirmationToastProps<T> = {
+    message: string | ((args: T) => string);
+    messageProps?: TypographyProps;
+    renderBody?: (args: T) => JSX.Element;
     confirmProps: ButtonProps & {
-        handler: () => void;
+        handler: (args: T) => void;
         buttonText?: string;
     };
     cancelProps?: ButtonProps & {
-        handler?: () => void;
+        handler?: (args?: T) => void;
         buttonText?: string;
     };
+    position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right' | 'center';
 };
 
-export const useConfirmationToast = ({ message, confirmProps, cancelProps }: useConfirmationToastProps) => {
+export const useConfirmationToast = <T,>({
+    message,
+    messageProps,
+    renderBody,
+    confirmProps,
+    cancelProps,
+    position = 'top-right',
+}: useConfirmationToastProps<T>) => {
     const { handler: confirmHandler, buttonText: confirmButtonText, ...confirmButtonProps } = confirmProps;
     const { handler: cancelHandler, buttonText: cancelButtonText, ...cancelButtonProps } = cancelProps || {};
 
-    const toastRef = useRef<Id>('');
-    const handleConfirm = () => {
-        confirmHandler();
-        if (toastRef.current) {
-            toast.dismiss(toastRef.current);
-        }
-    };
+    const toastId = 'confirmation-toast';
 
-    const handleCancel = () => {
-        if (cancelHandler) {
-            cancelHandler();
-        }
-        if (toastRef.current) {
-            toast.dismiss(toastRef.current);
-        }
-    };
+    const handleConfirmation = (args: T, cancelArgs?: T) => {
+        const body = args && renderBody ? renderBody(args) : null;
 
-    const content = (
-        <Stack direction="column" sx={{ height: '100%', width: '200', textAlign: 'center' }} alignItems="center">
-            <Typography>{message}</Typography>
-            <Stack direction="row" spacing={2}>
-                <Button onClick={handleConfirm} variant="contained" color="success" {...confirmButtonProps}>
-                    {confirmButtonText || 'Confirm'}
-                </Button>
-                <Button onClick={handleCancel} variant="outlined" color="error" {...cancelButtonProps}>
-                    {cancelButtonText || 'Cancel'}
-                </Button>
+        const handleConfirm = () => {
+            confirmHandler(args);
+            toast.dismiss(toastId);
+        };
+
+        const handleCancel = () => {
+            if (cancelHandler) {
+                cancelHandler(cancelArgs);
+            }
+            toast.dismiss(toastId);
+        };
+
+        const messageString = typeof message === 'string' ? message : message(args);
+
+        const content = (
+            <Stack
+                direction="column"
+                sx={{ height: '100%', width: '200', textAlign: 'center' }}
+                spacing={2}
+                alignItems="center">
+                <Typography {...messageProps}>{messageString}</Typography>
+                {body}
+                <Stack direction="row" spacing={2}>
+                    <Button onClick={handleConfirm} variant="contained" color="success" {...confirmButtonProps}>
+                        {confirmButtonText || 'Confirm'}
+                    </Button>
+                    <Button onClick={handleCancel} variant="outlined" color="error" {...cancelButtonProps}>
+                        {cancelButtonText || 'Cancel'}
+                    </Button>
+                </Stack>
             </Stack>
-        </Stack>
-    );
-    const handleConfirmation = () => {
-        toastRef.current = toast(content, {
+        );
+
+        let className;
+
+        if (position === 'center') {
+            position = 'top-center';
+            className = 'Toastify__toast-container--center';
+        }
+
+        toast(content, {
+            toastId, // Use the same ID
             type: 'info',
+            icon: false,
             autoClose: false,
+            position,
+            closeButton: false,
+            className,
+            // closeButton: () => <CustomCloseButton onClose={handleCancel} />,
         });
     };
 
     return { handleConfirmation };
 };
-
-// const ExampleUsage = () => {
-//     const { handleConfirmation } = useConfirmationToast({
-//         message: 'Are you sure?',
-//         confirmProps: {
-//             handler: () => {
-//                 alert('Confirmed');
-//             },
-//             buttonText: 'Do it!',
-//         },
-//         cancelProps: {
-//             handler: () => {
-//                 alert('Cancelled');
-//             },
-//             buttonText: 'Cancel',
-//         },
-//     });
-//     const handleClick = () => {
-//         handleConfirmation();
-//     };
-
-//     return <Button onClick={handleClick}>Confirm</Button>;
-// };

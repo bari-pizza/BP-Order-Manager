@@ -1,9 +1,9 @@
-import { expect, Page } from '@playwright/test';
+import { Browser, BrowserContext, expect, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class BasePageDesktop extends BasePage {
-    constructor(page: Page) {
-        super(page);
+    constructor(page: Page, context: BrowserContext, browser: Browser) {
+        super(page, context, browser);
     }
 
     // Common navigation methods

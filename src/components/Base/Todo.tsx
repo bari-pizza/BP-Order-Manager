@@ -1,8 +1,13 @@
 import { Box, Tooltip } from '@mui/material';
 import styles from './Todo.module.css';
 import { toast } from 'react-toastify';
+import { getEnv } from '../../utils';
 
 export const Todo = ({ message, children }: { message?: string; children: React.ReactNode }) => {
+    // if (import.meta.env.MODE !== 'development' || process.env.NODE_ENV !== 'development') {
+    if (getEnv('MODE') === 'production') {
+        return null;
+    }
     const handleClick = () => {
         if (message) {
             toast.info(message);

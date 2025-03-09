@@ -28,3 +28,11 @@ body {
 .repeated-name-or-number {
     color: red;
 }
+
+.Toastify__toast-container:has(.Toastify__toast-container--center) {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: min-content;
+}

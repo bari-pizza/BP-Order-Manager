@@ -1,7 +1,8 @@
-import { Locator, Page, expect } from '@playwright/test';
+import { Browser, BrowserContext, Locator, Page, expect } from '@playwright/test';
 import { BasePageDesktop } from '../BasePage/BasePageDesktop';
 import { CloseDrawerProcess } from '../../utils/CloseDrawerProcess';
 import { faker } from '@faker-js/faker/locale/en_US';
+import { BasePage } from '../BasePage/BasePage';
 
 type DrawerIdentifier = string | number;
 
@@ -12,8 +13,8 @@ export class ManagerPage extends BasePageDesktop {
     private closeBusinessDayPopup: Locator = this.page.locator('.MuiDialog-root:has-text("Close Business Day")');
     private closeBusinessDayButton: Locator = this.closeBusinessDayPopup.locator('//button[text()="Close Day"]');
     private closeDrawerProcess: CloseDrawerProcess;
-    constructor(page: Page) {
-        super(page);
+    constructor(page: Page, context: BrowserContext, browser: Browser) {
+        super(page, context, browser);
         this.closeDrawerProcess = new CloseDrawerProcess(page);
     }
 
@@ -65,7 +66,6 @@ export class ManagerPage extends BasePageDesktop {
     }
 
     async addDriver(driver?: DriverIdentifier) {
-        const originalCount = await this.page.locator('.MuiButton-outlined.drawer-card-button').count();
         const addDriverButton = this.page
             .locator(`xpath=//*[contains(text(), 'Add Driver')]/ancestor::button[1]`)
             .nth(0);
@@ -76,6 +76,8 @@ export class ManagerPage extends BasePageDesktop {
         const driverList = this.page.locator(`//label[text()='Driver']/following::input[1]`);
         await driverList.waitFor(); // Wait for the driver list to load
 
+        let driverName: string | null = null;
+
         // Selecting driver based on the type of input
         if (!driver) {
             // Choose a random driver if null
@@ -85,12 +87,14 @@ export class ManagerPage extends BasePageDesktop {
             for (let i = 0; i < randomIndex; i++) {
                 await driverList.press('ArrowDown');
             }
+            driverName = await driverList.inputValue();
             await driverList.press('Enter');
         } else if (typeof driver === 'string') {
             // Select driver by name
             // TODO: improve this logic
+            driverName = driver;
             await driverList.fill(driver);
-            await new Promise((resolve) => setTimeout(resolve, 200));
+            await new Promise((resolve) => setTimeout(resolve, 500));
             await driverList.press('ArrowDown');
             await driverList.press('Enter');
         } else if (typeof driver === 'number') {
@@ -99,6 +103,7 @@ export class ManagerPage extends BasePageDesktop {
             for (let i = 0; i < driver; i++) {
                 await driverList.press('ArrowDown');
             }
+            driverName = await driverList.inputValue();
             await driverList.press('Enter');
         } else {
             throw new Error('Invalid driver identifier. Must be string, number, or null.');
@@ -110,13 +115,24 @@ export class ManagerPage extends BasePageDesktop {
         await submitButton.click();
         await expect(submitButton).not.toBeVisible();
 
-        const newCount = await this.page.locator('.MuiButton-outlined.drawer-card-button').count();
-        expect(newCount).toBe(originalCount + 1);
+        // const newCount = await this.page.locator('.MuiButton-outlined.drawer-card-button').count();
+        // expect(newCount).toBe(originalCount + 1);
+        const drawerLocator = await this.getDrawer(driverName!);
+        if (!drawerLocator) {
+            throw new Error('Drawer locator is null');
+        }
+
+        const driverEmail = await drawerLocator.getAttribute('data-user-email');
+        if (driverEmail && driverName) {
+            this.logInfo(`Added driver ${driverName} with email ${driverEmail}`);
+            BasePage.todaysDrivers.push({ email: driverEmail, name: driverName });
+        }
     }
 
     async closeDriver(drawerLocator: Locator) {
         await this.clickDrawer(drawerLocator);
         await this.closeDrawerProcess.completeCloseDriver(faker.number.int({ min: 5, max: 12 }));
+        this.logInfo(`Closed driver ${await drawerLocator.allTextContents()}`);
     }
 
     async closeDrivers() {
@@ -136,12 +152,14 @@ export class ManagerPage extends BasePageDesktop {
         for (const drawer of registers) {
             await this.clickDrawer(drawer);
             await this.closeDrawerProcess.completeCloseRegister();
+            this.logInfo(`Closed drawer ${await drawer.allTextContents()}`);
         }
         const thirdPartyDrawer = this.page.locator(
             '#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-third_party',
         );
         await this.clickDrawer(thirdPartyDrawer);
         await this.closeDrawerProcess.completeCloseThirdParty();
+        this.logInfo(`Closed drawer third party drawer`);
     }
 
     async closeDrawers() {
@@ -158,5 +176,29 @@ export class ManagerPage extends BasePageDesktop {
         await this.openCloseDayPopup();
         await this.closeBusinessDayButton.click();
         await this.page.waitForTimeout(5000);
+        this.logInfo('Closed business day');
+    }
+
+    async addDriversToDay(driverNames: string[]) {
+        this.logInfo('Adding drivers');
+        await this.navigateToManager();
+        await this.navigateToTab('Drawers');
+        for (const driverName of driverNames) {
+            await this.addDriver(driverName);
+        }
+    }
+
+    async closeAllDrawers() {
+        this.logInfo('Closing all drawers');
+        await this.navigateToManager();
+        await this.navigateToTab('Drawers');
+        await this.closeDrawers();
+    }
+
+    async closeDay() {
+        this.logInfo('Closing business day');
+        await this.navigateToManager();
+        await this.navigateToTab('Drawers');
+        await this.closeBusinessDay();
     }
 }

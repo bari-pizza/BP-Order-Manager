@@ -1,4 +1,14 @@
-import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon } from '@mui/material';
+import {
+    Toolbar,
+    Drawer,
+    List,
+    ListItemButton,
+    ListItemText,
+    ListItem,
+    ListItemIcon,
+    Badge,
+    Stack,
+} from '@mui/material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
 import { UserAvatar } from './Base/UserAvatar';
@@ -17,12 +27,16 @@ import {
     UserProfileLottieIcon,
 } from '../rickcedlib/LottieIcons';
 import { Phone as PhoneIcon, Computer as ComputerIcon } from '@mui/icons-material';
+import { useQueryClient } from '@tanstack/react-query';
+import { Order_Payment } from '../typesAndValidators';
+import { getEnv } from '../utils';
 
 interface NavBarItem {
     path?: string;
     icon: JSX.Element;
     text: string;
     forMobile: boolean;
+    className?: string;
     onClick?: () => void;
 }
 
@@ -34,7 +48,16 @@ export function NavBar() {
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
-    const version = import.meta.env.VITE_REACT_APP_VERSION;
+    const version = getEnv('VITE_REACT_APP_VERSION');
+    // const version = import.meta.env.VITE_REACT_APP_VERSION || process.env.VITE_REACT_APP_VERSION;
+
+    const queryClient = useQueryClient();
+    const orders = (
+        profile ? (queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) ?? []) : []
+    ) as Order_Payment[];
+    const orderCount = (isMobile ? orders.filter((o) => o.drawer_id === profile?.id) : orders).length;
+
+    const todaysDate = dayjs().format('ddd MMM D, YYYY');
 
     const drawerWidth = isMobile ? 65 : 200;
 
@@ -54,6 +77,7 @@ export function NavBar() {
             icon: <TimeLottieIcon />,
             onClick: showBusinessDatePicker,
             forMobile: true,
+            className: 'date-picker-button',
         },
         { path: '/search', icon: <SearchLottieIcon />, text: 'Search', forMobile: false },
         profile?.is_admin && {
@@ -63,7 +87,16 @@ export function NavBar() {
             forMobile: false,
         },
         profile?.is_manager && { path: '/manager', icon: <StaffLottieIcon />, text: 'Manager', forMobile: false },
-        { path: '/orders', icon: <MarketPlaceLottieIcon />, text: 'Orders', forMobile: true },
+        {
+            path: '/orders',
+            icon: (
+                <Badge badgeContent={orderCount} color="primary">
+                    <MarketPlaceLottieIcon />
+                </Badge>
+            ),
+            text: 'Orders',
+            forMobile: true,
+        },
         userListItem,
     ].filter((item) => item && (!isMobile || item.forMobile)) as NavBarItem[];
 
@@ -99,13 +132,12 @@ export function NavBar() {
                 }}>
                 {listItems.map((item) => (
                     <ListItem
-                        className="lottie-icon-container"
+                        className={`lottie-icon-container ${item.className || ''}`}
                         {...(item.path
                             ? {
                                   component: SmartLink,
                                   to: item.path,
                                   keepSearchParams: true,
-                                  unstable_viewTransition: true,
                               }
                             : { component: 'div' })}
                         key={item.text}>
@@ -118,12 +150,20 @@ export function NavBar() {
                     </ListItem>
                 ))}
                 {/* TODO: replace with Lottice Icon */}
-                <ListItem className="lottie-icon-container" key={isMobile ? 'phone' : 'computer'} component="div">
-                    <ListItemIcon>{isMobile ? <PhoneIcon /> : <ComputerIcon />}</ListItemIcon>
-                    {!isMobile && <ListItemText primary={isMobile ? 'Mobile' : 'Desktop'} />}
-                </ListItem>
                 <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
-                    <ListItemText>{version}</ListItemText>
+                    <Stack direction="column" width="100%">
+                        {/* <ListItem
+                            className="lottie-icon-container"
+                            key={isMobile ? 'phone' : 'computer'}
+                            component="div"></ListItem> */}
+                        <ListItemText>{todaysDate}</ListItemText>
+                        <ListItem>
+                            <ListItemIcon sx={{ justifyContent: 'center' }}>
+                                {isMobile ? <PhoneIcon /> : <ComputerIcon />}
+                            </ListItemIcon>
+                            <ListItemText>{version}</ListItemText>
+                        </ListItem>
+                    </Stack>
                 </ListItem>
             </List>
 

@@ -1,4 +1,14 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, Stack, Typography } from '@mui/material';
+import {
+    Button,
+    ButtonGroup,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Skeleton,
+    Stack,
+    Typography,
+} from '@mui/material';
 import { useBariPizzaContext, useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { SideBar, SideBarSkeleton } from '../../../components/SideBar';
 import { DrawerCardBaseSkeleton, DrawerCardSlotProps } from '../../../components/Base/DrawerCardBase';
@@ -30,6 +40,7 @@ export const DrawerSideBar = () => {
     const [businessDate] = useBusinessDate();
     const { constants } = useBariPizzaContext();
     const { orders, drawers, summaries, cashTransfers, drivers, businessDay } = useManagerDashboardContext();
+    const [activeSummaryTab, setActiveSummaryTab] = useState(0);
 
     const [editableCashTransferID, setEditableCashTransferID] = useState<string | null>(null);
 
@@ -53,30 +64,6 @@ export const DrawerSideBar = () => {
     const pmtTransfers = transfers.payment;
     const otherTransfers = transfers.other;
     const closingPmtTransfer = pmtTransfers.find((pmt) => pmt.title === 'Closing Payment');
-
-    /*TODO: ***Cash Transfer ****
-
-        [x] get all cash transfers in context (figure out if I need them in any other screens)
-
-        [x] find bank cash transfer for drawer
-        [x] if doesnt exist, use default value
-        [x] if exists, use value
-
-        [x] on save, create new cash transfer with bank_in_cents value
-        or update cash transfer with bank_in_cents value
-
-        [x] allow user to change bank source 
-
-        [x] implement a way to create other cash transfers
-
-        [x] determine payment to be created
-
-        [x] backend - if source or destination is_locked, don't allow changes
-
-        [x] create popup to show all cash transfers and edit/delete them
-
-    
-    */
 
     const defaultValues = useMemo(() => {
         return {
@@ -215,9 +202,6 @@ export const DrawerSideBar = () => {
         close();
     };
 
-    // TODO: don't allow reopening of driver drawer if there are no open registers
-    // probably handle this in backend
-
     const handleReopenDrawerClick = () => {
         console.log(`Reopening drawer ${currentDrawer.name}`);
         drawers.reOpen(currentDrawer);
@@ -239,6 +223,7 @@ export const DrawerSideBar = () => {
         0,
     );
     const items = [];
+    const hungerRushItems = [];
     switch (currentDrawer.drawer_type) {
         case 'driver':
             items.push(
@@ -253,17 +238,23 @@ export const DrawerSideBar = () => {
                 {
                     label: 'Hours',
                     value: -hours,
-                    details: `${(hours / constants.default.driver_hourly_wage_in_cents).toFixed(2)} hours @ ${formatCurrency(constants.default.driver_hourly_wage_in_cents)}`,
+                    details: `${(hours / constants.default.driver_hourly_wage_in_cents).toFixed(
+                        2,
+                    )} hours @ ${formatCurrency(constants.default.driver_hourly_wage_in_cents)}`,
                 },
                 {
                     label: 'Cards',
                     value: -card,
-                    details: `${formatCurrency(drawerSummary.card_in_cents)} base | ${formatCurrency(drawerSummary.card_tips_in_cents)} tips`,
+                    details: `${formatCurrency(drawerSummary.card_in_cents)} base | ${formatCurrency(
+                        drawerSummary.card_tips_in_cents,
+                    )} tips`,
                 },
                 {
                     label: '3rd Party',
                     value: -thirdParty,
-                    details: `${formatCurrency(drawerSummary.third_party_in_cents)} base | ${formatCurrency(drawerSummary.third_party_tips_in_cents)} tips`,
+                    details: `${formatCurrency(drawerSummary.third_party_in_cents)} base | ${formatCurrency(
+                        drawerSummary.third_party_tips_in_cents,
+                    )} tips`,
                 },
                 {
                     label: 'Deliveries',
@@ -278,8 +269,18 @@ export const DrawerSideBar = () => {
                     label: 'Payments',
                     value: payments,
                     details: closingPmtTransfer
-                        ? `Closing Payment: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
+                        ? `Closing Payment Paid ${closingPmtTransfer.source === currentDrawer.drawer_id ? 'By' : 'To'} ${currentDrawer.name}: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
                         : 'No Closing Payment',
+                },
+            );
+            hungerRushItems.push(
+                {
+                    label: 'Total',
+                    value: total,
+                },
+                {
+                    label: 'Bank',
+                    value: bank,
                 },
             );
             break;
@@ -329,6 +330,9 @@ export const DrawerSideBar = () => {
     return (
         <SideBar width="350px">
             <Stack direction="column" height="100vh" spacing={2} alignItems="center" mt={2}>
+                <Typography variant="h6">
+                    {hours} vs {drawerSummary.hours_in_cents}
+                </Typography>
                 <Stack direction="column" alignItems="center" gap={2}>
                     <AnimatePresence>
                         <ContextMenu openOnType="click">
@@ -350,7 +354,27 @@ export const DrawerSideBar = () => {
                                     forSideBar
                                 />
                             )}
-                            {isDriver && <SummaryStack items={items} />}
+                            {/* {isDriver && <SummaryStack items={items} />} */}
+                            {(isDriver || currentDrawer.drawer_type === 'register') && (
+                                <>
+                                    {activeSummaryTab === 0 && <SummaryStack items={items} />}
+                                    {activeSummaryTab === 1 && <SummaryStack items={hungerRushItems} />}
+
+                                    <ButtonGroup>
+                                        <Button
+                                            onClick={() => setActiveSummaryTab(0)}
+                                            variant={activeSummaryTab === 0 ? 'contained' : 'outlined'}>
+                                            Closing Summary
+                                        </Button>
+                                        <Button
+                                            onClick={() => setActiveSummaryTab(1)}
+                                            variant={activeSummaryTab === 1 ? 'contained' : 'outlined'}>
+                                            Hunger Rush
+                                        </Button>
+                                    </ButtonGroup>
+                                </>
+                            )}
+
                             {currentDrawer.drawer_type === 'third_party' && (
                                 <ThirdPartySummary thirdPartySummary={thirdPartySummary} />
                             )}

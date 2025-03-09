@@ -1,4 +1,4 @@
-import { IconButton, Stack } from '@mui/material';
+import { IconButton, Stack, Tooltip } from '@mui/material';
 import {
     DataGrid,
     GridColDef,
@@ -9,20 +9,128 @@ import {
     GridRowModesModel,
 } from '@mui/x-data-grid';
 import { Profile } from '../../../typesAndValidators';
-import { useState } from 'react';
 import { updateEmployee } from '../../../supabaseQueries';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { CellEditCheckbox, CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
 import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
 import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
 import { Email as EmailIcon } from '@mui/icons-material';
-import { toast } from 'react-toastify';
+import { Id, toast } from 'react-toastify';
+import { useDataGrid } from '../../../hooks/ui/useDataGrid';
+import { useRef, useState } from 'react';
+import { supaClient } from '../../../supaClient';
+import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 
 type Employee = Profile & { is_driver: boolean };
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
-    const [rows, setRows] = useState<Employee[]>(employees);
-    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+    const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<Employee>({ data: employees });
+    const toastRef = useRef<Id>('');
+
+    const deleteEmployee = async (employee: Employee) => {
+        // TODO: create a similar function and confirmation for each table with createCellActions
+        // TODO: show deleted employees as greyed out or something
+        // TODO: show deleted employees at the bottom
+        const { id, first_name, last_name } = employee;
+        const fullName = `${first_name} ${last_name}`;
+        toastRef.current = toast.loading(`Deleting employee ${fullName}`);
+        const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: true });
+        if (error) {
+            toast.update(toastRef.current, {
+                render: error.message,
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            return;
+        } else {
+            toast.update(toastRef.current, {
+                render: `Employee ${fullName} deleted successfully`,
+                type: 'success',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            // take row out of edit mode
+            setRowModesModel({
+                ...rowModesModel,
+                [id]: { mode: GridRowModes.View },
+            });
+        }
+    };
+
+    const restoreEmployee = async (employee: Employee) => {
+        const { id } = employee;
+        const fullName = `${employee.first_name} ${employee.last_name}`;
+        toastRef.current = toast.loading(`Restoring employee ${fullName}`);
+        const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: false });
+        if (error) {
+            toast.update(toastRef.current, {
+                render: error.message,
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            return;
+        } else {
+            toast.update(toastRef.current, {
+                render: `Employee ${fullName} restored successfully`,
+                type: 'success',
+                isLoading: false,
+                autoClose: 5000,
+            });
+        }
+    };
+
+    const { handleConfirmation: confirmDelete } = useConfirmationToast<Employee>({
+        // message: 'Are you sure you want to delete this employee?',
+        message: (employee) => {
+            const { first_name, last_name } = employee;
+            const fullName = `${first_name} ${last_name}`;
+            return `Are you sure you want to delete ${fullName}?`;
+        },
+        confirmProps: {
+            color: 'error',
+            variant: 'outlined',
+            handler: (employee) => {
+                const { id } = employee;
+                if (!id) {
+                    toast.error('Operation failed - try again!');
+                    return;
+                }
+                deleteEmployee(employee);
+                setRowModesModel({
+                    ...rowModesModel,
+                    [id]: { mode: GridRowModes.View, ignoreModifications: true },
+                });
+            },
+            buttonText: 'Delete',
+        },
+    });
+
+    const { handleConfirmation: confirmRestore } = useConfirmationToast<Employee>({
+        message: (employee) => {
+            const { first_name, last_name } = employee;
+            const fullName = `${first_name} ${last_name}`;
+            return `Are you sure you want to restore ${fullName}?`;
+        },
+        confirmProps: {
+            color: 'primary',
+            variant: 'contained',
+            handler: (employee) => {
+                const { id } = employee;
+                if (!id) {
+                    toast.error('Operation failed - try again!');
+                    return;
+                }
+                restoreEmployee(employee);
+                setRowModesModel({
+                    ...rowModesModel,
+                    [id]: { mode: GridRowModes.View, ignoreModifications: true },
+                });
+            },
+            buttonText: 'Restore',
+        },
+    });
 
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -30,21 +138,21 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         }
     };
 
-    const queryClient = useQueryClient();
-
     const updateEmployeeMutation = useMutation({
         mutationFn: (employee: Employee) => {
             const { is_driver, ...profile } = employee;
+            console.log({ profile, is_driver });
             return updateEmployee(profile, is_driver);
         },
         onSuccess: (data) => {
+            console.log({ data });
             const { profile, driver } = data[0];
             const updatedRow = {
                 ...profile,
-                is_driver: !driver?.is_deleted,
+                is_driver: driver && !driver.is_deleted,
             };
+            console.log({ updatedRow });
             setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
-            queryClient.invalidateQueries({ queryKey: ['profiles'] });
         },
         onError: (error) => {
             console.log({ error });
@@ -55,10 +163,8 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         console.log('processRowUpdate', newRow);
         const updatedRow = {
             ...(newRow as Employee),
-            // isNew: false
         };
         updateEmployeeMutation.mutate(updatedRow);
-        // setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         setRows((prev) => prev.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;
     };
@@ -67,15 +173,25 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         setRowModesModel(newRowModesModel);
     };
 
-    const columns: GridColDef[] = [
+    const columns: GridColDef<Employee>[] = [
         {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
             width: 100,
             cellClassName: 'actions',
-            getActions: ({ id }) => {
-                return createCellActions(id, rowModesModel, setRowModesModel);
+            getActions: ({ id, row }) => {
+                const { is_deleted } = row;
+                if (is_deleted) {
+                    return createCellActions(
+                        id,
+                        rowModesModel,
+                        setRowModesModel,
+                        () => confirmRestore(row),
+                        is_deleted,
+                    );
+                }
+                return createCellActions(id, rowModesModel, setRowModesModel, () => confirmDelete(row), is_deleted);
             },
         },
         {
@@ -100,6 +216,10 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             field: 'email',
             headerName: 'Email',
             width: 200,
+            editable: true,
+            renderEditCell: (params) => {
+                return <CellEditTextField params={params} inputProps={{ disabled: true }} field="email" />;
+            },
         },
         {
             field: 'phone',
@@ -114,6 +234,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             field: 'is_admin',
             headerName: 'Admin',
             width: 100,
+            headerAlign: 'center',
             editable: true,
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
@@ -127,7 +248,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             headerName: 'Manager',
             width: 100,
             editable: true,
-
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
@@ -140,6 +261,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             headerName: 'Driver',
             width: 100,
             editable: true,
+            headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
             },
@@ -150,27 +272,30 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'send_email',
             headerName: 'Send PW Reset Email',
+            headerAlign: 'center',
             width: 175,
             editable: false,
-            renderCell: (params) => {
-                const handleClick = () => {
-                    toast.info('This feature is not yet implemented');
-                    toast.success(`Sent password reset email to ${params.row.email}`);
-                };
-                return (
-                    <IconButton onClick={handleClick}>
-                        <EmailIcon />
-                    </IconButton>
-                );
-            },
+            renderCell: ({ row: { email, is_deleted } }) => <RenderEmail email={email} disabled={is_deleted} />,
         },
     ];
     return (
-        <Stack direction="column">
+        <Stack direction="column" minHeight="300px">
             <DataGrid
                 sx={{
                     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
+                    '& .row-is-deleted': {
+                        color: 'text.disabled',
+                        '& .MuiButtonBase-root': { color: 'text.disabled' },
+                        '& .actions .MuiButtonBase-root': { color: 'primary.main' },
+                    },
                 }}
+                pageSizeOptions={[5, 10, 25]}
+                disableVirtualization
+                onCellDoubleClick={(_params, event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                }}
+                disableRowSelectionOnClick
                 rows={rows}
                 columns={columns}
                 editMode="row"
@@ -180,10 +305,65 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                 processRowUpdate={processRowUpdate}
                 getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
                 getRowClassName={(params) => {
+                    const isDeleted = params.row.is_deleted;
+                    if (isDeleted) return 'row-is-deleted';
                     const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
                     return isEditing ? 'row-is-edit' : '';
                 }}
             />
         </Stack>
+    );
+};
+
+const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const toastRef = useRef<Id>('');
+
+    const handlePasswordReset = async () => {
+        setIsSubmitting(true);
+        toastRef.current = toast.loading(`Sending password reset email to ${email}`);
+        await supaClient.auth.resetPasswordForEmail(email, { redirectTo: '/myaccount' }).then(({ error }) => {
+            if (error) {
+                toast.update(toastRef.current, {
+                    render: error.message,
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 5000,
+                });
+            } else {
+                toast.update(toastRef.current, {
+                    render: `Password reset email sent to ${email}`,
+                    type: 'success',
+                    isLoading: false,
+                    autoClose: 5000,
+                });
+            }
+            setIsSubmitting(false);
+        });
+    };
+
+    const { handleConfirmation } = useConfirmationToast({
+        message: `Are you sure you want to send a password reset email to ${email}?`,
+        confirmProps: {
+            handler: handlePasswordReset,
+            buttonText: 'Send',
+            color: 'primary',
+        },
+        cancelProps: {
+            buttonText: 'Cancel',
+            color: 'error',
+        },
+    });
+
+    return (
+        <Tooltip title="Send password reset email">
+            <IconButton
+                onClick={handleConfirmation}
+                disabled={isSubmitting || disabled}
+                color="primary"
+                sx={{ justifyContent: 'center', width: '100%' }}>
+                <EmailIcon />
+            </IconButton>
+        </Tooltip>
     );
 };

@@ -22,6 +22,7 @@ export type CashTransfer = Tables<'CashTransfer'>;
 export type CashTransferType = Tables<'CashTransfer'>['transfer_type'];
 export type AppSetting = Tables<'AppSetting'>;
 export type BusinessDaySummary = Tables<'BusinessDaySummary'>;
+export type GlobalChangeTracker = Tables<'GlobalChangeTracker'>;
 
 export type NewProfile = Omit<Profile, 'id' | 'created_at'>;
 export type NewDrawer = Omit<Drawer, 'drawer_id' | 'created_at'>;
@@ -118,8 +119,8 @@ const paymentValidators = {
             if (isNaN(value)) {
                 return 'Must be a number';
             }
-            if (value < 1) {
-                return 'Must be greater than 0';
+            if (value < 0) {
+                return 'Cannot be negative';
             }
             return true;
         },

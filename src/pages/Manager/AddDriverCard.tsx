@@ -38,6 +38,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
         drawer_id: 'add-driver',
         drawer_type: 'driver',
         name: 'Add Driver',
+        is_deleted: false,
         driver: {
             id: '3',
             email: 'vI8Pb@example.com',
@@ -48,6 +49,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
             last_name: 'Driver',
             phone: '555-555-5555',
             avatar_src: `https://i.pravatar.cc/300?u=${dateAndHour}`,
+            is_deleted: false,
         },
     };
 

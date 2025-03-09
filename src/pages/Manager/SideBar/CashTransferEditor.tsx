@@ -170,7 +170,7 @@ export const CashTransferEditor = ({
     const { handleConfirmation: handleDeletionConfirmation } = useConfirmationToast({
         message: 'Are you sure you want to delete this cash transfer?',
         confirmProps: {
-            handler: handleSubmit(onDelete),
+            handler: () => handleSubmit(onDelete),
             buttonText: 'Delete',
             color: 'error',
         },

@@ -26,6 +26,8 @@ import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
 import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
 import { motion } from 'framer-motion';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
+import { useSession } from '../../../hooks/data/useSession';
+import { useDrivers } from '../../../hooks/data/useDrivers';
 
 const isValidDrawer = (
     drawer: Drawer | null,
@@ -98,13 +100,18 @@ export const OrderEditor = ({
     forNewOrder = false,
 }: OrderEditorProps) => {
     const [businessDate] = useBusinessDate();
-    const { origins, drawers, drivers, constants } = useBariPizzaContext();
+    const { origins, drawers, constants } = useBariPizzaContext();
+    const {
+        drivers: { todays: todaysDrivers },
+    } = useDrivers();
+    const { profile } = useSession();
     const driverIsEditing = !!driverDrawerID;
 
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
         return {
             business_date: businessDate.format('YYYY-MM-DD'),
+            last_updated_by: profile?.id,
             origin_id: origins.find((o) => o.name === 'Bari Pizza')!.origin_id,
             order_number: null,
             order_name: null,
@@ -115,7 +122,7 @@ export const OrderEditor = ({
             delivery_fee_in_cents: defaultDeliveryFee,
             initial_payment_type: 'cash' as PaymentType,
         };
-    }, [businessDate, origins, defaultDeliveryFee, driverDrawerID]);
+    }, [businessDate, origins, defaultDeliveryFee, driverDrawerID, profile]);
     const {
         handleSubmit,
         register,
@@ -130,7 +137,7 @@ export const OrderEditor = ({
         reValidateMode: 'onChange',
     });
 
-    const queryClient = useQueryClient();
+    // const queryClient = useQueryClient();
 
     const createNewOrderMutation = useMutation({
         mutationFn: createNewOrder,
@@ -138,7 +145,6 @@ export const OrderEditor = ({
             console.log({ data });
             close();
             reset();
-            queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
 
         onError: (error) => {
@@ -150,9 +156,7 @@ export const OrderEditor = ({
     const updateOrderMutation = useMutation({
         mutationFn: updateOrder,
         onSuccess: (data) => {
-            // close();
             reset(data[0]);
-            queryClient.invalidateQueries({ queryKey: ['orders', data[0].business_date] });
         },
         onError: (error) => {
             console.error(`Issue updating order: "${order?.order_id}`, error);
@@ -161,7 +165,9 @@ export const OrderEditor = ({
         },
     });
 
-    const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...drivers];
+    // TODO: showing default driver but not adding them as drawer
+
+    const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...todaysDrivers];
 
     const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'))!;
     const currentOrderName = watch('order_name');
@@ -171,7 +177,9 @@ export const OrderEditor = ({
 
     const { can_deliver, has_order_number, is_third_party } = currentOrigin;
 
-    const validOrigins = driverDrawerID ? origins.filter((origin) => origin.can_deliver) : origins;
+    const validOrigins = (driverDrawerID ? origins.filter((origin) => origin.can_deliver) : origins).filter(
+        (origin) => !origin.is_deleted,
+    );
 
     const invalidOrderType = currentOrderType === 'delivery' && can_deliver === false;
 
@@ -407,6 +415,7 @@ export const OrderEditor = ({
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         data.drawer_id = data.drawer_id || null; // can't be ''
+        data.last_updated_by = profile?.id || null;
         if ('order_id' in data) {
             updateOrderMutation.mutate(data);
         } else {
@@ -448,7 +457,7 @@ export const OrderEditor = ({
 
     if (isOpen) {
         return (
-            <Stack direction="column" m={2}>
+            <Stack direction="column" m={2} height="100%">
                 <Typography variant="h5" textAlign={'center'}>
                     Order Editor
                 </Typography>
@@ -465,8 +474,14 @@ export const OrderEditor = ({
                         name="initial_payment_type"
                     />
                 </Stack>
-                <Button onClick={handleSubmit(onSubmit, onError)}>Save</Button>
-                <Button onClick={handleCancel}>Cancel</Button>
+                <Stack direction="column" spacing={2} mt={2} justifyContent="space-between" height="100%">
+                    <Button onClick={handleSubmit(onSubmit, onError)} variant="contained" sx={{ height: '75px' }}>
+                        Save
+                    </Button>
+                    <Button onClick={handleCancel} variant="outlined" color="error" sx={{ height: '75px' }}>
+                        Cancel
+                    </Button>
+                </Stack>
             </Stack>
         );
     }
@@ -500,8 +515,16 @@ const OrderEditorDialog = ({
     const [editablePaymentID, setEditablePaymentID] = useState<string | null>(null);
     const payments = order.payments?.sort((a, b) => b.created_at.localeCompare(a.created_at)) || [];
 
+    const queryClient = useQueryClient();
+
+    const orderOrigins = (queryClient.getQueryData<OrderOrigin>(['origins']) ?? []) as OrderOrigin[];
+
+    const orderOrigin = orderOrigins.find((origin) => order.origin_id === origin.origin_id);
+
+    const thirdPartyCanTip = (orderOrigin?.is_third_party && orderOrigin?.can_tip) || false;
+
     const paymentsTotalInCents = payments.reduce((total, payment) => total + payment.amount_in_cents, 0);
-    const missingPaymentInCents = order.total_in_cents - paymentsTotalInCents;
+    const missingPaymentInCents = Math.max(order.total_in_cents - paymentsTotalInCents, 0);
 
     const activePayment = editablePaymentID
         ? payments?.find((payment) => payment.payment_id === editablePaymentID)
@@ -520,6 +543,7 @@ const OrderEditorDialog = ({
                 defaultAmount={missingPaymentInCents}
                 isEditing={true}
                 setIsEditing={(bool) => setEditablePaymentID(bool ? 'newPayment' : null)}
+                thirdPartyCanTip={thirdPartyCanTip}
             />
         ) : (
             <PaymentEditor
@@ -529,6 +553,7 @@ const OrderEditorDialog = ({
                 validPaymentTypes={validPaymentTypes}
                 isEditing={editablePaymentID === activePayment!.payment_id}
                 setIsEditing={(bool) => setEditablePaymentID(bool ? activePayment!.payment_id : null)}
+                thirdPartyCanTip={thirdPartyCanTip}
             />
         )
     ) : null;

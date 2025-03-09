@@ -10,6 +10,7 @@ import { DrawersTab } from './Tabs/DrawersTab';
 import { SalesTab } from './Tabs/SalesTab';
 import { OrdersTab } from './Tabs/OrdersTab';
 import { CardsTab } from './Tabs/CardsTab';
+import { devOnly } from '../../utils';
 
 /*    TODO: About Today
         Sales
@@ -121,16 +122,18 @@ export const ManagerDashboard = () => {
                 </Stack>
                 <Box>
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
-                        <Tab value="sales" label="Sales" icon={<SalesIcon />} iconPosition="start" />
+                        {devOnly(<Tab value="sales" label="Sales" icon={<SalesIcon />} iconPosition="start" />)}
                         <Tab value="drawers" label="Drawers" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
                         <Tab value="cards" label="Credit Cards" icon={<DriversIcon />} iconPosition="start" />
-                        <Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />
+                        {devOnly(<Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />)}
                     </Tabs>
                 </Box>
-                <TabPanel tabName="sales" value={tabName}>
-                    <SalesTab />
-                </TabPanel>
+                {devOnly(
+                    <TabPanel tabName="sales" value={tabName}>
+                        <SalesTab />
+                    </TabPanel>,
+                )}
                 <TabPanel tabName="drawers" value={tabName}>
                     <DrawersTab />
                 </TabPanel>
@@ -140,9 +143,11 @@ export const ManagerDashboard = () => {
                 <TabPanel tabName="cards" value={tabName}>
                     <CardsTab />
                 </TabPanel>
-                <TabPanel tabName="settings" value={tabName}>
-                    Settings go here!
-                </TabPanel>
+                {devOnly(
+                    <TabPanel tabName="settings" value={tabName}>
+                        Settings go here!
+                    </TabPanel>,
+                )}
             </Stack>
         </ManagerDashboardContext.Provider>
     );

@@ -26,6 +26,7 @@ const unassignedDrawer: Drawer = {
     name: 'Unassigned',
     created_at: '2024-08-27T00:00:00.000Z',
     drawer_type: 'unassigned',
+    is_deleted: false,
 };
 
 const smallStyle = {

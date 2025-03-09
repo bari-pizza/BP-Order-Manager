@@ -38,6 +38,8 @@ export class CloseDrawerProcess {
         await this.clickSaveAndCloseDrawer();
         await this.waitForDialog();
 
+        await this.page.waitForTimeout(2500);
+
         const buttonClosingPayment = this.page.locator('text=/Create|Edit Closing Payment/');
 
         if (await buttonClosingPayment.isVisible()) {

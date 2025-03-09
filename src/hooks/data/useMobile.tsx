@@ -4,12 +4,36 @@ import { useDrivers } from './useDrivers';
 // import { useRef } from 'react';
 import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
 
-/* TODO: Julia
+/* TODO: Finishing Touches
 
     [ ] add something at the top of the screen (Business Date!)
     [ ] fix scrolling in orders area
+    [x] Add a way for admin to create a new driver
+    [x] Send password reset email
+    [x] Add a way to update your password
+    [ ] Choose a prettier secondary color
+    [x] - info telling manager to delete order they must first:
+            - delete all payments
+            - unassign from any drawers
+    [ ] - figure out visual bug with lock icon badge (color sometimes showing)
+    [ ] - fix several warnings in console
+        [ ] - react router future
+    [ ] - MUI Data Grid - space between table and footer takes an instant to disappear
+    [ ] - separate skeletons for mobile and desktop
+    [ ] - order ticket stretches when a row is added or removed from order ticket area (motion issues)
+    [ ] - add new lottie icons
+        [ ] - For tabs (Orders, Drivers, Cards, Sales)
+    [x] - check issues with subscriptions
+        [x] - mobile is not seeing new orders applied
+        [x] - not all changes to orders are being shown to a second instance of desktop
+        [x] - some orders that driver add dont show up until a payment is recorded
+        [x] - only some orders show as locked even though all are
+    [x] - Order Editor should only use today's drawers not all drawers
 
-*/
+    [x] - set up businessDate at app level and then access it through queryClient (or maybe just make the effect at midnight its own hook)
+
+    [x] - set up supabase global table that invalidates all queries when a new row is added
+        */
 
 export const useMobile = () => {
     const [businessDate] = useBusinessDate();
@@ -20,9 +44,6 @@ export const useMobile = () => {
     } = useDrivers();
     const { drivers, drawers, origins, constants } = useBariPizzaContext();
     const { orders, ticket, summaries, cashTransfers } = useOrdersDrawersTickets();
-    // const toastRef = useRef<{
-    //     [toastID: string]: ({ data, errors, forEachError }: HandleOutcomeProps) => void;
-    // }>({});
 
     if (!isMobile) {
         return {
@@ -80,44 +101,6 @@ export const useMobile = () => {
 
     const driversOrders = orders.byDrawerID(driver.drawer_id);
     const driverCashTransfers = cashTransfers.byDrawerID(driver.drawer_id);
-
-    /* TODO: drivers need to be able to:
-
-        [x] add orders
-            - origin
-            - drawer (self)
-            - order type (delivery)
-            - order #/name
-            - delivery fee (default)
-            - total
-
-        [x] update orders
-            - origin
-            - order #/name
-            - total
-
-        [ ] - request to delete orders
-        [ ] - info telling manager to delete order they must first:
-                - delete all payments
-                - unassign from any drawers
-
-        [x] add payments
-            - payment type
-            - amount
-            - tip
-
-        [x] update payments
-            - payment type
-            - amount
-            - tip
-
-        [x] delete payments
-
-
-
-        [x] access end of day payment slip
-
-    */
 
     return {
         businessDate,

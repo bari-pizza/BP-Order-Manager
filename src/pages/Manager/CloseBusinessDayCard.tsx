@@ -23,14 +23,12 @@ export const CloseBusinessDayCard = () => {
     const openOrders: Order[] = [];
 
     combinedDrawersAndDrivers.forEach((drawer) => {
-        // [x] should confirm that all drawers are locked
         if (!summaries.byDrawerID(drawer.drawer_id)?.is_locked) {
             openDrawers.push(drawer);
         }
     });
 
     orders.all.forEach((order) => {
-        // [x] should confirm that all orders are assigned to a drawer
         if (!order.drawer_id) {
             openOrders.push(order);
         }
@@ -60,10 +58,12 @@ export const CloseBusinessDayCard = () => {
     orders.all.forEach((order) => {
         grandSummary.total_in_cents += order.total_in_cents;
         grandSummary.orders += 1;
-        order.payments.forEach((payment) => {
+        order.payments?.forEach((payment) => {
             if (payment.payment_type === 'cash') grandSummary.cash_in_cents += payment.amount_in_cents;
-            if (payment.payment_type === 'card')
+            if (payment.payment_type === 'card') {
                 grandSummary.card_in_cents += payment.amount_in_cents + payment.tip_in_cents;
+                grandSummary.total_in_cents += payment.tip_in_cents;
+            }
         });
     });
 

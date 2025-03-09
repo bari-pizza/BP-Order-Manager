@@ -17,7 +17,7 @@ import { useSession } from './hooks/data/useSession.ts';
 import { OrderDashboard, OrderDashboardSkeleton } from './pages/Orders/OrderDashboard.tsx';
 import { PageMissing } from './components/PageMissing.tsx';
 import { Home } from './pages/Home/Home.tsx';
-import { MyAccount } from './pages/Profile/MyAccount.tsx';
+import { MyAccount, MyAccountSkeleton } from './pages/Profile/MyAccount.tsx';
 import { Login } from './pages/Profile/Login.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllAppSettings, getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
@@ -28,11 +28,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ManagerDashboard, ManagerDashboardSkeleton } from './pages/Manager/ManagerDashboard.tsx';
 import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
+import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
+import { useBusinessDate, useMidnightEffect } from './hooks/data/useBusinessDate.tsx';
 
 const router = createBrowserRouter([
     {
         path: '/',
-        element: <Layout />,
+        element: (
+            <ErrorBoundary>
+                <Layout />
+            </ErrorBoundary>
+        ),
         children: [
             {
                 path: '*',
@@ -56,11 +62,15 @@ const router = createBrowserRouter([
             },
             {
                 path: '/login',
-                element: <Login authMode="sign_in" />,
+                element: <Login />,
             },
             {
                 path: '/myaccount',
-                element: <MyAccount />,
+                element: (
+                    <ProtectedRoute fallback={<MyAccountSkeleton />}>
+                        <MyAccount />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: '/admin',
@@ -90,13 +100,18 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+    console.log('rendering app.tsx');
+
     return (
-        <ErrorBoundary>
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
-                <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-            </QueryClientProvider>
-        </ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider
+                router={router}
+                future={{
+                    v7_startTransition: true,
+                }}
+            />
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
+        </QueryClientProvider>
     );
 }
 
@@ -115,6 +130,7 @@ function Layout() {
     const isMobile = useMediaQuery(
         '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
     );
+    useMidnightEffect();
     // MAYBE include useSubscribeToTable here but these shouldnt be changed often
     const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }] = useSuspenseQueries({
         queries: [
@@ -145,6 +161,9 @@ function Layout() {
             },
         ],
     });
+    const [businessDate] = useBusinessDate();
+
+    useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
     return (
         // <APIProvider
@@ -164,15 +183,7 @@ function Layout() {
                     <LayoutContext.Provider
                         value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth, isMobile }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
-                            <ToastContainer
-                                style={{
-                                    width: 'maxContent',
-                                    justifyContent: 'right',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'flex-end',
-                                }}
-                            />
+                            <ToastContainer />
                             <Stack id="main" direction="row" justifyContent="center">
                                 <NavBar />
                                 <Stack id="content" direction="column" overflow="auto" width={'100%'}>

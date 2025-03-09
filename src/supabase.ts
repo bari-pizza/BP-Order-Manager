@@ -190,18 +190,21 @@ export type Database = {
           created_at: string
           drawer_id: string
           drawer_type: Database["public"]["Enums"]["drawer_type"]
+          is_deleted: boolean
           name: string
         }
         Insert: {
           created_at?: string
           drawer_id?: string
           drawer_type: Database["public"]["Enums"]["drawer_type"]
+          is_deleted?: boolean
           name: string
         }
         Update: {
           created_at?: string
           drawer_id?: string
           drawer_type?: Database["public"]["Enums"]["drawer_type"]
+          is_deleted?: boolean
           name?: string
         }
         Relationships: []
@@ -248,21 +251,33 @@ export type Database = {
           created_at: string | null
           error_message: string
           id: number
-          order_id: string | null
         }
         Insert: {
           context?: string | null
           created_at?: string | null
           error_message: string
           id?: never
-          order_id?: string | null
         }
         Update: {
           context?: string | null
           created_at?: string | null
           error_message?: string
           id?: never
-          order_id?: string | null
+        }
+        Relationships: []
+      }
+      GlobalChangeTracker: {
+        Row: {
+          table_name: string
+          updated_at: string
+        }
+        Insert: {
+          table_name: string
+          updated_at?: string
+        }
+        Update: {
+          table_name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -273,6 +288,7 @@ export type Database = {
           delivery_fee_in_cents: number
           drawer_id: string | null
           is_locked: boolean
+          last_updated_by: string | null
           order_id: string
           order_name: string | null
           order_number: number | null
@@ -287,6 +303,7 @@ export type Database = {
           delivery_fee_in_cents?: number
           drawer_id?: string | null
           is_locked?: boolean
+          last_updated_by?: string | null
           order_id?: string
           order_name?: string | null
           order_number?: number | null
@@ -301,6 +318,7 @@ export type Database = {
           delivery_fee_in_cents?: number
           drawer_id?: string | null
           is_locked?: boolean
+          last_updated_by?: string | null
           order_id?: string
           order_name?: string | null
           order_number?: number | null
@@ -310,6 +328,13 @@ export type Database = {
           total_in_cents?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "Order_last_updated_by_fkey"
+            columns: ["last_updated_by"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "Order_origin_id_fkey"
             columns: ["origin_id"]
@@ -333,6 +358,7 @@ export type Database = {
           default_is_prepaid: boolean
           has_order_number: boolean
           icon: string | null
+          is_deleted: boolean
           is_prepaid_toggleable: boolean
           is_third_party: boolean
           name: string
@@ -344,6 +370,7 @@ export type Database = {
           default_is_prepaid?: boolean
           has_order_number?: boolean
           icon?: string | null
+          is_deleted?: boolean
           is_prepaid_toggleable?: boolean
           is_third_party?: boolean
           name: string
@@ -355,6 +382,7 @@ export type Database = {
           default_is_prepaid?: boolean
           has_order_number?: boolean
           icon?: string | null
+          is_deleted?: boolean
           is_prepaid_toggleable?: boolean
           is_third_party?: boolean
           name?: string
@@ -365,8 +393,10 @@ export type Database = {
       Payment: {
         Row: {
           amount_in_cents: number
+          business_date: string
           created_at: string
           is_locked: boolean
+          last_updated_by: string | null
           order_id: string
           payment_id: string
           payment_type: Database["public"]["Enums"]["payment_type"]
@@ -375,8 +405,10 @@ export type Database = {
         }
         Insert: {
           amount_in_cents?: number
+          business_date: string
           created_at?: string
           is_locked?: boolean
+          last_updated_by?: string | null
           order_id: string
           payment_id?: string
           payment_type: Database["public"]["Enums"]["payment_type"]
@@ -385,8 +417,10 @@ export type Database = {
         }
         Update: {
           amount_in_cents?: number
+          business_date?: string
           created_at?: string
           is_locked?: boolean
+          last_updated_by?: string | null
           order_id?: string
           payment_id?: string
           payment_type?: Database["public"]["Enums"]["payment_type"]
@@ -394,6 +428,13 @@ export type Database = {
           tip_in_cents?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "Payment_last_updated_by_fkey"
+            columns: ["last_updated_by"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payments_order_id_fkey"
             columns: ["order_id"]
@@ -411,6 +452,7 @@ export type Database = {
           id: string
           is_admin: boolean
           is_cashier: boolean
+          is_deleted: boolean
           is_manager: boolean
           last_name: string | null
           phone: string | null
@@ -422,6 +464,7 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_cashier?: boolean
+          is_deleted?: boolean
           is_manager?: boolean
           last_name?: string | null
           phone?: string | null
@@ -433,6 +476,7 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_cashier?: boolean
+          is_deleted?: boolean
           is_manager?: boolean
           last_name?: string | null
           phone?: string | null
@@ -484,6 +528,13 @@ export type Database = {
           p_business_date: string
         }
         Returns: Json
+      }
+      update_employee: {
+        Args: {
+          p_id: string
+          p_is_deleted?: boolean
+        }
+        Returns: undefined
       }
     }
     Enums: {

@@ -2,6 +2,9 @@
     "files": [],
     "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
     "compilerOptions": {
-        "types": ["jest", "node", "testing-library__jest-dom"]
+        "types": ["jest", "node", "testing-library__jest-dom"],
+        "compilerOptions": {
+            "experimentalDecorators": true
+        }
     }
 }

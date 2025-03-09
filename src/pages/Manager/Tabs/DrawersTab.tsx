@@ -5,7 +5,7 @@ import { AddDriverCard } from '../AddDriverCard';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { DrawerSideBar, DrawerSideBarSkeleton } from '../SideBar/DrawerSideBar';
 import { ContextMenu } from '../../../components/Base/ContextMenu';
-import { MotionProps } from 'framer-motion';
+import { AnimatePresence, MotionProps } from 'framer-motion';
 import { MotionWrapper } from '../../../rickcedlib/components/MotionWrapper';
 import { Suspense, useRef } from 'react';
 import { CloseBusinessDayCard } from '../CloseBusinessDayCard';
@@ -59,29 +59,32 @@ export const DrawersTab = () => {
             width="100%"
             height="100%"
             flexWrap={'wrap'}>
-            {combinedDrawersAndDrivers.map((drawer) => {
-                return (
-                    <ContextMenu openOnType="right-click" key={drawer.drawer_id}>
-                        <ContextMenu.Base>
-                            <MotionWrapper motionProps={motionProps} motionKey={drawer.drawer_id}>
-                                <DrawerCard drawer={drawer} />
-                            </MotionWrapper>
-                        </ContextMenu.Base>
-                        <DrawerCard.contextMenu drawer={drawer} />
-                    </ContextMenu>
-                );
-            })}
-            {!businessDay.isLocked && (
-                <MotionWrapper motionProps={motionProps} motionKey="add-driver-card">
-                    <AddDriverCard {...addDriverCardDialogProps} />
+            <AnimatePresence>
+                {combinedDrawersAndDrivers.map((drawer) => {
+                    return (
+                        <MotionWrapper motionProps={motionProps} motionKey={drawer.drawer_id} key={drawer.drawer_id}>
+                            <ContextMenu openOnType="right-click" key={drawer.drawer_id}>
+                                <ContextMenu.Base>
+                                    <DrawerCard drawer={drawer} />
+                                </ContextMenu.Base>
+                                <DrawerCard.contextMenu drawer={drawer} />
+                            </ContextMenu>
+                        </MotionWrapper>
+                    );
+                })}
+                {!businessDay.isLocked && (
+                    <MotionWrapper motionProps={motionProps} motionKey="add-driver-card" key="add-driver-card">
+                        <AddDriverCard {...addDriverCardDialogProps} />
+                    </MotionWrapper>
+                )}
+                <MotionWrapper
+                    motionProps={closeDayMotionProps}
+                    motionKey="close-business-day"
+                    key="close-business-day"
+                    stackProps={{ width: lastCardWidth }}>
+                    <CloseBusinessDayCard />
                 </MotionWrapper>
-            )}
-            <MotionWrapper
-                motionProps={closeDayMotionProps}
-                motionKey="close-business-day"
-                stackProps={{ width: lastCardWidth }}>
-                <CloseBusinessDayCard />
-            </MotionWrapper>
+            </AnimatePresence>
 
             <Suspense fallback={<DrawerSideBarSkeleton />}>
                 <DrawerSideBar />

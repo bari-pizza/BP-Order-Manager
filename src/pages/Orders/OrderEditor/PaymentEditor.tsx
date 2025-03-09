@@ -1,6 +1,6 @@
 import { Control, Controller, FieldValues, Path, useForm } from 'react-hook-form';
 import { LabeledStack } from '../../../rickcedlib/components/LabeledStack';
-import { Payment, PaymentType, validators } from '../../../typesAndValidators';
+import { NewPayment, OrderType, Payment, PaymentType, validators } from '../../../typesAndValidators';
 import { Button, ButtonGroup, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useEffect } from 'react';
 import { usePaymentCRUD } from '../../../api/payment';
@@ -10,6 +10,10 @@ import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { PaymentTypeIcon } from '../PaymentTypeIcon';
 import { formatCurrency } from '../../../utils';
 import { useLayoutContext } from '../../../hooks/data/useContextData';
+import { useMutation } from '@tanstack/react-query';
+import { handleResponse } from '../../../supabaseQueries';
+import { supaClient } from '../../../supaClient';
+import { OrderTypeIcon } from '../../../components/Order/OrderTypeIcon';
 
 interface PaymentEditorProps {
     payment?: Payment;
@@ -21,6 +25,7 @@ interface PaymentEditorProps {
     isEditing: boolean;
     setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
     disabled?: boolean;
+    thirdPartyCanTip?: boolean;
 }
 
 const allPaymentTypes: { value: PaymentType; label: string }[] = [
@@ -31,8 +36,22 @@ const allPaymentTypes: { value: PaymentType; label: string }[] = [
 
 type FormValues = Payment;
 
-// TODO: make sure payment tip auto-updates
-// TODO: add a note to explain how bank, payment, and other works
+const createNewPayment = async (newPayment: NewPayment) => {
+    const { data, error } = await supaClient.from('Payment').insert([newPayment]).select('*');
+    console.log({ data });
+    return handleResponse<Payment>({ data, error, shouldThrow: true });
+};
+
+const updatePayment = async (payment: Payment) => {
+    const { data, error } = await supaClient
+        .from('Payment')
+        .update(payment)
+        .eq('payment_id', payment.payment_id)
+        .select('*');
+    console.log({ data });
+    return handleResponse<Payment>({ data, error, shouldThrow: true });
+};
+
 // TODO: explain that food is not included in this system and should be handled separately
 
 export const PaymentEditor = ({
@@ -45,6 +64,7 @@ export const PaymentEditor = ({
     isEditing = false,
     setIsEditing,
     disabled = false,
+    thirdPartyCanTip = true,
 }: PaymentEditorProps) => {
     const [businessDate] = useBusinessDate();
     const { isMobile } = useLayoutContext();
@@ -54,6 +74,7 @@ export const PaymentEditor = ({
         tip_in_cents: 0,
         special_note: '',
         order_id: orderID,
+        business_date: businessDate.format('YYYY-MM-DD'),
     };
     const {
         control,
@@ -75,11 +96,40 @@ export const PaymentEditor = ({
 
     const { paymentMutations } = usePaymentCRUD({ queryKey: ['orders', businessDate.format('YYYY-MM-DD')] });
 
+    const createNewPaymentMutation = useMutation({
+        mutationFn: createNewPayment,
+        onSuccess: (data) => {
+            console.log({ data });
+            // reset the form
+        },
+
+        onError: (error) => {
+            console.error('Issue creating new order', error);
+        },
+    });
+
+    const updatePaymentMutation = useMutation({
+        mutationFn: updatePayment,
+        onSuccess: (data) => {
+            console.log({ data });
+        },
+
+        onError: (error) => {
+            console.error('Issue updating order', error);
+        },
+    });
+
     const onSubmit = (data: FormValues) => {
+        if (paymentTypeName === 'third party' && !thirdPartyCanTip) {
+            // make sure tip is 0 if third party can't tip
+            data.tip_in_cents = 0;
+        }
         if (forNewPayment) {
-            paymentMutations.create(data);
+            // paymentMutations.create(data);
+            createNewPaymentMutation.mutate(data);
         } else {
-            paymentMutations.update(data);
+            updatePaymentMutation.mutate(data);
+            // paymentMutations.update(data);
         }
         setIsEditing(false);
     };
@@ -92,7 +142,7 @@ export const PaymentEditor = ({
     const { handleConfirmation: handleDeletionConfirmation } = useConfirmationToast({
         message: 'Are you sure you want to delete this payment?',
         confirmProps: {
-            handler: handleSubmit(onDelete),
+            handler: () => handleSubmit(onDelete)(),
             buttonText: 'Delete',
             color: 'error',
         },
@@ -129,11 +179,11 @@ export const PaymentEditor = ({
                     onClick={() => setIsEditing(true)}
                     sx={{ padding: 0, width: '100%' }}
                     disabled={disabled}
-                    className="payment-editor-edit-payment">
+                    className={`payment-editor-edit-payment payment-id-${payment.payment_id} lottie-icon-container`}>
                     <LabeledStack
                         style={{ cursor: 'pointer', width: '100%' }}
                         label={paymentTypeName + (invalidPaymentType ? ' (Invalid)' : '')}
-                        color={invalidPaymentType ? theme.palette.error.main : ''}
+                        color={invalidPaymentType ? theme.palette.error.main : theme.palette.primary.main}
                         direction="row"
                         spacing={2}
                         height={60}
@@ -141,9 +191,13 @@ export const PaymentEditor = ({
                         justifyContent="space-between">
                         <PaymentTypeIcon paymentType={payment.payment_type} />
                         <Divider orientation="vertical" />
-                        <Typography variant="body1">{formatCurrency(payment.amount_in_cents)}</Typography>
+                        <Typography variant="body1" className="payment-amount-in-cents">
+                            {formatCurrency(payment.amount_in_cents)}
+                        </Typography>
                         <Divider orientation="vertical" />
-                        <Typography variant="body1">{formatCurrency(payment.tip_in_cents)}</Typography>
+                        <Typography variant="body1" className="payment-tip-in-cents">
+                            {formatCurrency(payment.tip_in_cents)}
+                        </Typography>
                         {!isMobile && (
                             <>
                                 <Divider orientation="vertical" />
@@ -159,10 +213,13 @@ export const PaymentEditor = ({
     }
 
     return (
-        <Stack direction="column" rowGap={2} className="payment-editor-editing-payment">
+        <Stack
+            direction="column"
+            rowGap={2}
+            className={`payment-editor-editing-payment payment-id-${payment?.payment_id || 'new'}`}>
             <LabeledStack
                 label={paymentTypeName}
-                color={isDirty || forNewPayment ? theme.palette.primary.main : ''}
+                color={isDirty || forNewPayment ? theme.palette.primary.main : 'black'}
                 direction="column"
                 justifyContent="space-between"
                 mt={1}
@@ -208,6 +265,7 @@ export const PaymentEditor = ({
                                         setValue('tip_in_cents', value, { shouldDirty })
                                     }
                                     isDirty={dirtyFields.tip_in_cents || forNewPayment}
+                                    disabled={paymentTypeName === 'third party' && !thirdPartyCanTip}
                                 />
                             );
                         }}
@@ -253,6 +311,8 @@ export const PaymentTypeSelector = <T extends FieldValues>({
     name = 'payment_type' as Path<T>,
     variant = 'standard',
 }: PaymentTypeSelectorProps<T>) => {
+    const theme = useTheme();
+
     return (
         <Controller
             name={name}
@@ -262,8 +322,12 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                     <ButtonGroup
                         orientation="horizontal"
                         fullWidth
-                        color={isDirty ? 'secondary' : 'primary'}
-                        sx={{ width: '100%' }}
+                        color="primary"
+                        sx={{
+                            width: '100%',
+                            border: '2px solid',
+                            borderColor: isDirty ? `${theme.palette.primary.main}` : 'white',
+                        }}
                         aria-label="Payment Type"
                         {...field}>
                         {validPaymentTypes.map((option) => {
@@ -271,11 +335,20 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                             if (variant === 'standard') {
                                 return (
                                     <Button
+                                        className={`payment-type-${option.value} ${isSelected ? 'selected' : ''}`}
                                         key={option.value}
                                         variant={isSelected ? 'contained' : 'outlined'}
                                         onClick={() => {
                                             handleChange(option.value);
                                         }}
+                                        sx={
+                                            isDirty && isSelected
+                                                ? {
+                                                      fontStyle: 'italic',
+                                                      fontWeight: 'bold',
+                                                  }
+                                                : {}
+                                        }
                                         startIcon={<PaymentTypeIcon paymentType={option.value} />}>
                                         {option.label}
                                     </Button>
@@ -287,7 +360,15 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                                     variant={isSelected ? 'contained' : 'outlined'}
                                     onClick={() => {
                                         handleChange(option.value);
-                                    }}>
+                                    }}
+                                    sx={
+                                        isDirty && isSelected
+                                            ? {
+                                                  fontStyle: 'italic',
+                                                  fontWeight: 'bold',
+                                              }
+                                            : {}
+                                    }>
                                     {option.label}
                                 </Button>
                             );
@@ -296,5 +377,82 @@ export const PaymentTypeSelector = <T extends FieldValues>({
                 );
             }}
         />
+    );
+};
+
+export const ExamplePaymentSelector = ({
+    cash,
+    card,
+    thirdParty,
+    selected,
+}: {
+    cash: boolean;
+    card: boolean;
+    thirdParty: boolean;
+    selected: 'cash' | 'card' | 'third_party';
+}) => {
+    const validPaymentTypes: {
+        value: PaymentType;
+        label: string;
+    }[] = [];
+
+    if (cash) {
+        validPaymentTypes.push({ value: 'cash', label: 'Cash' });
+    }
+    if (card) {
+        validPaymentTypes.push({ value: 'card', label: 'Card' });
+    }
+    if (thirdParty) {
+        validPaymentTypes.push({ value: 'third_party', label: '3rd Party' });
+    }
+
+    return (
+        <ButtonGroup
+            orientation="horizontal"
+            fullWidth
+            color="primary"
+            sx={{ width: '100%', cursor: 'pointer' }}
+            aria-label="Payment Type">
+            {validPaymentTypes.map((option) => {
+                const isSelected = option.value === selected;
+                return (
+                    <Button
+                        className={`payment-type-${option.value} ${isSelected ? 'selected' : ''}`}
+                        key={option.value}
+                        variant={isSelected ? 'contained' : 'outlined'}
+                        startIcon={<PaymentTypeIcon paymentType={option.value} />}>
+                        {option.label}
+                    </Button>
+                );
+            })}
+        </ButtonGroup>
+    );
+};
+
+export const ExampleOrderTypeSelector = ({ delivery }: { delivery: boolean }) => {
+    const validOrderTypes: {
+        value: OrderType;
+        label: string;
+    }[] = [{ value: 'pickup', label: 'Pickup' }];
+
+    if (delivery) {
+        validOrderTypes.push({ value: 'delivery', label: 'Delivery' });
+    }
+
+    return (
+        <ButtonGroup orientation="horizontal" fullWidth color="primary" sx={{ width: '100%' }} aria-label="Order Type">
+            {validOrderTypes.map((option) => {
+                const isSelected = option.value === 'pickup';
+                return (
+                    <Button
+                        className={`payment-type-${option.value} ${isSelected ? 'selected' : ''}`}
+                        key={option.value}
+                        variant={isSelected ? 'contained' : 'outlined'}
+                        startIcon={<OrderTypeIcon orderType={option.value} />}>
+                        {option.label}
+                    </Button>
+                );
+            })}
+        </ButtonGroup>
     );
 };

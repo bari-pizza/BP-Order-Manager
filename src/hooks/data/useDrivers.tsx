@@ -1,5 +1,9 @@
-import { useSuspenseQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { addDriverToBusinessDay, getAllDaysDrivers, removeDriverFromBusinessDay } from '../../supabaseQueries';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import {
+    addDriverToBusinessDay,
+    // getAllDaysDrivers,
+    removeDriverFromBusinessDay,
+} from '../../supabaseQueries';
 import { useBusinessDate } from './useBusinessDate';
 import { useBariPizzaContext } from './useContextData';
 import { BusinessDayDriver, Driver_Drawer } from '../../typesAndValidators';
@@ -8,7 +12,7 @@ import { useRef, useState } from 'react';
 import { DataWithError, HandleOutcomeProps } from '../../toast/toast';
 import { addDriverToBusinessDayToast, removeDriverFromBusinessDayToast } from '../../toast/driversToast';
 import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
-import { useSubscribeToTable } from './useSubscribeToTable';
+// import { useSubscribeToTable } from './useSubscribeToTable';
 
 export const useDrivers = () => {
     const [businessDate] = useBusinessDate();
@@ -18,18 +22,26 @@ export const useDrivers = () => {
         [orderID: string]: ({ data, errors, forEachError }: HandleOutcomeProps) => void;
     }>({});
 
-    const { data: initialBusinessDayDrivers } = useSuspenseQuery({
-        queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')],
-        queryFn: () => getAllDaysDrivers(businessDate),
-        refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 30,
-    });
-    const businessDayDrivers = useSubscribeToTable<BusinessDayDriver>({
-        tableName: 'BusinessDayDriver',
-        initialData: initialBusinessDayDrivers,
-        primaryKeys: ['business_date', 'drawer_id'],
-        queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')],
-    });
+    // const { data: initialBusinessDayDrivers } = useSuspenseQuery({
+    //     queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')],
+    //     queryFn: () => getAllDaysDrivers(businessDate),
+    //     refetchOnWindowFocus: false,
+    //     staleTime: 1000 * 60 * 30,
+    // });
+    // const businessDayDrivers = useSubscribeToTable<BusinessDayDriver>({
+    // useSubscribeToTable<BusinessDayDriver>({
+    //     tableName: 'BusinessDayDriver',
+    //     // initialData: initialBusinessDayDrivers,
+    //     primaryKeys: ['business_date', 'drawer_id'],
+    //     queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')],
+    //     queryFn: () => getAllDaysDrivers(businessDate),
+    //     showToast: ['insert', 'delete', 'update'],
+    // });
+
+    const queryClient = useQueryClient();
+
+    const businessDayDrivers = (queryClient.getQueryData(['businessDayDrivers', businessDate.format('YYYY-MM-DD')]) ??
+        []) as BusinessDayDriver[];
 
     const todaysDrivers = businessDayDrivers
         .map(({ drawer_id }) => {
@@ -43,7 +55,7 @@ export const useDrivers = () => {
             return !todaysDrivers.some((todaysDriver) => todaysDriver.drawer_id === driver.drawer_id);
         }) || [];
 
-    const queryClient = useQueryClient();
+    // const queryClient = useQueryClient();
 
     const addDriverToDayMutation = useMutation({
         mutationFn: ({ drawerID, businessDate }: { drawerID: string; businessDate: dayjs.Dayjs }) =>

@@ -1,5 +1,6 @@
-import { Drawer, Driver_Drawer } from './typesAndValidators';
+import { Drawer, Driver_Drawer, Order_Payment } from './typesAndValidators';
 import dayjs from 'dayjs';
+import { cloneElement, isValidElement } from 'react';
 
 export const getDrawerFullName = (drawer: Drawer | Driver_Drawer | null) => {
     if (!drawer) {
@@ -14,6 +15,27 @@ export const getDrawerFullName = (drawer: Drawer | Driver_Drawer | null) => {
 export const formatCurrency = (cents: number, includePositiveSign = false) => {
     const sign = cents < 0 ? '-' : includePositiveSign ? '+' : '';
     return `${sign}$${(Math.abs(cents) / 100).toFixed(2)}`;
+};
+
+export const sortOrders = (a: Order_Payment, b: Order_Payment) => {
+    // sort by order number first
+    // then sort by order name
+    if (a?.order_number) {
+        if (b?.order_number) {
+            return a.order_number - b.order_number;
+        } else {
+            return -1;
+        }
+    }
+
+    if (b?.order_number) {
+        return 1;
+    }
+
+    if (a?.order_name && b?.order_name) {
+        return a.order_name.localeCompare(b.order_name);
+    }
+    return 0;
 };
 
 export const dayjsToMDY = (date: dayjs.Dayjs) => {
@@ -35,4 +57,33 @@ export const getRunningTotal = (values: number[]) => {
 export const nonZeroModulo = (a: number, b: number) => {
     const c = a % b;
     return c === 0 ? b : c;
+};
+
+export const getEnv = (variableName: string): string => {
+    if (variableName === 'MODE') {
+        return import.meta.env.MODE || (process.env.NODE_ENV as string);
+    }
+    if (import.meta.env.MODE === 'development') {
+        return import.meta.env[variableName] || process.env[variableName];
+    } else {
+        // In production, only check import.meta.env
+        return import.meta.env[variableName];
+    }
+};
+
+export const devOnly = (child: React.ReactElement) => {
+    if (getEnv('MODE') === 'development') {
+        if (isValidElement(child)) {
+            return cloneElement(child, {
+                // @ts-expect-error ignore
+                style: {
+                    // @ts-expect-error ignore
+                    ...child.props.style,
+                    border: '2px solid red',
+                },
+            });
+        }
+        return child; // Return the child as is if not a valid element
+    }
+    return null;
 };
