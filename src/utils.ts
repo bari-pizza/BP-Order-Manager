@@ -63,12 +63,7 @@ export const getEnv = (variableName: string): string => {
     if (variableName === 'MODE') {
         return import.meta.env.MODE || (process.env.NODE_ENV as string);
     }
-    if (import.meta.env.MODE === 'development') {
-        return import.meta.env[variableName] || process.env[variableName];
-    } else {
-        // In production, only check import.meta.env
-        return import.meta.env[variableName];
-    }
+    return import.meta.env[variableName] || process.env[variableName];
 };
 
 export const devOnly = (child: React.ReactElement) => {
