@@ -6,6 +6,7 @@ type OneOfByKey<Obj> = { [key in keyof Obj]: OneOnly<Obj, key> };
 export type OneOfType<Obj> = ValueOf<OneOfByKey<Obj>>;
 
 export type Profile = Tables<'Profile'>;
+export type Employee = Profile & { is_driver: boolean };
 export type Drawer = Tables<'Drawer'>;
 export type DrawerType = Tables<'Drawer'>['drawer_type'];
 export type Driver_Drawer = Drawer & { driver: Profile };

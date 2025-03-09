@@ -7,18 +7,21 @@ const drawers: Drawer[] = [
         created_at: '2024-08-13T01:45:22.015413+00:00',
         name: 'Drawer 1',
         drawer_type: 'register',
+        is_deleted: false,
     },
     {
         drawer_id: '4590a732-d422-4413-aa33-9539f7f45f54',
         created_at: '2024-08-13T01:45:33.864466+00:00',
         name: 'Drawer 2',
         drawer_type: 'register',
+        is_deleted: false,
     },
     {
         drawer_id: 'da9cc0c9-5e1e-4c25-adcf-190286ebf560',
         created_at: '2024-08-13T01:45:49.369411+00:00',
         name: 'Third Party Pickup',
         drawer_type: 'third_party',
+        is_deleted: false,
     },
 ];
 
@@ -29,6 +32,7 @@ const createDummyDriver: () => Driver_Drawer = () => {
         drawer_id: faker.string.uuid(),
         created_at: faker.date.recent().toISOString(),
         drawer_type: 'driver',
+        is_deleted: false,
         driver: {
             id: faker.string.uuid(),
             email: faker.internet.email(),
@@ -36,6 +40,7 @@ const createDummyDriver: () => Driver_Drawer = () => {
             last_name: fullName.split(' ')[1],
             first_name: fullName.split(' ')[0],
             is_admin: false,
+            is_deleted: false,
             is_manager: false,
             is_cashier: false,
             avatar_src: 'https://i.pravatar.cc/300',

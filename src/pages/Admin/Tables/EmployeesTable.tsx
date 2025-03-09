@@ -8,7 +8,7 @@ import {
     GridRowModes,
     GridRowModesModel,
 } from '@mui/x-data-grid';
-import { Profile } from '../../../typesAndValidators';
+import { Employee } from '../../../typesAndValidators';
 import { updateEmployee } from '../../../supabaseQueries';
 import { useMutation } from '@tanstack/react-query';
 import { CellEditCheckbox, CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
@@ -20,8 +20,6 @@ import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { useRef, useState } from 'react';
 import { supaClient } from '../../../supaClient';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
-
-type Employee = Profile & { is_driver: boolean };
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<Employee>({ data: employees });
