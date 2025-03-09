@@ -30,6 +30,7 @@ import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
 import { useBusinessDate, useMidnightEffect } from './hooks/data/useBusinessDate.tsx';
+import { getEnv } from './utils.ts';
 
 const router = createBrowserRouter([
     {
@@ -164,6 +165,9 @@ function Layout() {
     const [businessDate] = useBusinessDate();
 
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
+
+    console.log(getEnv('VITE_REACT_APP_VERSION'));
+    console.log(process.env.npm_package_version);
 
     return (
         // <APIProvider
