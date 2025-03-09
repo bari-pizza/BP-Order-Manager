@@ -116,13 +116,13 @@ const RenderDeleteButton = ({
     const value = (payments.length > 0 ? 1 : 0) + (drawerID ? 2 : 0);
 
     const handleDeleteClick = () => {
-        if (value === 0) handleConfirmDeleteOrder();
+        if (value === 0) handleConfirmDeleteOrder(orderID);
         if (value === 1) toast.error('Remove all payments before deleting');
         if (value === 2) toast.error('Unassign order before deleting');
         if (value === 3) toast.error('Unassign order and remove all payments before deleting');
     };
 
-    const { handleConfirmation: handleConfirmDeleteOrder } = useConfirmationToast({
+    const { handleConfirmation: handleConfirmDeleteOrder } = useConfirmationToast<string>({
         message: 'Are you sure you want to delete this order?',
         confirmProps: {
             handler: () => deleteOrder(orderID),

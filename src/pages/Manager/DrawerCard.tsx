@@ -87,13 +87,13 @@ const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {
             toast.error('Cannot remove driver unless all orders are removed first');
             return;
         }
-        handleConfirmRemoveDriver();
+        handleConfirmRemoveDriver(drawer);
     };
 
-    const { handleConfirmation: handleConfirmRemoveDriver } = useConfirmationToast({
-        message: 'Are you sure you want to remove this driver from today?',
+    const { handleConfirmation: handleConfirmRemoveDriver } = useConfirmationToast<Driver_Drawer>({
+        // message: 'Are you sure you want to remove this driver from today?',
+        message: (driver) => `Are you sure you want to remove ${driver.name} from today?`,
         confirmProps: {
-            // handler: handleRemoveDriverClick,
             handler: () => drivers.remove(drawer as Driver_Drawer),
             buttonText: 'Delete',
             color: 'error',
