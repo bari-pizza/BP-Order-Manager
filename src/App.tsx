@@ -183,15 +183,7 @@ function Layout() {
                     <LayoutContext.Provider
                         value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth, isMobile }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
-                            <ToastContainer
-                                style={{
-                                    width: 'maxContent',
-                                    justifyContent: 'right',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'flex-end',
-                                }}
-                            />
+                            <ToastContainer />
                             <Stack id="main" direction="row" justifyContent="center">
                                 <NavBar />
                                 <Stack id="content" direction="column" overflow="auto" width={'100%'}>

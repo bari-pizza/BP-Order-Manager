@@ -12,6 +12,7 @@ import { Todo } from '../../components/Base/Todo';
 import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
 import { SettingsLottieIcon } from '../../rickcedlib/LottieIcons';
+import { devOnly } from '../../utils';
 
 /*    TODO: About Today
         Sales
@@ -124,7 +125,7 @@ export const AdminDashboard = () => {
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
                         <Tab value="employees" label="Employees" icon={<SalesIcon />} iconPosition="start" />
                         <Tab value="origins" label="Origins" icon={<DriversIcon />} iconPosition="start" />
-                        <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
+                        {devOnly(<Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />)}
                         <Tab
                             value="settings"
                             label="Settings"
@@ -140,9 +141,11 @@ export const AdminDashboard = () => {
                     <TabPanel tabName="origins" value={tabName}>
                         <OriginsTab />
                     </TabPanel>
-                    <TabPanel tabName="orders" value={tabName}>
-                        <Todo>Create orders tab</Todo>
-                    </TabPanel>
+                    {devOnly(
+                        <TabPanel tabName="orders" value={tabName}>
+                            <Todo>Create orders tab</Todo>
+                        </TabPanel>,
+                    )}
                     <TabPanel tabName="settings" value={tabName}>
                         <SettingsTab />
                     </TabPanel>

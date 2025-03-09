@@ -1,5 +1,6 @@
 import { Drawer, Driver_Drawer, Order_Payment } from './typesAndValidators';
 import dayjs from 'dayjs';
+import { cloneElement, isValidElement } from 'react';
 
 export const getDrawerFullName = (drawer: Drawer | Driver_Drawer | null) => {
     if (!drawer) {
@@ -68,4 +69,21 @@ export const getEnv = (variableName: string): string => {
         // In production, only check import.meta.env
         return import.meta.env[variableName];
     }
+};
+
+export const devOnly = (child: React.ReactElement) => {
+    if (getEnv('MODE') === 'development') {
+        if (isValidElement(child)) {
+            return cloneElement(child, {
+                // @ts-expect-error ignore
+                style: {
+                    // @ts-expect-error ignore
+                    ...child.props.style,
+                    border: '2px solid red',
+                },
+            });
+        }
+        return child; // Return the child as is if not a valid element
+    }
+    return null;
 };

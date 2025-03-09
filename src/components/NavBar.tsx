@@ -1,4 +1,14 @@
-import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon, Badge } from '@mui/material';
+import {
+    Toolbar,
+    Drawer,
+    List,
+    ListItemButton,
+    ListItemText,
+    ListItem,
+    ListItemIcon,
+    Badge,
+    Stack,
+} from '@mui/material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
 import { UserAvatar } from './Base/UserAvatar';
@@ -47,7 +57,7 @@ export function NavBar() {
     ) as Order_Payment[];
     const orderCount = (isMobile ? orders.filter((o) => o.drawer_id === profile?.id) : orders).length;
 
-    const todaysDate = dayjs().format('YYYY-MM-DD');
+    const todaysDate = dayjs().format('ddd MMM D, YYYY');
 
     const drawerWidth = isMobile ? 65 : 200;
 
@@ -140,13 +150,20 @@ export function NavBar() {
                     </ListItem>
                 ))}
                 {/* TODO: replace with Lottice Icon */}
-                <ListItem className="lottie-icon-container" key={isMobile ? 'phone' : 'computer'} component="div">
-                    <ListItemIcon>{isMobile ? <PhoneIcon /> : <ComputerIcon />}</ListItemIcon>
-                    {!isMobile && <ListItemText primary={isMobile ? 'Mobile' : 'Desktop'} />}
-                </ListItem>
                 <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
-                    <ListItemText>{version}</ListItemText>
-                    <ListItemText>{todaysDate}</ListItemText>
+                    <Stack direction="column" width="100%">
+                        {/* <ListItem
+                            className="lottie-icon-container"
+                            key={isMobile ? 'phone' : 'computer'}
+                            component="div"></ListItem> */}
+                        <ListItemText>{todaysDate}</ListItemText>
+                        <ListItem>
+                            <ListItemIcon sx={{ justifyContent: 'center' }}>
+                                {isMobile ? <PhoneIcon /> : <ComputerIcon />}
+                            </ListItemIcon>
+                            <ListItemText>{version}</ListItemText>
+                        </ListItem>
+                    </Stack>
                 </ListItem>
             </List>
 

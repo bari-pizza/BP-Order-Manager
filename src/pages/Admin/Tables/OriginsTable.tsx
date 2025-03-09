@@ -69,6 +69,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     const { handleConfirmation: confirmEdit } = useConfirmationToast<OriginRow>({
         message: 'Origin Preview',
         messageProps: { variant: 'h3' },
+        position: 'center',
         renderBody: (origin) => {
             return <ExampleOrigin origin={origin} />;
         },
