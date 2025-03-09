@@ -63,6 +63,9 @@ export const getEnv = (variableName: string): string => {
     if (variableName === 'MODE') {
         return import.meta.env.MODE || (process.env.NODE_ENV as string);
     }
+    if (variableName === 'VITE_REACT_APP_VERSION') {
+        return import.meta.env.VITE_REACT_APP_VERSION || process.env.npm_package_version;
+    }
     return import.meta.env[variableName] || process.env[variableName];
 };
 
