@@ -165,8 +165,6 @@ export const OrderEditor = ({
         },
     });
 
-    // TODO: showing default driver but not adding them as drawer
-
     const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...todaysDrivers];
 
     const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'))!;
@@ -213,7 +211,7 @@ export const OrderEditor = ({
         if (invalidDrawer) {
             setValue('drawer_id', validDrawers.length === 1 ? validDrawers[0].drawer_id : '');
         }
-    }, [invalidDrawer, validDrawers, setValue]);
+    }, [invalidDrawer, validDrawers, setValue, currentDrawer]);
 
     useEffect(() => {
         // initial payment type only exists on new orders
@@ -297,14 +295,12 @@ export const OrderEditor = ({
                 name="drawer_id"
                 control={control}
                 render={({ field }) => {
-                    const currentDrawerID =
-                        validDrawers.length === 1
-                            ? validDrawers[0].drawer_id
-                            : validDrawers.some((drawer) => drawer.drawer_id === field.value)
-                              ? field.value
-                              : '';
-
-                    // console.log({ validDrawers, driverDrawerID, currentDrawerID, field });
+                    // const currentDrawerID =
+                    //     validDrawers.length === 1
+                    //         ? validDrawers[0].drawer_id
+                    //         : validDrawers.some((drawer) => drawer.drawer_id === field.value)
+                    //           ? field.value
+                    //           : '';
 
                     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
                         if (['Delete', 'Backspace', 'Escape'].includes(event.key)) {
@@ -319,7 +315,7 @@ export const OrderEditor = ({
                             label="Drawer"
                             select
                             isDirty={dirtyFields.drawer_id}
-                            value={currentDrawerID}
+                            value={field.value}
                             onKeyDown={handleKeyDown}
                             disabled={isLocked || driverIsEditing}>
                             {validDrawers.map((drawer) => {

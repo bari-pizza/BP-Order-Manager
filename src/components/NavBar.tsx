@@ -1,14 +1,4 @@
-import {
-    Toolbar,
-    Drawer,
-    List,
-    ListItemButton,
-    ListItemText,
-    ListItem,
-    ListItemIcon,
-    Badge,
-    Stack,
-} from '@mui/material';
+import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon, Badge } from '@mui/material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
 import { UserAvatar } from './Base/UserAvatar';
@@ -151,19 +141,15 @@ export function NavBar() {
                 ))}
                 {/* TODO: replace with Lottice Icon */}
                 <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
-                    <Stack direction="column" width="100%">
-                        {/* <ListItem
-                            className="lottie-icon-container"
-                            key={isMobile ? 'phone' : 'computer'}
-                            component="div"></ListItem> */}
-                        <ListItemText>{todaysDate}</ListItemText>
+                    <List>
                         <ListItem>
                             <ListItemIcon sx={{ justifyContent: 'center' }}>
                                 {isMobile ? <PhoneIcon /> : <ComputerIcon />}
                             </ListItemIcon>
                             <ListItemText>{version}</ListItemText>
                         </ListItem>
-                    </Stack>
+                        <ListItemText>{todaysDate}</ListItemText>
+                    </List>
                 </ListItem>
             </List>
 

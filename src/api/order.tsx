@@ -113,9 +113,19 @@ const updateOrder: SupabaseInteractor<Order_Payment, Order> = async (order) => {
     return handlePayload<Order>(payload);
 };
 
-const deleteOrder: SupabaseInteractor<string, Order> = async (orderID) => {
-    const payload = await supaClient.from('Order').delete().eq('order_id', orderID).select();
-    return handlePayload<Order>(payload);
+// const deleteOrder: SupabaseInteractor<string, Order> = async (orderID) => {
+// const payload = await supaClient.from('Order').delete().eq('order_id', orderID).select();
+// return handlePayload<Order>(payload);
+const deleteOrder: SupabaseRPCInteractor<{ orderID: string }> = async ({ orderID }) => {
+    // call supaClient.rpc('delete_order', { p_order_id: [orderID] });
+    // if payments exist, return error
+    // if drawerID exists, remove from drawer, return error if drawer is locked
+    // delete order
+    const { data } = await supaClient.rpc('delete_order', {
+        p_order_id: orderID,
+    });
+
+    return data as unknown as RPCPayload;
 };
 
 const addOrdersToDrawer: SupabaseRPCInteractor<{ orderIDs: string[]; drawerID: string }> = async ({
@@ -146,7 +156,7 @@ const useCreateNewOrder = ({ queryKey }: { queryKey: string[] }) => {
         getMessages: {
             pending: () => 'Creating new order...',
             success: () => `Successfully created new order.`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to create new order.`,
         },
     });
@@ -159,21 +169,37 @@ const useUpdateOrder = ({ queryKey }: { queryKey: string[] }) => {
         getMessages: {
             pending: () => 'Updating order...',
             success: () => `Successfully updated order`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to update order`,
         },
     });
 };
 
+// const useDeleteOrder = ({ queryKey }: { queryKey: string[] }) => {
+//     return useInteractionHandler<string, Order>({
+//         interactor: deleteOrder,
+//         queryKey,
+//         getMessages: {
+//             pending: () => 'Deleting order...',
+//             success: () => `Successfully deleted order`,
+//             mainError: (error) => error.message,
+//             errors: () => `Failed to delete order`,
+//         },
+//     });
+// };
+
 const useDeleteOrder = ({ queryKey }: { queryKey: string[] }) => {
-    return useInteractionHandler<string, Order>({
+    return useRPCInteractionHandler<{ orderID: string }>({
         interactor: deleteOrder,
         queryKey,
         getMessages: {
             pending: () => 'Deleting order...',
             success: () => `Successfully deleted order`,
-            mainError: (error) => error.message,
-            errors: () => `Failed to delete order`,
+            mainError: () => `Failed to delete order`,
+            errors: (error) => error!.message,
+        },
+        forEachError: (error) => {
+            console.error({ error }, 'forEachError');
         },
     });
 };
@@ -198,9 +224,10 @@ const useAddOrdersToDrawer = ({
             pending: () => 'Adding orders to drawer...',
             success: () => `Successfully added order(s) to drawer`,
             mainError: () => `Failed to add order(s) to drawer`,
-            errors: (error) => error.message,
+            errors: (error) => error!.message,
         },
         forEachError: (error) => {
+            // toast.error(error);
             console.error({ error }, 'forEachError');
         },
         handleSuccess(response) {
@@ -238,7 +265,7 @@ const useRemoveOrdersFromDrawer = ({
             pending: () => 'Removing orders from drawer...',
             success: () => `Successfully removed order(s) from drawer`,
             mainError: () => `Failed to remove order(s) from drawer`,
-            errors: (error) => error.message,
+            errors: (error) => error!.message,
         },
         forEachError: (order) => {
             console.error({ order });
@@ -279,13 +306,16 @@ export const useOrderAPI = ({ businessDate }: { businessDate: dayjs.Dayjs }) => 
         handleSuccessRef,
         handleFailureRef,
     });
+    const deleteOrderMutation = useDeleteOrder({
+        queryKey,
+    });
     return {
         orderAPI: {
             subscribe: () => subscribeToOrders({ businessDate }),
             // getAll: useGetAllDaysOrders({ businessDate }),
             create: useCreateNewOrder({ queryKey }).mutate,
             update: useUpdateOrder({ queryKey }).mutate,
-            delete: useDeleteOrder({ queryKey }).mutate,
+            // delete: useDeleteOrder({ queryKey }).mutate,
             addOrdersToDrawer: ({
                 orderIDs,
                 drawerID,
@@ -324,6 +354,23 @@ export const useOrderAPI = ({ businessDate }: { businessDate: dayjs.Dayjs }) => 
                     handleFailureRef.current['removeOrdersFromDrawer'] = handleFailure;
                 }
                 removeOrdersFromDrawerMutation.mutate({ orderIDs, drawerID });
+            },
+            deleteOrder: ({
+                orderID,
+                handleSuccess,
+                handleFailure,
+            }: {
+                orderID: string;
+                handleSuccess?: (response: RPCPayload['data']) => void;
+                handleFailure?: (error: PostgrestError | Error) => void;
+            }) => {
+                if (handleSuccess) {
+                    handleSuccessRef.current['removeOrdersFromDrawer'] = handleSuccess;
+                }
+                if (handleFailure) {
+                    handleFailureRef.current['removeOrdersFromDrawer'] = handleFailure;
+                }
+                deleteOrderMutation.mutate({ orderID });
             },
         },
     };

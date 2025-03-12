@@ -1,4 +1,5 @@
 import { IconButton, Stack, Typography } from '@mui/material';
+import { Edit as EditIcon } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { OrderWithFullDetails, Payment } from '../../../typesAndValidators';
 import { OrderTypeIcon } from '../../../components/Order/OrderTypeIcon';
@@ -9,6 +10,10 @@ import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { toast } from 'react-toastify';
+import { useDialogProps } from '../../../hooks/ui/useDialogProps';
+import { OrderEditor } from '../../Orders/OrderEditor/OrderEditor';
+import { useOrdersDrawersTickets } from '../../../hooks/data/useOrdersDrawersTickets';
+// import { toast } from 'react-toastify';
 
 export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
     const rows = orders;
@@ -71,15 +76,23 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
             },
         },
         {
+            field: 'edit',
+            headerName: 'Edit',
+            flex: 1,
+            renderCell: ({ row }) => {
+                return <RenderEditButton order={row} />;
+            },
+        },
+        {
             field: 'delete',
             headerName: 'Delete',
             flex: 1,
-            valueGetter: (_value, { payments, drawer_id }) => {
-                const value = (payments.length > 0 ? 1 : 0) + (drawer_id ? 2 : 0);
+            valueGetter: (_, { payments }) => {
+                const value = payments.length > 0 ? 1 : 0;
                 return value;
             },
-            renderCell: ({ row: { order_id, payments, drawer_id } }) => (
-                <RenderDeleteButton payments={payments} drawerID={drawer_id} orderID={order_id} />
+            renderCell: ({ row: { order_id, payments } }) => (
+                <RenderDeleteButton payments={payments} orderID={order_id} />
             ),
         },
     ];
@@ -101,37 +114,53 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
     );
 };
 
-const RenderDeleteButton = ({
-    payments,
-    drawerID,
-    orderID,
-}: {
-    payments: Payment[];
-    drawerID: string | null;
-    orderID: string;
-}) => {
+const RenderEditButton = ({ order }: { order: OrderWithFullDetails }) => {
+    const { isOpen, close, open } = useDialogProps();
+    const {
+        orders: { isRepeat },
+    } = useOrdersDrawersTickets();
+    return (
+        <>
+            <IconButton>
+                <EditIcon onClick={() => open()} />
+            </IconButton>
+            <OrderEditor order={order} asDialog close={close} isOpen={isOpen} isRepeat={isRepeat} />
+        </>
+    );
+};
+
+const RenderDeleteButton = ({ payments, orderID }: { payments: Payment[]; orderID: string }) => {
     const {
         orders: { delete: deleteOrder },
     } = useManagerDashboardContext();
-    const value = (payments.length > 0 ? 1 : 0) + (drawerID ? 2 : 0);
+    const value = payments.length > 0 ? 1 : 0;
 
     const handleDeleteClick = () => {
         if (value === 0) handleConfirmDeleteOrder(orderID);
-        if (value === 1) toast.error('Remove all payments before deleting');
-        if (value === 2) toast.error('Unassign order before deleting');
-        if (value === 3) toast.error('Unassign order and remove all payments before deleting');
+        if (value === 1) toast.error('Delete all payments before deleting');
+        // if (value === 2) toast.error('Unassign order before deleting');
+        // if (value === 3) toast.error('Unassign order and remove all payments before deleting');
     };
 
     const { handleConfirmation: handleConfirmDeleteOrder } = useConfirmationToast<string>({
         message: 'Are you sure you want to delete this order?',
-        confirmProps: {
-            handler: () => deleteOrder(orderID),
-            buttonText: 'Delete',
-            color: 'error',
-        },
+        // confirmProps: {
+        //     handler: () => deleteOrder(orderID),
+        //     buttonText: 'Delete',
+        //     color: 'error',
+        // },
         cancelProps: {
             buttonText: 'Cancel',
             color: 'info',
+        },
+        confirmProps: {
+            color: 'error',
+            variant: 'outlined',
+            handler: (orderID) => {
+                console.log(`trying to delete ${orderID}`);
+                deleteOrder(orderID);
+            },
+            buttonText: 'Delete',
         },
     });
     return (
