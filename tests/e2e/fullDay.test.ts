@@ -8,6 +8,7 @@ let combinedPages: CombinedPages;
 
 test.beforeAll(async () => {
     Logger.startLog();
+    Logger.setLogLevel('debug');
     combinedPages = await CombinedPages.create();
     await combinedPages.loginWithCredentials('jrajulialmeida@gmail.com', 'Password1234!');
 });

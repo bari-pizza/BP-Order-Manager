@@ -29,7 +29,7 @@ const useCreateNewPayment = ({ queryKey }: { queryKey: string[] }) => {
         getMessages: {
             pending: () => 'Creating new payment...',
             success: () => `Successfully created new payment.`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to create new payment.`,
         },
         handleSuccess: (data) => {
@@ -45,7 +45,7 @@ const useUpdatePayment = ({ queryKey }: { queryKey: string[] }) => {
         getMessages: {
             pending: () => 'Updating payment...',
             success: () => `Successfully updated payment`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to update payment`,
         },
     });
@@ -58,7 +58,7 @@ const useDeletePayment = ({ queryKey }: { queryKey: string[] }) => {
         getMessages: {
             pending: () => 'Deleting payment...',
             success: () => `Successfully deleted payment`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to delete payment`,
         },
     });

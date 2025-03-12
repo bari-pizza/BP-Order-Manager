@@ -20,6 +20,7 @@ import { Phone as PhoneIcon, Computer as ComputerIcon } from '@mui/icons-materia
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { getEnv } from '../utils';
+import { useClearCache } from '../rickcedlib/hooks/useClearCache';
 
 interface NavBarItem {
     path?: string;
@@ -33,6 +34,7 @@ interface NavBarItem {
 const today = dayjs();
 
 export function NavBar() {
+    const clearCacheAndReload = useClearCache();
     const { session, profile } = useUserContext();
     const { isMobile } = useLayoutContext();
     const [businessDate] = useBusinessDate();
@@ -142,12 +144,14 @@ export function NavBar() {
                 {/* TODO: replace with Lottice Icon */}
                 <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
                     <List>
-                        <ListItem>
-                            <ListItemIcon sx={{ justifyContent: 'center' }}>
-                                {isMobile ? <PhoneIcon /> : <ComputerIcon />}
-                            </ListItemIcon>
-                            <ListItemText>{version}</ListItemText>
-                        </ListItem>
+                        <ListItemButton onClick={clearCacheAndReload}>
+                            <ListItem>
+                                <ListItemIcon sx={{ justifyContent: 'center' }}>
+                                    {isMobile ? <PhoneIcon /> : <ComputerIcon />}
+                                </ListItemIcon>
+                                <ListItemText>{version}</ListItemText>
+                            </ListItem>
+                        </ListItemButton>
                         <ListItemText>{todaysDate}</ListItemText>
                     </List>
                 </ListItem>

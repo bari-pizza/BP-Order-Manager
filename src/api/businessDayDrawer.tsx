@@ -78,7 +78,7 @@ const useUpsertBusinessDayDrawer = ({ queryKey }: { queryKey: string[] }) => {
             // return '' or null if no message necessary
             pending: () => 'Saving data...',
             success: () => `Save successful`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to save data`,
         },
         handleSuccess: (data) => {
@@ -112,7 +112,7 @@ const useCloseBusinessDayDrawer = ({
             pending: () => 'Closing drawer...',
             success: () => `Successfully closed drawer`,
             mainError: () => `Failed to close drawer`,
-            errors: (error) => error.message,
+            errors: (error) => error!.message,
         },
         forEachError: (error) => {
             console.error({ error }, 'forEachError');
@@ -152,7 +152,7 @@ const useReopenBusinessDayDrawer = ({
             pending: () => 'Reopening drawer...',
             success: () => `Successfully reopened drawer`,
             mainError: () => `Failed to reopen drawer`,
-            errors: (error) => error.message,
+            errors: (error) => error!.message,
         },
         forEachError: (error) => {
             console.error({ error }, 'forEachError');

@@ -47,7 +47,7 @@ const useUpsertBusinessDaySummary = ({ queryKey }: { queryKey: string[] }) => {
             pending: () => 'Updating business day...',
             success: (data) =>
                 `Successfully ${data.is_locked ? 'closed' : 'reopened'} business day: ${data.business_date}`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to update db`,
         },
         handleSuccess: (data) => {

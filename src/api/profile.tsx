@@ -27,7 +27,7 @@ const useCreateNewProfile = ({ queryKey }: { queryKey: string[] }) => {
             // return '' or null if no message necessary
             pending: () => 'Saving new profile...',
             success: (data) => `Successfully saved new profile: ${data.first_name} ${data.last_name}`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to create new profile`,
         },
         handleSuccess: (data) => {
@@ -49,7 +49,7 @@ const useUpdateNewProfile = ({ queryKey }: { queryKey: string[] }) => {
             // return '' or null if no message necessary
             pending: () => 'Saving changes to profile...',
             success: (data) => `Successfully saved changes to ${data.first_name} ${data.last_name}`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to save changes to profile`,
         },
         handleSuccess: (data) => {

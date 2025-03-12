@@ -631,8 +631,10 @@ export const useSetupAllSubscriptions = ({
             .on('postgres_changes', { event: '*', schema: 'public', table: 'GlobalChangeTracker' }, (payload) => {
                 const { table_name } = payload.new as GlobalChangeTracker;
 
-                // Invalidate queries for the specific table
-                if (table_name in queryKeys) {
+                if (table_name === 'All Tables') {
+                    queryClient.invalidateQueries();
+                } else if (table_name in queryKeys) {
+                    // Invalidate queries for the specific table
                     queryClient.invalidateQueries({ queryKey: [queryKeys[table_name as keyof typeof queryKeys]] });
                 }
             })

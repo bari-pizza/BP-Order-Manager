@@ -7,6 +7,12 @@ import { exec } from 'child_process';
 export class Logger {
     private static filePath: string;
     constructor() {}
+    private static logLevels = { debug: 0, info: 1, warn: 2, error: 3 };
+    private static logLevel = 1;
+
+    public static setLogLevel(level: string) {
+        this.logLevel = this.logLevels[level];
+    }
 
     public static startLog() {
         const timestamp = dayjs().format('YYYY-MM-DD-HH-mm-ss');
@@ -15,21 +21,33 @@ export class Logger {
         fs.writeFileSync(Logger.filePath, styleTag);
     }
 
-    public static log(message: string) {
-        const timestamp = dayjs().format('HH-mm-ss');
-        fs.appendFileSync(Logger.filePath, `[LOG] [${timestamp}] ${message}\n`);
-    }
-
-    // logInfo(message: string, details?: object) {
-    //     const timestamp = new Date().toISOString();
-    //     fs.appendFileSync(this.filePath, `[INFO] [${timestamp}] ${message}\n`);
-    //     if (details) {
-    //         const prettifiedDetails = JSON.stringify(details, null, 2); // Prettify the JSON
-    //         fs.appendFileSync(this.filePath, prettifiedDetails + '\n');
-    //     }
+    // public static log(message: string) {
+    //     const timestamp = dayjs().format('HH-mm-ss');
+    //     fs.appendFileSync(Logger.filePath, `[LOG] [${timestamp}] ${message}\n`);
     // }
 
+    public static logDebug(message: string, details?: object) {
+        const timestamp = dayjs().format('HH-mm-ss');
+        const logMessage = `
+            <div style="margin-bottom: 1em; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                <div><strong>[DEBUG] [${timestamp}]</strong> ${message}</div>
+                ${
+                    details
+                        ? `
+                    <details style="margin-top: 10px; font-family: monospace;">
+                        <summary>Details</summary>
+                        <pre>${JSON.stringify(details, null, 2)}</pre>
+                    </details>
+                `
+                        : ''
+                }
+            </div>
+        `;
+        fs.appendFileSync(Logger.filePath, logMessage);
+    }
+
     public static logInfo(message: string, details?: object) {
+        if (Logger.logLevel > 1) return;
         const timestamp = dayjs().format('HH-mm-ss');
         const logMessage = `
             <div style="margin-bottom: 1em; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
@@ -49,7 +67,29 @@ export class Logger {
         fs.appendFileSync(Logger.filePath, logMessage);
     }
 
+    public static logWarning(message: string, stack: object) {
+        if (Logger.logLevel > 2) return;
+        const timestamp = dayjs().format('HH-mm-ss');
+        const logMessage = `
+            <div style="margin-bottom: 1em; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                <div class="error"><strong>[WARNING] [${timestamp}]</strong> ${message}</div>
+                ${
+                    stack
+                        ? `
+                    <details style="margin-top: 10px; font-family: monospace;">
+                        <summary>Stack</summary>
+                        <pre>${JSON.stringify(stack, null, 2)}</pre>
+                    </details>
+                `
+                        : ''
+                }
+            </div>
+        `;
+        fs.appendFileSync(Logger.filePath, logMessage);
+    }
+
     public static logError(message: string, stack: object) {
+        if (Logger.logLevel > 3) return;
         const timestamp = dayjs().format('HH-mm-ss');
         const logMessage = `
             <div style="margin-bottom: 1em; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
@@ -67,7 +107,6 @@ export class Logger {
             </div>
         `;
         fs.appendFileSync(Logger.filePath, logMessage);
-        // fs.appendFileSync(this.filePath, `[ERROR] [${timestamp}] ${message}\n`);
     }
 
     public static logRequest(method: string, url: string) {
