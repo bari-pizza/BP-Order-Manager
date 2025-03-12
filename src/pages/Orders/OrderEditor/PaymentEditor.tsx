@@ -244,6 +244,7 @@ export const PaymentEditor = ({
                                         setValue('amount_in_cents', value, { shouldDirty })
                                     }
                                     isDirty={dirtyFields.amount_in_cents || forNewPayment}
+                                    inputProps={{ pattern: '[0-9]*' }}
                                 />
                             );
                         }}
@@ -266,6 +267,7 @@ export const PaymentEditor = ({
                                     }
                                     isDirty={dirtyFields.tip_in_cents || forNewPayment}
                                     disabled={paymentTypeName === 'third party' && !thirdPartyCanTip}
+                                    inputProps={{ pattern: '[0-9]*' }}
                                 />
                             );
                         }}

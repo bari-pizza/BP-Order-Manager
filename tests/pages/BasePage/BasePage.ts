@@ -167,7 +167,7 @@ export abstract class BasePage {
         await expect(link).toBeVisible();
         await link.click();
         await expect(this.page).toHaveURL(href);
-        Logger.logInfo(`Navigated to ${href}`);
+        Logger.logDebug(`Navigated to ${href}`);
         await this.page.mouse.move(0, 0);
     }
 

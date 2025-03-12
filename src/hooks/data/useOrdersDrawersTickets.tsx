@@ -23,6 +23,8 @@ import { useBusinessDaySummaryAPI } from '../../api/businessDateSummary';
 import { useDocumentTitle } from 'usehooks-ts';
 import { useQueryClient } from '@tanstack/react-query';
 import { sortOrders } from '../../utils';
+// import { toast } from 'react-toastify';
+// import { PostgrestError } from '@supabase/supabase-js';
 // import { supaClient } from '../../supaClient';
 // import dayjs from 'dayjs';
 
@@ -234,6 +236,22 @@ export const useOrdersDrawersTickets = () => {
         orderAPI.removeOrdersFromDrawer({ drawerID, orderIDs: selectedTickets, handleSuccess, handleFailure });
     };
 
+    const deleteOrderFromDB = (orderID: string) => {
+        // const handleSuccess = (response: RPCPayload['data']) => {
+        //     console.log({ response });
+        //     const successes = response!.successes;
+        //     if (successes.length > 0) {
+        //         toast.success('Order deleted successfully');
+        //     }
+        // };
+        // const handleFailure = (error: PostgrestError | Error) => {
+        //     console.error({ error });
+        //     toast.error(error.message);
+        // };
+        // orderAPI.deleteOrder({ orderID, handleSuccess, handleFailure });
+        orderAPI.delete(orderID);
+    };
+
     const handleDrawerClick = (drawer: Drawer | Driver_Drawer) => {
         if (handlingDrawerClick) {
             return;
@@ -422,7 +440,7 @@ export const useOrdersDrawersTickets = () => {
             all: allOrderPayments,
             byDrawerID: getOrdersByDrawerID,
             isRepeat,
-            delete: orderAPI.delete,
+            delete: deleteOrderFromDB,
         },
         payments: {
             all: allPayments,

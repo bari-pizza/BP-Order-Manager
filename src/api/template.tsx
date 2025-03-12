@@ -22,7 +22,7 @@ const useTemplateInteraction = ({ queryKey }: { queryKey: string[] }) => {
             // return '' or null if no message necessary
             pending: () => 'Loading message goes here...',
             success: (data) => `Successfully updated db: ${data.id}`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to update db`,
         },
         handleSuccess: (data) => {

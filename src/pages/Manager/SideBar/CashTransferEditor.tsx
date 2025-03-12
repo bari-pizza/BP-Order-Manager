@@ -119,6 +119,8 @@ export const CashTransferEditor = ({
           }
         : getFormValues(cashTransfer, drawerID);
 
+    console.log({ defaultValues });
+
     const {
         control,
         formState: { errors },
@@ -138,9 +140,11 @@ export const CashTransferEditor = ({
         // replace empty string with null in source and destination
         cashTransfer.source = cashTransfer.source === '' ? null : cashTransfer.source;
         cashTransfer.destination = cashTransfer.destination === '' ? null : cashTransfer.destination;
+        cashTransfer.business_date = businessDate.format('YYYY-MM-DD');
         if (isExistingCashTransfer(cashTransfer)) {
             cashTransfers.update(cashTransfer);
         } else {
+            console.log({ cashTransfer });
             cashTransfers.create(cashTransfer);
             reset({
                 cashTransfer: {

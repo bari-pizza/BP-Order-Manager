@@ -20,7 +20,7 @@ import {
 } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBusinessDate } from '../../../hooks/data/useBusinessDate';
-import { useBariPizzaContext } from '../../../hooks/data/useContextData';
+import { useBariPizzaContext, useLayoutContext } from '../../../hooks/data/useContextData';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { PaymentEditor, PaymentTypeSelector } from './PaymentEditor';
 import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
@@ -106,6 +106,7 @@ export const OrderEditor = ({
     } = useDrivers();
     const { profile } = useSession();
     const driverIsEditing = !!driverDrawerID;
+    const { isMobile } = useLayoutContext();
 
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
@@ -165,8 +166,6 @@ export const OrderEditor = ({
         },
     });
 
-    // TODO: showing default driver but not adding them as drawer
-
     const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...todaysDrivers];
 
     const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'))!;
@@ -213,7 +212,7 @@ export const OrderEditor = ({
         if (invalidDrawer) {
             setValue('drawer_id', validDrawers.length === 1 ? validDrawers[0].drawer_id : '');
         }
-    }, [invalidDrawer, validDrawers, setValue]);
+    }, [invalidDrawer, validDrawers, setValue, currentDrawer]);
 
     useEffect(() => {
         // initial payment type only exists on new orders
@@ -258,7 +257,7 @@ export const OrderEditor = ({
                     return (
                         <SmartTextField
                             {...field}
-                            autoFocus
+                            autoFocus={!isMobile}
                             label="Origin"
                             select
                             disabled={isLocked}
@@ -297,17 +296,8 @@ export const OrderEditor = ({
                 name="drawer_id"
                 control={control}
                 render={({ field }) => {
-                    const currentDrawerID =
-                        validDrawers.length === 1
-                            ? validDrawers[0].drawer_id
-                            : validDrawers.some((drawer) => drawer.drawer_id === field.value)
-                              ? field.value
-                              : '';
-
-                    // console.log({ validDrawers, driverDrawerID, currentDrawerID, field });
-
                     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-                        if (['Delete', 'Backspace', 'Escape'].includes(event.key)) {
+                        if (['Delete', 'Backspace'].includes(event.key)) {
                             // Clear the value if Delete, Backspace, or Esc is pressed
                             field.onChange(''); // Set the value to empty
                         }
@@ -319,7 +309,7 @@ export const OrderEditor = ({
                             label="Drawer"
                             select
                             isDirty={dirtyFields.drawer_id}
-                            value={currentDrawerID}
+                            value={field.value}
                             onKeyDown={handleKeyDown}
                             disabled={isLocked || driverIsEditing}>
                             {validDrawers.map((drawer) => {
@@ -354,6 +344,7 @@ export const OrderEditor = ({
                     error={!!(errors.order_number || numberAlreadyExists)}
                     helperText={errors.order_number?.message || numberAlreadyExists}
                     isDirty={dirtyFields.order_number}
+                    inputProps={{ pattern: '[0-9]*' }}
                 />
             ) : (
                 <SmartTextField
@@ -386,6 +377,7 @@ export const OrderEditor = ({
                                     setValue('delivery_fee_in_cents', value, { shouldDirty })
                                 }
                                 isDirty={dirtyFields.delivery_fee_in_cents}
+                                inputProps={{ pattern: '[0-9]*' }}
                             />
                         );
                     }}
@@ -406,6 +398,7 @@ export const OrderEditor = ({
                             value={value}
                             handleChange={(value, shouldDirty) => setValue('total_in_cents', value, { shouldDirty })}
                             isDirty={dirtyFields.total_in_cents}
+                            inputProps={{ pattern: '[0-9]*' }}
                         />
                     );
                 }}

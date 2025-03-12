@@ -60,8 +60,9 @@ export const handlePayload = <T,>(payload: Payload<T>) => {
 // };
 
 export type RPCPayload = { isRPC: true } & OneOfType<{
-    data: { successes: string[]; failures: { [key: string]: PostgrestError }[] };
-    error: PostgrestError;
+    // data: { successes: string[]; failures: { [key: string]: PostgrestError }[] };
+    data: { successes: string[]; failures: { [key: string]: string }[] };
+    error: string;
 }>;
 
 // export const handleRPCPayload = <T,>(payload: Payload<T>) => {
@@ -89,8 +90,8 @@ export type SupabaseRPCInteractor<T> = {
 type GetMessages<T, U> = {
     pending: (data: T) => string;
     success: (data: U) => string;
-    mainError: (error: PostgrestError | Error) => string;
-    errors: (error: PostgrestError | Error) => string;
+    mainError: (error?: PostgrestError | Error) => string;
+    errors: (error?: PostgrestError | Error) => string;
 };
 
 // const defaultNormalizer = <T,>(payload: RPCPayload) => {
@@ -114,7 +115,8 @@ type UseRPCInteractionHandlerProps<T> = {
     interactor: SupabaseRPCInteractor<T>;
     queryKey: string[];
     getMessages: GetMessages<T, RPCPayload['data']>;
-    forEachError: (error: PostgrestError) => void;
+    // forEachError: (error: PostgrestError) => void;
+    forEachError: (error: string) => void;
     handleSuccess?: (data: RPCPayload['data']) => void;
     handleFailure?: (error: PostgrestError | Error) => void;
 };
@@ -214,26 +216,33 @@ export const useRPCInteractionHandler = <T,>({
             }
         },
         onSuccess: (payload) => {
-            if (payload.data?.successes.length === 0) {
-                throw new Error('Failed to save changes: ' + payload?.error);
+            console.log({ payload });
+            // if (payload.data?.successes.length === 0) {
+            //     throw new Error('Failed to save changes: ' + payload?.error);
+            // }
+            if (payload.error) {
+                throw new Error(payload?.error);
             }
             const successMessage = getMessages.success(payload.data);
             queryClient.invalidateQueries({ queryKey });
-            if (successMessage) {
+            if (payload.data?.successes.length && successMessage) {
                 toast.update(toastRef.current, {
                     render: successMessage,
                     type: 'success',
                     isLoading: false,
                     autoClose: 2000,
                 });
+            } else {
+                toast.update(toastRef.current, {
+                    render: getMessages.mainError(),
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 2000,
+                });
             }
-            // TODO: failures aren't coming through with the right shape
-            // fix for both rpc functions probably
-            // might have been fixed, no idea lol
-            console.log({ payload });
             payload.data?.failures.forEach((data) => {
                 const error = Object.values(data)[0];
-                const errorMessage = getMessages.errors(error);
+                const errorMessage = getMessages.errors(new Error(error));
                 if (errorMessage) {
                     toast.error(errorMessage);
                 }

@@ -167,7 +167,6 @@ function Layout() {
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
     console.log(getEnv('VITE_REACT_APP_VERSION'));
-    console.log(process.env.npm_package_version);
 
     return (
         // <APIProvider

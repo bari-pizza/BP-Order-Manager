@@ -26,7 +26,7 @@ const useCreateNewOrderOrigin = ({ queryKey }: { queryKey: string[] }) => {
             // return '' or null if no message necessary
             pending: () => 'Saving new order origin...',
             success: (data) => `Successfully saved new order origin: ${data.name}`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to create new order origin`,
         },
         handleSuccess: (data) => {
@@ -48,7 +48,7 @@ const useUpdateNewOrderOrigin = ({ queryKey }: { queryKey: string[] }) => {
             // return '' or null if no message necessary
             pending: () => 'Saving changes...',
             success: (data) => `Successfully saved changes to ${data.name}`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to save changes`,
         },
         handleSuccess: (data) => {

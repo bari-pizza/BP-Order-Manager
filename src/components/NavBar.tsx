@@ -1,14 +1,4 @@
-import {
-    Toolbar,
-    Drawer,
-    List,
-    ListItemButton,
-    ListItemText,
-    ListItem,
-    ListItemIcon,
-    Badge,
-    Stack,
-} from '@mui/material';
+import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon, Badge } from '@mui/material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
 import { UserAvatar } from './Base/UserAvatar';
@@ -30,6 +20,7 @@ import { Phone as PhoneIcon, Computer as ComputerIcon } from '@mui/icons-materia
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { getEnv } from '../utils';
+import { useClearCache } from '../rickcedlib/hooks/useClearCache';
 
 interface NavBarItem {
     path?: string;
@@ -43,6 +34,7 @@ interface NavBarItem {
 const today = dayjs();
 
 export function NavBar() {
+    const clearCacheAndReload = useClearCache();
     const { session, profile } = useUserContext();
     const { isMobile } = useLayoutContext();
     const [businessDate] = useBusinessDate();
@@ -151,19 +143,17 @@ export function NavBar() {
                 ))}
                 {/* TODO: replace with Lottice Icon */}
                 <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
-                    <Stack direction="column" width="100%">
-                        {/* <ListItem
-                            className="lottie-icon-container"
-                            key={isMobile ? 'phone' : 'computer'}
-                            component="div"></ListItem> */}
+                    <List>
+                        <ListItemButton onClick={clearCacheAndReload}>
+                            <ListItem>
+                                <ListItemIcon sx={{ justifyContent: 'center' }}>
+                                    {isMobile ? <PhoneIcon /> : <ComputerIcon />}
+                                </ListItemIcon>
+                                <ListItemText>{version}</ListItemText>
+                            </ListItem>
+                        </ListItemButton>
                         <ListItemText>{todaysDate}</ListItemText>
-                        <ListItem>
-                            <ListItemIcon sx={{ justifyContent: 'center' }}>
-                                {isMobile ? <PhoneIcon /> : <ComputerIcon />}
-                            </ListItemIcon>
-                            <ListItemText>{version}</ListItemText>
-                        </ListItem>
-                    </Stack>
+                    </List>
                 </ListItem>
             </List>
 

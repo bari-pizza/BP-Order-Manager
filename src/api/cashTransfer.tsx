@@ -61,7 +61,7 @@ const useCreateNewCashTransfer = ({ queryKey }: { queryKey: string[] }) => {
         getMessages: {
             pending: () => 'Creating new cash transfer',
             success: () => `Successfully created new cash transfer.`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to create new cash transfer.`,
         },
         handleSuccess: (data) => {
@@ -77,7 +77,7 @@ const useUpdateCashTransfer = ({ queryKey }: { queryKey: string[] }) => {
         getMessages: {
             pending: () => 'Updating cash transfer...',
             success: () => `Successfully updated cash transfer`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to update cash transfer`,
         },
     });
@@ -90,7 +90,7 @@ const useDeleteCashTransfer = ({ queryKey }: { queryKey: string[] }) => {
         getMessages: {
             pending: () => 'Deleting cash transfer...',
             success: () => `Successfully deleted cash transfer`,
-            mainError: (error) => error.message,
+            mainError: (error) => error!.message,
             errors: () => `Failed to delete cash transfer`,
         },
     });
