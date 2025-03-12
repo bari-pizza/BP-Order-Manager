@@ -221,7 +221,7 @@ export const useRPCInteractionHandler = <T,>({
             //     throw new Error('Failed to save changes: ' + payload?.error);
             // }
             if (payload.error) {
-                throw new Error('Failed to save changes: ' + payload?.error);
+                throw new Error(payload?.error);
             }
             const successMessage = getMessages.success(payload.data);
             queryClient.invalidateQueries({ queryKey });
