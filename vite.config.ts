@@ -4,6 +4,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { qrcode } from 'vite-plugin-qrcode';
 import { VitePWA } from 'vite-plugin-pwa';
+import replace from '@rollup/plugin-replace';
+import packageJson from './package.json';
 // https://www.npmjs.com/package/vite-plugin-pwa/v/0.9.1
 
 // https://vitejs.dev/config/
@@ -14,6 +16,9 @@ export default defineConfig({
     },
     plugins: [
         react(),
+        replace({
+            __APP_VERSION__: JSON.stringify(packageJson.version),
+        }),
         qrcode(),
         VitePWA({
             registerType: 'autoUpdate',
