@@ -88,6 +88,12 @@ export function NavBar() {
             text: 'Orders',
             forMobile: true,
         },
+        {
+            path: '/how-to',
+            icon: <ComputerIcon />,
+            text: 'How To',
+            forMobile: true,
+        },
         userListItem,
     ].filter((item) => item && (!isMobile || item.forMobile)) as NavBarItem[];
 
@@ -144,7 +150,7 @@ export function NavBar() {
                 <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
                     <List>
                         <ListItemButton onClick={clearCacheAndReload}>
-                            <ListItem>
+                            <ListItem id="bpom-version">
                                 <ListItemIcon sx={{ justifyContent: 'center' }}>
                                     {isMobile ? <PhoneIcon /> : <ComputerIcon />}
                                 </ListItemIcon>

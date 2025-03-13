@@ -19,6 +19,7 @@ import { PageMissing } from './components/PageMissing.tsx';
 import { Home } from './pages/Home/Home.tsx';
 import { MyAccount, MyAccountSkeleton } from './pages/Profile/MyAccount.tsx';
 import { Login } from './pages/Profile/Login.tsx';
+import { HowTo } from './pages/HowTo/HowTo.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllAppSettings, getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
 import { BariPizzaContext } from './context/BariPizzaContext.tsx';
@@ -30,6 +31,8 @@ import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
 import { useBusinessDate, useMidnightEffect } from './hooks/data/useBusinessDate.tsx';
+import { ShepherdJourneyProvider } from 'react-shepherd';
+import 'shepherd.js/dist/css/shepherd.css';
 
 const router = createBrowserRouter([
     {
@@ -51,6 +54,14 @@ const router = createBrowserRouter([
             {
                 path: '/search',
                 element: <UnderConstruction />,
+            },
+            {
+                path: '/how-to',
+                element: (
+                    <ProtectedRoute fallback={<MyAccountSkeleton />}>
+                        <HowTo />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: '/orders',
@@ -104,13 +115,15 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <RouterProvider
-                router={router}
-                future={{
-                    v7_startTransition: true,
-                }}
-            />
-            <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
+            <ShepherdJourneyProvider>
+                <RouterProvider
+                    router={router}
+                    future={{
+                        v7_startTransition: true,
+                    }}
+                />
+                <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
+            </ShepherdJourneyProvider>
         </QueryClientProvider>
     );
 }
