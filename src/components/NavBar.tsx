@@ -19,7 +19,6 @@ import {
 import { Phone as PhoneIcon, Computer as ComputerIcon } from '@mui/icons-material';
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
-import { getEnv } from '../utils';
 import { useClearCache } from '../rickcedlib/hooks/useClearCache';
 
 interface NavBarItem {
@@ -40,10 +39,8 @@ export function NavBar() {
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
-    const version = getEnv('VITE_REACT_APP_VERSION') || '?.?.?';
-    const dummy = getEnv('VITE_DUMMY_VARIABLE');
-    console.log({ dummy });
-    // const version = import.meta.env.VITE_REACT_APP_VERSION || process.env.VITE_REACT_APP_VERSION;
+    // const version = `__APP_VERSION__`.split('"').join('');
+    const version = `__APP_VERSION__`.replace(/"/g, '');
 
     const queryClient = useQueryClient();
     const orders = (
