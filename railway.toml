@@ -1,10 +1,12 @@
-
 [build]
 builder = "nixpacks"
-buildCommand = "npm run build && node -e 'require(\"fs\").writeFileSync(\".version\", require(\"./package.json\").version)'"
+buildCommand = "npm run build"
 
 [deploy]
-startCommand = "VITE_REACT_APP_VERSION=$(cat .version) npx serve -s dist"
+startCommand = "VITE_REACT_APP_VERSION=$VERSION npx serve -s dist"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "never"
+
+[build.args]
+VERSION = "$(node -p 'require(\"./package.json\").version')"

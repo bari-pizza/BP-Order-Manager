@@ -41,11 +41,13 @@ export function NavBar() {
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
     const version = getEnv('VITE_REACT_APP_VERSION') || '?.?.?';
+    const dummy = getEnv('VITE_DUMMY_VARIABLE');
+    console.log({ dummy });
     // const version = import.meta.env.VITE_REACT_APP_VERSION || process.env.VITE_REACT_APP_VERSION;
 
     const queryClient = useQueryClient();
     const orders = (
-        profile ? (queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) ?? []) : []
+        profile ? queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) ?? [] : []
     ) as Order_Payment[];
     const orderCount = (isMobile ? orders.filter((o) => o.drawer_id === profile?.id) : orders).length;
 
