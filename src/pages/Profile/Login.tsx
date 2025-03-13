@@ -6,6 +6,8 @@ import { Stack, Typography, TextField, Divider, Button, IconButton, InputAdornme
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
+import { useQueryClient } from '@tanstack/react-query';
+import { Profile } from '../../typesAndValidators';
 
 type FormValues = {
     email: string;
@@ -24,6 +26,7 @@ export function Login() {
         reset,
         formState: { errors, dirtyFields, isSubmitting },
     } = useForm({ defaultValues: { email: '', password: '', forgotPassword: false, showPassword: false } });
+    const queryClient = useQueryClient();
 
     const mode = watch('forgotPassword') ? 'reset_password' : 'sign_in';
     const title = mode === 'reset_password' ? 'Reset Password' : 'Sign In';
@@ -54,7 +57,29 @@ export function Login() {
 
     const onSignIn = async (data: FormValues) => {
         toastRef.current = toast.loading('Signing in...');
-        const { data: userData, error } = await supaClient.auth.signInWithPassword({
+        const profiles = queryClient.getQueryData(['profiles']) as Profile[];
+        const profile = profiles.find((p) => p.email === data.email) || null;
+        if (!profile) {
+            toast.update(toastRef.current, {
+                render: 'Could not sign in. Profile not found.',
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            return;
+        }
+        if (profile.is_deleted) {
+            toast.update(toastRef.current, {
+                render: 'Could not sign in. Your account has been deleted.',
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            return;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { data: _, error } = await supaClient.auth.signInWithPassword({
             email: data.email,
             password: data.password,
         });
@@ -68,7 +93,7 @@ export function Login() {
             return;
         }
         toast.update(toastRef.current, {
-            render: `Welcome back ${userData.user.email}!`,
+            render: `Welcome back ${profile.first_name}!`,
             type: 'success',
             isLoading: false,
             autoClose: 5000,

@@ -269,7 +269,9 @@ export const DrawerSideBar = () => {
                     label: 'Payments',
                     value: payments,
                     details: closingPmtTransfer
-                        ? `Closing Payment Paid ${closingPmtTransfer.source === currentDrawer.drawer_id ? 'By' : 'To'} ${currentDrawer.name}: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
+                        ? `Closing Payment Paid ${
+                              closingPmtTransfer.source === currentDrawer.drawer_id ? 'By' : 'To'
+                          } ${currentDrawer.name}: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
                         : 'No Closing Payment',
                 },
             );
@@ -330,9 +332,6 @@ export const DrawerSideBar = () => {
     return (
         <SideBar width="350px">
             <Stack direction="column" height="100vh" spacing={2} alignItems="center" mt={2}>
-                <Typography variant="h6">
-                    {hours} vs {drawerSummary.hours_in_cents}
-                </Typography>
                 <Stack direction="column" alignItems="center" gap={2}>
                     <AnimatePresence>
                         <ContextMenu openOnType="click">

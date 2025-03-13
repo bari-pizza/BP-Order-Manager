@@ -13,62 +13,7 @@ export interface SupashipUserInfo {
 // for the future
 // https://dev.to/ankitjey/the-magic-of-react-query-and-supabase-1pom
 
-// TODO: would be better if we could use queryClient for this
-
 export const useSession = (): SupashipUserInfo => {
-    // const [userInfo, setUserInfo] = useState<SupashipUserInfo>({
-    //     profile: null,
-    //     session: null,
-    //     loading: true,
-    // });
-    // const [channel, setChannel] = useState<RealtimeChannel | null>(null);
-
-    // useEffect(() => {
-    //     supaClient.auth.getSession().then(({ data: { session } }) => {
-    //         setUserInfo((userInfo) => ({ ...userInfo, session, loading: true }));
-    //         supaClient.auth.onAuthStateChange((_event, session) => {
-    //             setUserInfo({ session, profile: null, loading: false });
-    //         });
-    //     });
-    // }, []);
-
-    // useEffect(() => {
-    //     async function listenToUserProfileChanges(userId: string) {
-    //         const { data } = await supaClient.from('Profile').select('*').filter('id', 'eq', userId);
-    //         if (data?.[0]) {
-    //             setUserInfo({ ...userInfo, profile: data?.[0], loading: false });
-    //         }
-    //         return supaClient
-    //             .channel(`public:Profile`)
-    //             .on(
-    //                 'postgres_changes',
-    //                 {
-    //                     event: '*',
-    //                     schema: 'public',
-    //                     table: 'Profile',
-    //                     filter: `id=eq.${userId}`,
-    //                 },
-    //                 (payload) => {
-    //                     setUserInfo({ ...userInfo, profile: payload.new as Profile, loading: false });
-    //                 },
-    //             )
-    //             .subscribe();
-    //     }
-
-    //     if (userInfo.session?.user && !userInfo.profile) {
-    //         listenToUserProfileChanges(userInfo.session.user.id).then((newChannel) => {
-    //             if (channel) {
-    //                 channel.unsubscribe();
-    //             }
-    //             setChannel(newChannel);
-    //         });
-    //     } else if (!userInfo.session?.user) {
-    //         channel?.unsubscribe();
-    //         setChannel(null);
-    //     }
-    // }, [channel, userInfo]);
-
-    // return userInfo;
     const queryClient = useQueryClient();
 
     // Fetch session
@@ -79,17 +24,6 @@ export const useSession = (): SupashipUserInfo => {
             return data.session;
         },
     });
-
-    // Fetch profile if session exists
-    // const { data: profile, isLoading: profileLoading } = useQuery({
-    //     queryKey: ["profile", session?.user?.id],
-    //     queryFn: async () => {
-    //         if (!session?.user) return null;
-    //         const { data } = await supaClient.from("Profile").select("*").eq("id", session.user.id).single();
-    //         return data;
-    //     },
-    //     enabled: !!session?.user, // Only run if session exists
-    // });
 
     const profiles = (queryClient.getQueryData(['profiles']) || []) as Profile[];
 
@@ -107,30 +41,9 @@ export const useSession = (): SupashipUserInfo => {
         };
     }, [queryClient]);
 
-    // Listen to profile changes via Supabase Realtime
-    // useEffect(() => {
-    //     if (!session?.user) return;
-
-    //     const channel = supaClient
-    //         .channel(`public:Profile`)
-    //         .on(
-    //             'postgres_changes',
-    //             {
-    //                 event: '*',
-    //                 schema: 'public',
-    //                 table: 'Profile',
-    //                 filter: `id=eq.${session.user.id}`,
-    //             },
-    //             (payload) => {
-    //                 queryClient.setQueryData(['profile', session.user.id], payload.new);
-    //             },
-    //         )
-    //         .subscribe();
-
-    //     return () => {
-    //         channel.unsubscribe();
-    //     };
-    // }, [session, queryClient]);
+    // if (profile?.is_deleted) {
+    //     return { session: null, profile: null, loading: sessionLoading || profileLoading };
+    // }
 
     return { session, profile, loading: sessionLoading || profileLoading };
 };
