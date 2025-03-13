@@ -1,5 +1,5 @@
 import { IconButton, Stack, Typography } from '@mui/material';
-import { Edit as EditIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Lock as LockIcon } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { OrderWithFullDetails, Payment } from '../../../typesAndValidators';
 import { OrderTypeIcon } from '../../../components/Order/OrderTypeIcon';
@@ -119,6 +119,13 @@ const RenderEditButton = ({ order }: { order: OrderWithFullDetails }) => {
     const {
         orders: { isRepeat },
     } = useOrdersDrawersTickets();
+    if (order.is_locked) {
+        return (
+            <IconButton>
+                <LockIcon />
+            </IconButton>
+        );
+    }
     return (
         <>
             <IconButton>
@@ -164,10 +171,8 @@ const RenderDeleteButton = ({ payments, orderID }: { payments: Payment[]; orderI
         },
     });
     return (
-        <Stack direction="row" alignItems="center" height="100%" spacing={1}>
-            <IconButton onClick={handleDeleteClick} color={value === 0 ? 'error' : 'default'}>
-                <DeleteIcon />
-            </IconButton>
-        </Stack>
+        <IconButton onClick={handleDeleteClick} color={value === 0 ? 'error' : 'default'}>
+            <DeleteIcon />
+        </IconButton>
     );
 };
