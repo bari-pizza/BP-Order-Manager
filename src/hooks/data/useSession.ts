@@ -41,9 +41,13 @@ export const useSession = (): SupashipUserInfo => {
         };
     }, [queryClient]);
 
-    // if (profile?.is_deleted) {
-    //     return { session: null, profile: null, loading: sessionLoading || profileLoading };
-    // }
+    useEffect(() => {
+        if (profile?.is_deleted) {
+            console.log('user deleted');
+            supaClient.auth.signOut();
+            queryClient.setQueryData(['session'], null);
+        }
+    }, [profile, queryClient]);
 
     return { session, profile, loading: sessionLoading || profileLoading };
 };
