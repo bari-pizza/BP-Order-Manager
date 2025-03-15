@@ -1,23 +1,32 @@
-import { Avatar, Badge, Skeleton, SvgIconTypeMap } from '@mui/material';
-import { Drawer, Driver_Drawer } from '../../typesAndValidators';
-import { DrawerCardOverrideSX, DrawerCardSlotProps } from './DrawerCardBase';
-import { OverridableComponent } from '@mui/material/OverridableComponent';
 import {
-    PointOfSale as PointOfSaleIcon,
-    DeliveryDining as DeliveryDiningIcon,
-    Face as FaceIcon,
-} from '@mui/icons-material';
-import { createElement } from 'react';
+    // Avatar,
+    Badge,
+    Skeleton,
+    // SvgIconTypeMap
+} from '@mui/material';
+import { Drawer, DrawerType, Driver_Drawer } from '../../typesAndValidators';
+import {
+    DrawerCardOverrideSX,
+    // DrawerCardSlotProps
+} from './DrawerCardBase';
+// import { OverridableComponent } from '@mui/material/OverridableComponent';
+// import {
+//     PointOfSale as PointOfSaleIcon,
+//     DeliveryDining as DeliveryDiningIcon,
+//     Face as FaceIcon,
+// } from '@mui/icons-material';
+// import { createElement } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { LockLottieIcon } from '../../rickcedlib/LottieIcons';
+import { LockLottieIcon, RoundLottieIcon } from '../../rickcedlib/LottieIcons';
+import { useBariPizzaContext } from '../../hooks/data/useContextData';
 
 type DrawerAvatarProps = {
     size?: 'small' | 'medium' | 'large' | 'xlarge';
     variant?: 'standard' | 'border';
     sx?: DrawerCardOverrideSX;
     drawer?: Drawer | Driver_Drawer;
-    props?: DrawerCardSlotProps;
-    drawerRef?: React.RefObject<HTMLDivElement>;
+    // props?: DrawerCardSlotProps;
+    // drawerRef?: React.RefObject<HTMLDivElement>;
     isLocked?: boolean;
 };
 
@@ -58,17 +67,31 @@ export const DrawerAvatar = ({
     size = 'medium',
     variant = 'standard',
     sx,
-    props,
-    drawerRef,
+    // props,
+    // drawerRef,
     isLocked = false,
 }: DrawerAvatarProps) => {
     const theme = useTheme();
-    const iconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
-        register: PointOfSaleIcon,
-        third_party: DeliveryDiningIcon,
-        driver: FaceIcon,
-        unassigned: FaceIcon,
+    const { resources } = useBariPizzaContext();
+    // const iconMap: Record<string, OverridableComponent<SvgIconTypeMap>> = {
+    //     register: PointOfSaleIcon,
+    //     third_party: DeliveryDiningIcon,
+    //     driver: FaceIcon,
+    //     unassigned: FaceIcon,
+    // };
+
+    const keys: Record<DrawerType, string> = {
+        register: 'Register',
+        third_party: 'Third Party Pickup',
+        driver: 'Unassigned Drawer',
+        unassigned: 'Unassigned Drawer',
     };
+
+    const resource = resources.find((resource) => resource.title === keys[drawer.drawer_type]);
+
+    console.log({ drawer, resource, resources, key: keys[drawer.drawer_type] });
+
+    const imageSrc = ('driver' in drawer && drawer.driver.avatar_src) || resource?.src || '';
 
     const finalAvatarSx = {
         ...(size === 'small' ? smallStyle : {}),
@@ -80,10 +103,12 @@ export const DrawerAvatar = ({
         ...sx?.avatar,
     };
 
-    const avatarChild = createElement(iconMap[drawer.drawer_type], {
-        sx: sx?.avatarIcon,
-        ...props?.avatarIcon,
-    });
+    console.log({ finalAvatarSx });
+
+    // const avatarChild = createElement(iconMap[drawer.drawer_type], {
+    //     sx: sx?.avatarIcon,
+    //     ...props?.avatarIcon,
+    // });
     return (
         <Badge
             badgeContent={isLocked ? <LockLottieIcon /> : 0}
@@ -99,14 +124,19 @@ export const DrawerAvatar = ({
             }}
             overlap="circular"
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-            <Avatar
+            <RoundLottieIcon
+                imageSrc={imageSrc}
+                height={finalAvatarSx.height as string}
+                width={finalAvatarSx.width as string}
+            />
+            {/* <Avatar
                 className={'drawer-avatar-' + drawer.drawer_id}
                 ref={drawerRef}
                 sx={finalAvatarSx}
                 src={('driver' in drawer && drawer.driver.avatar_src) || ''}
                 {...props?.avatar}>
                 {avatarChild}
-            </Avatar>
+            </Avatar> */}
         </Badge>
     );
 };

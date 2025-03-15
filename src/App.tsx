@@ -21,7 +21,7 @@ import { MyAccount, MyAccountSkeleton } from './pages/Profile/MyAccount.tsx';
 import { Login } from './pages/Profile/Login.tsx';
 import { HowTo } from './pages/HowTo/HowTo.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
-import { getAllAppSettings, getAllDrawers, getAllDrivers, getAllOrigins } from './supabaseQueries.ts';
+import { getAllAppSettings, getAllDrawers, getAllDrivers, getAllOrigins, getAllResources } from './supabaseQueries.ts';
 import { BariPizzaContext } from './context/BariPizzaContext.tsx';
 import { AdminDashboard, AdminDashboardSkeleton } from './pages/Admin/AdminDashboard.tsx';
 import { ToastContainer } from 'react-toastify';
@@ -145,35 +145,42 @@ function Layout() {
     );
     useMidnightEffect();
     // MAYBE include useSubscribeToTable here but these shouldnt be changed often
-    const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }] = useSuspenseQueries({
-        queries: [
-            {
-                queryKey: ['drawers'],
-                queryFn: getAllDrawers,
-                staleTime: 1000 * 60 * 30,
-                gcTime: 1000 * 60 * 30,
-                refetchOnWindowFocus: false,
-            },
-            {
-                queryKey: ['drivers'],
-                queryFn: getAllDrivers,
-                staleTime: 1000 * 60 * 30,
-                refetchOnWindowFocus: false,
-            },
-            {
-                queryKey: ['origins'],
-                queryFn: getAllOrigins,
-                staleTime: 1000 * 60 * 30,
-                refetchOnWindowFocus: false,
-            },
-            {
-                queryKey: ['constants'],
-                queryFn: getAllAppSettings,
-                staleTime: 1000 * 60 * 30,
-                refetchOnWindowFocus: false,
-            },
-        ],
-    });
+    const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }, { data: resources }] =
+        useSuspenseQueries({
+            queries: [
+                {
+                    queryKey: ['drawers'],
+                    queryFn: getAllDrawers,
+                    staleTime: 1000 * 60 * 30,
+                    gcTime: 1000 * 60 * 30,
+                    refetchOnWindowFocus: false,
+                },
+                {
+                    queryKey: ['drivers'],
+                    queryFn: getAllDrivers,
+                    staleTime: 1000 * 60 * 30,
+                    refetchOnWindowFocus: false,
+                },
+                {
+                    queryKey: ['origins'],
+                    queryFn: getAllOrigins,
+                    staleTime: 1000 * 60 * 30,
+                    refetchOnWindowFocus: false,
+                },
+                {
+                    queryKey: ['constants'],
+                    queryFn: getAllAppSettings,
+                    staleTime: 1000 * 60 * 30,
+                    refetchOnWindowFocus: false,
+                },
+                {
+                    queryKey: ['resources'],
+                    queryFn: getAllResources,
+                    staleTime: 1000 * 60 * 30,
+                    refetchOnWindowFocus: false,
+                },
+            ],
+        });
     const [businessDate] = useBusinessDate();
 
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
@@ -192,6 +199,7 @@ function Layout() {
                         drivers: drivers.sort((a, b) => a.name.localeCompare(b.name)),
                         origins,
                         constants,
+                        resources,
                     }}>
                     <LayoutContext.Provider
                         value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth, isMobile }}>

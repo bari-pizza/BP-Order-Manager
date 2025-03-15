@@ -1,6 +1,5 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
-import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
 import { ManagerDashboardContext as AdminDashboardContext } from '../../context/ManagerDashboardContext';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
@@ -8,11 +7,11 @@ import { useDrivers } from '../../hooks/data/useDrivers';
 import { Driver_Drawer, AdminDashboardTabName, Drawer } from '../../typesAndValidators';
 import { EmployeesTab } from './Tabs/EmployeesTab';
 import { OriginsTab } from './Tabs/OriginsTab';
-import { Todo } from '../../components/Base/Todo';
 import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
-import { SettingsLottieIcon } from '../../rickcedlib/LottieIcons';
+import { GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
 import { devOnly } from '../../utils';
+import { ResourcesTab } from './Tabs/ResourcesTab';
 
 /*    TODO: About Today
         Sales
@@ -123,9 +122,26 @@ export const AdminDashboard = () => {
                 </Stack>
                 <Box>
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
-                        <Tab value="employees" label="Employees" icon={<SalesIcon />} iconPosition="start" />
-                        <Tab value="origins" label="Origins" icon={<DriversIcon />} iconPosition="start" />
-                        {devOnly(<Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />)}
+                        <Tab
+                            value="employees"
+                            label="Employees"
+                            icon={<StaffLottieIcon autoPlay={tabName === 'employees'} />}
+                            iconPosition="start"
+                        />
+                        <Tab
+                            value="origins"
+                            label="Origins"
+                            icon={<GlobeLottieIcon autoPlay={tabName === 'origins'} />}
+                            iconPosition="start"
+                        />
+                        {devOnly(
+                            <Tab
+                                value="resources"
+                                label="Resources"
+                                icon={<SettingsLottieIcon autoPlay={tabName === 'resources'} />}
+                                iconPosition="start"
+                            />,
+                        )}
                         <Tab
                             value="settings"
                             label="Settings"
@@ -142,8 +158,8 @@ export const AdminDashboard = () => {
                         <OriginsTab />
                     </TabPanel>
                     {devOnly(
-                        <TabPanel tabName="orders" value={tabName}>
-                            <Todo>Create orders tab</Todo>
+                        <TabPanel tabName="resources" value={tabName}>
+                            <ResourcesTab />
                         </TabPanel>,
                     )}
                     <TabPanel tabName="settings" value={tabName}>

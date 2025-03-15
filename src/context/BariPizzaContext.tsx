@@ -1,10 +1,11 @@
 import { createContext } from 'react';
-import type { Drawer, Driver_Drawer, OrderOrigin } from '../typesAndValidators';
+import type { Drawer, Driver_Drawer, OrderOrigin, Resource } from '../typesAndValidators';
 
 interface BariPizzaContextProps {
     drawers: Drawer[];
     drivers: Driver_Drawer[];
     origins: OrderOrigin[];
+    resources: Resource[];
     constants: {
         default: {
             delivery_fee_in_cents: number;
@@ -21,6 +22,7 @@ export const BariPizzaContext = createContext<BariPizzaContextProps>({
     drawers: [],
     drivers: [],
     origins: [],
+    resources: [],
     constants: {
         default: {
             delivery_fee_in_cents: 300,

@@ -45,7 +45,7 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
                 } = row;
                 return (
                     <Stack direction="row" alignItems="center" height="100%" spacing={2}>
-                        <OriginLogo orderOrigin={origin} size="medium" variant="border" />
+                        <OriginLogo orderOrigin={origin} />
                         <OrderTypeIcon orderType={order_type} />
                         <span>{order_number ?? order_name}</span>
                     </Stack>

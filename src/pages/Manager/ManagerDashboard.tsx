@@ -1,6 +1,5 @@
 import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
-import { PointOfSale as SalesIcon, Garage as DriversIcon } from '@mui/icons-material';
 import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
@@ -11,6 +10,13 @@ import { SalesTab } from './Tabs/SalesTab';
 import { OrdersTab } from './Tabs/OrdersTab';
 import { CardsTab } from './Tabs/CardsTab';
 import { devOnly } from '../../utils';
+import {
+    CreditCardLottieIcon,
+    IncomeLottieIcon,
+    OrderHistoryLottieIcon,
+    RegisterLottieIcon,
+    SettingsLottieIcon,
+} from '../../rickcedlib/LottieIcons';
 
 /*    TODO: About Today
         Sales
@@ -122,11 +128,41 @@ export const ManagerDashboard = () => {
                 </Stack>
                 <Box>
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
-                        {devOnly(<Tab value="sales" label="Sales" icon={<SalesIcon />} iconPosition="start" />)}
-                        <Tab value="drawers" label="Drawers" icon={<DriversIcon />} iconPosition="start" />
-                        <Tab value="orders" label="Orders" icon={<DriversIcon />} iconPosition="start" />
-                        <Tab value="cards" label="Credit Cards" icon={<DriversIcon />} iconPosition="start" />
-                        {devOnly(<Tab value="settings" label="Settings" icon={<DriversIcon />} iconPosition="start" />)}
+                        {devOnly(
+                            <Tab
+                                value="sales"
+                                label="Sales"
+                                icon={<IncomeLottieIcon autoPlay={tabName === 'sales'} />}
+                                iconPosition="start"
+                            />,
+                        )}
+                        <Tab
+                            value="drawers"
+                            label="Drawers"
+                            icon={<RegisterLottieIcon autoPlay={tabName === 'drawers'} />}
+                            iconPosition="start"
+                        />
+                        <Tab
+                            value="orders"
+                            label="Orders"
+                            icon={<OrderHistoryLottieIcon autoPlay={tabName === 'orders'} />}
+                            iconPosition="start"
+                        />
+                        <Tab
+                            value="cards"
+                            label="Credit Cards"
+                            icon={<CreditCardLottieIcon autoPlay={tabName === 'cards'} />}
+                            iconPosition="start"
+                        />
+
+                        {devOnly(
+                            <Tab
+                                value="settings"
+                                label="Settings"
+                                icon={<SettingsLottieIcon autoPlay={tabName === 'settings'} />}
+                                iconPosition="start"
+                            />,
+                        )}
                     </Tabs>
                 </Box>
                 {devOnly(
@@ -143,6 +179,7 @@ export const ManagerDashboard = () => {
                 <TabPanel tabName="cards" value={tabName}>
                     <CardsTab />
                 </TabPanel>
+
                 {devOnly(
                     <TabPanel tabName="settings" value={tabName}>
                         Settings go here!

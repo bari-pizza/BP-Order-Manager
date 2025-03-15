@@ -36,3 +36,7 @@ body {
     justify-content: center;
     width: min-content;
 }
+
+.lottie-round {
+    transform: scale(1.5);
+}

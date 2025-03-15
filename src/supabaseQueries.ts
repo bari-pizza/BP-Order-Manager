@@ -10,6 +10,7 @@ import {
     Order_Payment,
     Driver,
     PaymentType,
+    Resource,
 } from './typesAndValidators';
 import { z } from 'zod';
 import dayjs from 'dayjs';
@@ -102,6 +103,16 @@ export const getAllOrigins = async () => {
     }
 
     return data as unknown as OrderOrigin[];
+};
+
+export const getAllResources = async () => {
+    const { data, error } = await supaClient.from('Resource').select('*');
+    if (error) {
+        console.error(error);
+        return [] as Resource[];
+    }
+
+    return data as unknown as Resource[];
 };
 
 export const getAllAppSettings = async () => {

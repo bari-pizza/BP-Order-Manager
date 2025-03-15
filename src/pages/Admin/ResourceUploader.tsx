@@ -1,23 +1,23 @@
 import { useUploadToast } from '../../hooks/upload/useUploadToast';
-import { BucketName, OrderOrigin } from '../../typesAndValidators';
+import { BucketName, Resource } from '../../typesAndValidators';
 import { ImageUploader } from '../../components/Base/Uploader/ImageUploader';
-import { useOrderOriginCRUD } from '../../api/orderOrigin';
+import { useResourceCRUD } from '../../api/resource';
 
-type LogoUploaderProps = {
-    origin: OrderOrigin;
+type ResourceUploaderProps = {
+    resource: Resource;
     onUpload?: () => void;
     onSuccess?: (downloadURL: string) => void;
     onError?: (error: Error) => void;
     disabled?: boolean;
 };
 
-export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }: LogoUploaderProps) => {
-    const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['order_origins'] });
+export const ResourceUploader = ({ resource, onUpload, onSuccess, onError, disabled }: ResourceUploaderProps) => {
+    const { resourceMutations } = useResourceCRUD({ queryKey: ['resources'] });
     const { startToast, successToast, errorToast } = useUploadToast({
         messages: {
-            onUpload: () => 'Uploading new logo...',
-            onSuccess: () => 'Logo uploaded successfully',
-            onError: () => 'Failed to upload logo',
+            onUpload: () => 'Uploading new icon...',
+            onSuccess: () => 'Icon uploaded successfully',
+            onError: () => 'Failed to upload icon',
         },
     });
 
@@ -29,7 +29,7 @@ export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }:
     const handleSuccess = (downloadURL: string) => {
         onSuccess?.(downloadURL);
         successToast(downloadURL);
-        orderOriginMutations.update({ ...origin, icon: downloadURL });
+        resourceMutations.update({ ...resource, src: downloadURL });
     };
 
     const handleError = (error: Error) => {
@@ -41,10 +41,14 @@ export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }:
         onUpload: handleUpload,
         onSuccess: handleSuccess,
         onError: handleError,
-        bucketName: 'order_origins' as BucketName,
-        basePath: origin.name,
-        fileName: 'logo',
-        originalURL: origin.icon || '',
+        bucketName: 'resources' as BucketName,
+        basePath: resource.title,
+        fileName: 'src',
+        originalURL: resource.src || '',
+        // imgProps: {
+        //     width: 125,
+        //     height: 125,
+        // },
     };
 
     return <ImageUploader {...imageUploaderProps} disabled={disabled} size="medium" />;

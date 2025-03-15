@@ -47,7 +47,7 @@ export const DrawerCard = ({ drawer, sx, props }: DrawerCardProps) => {
             <div>
                 <DrawerCardBase
                     drawer={drawer}
-                    drawerRef={drawerRef}
+                    // drawerRef={drawerRef}
                     isOpen={isOpen}
                     badgeCount={orderCount}
                     handleClick={() => ctxDrawer.onClick(drawer)}
