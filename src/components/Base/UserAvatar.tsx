@@ -1,5 +1,5 @@
 // import { Avatar, Skeleton } from '@mui/material';
-import { useUserContext } from '../../hooks/data/useContextData';
+import { useBariPizzaContext, useUserContext } from '../../hooks/data/useContextData';
 import { RoundLottieIcon } from '../../rickcedlib/LottieIcons';
 
 // const avatarSX = {
@@ -34,9 +34,17 @@ import { RoundLottieIcon } from '../../rickcedlib/LottieIcons';
 // };
 
 export const UserAvatar = () => {
+    const { resources } = useBariPizzaContext();
     const { session, profile } = useUserContext();
     if (profile) {
-        return <RoundLottieIcon imageSrc={profile.avatar_src || ''} />;
+        if (profile.avatar_src) {
+            return <RoundLottieIcon imageSrc={profile.avatar_src} />;
+        }
+        const resource = resources.find((resource) => resource.title === 'Missing Avatar');
+        if (resource) {
+            return <RoundLottieIcon imageSrc={resource.src} />;
+        }
+        return null;
     }
 
     if (!session) {

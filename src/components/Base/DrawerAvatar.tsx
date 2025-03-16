@@ -88,10 +88,11 @@ export const DrawerAvatar = ({
     };
 
     const resource = resources.find((resource) => resource.title === keys[drawer.drawer_type]);
+    const missingAvatarSrc = resources.find((resource) => resource.title === 'Missing Avatar')?.src;
 
-    console.log({ drawer, resource, resources, key: keys[drawer.drawer_type] });
+    console.log({ drawer, resource, resources, key: keys[drawer.drawer_type], missingAvatarSrc });
 
-    const imageSrc = ('driver' in drawer && drawer.driver.avatar_src) || resource?.src || '';
+    const imageSrc = ('driver' in drawer && (drawer.driver.avatar_src || missingAvatarSrc)) || resource?.src || '';
 
     const finalAvatarSx = {
         ...(size === 'small' ? smallStyle : {}),
