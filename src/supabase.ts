@@ -483,6 +483,21 @@ export type Database = {
         }
         Relationships: []
       }
+      Resource: {
+        Row: {
+          src: string | null
+          title: string
+        }
+        Insert: {
+          src?: string | null
+          title: string
+        }
+        Update: {
+          src?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

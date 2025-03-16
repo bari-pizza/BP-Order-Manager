@@ -258,14 +258,22 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             width: 100,
             editable: true,
             renderCell: (params) => {
-                return <LogoUploader origin={params.row} disabled />;
+                return (
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2} justifyContent="center">
+                        <LogoUploader origin={params.row} disabled />
+                    </Stack>
+                );
             },
             renderEditCell: (params) => {
                 const onSuccess = (downloadURL: string) => {
                     console.log(`saving ${downloadURL}`);
                     params.api.setEditCellValue({ id: params.id, field: 'icon', value: downloadURL });
                 };
-                return <LogoUploader origin={params.row} onSuccess={onSuccess} />;
+                return (
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2} justifyContent="center">
+                        <LogoUploader origin={params.row} onSuccess={onSuccess} />
+                    </Stack>
+                );
             },
         },
         {

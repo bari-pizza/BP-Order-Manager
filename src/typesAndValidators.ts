@@ -14,6 +14,7 @@ export type Driver = Tables<'Driver'>;
 export type Order = Tables<'Order'>;
 export type OrderOrigin = Tables<'OrderOrigin'>;
 export type OrderType = Tables<'Order'>['order_type'];
+export type Resource = Tables<'Resource'>;
 export type BusinessDayDriver = Tables<'BusinessDayDriver'>;
 export type Payment = Tables<'Payment'>;
 export type Order_Payment = Order & { payments: Payment[] };
@@ -44,7 +45,7 @@ export type PaymentWithFullDetails = Payment & {
     origin: OrderOrigin;
 };
 
-export type AdminDashboardTabName = 'employees' | 'origins' | 'orders' | 'settings';
+export type AdminDashboardTabName = 'employees' | 'origins' | 'orders' | 'resources' | 'settings';
 export type ManagerDashboardTabName = 'sales' | 'drawers' | 'orders' | 'cards' | 'settings';
 export type LocalStorageField = {
     adminDashboardTabName: AdminDashboardTabName;
@@ -52,7 +53,7 @@ export type LocalStorageField = {
     openDrawer: Drawer | Driver_Drawer;
 };
 
-export type BucketName = 'avatars' | 'order_origins';
+export type BucketName = 'avatars' | 'order_origins' | 'resources';
 
 const orderValidators = {
     order_number: {

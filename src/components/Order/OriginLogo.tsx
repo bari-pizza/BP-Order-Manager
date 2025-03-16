@@ -1,15 +1,15 @@
 import { OrderOrigin } from '../../typesAndValidators';
-import { RoundImage, RoundImageProps } from '../Base/RoundImage';
+import { RoundLottieIcon } from '../../rickcedlib/LottieIcons';
 
-type OriginLogoProps = Omit<RoundImageProps, 'src' | 'alt'> & { orderOrigin: OrderOrigin };
+type OriginLogoProps = { orderOrigin: OrderOrigin };
 
-export const OriginLogo = ({ orderOrigin, ...props }: OriginLogoProps) => {
+export const OriginLogo = ({ orderOrigin }: OriginLogoProps) => {
     return (
-        <RoundImage
-            src={orderOrigin.icon || ''}
-            alt={orderOrigin.name}
+        <RoundLottieIcon
+            imageSrc={orderOrigin.icon || ''}
+            height="25px"
+            width="25px"
             className={`origin-logo-${orderOrigin.name}`}
-            {...props}
         />
     );
 };

@@ -4,12 +4,7 @@ import PizzaShopLottie from '../../assets/Pizza Shop.json';
 
 export const Home = () => {
     return (
-        <Stack
-            alignItems="center"
-            justifyContent="center"
-            direction="column"
-            height="100vh"
-            sx={{ border: '1px solid red' }}>
+        <Stack alignItems="center" justifyContent="center" direction="column" height="100vh">
             <Player autoplay src={PizzaShopLottie} style={{ maxHeight: '100vh' }} keepLastFrame />
         </Stack>
     );

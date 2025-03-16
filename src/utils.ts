@@ -1,3 +1,4 @@
+import { decomposeColor } from '@mui/material';
 import { Drawer, Driver_Drawer, Order_Payment } from './typesAndValidators';
 import dayjs from 'dayjs';
 import { cloneElement, isValidElement } from 'react';
@@ -81,4 +82,107 @@ export const devOnly = (child: React.ReactElement) => {
         return child; // Return the child as is if not a valid element
     }
     return null;
+};
+
+export const urlToRoundedBase64 = (url: string, size = 200) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // Important for CORS
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            // Set canvas size (adjust as needed)
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d')!;
+
+            // Create a circular clipping path
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.clip();
+
+            // Draw the image onto the canvas
+            const smallerDimension = Math.min(img.width, img.height);
+            const x = (img.width - smallerDimension) / 2;
+            const y = (img.height - smallerDimension) / 2;
+            ctx.drawImage(img, x, y, smallerDimension, smallerDimension, 0, 0, size, size);
+
+            // Convert to base64
+            const base64 = canvas.toDataURL('image/png');
+            resolve(base64);
+        };
+        img.onerror = (error) => reject(error);
+        img.src = url;
+    });
+};
+
+export const copyAndCleanLottie = (lottieJSON: unknown, layerName: string, shapeName: string, propPath: string) => {
+    const copiedLottieData = JSON.parse(JSON.stringify(lottieJSON)); // Create a new object
+    if (copiedLottieData.layers[0].nm === 'Group Layer 8') {
+        copiedLottieData.layers.shift();
+    }
+    const primaryColor = '#008764';
+    const decomposed = decomposeColor(primaryColor);
+    const [r, g, b] = decomposed.values;
+    console.log({ primaryColor, decomposed });
+
+    const normalizedR = r / 255;
+    const normalizedG = g / 255;
+    const normalizedB = b / 255;
+    return editLottieLayerProperty(copiedLottieData, layerName, shapeName, propPath, [
+        normalizedR,
+        normalizedG,
+        normalizedB,
+    ]) as unknown;
+};
+
+export const editLottieLayerProperty = (
+    lottieJson: string,
+    layerName: string,
+    shapeName: string,
+    propPath: string,
+    newValue: unknown,
+) => {
+    const updatedJson = JSON.parse(JSON.stringify(lottieJson)); // Deep copy
+    const layers = updatedJson.layers as { [key: string]: unknown }[];
+
+    const targetLayer = layers.find((layer) => layer.nm === layerName);
+    if (!targetLayer) {
+        console.error(`Layer "${layerName}" not found.`);
+        return lottieJson; // Return original if layer not found
+    }
+    let targetObject = targetLayer; // Start with the layer
+
+    if (shapeName) {
+        const shapes = targetLayer.shapes as { [key: string]: unknown }[];
+        const targetShape = shapes?.find((shape) => shape.nm === shapeName);
+        if (targetShape) {
+            targetObject = targetShape; // If shapeName provided, target the shape
+        } else {
+            console.error(`Shape "${shapeName}" not found in layer "${layerName}".`);
+            return lottieJson;
+        }
+    }
+
+    const pathParts = propPath.split('.');
+    let currentObj = targetObject;
+
+    for (let i = 0; i < pathParts.length - 1; i++) {
+        currentObj = currentObj[pathParts[i]] as { [key: string]: unknown };
+        if (!currentObj) {
+            console.error(`Property path "${propPath}" not found.`);
+            return lottieJson;
+        }
+    }
+
+    const lastProp = pathParts[pathParts.length - 1];
+    // eslint-disable-next-line no-prototype-builtins
+    if (currentObj && currentObj.hasOwnProperty(lastProp)) {
+        currentObj[lastProp] = newValue;
+    } else {
+        console.error(`Property "${lastProp}" not found.`);
+        return lottieJson;
+    }
+
+    return updatedJson;
 };

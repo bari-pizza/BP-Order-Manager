@@ -9,14 +9,17 @@ import { useLocation } from 'react-router-dom';
 
 import {
     AdminShieldLottieIcon,
+    DesktopLottieIcon,
+    HelpLottieIcon,
     HomeLottieIcon,
+    ManagerLottieIcon,
     MarketPlaceLottieIcon,
+    MobileLottieIcon,
+    // RoundLottieIcon,
     SearchLottieIcon,
-    StaffLottieIcon,
     TimeLottieIcon,
     UserProfileLottieIcon,
 } from '../rickcedlib/LottieIcons';
-import { Phone as PhoneIcon, Computer as ComputerIcon } from '@mui/icons-material';
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { useClearCache } from '../rickcedlib/hooks/useClearCache';
@@ -77,7 +80,7 @@ export function NavBar() {
             text: 'Admin',
             forMobile: false,
         },
-        profile?.is_manager && { path: '/manager', icon: <StaffLottieIcon />, text: 'Manager', forMobile: false },
+        profile?.is_manager && { path: '/manager', icon: <ManagerLottieIcon />, text: 'Manager', forMobile: false },
         {
             path: '/orders',
             icon: (
@@ -86,6 +89,12 @@ export function NavBar() {
                 </Badge>
             ),
             text: 'Orders',
+            forMobile: true,
+        },
+        {
+            path: '/how-to',
+            icon: <HelpLottieIcon />,
+            text: 'How To',
             forMobile: true,
         },
         userListItem,
@@ -141,12 +150,14 @@ export function NavBar() {
                     </ListItem>
                 ))}
                 {/* TODO: replace with Lottice Icon */}
-                <ListItem sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}>
+                <ListItem
+                    sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}
+                    className="lottie-icon-container">
                     <List>
                         <ListItemButton onClick={clearCacheAndReload}>
-                            <ListItem>
+                            <ListItem id="bpom-version">
                                 <ListItemIcon sx={{ justifyContent: 'center' }}>
-                                    {isMobile ? <PhoneIcon /> : <ComputerIcon />}
+                                    {isMobile ? <MobileLottieIcon /> : <DesktopLottieIcon />}
                                 </ListItemIcon>
                                 <ListItemText>{version}</ListItemText>
                             </ListItem>

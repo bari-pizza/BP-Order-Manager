@@ -624,6 +624,7 @@ export const useSetupAllSubscriptions = ({
             Driver: 'drivers',
             OrderOrigin: 'origins',
             Profile: 'profiles',
+            Resource: 'resources',
         };
 
         const subscription = supaClient

@@ -37,7 +37,7 @@ export type DrawerCardOverrideSX = {
 
 interface DrawerCardBaseProps {
     drawer: Drawer | Driver_Drawer;
-    drawerRef?: React.RefObject<HTMLDivElement>;
+    // drawerRef?: React.RefObject<HTMLDivElement>;
     isOpen?: boolean;
     badgeCount: number;
     handleClick?: () => void;
@@ -48,7 +48,7 @@ interface DrawerCardBaseProps {
 
 export const DrawerCardBase = ({
     drawer,
-    drawerRef,
+    // drawerRef,
     isOpen,
     badgeCount,
     handleClick,
@@ -138,7 +138,8 @@ export const DrawerCardBase = ({
                 sx={overrideSX.buttonStack}
                 alignItems="center"
                 gap={1}
-                justifyContent="space-between"
+                // justifyContent="space-between"
+                justifyContent="space-evenly"
                 {...props?.buttonStack}>
                 <Badge
                     // badgeCount={{ start: previousBadgeCount, end: badgeCount }}
@@ -149,13 +150,13 @@ export const DrawerCardBase = ({
                     key={badgeCount}>
                     <DrawerAvatar
                         drawer={drawer}
-                        drawerRef={drawerRef}
+                        // drawerRef={drawerRef}
                         sx={overrideSX}
-                        props={props}
+                        // props={props}
                         isLocked={isLocked}
                     />
                 </Badge>
-                <Stack justifyContent="center" alignItems="center" height="100%" {...props?.nameStack}>
+                <Stack justifyContent="center" alignItems="center" height="50px" {...props?.nameStack}>
                     <Typography pt={1} variant="body2" {...props?.nameTypography}>
                         {drawerName}
                     </Typography>

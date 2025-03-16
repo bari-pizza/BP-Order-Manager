@@ -30,8 +30,8 @@ export const DrawerCard = ({ drawer, sx, props, canOpen = true }: DrawerCardProp
 
     const baseSX = {
         avatar: {
-            width: '6em',
-            height: '6em',
+            width: '7em',
+            height: '7em',
         },
         button: {
             height: '16em',
