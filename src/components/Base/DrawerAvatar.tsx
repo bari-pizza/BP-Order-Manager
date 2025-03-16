@@ -128,6 +128,7 @@ export const DrawerAvatar = ({
                 imageSrc={imageSrc}
                 height={finalAvatarSx.height as string}
                 width={finalAvatarSx.width as string}
+                className={'drawer-avatar-' + drawer.drawer_id}
             />
             {/* <Avatar
                 className={'drawer-avatar-' + drawer.drawer_id}

@@ -10,12 +10,13 @@ export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
         {
             field: 'title',
             headerName: 'Title',
-            width: 200,
+            flex: 4,
         },
         {
             field: 'src',
             headerName: 'Icon',
-            width: 200,
+            headerAlign: 'center',
+            flex: 6,
             editable: true,
             renderCell: (params) => {
                 // return <ResourceUploader resource={params.row} disabled />;
@@ -23,15 +24,12 @@ export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
                     console.log(`saving ${downloadURL}`);
                     params.api.setEditCellValue({ id: params.id, field: 'src', value: downloadURL });
                 };
-                return <ResourceUploader resource={params.row} onSuccess={onSuccess} />;
+                return (
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2} justifyContent="center">
+                        <ResourceUploader resource={params.row} onSuccess={onSuccess} />
+                    </Stack>
+                );
             },
-            // renderEditCell: (params) => {
-            //     const onSuccess = (downloadURL: string) => {
-            //         console.log(`saving ${downloadURL}`);
-            //         params.api.setEditCellValue({ id: params.id, field: 'src', value: downloadURL });
-            //     };
-            //     return <ResourceUploader resource={params.row} onSuccess={onSuccess} />;
-            // },
         },
     ];
     return (
@@ -46,6 +44,7 @@ export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
                     return 'lottie-icon-container';
                 }}
                 hideFooter
+                rowHeight={100}
             />
         </Stack>
     );

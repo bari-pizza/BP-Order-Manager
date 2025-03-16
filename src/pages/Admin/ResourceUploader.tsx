@@ -45,11 +45,7 @@ export const ResourceUploader = ({ resource, onUpload, onSuccess, onError, disab
         basePath: resource.title,
         fileName: 'src',
         originalURL: resource.src || '',
-        // imgProps: {
-        //     width: 125,
-        //     height: 125,
-        // },
     };
 
-    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="medium" />;
+    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="large" />;
 };

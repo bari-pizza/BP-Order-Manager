@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Stack } from '@mui/material';
 import { Player } from '@lottiefiles/react-lottie-player';
 
@@ -8,6 +8,7 @@ type LottieIconProps = {
     width?: string;
     autoPlay?: boolean;
     className?: string;
+    playOnce?: boolean;
 };
 
 export const LottieIcon = ({
@@ -16,18 +17,32 @@ export const LottieIcon = ({
     width = '35px',
     autoPlay = false,
     className,
+    playOnce = false,
 }: LottieIconProps) => {
     const playerRef = useRef<Player | null>(null); // Ref to access Player methods
     const containerRef = useRef<HTMLDivElement | null>(null); // Ref to access DOM methods
+    const [hasPlayed, setHasPlayed] = useState(false); // Track if played once
 
     useEffect(() => {
         const hoverAncestor = containerRef.current?.closest('.lottie-icon-container'); // Detect the closest ancestor with the hover class
         if (!hoverAncestor) return;
 
         const handleHover = () => {
+            // if (playerRef.current) {
+            //     playerRef.current.play();
+            //     playerRef.current.setLoop(true);
+            // }
             if (playerRef.current) {
+                if (playOnce && hasPlayed) return; // If playOnce and already played, do nothing
                 playerRef.current.play();
-                playerRef.current.setLoop(true);
+                if (playOnce) {
+                    setHasPlayed(true); // Mark as played
+                    // playerRef.current.addEventListener('complete', () => {
+                    //     playerRef.current?.stop();
+                    // });
+                } else {
+                    playerRef.current.setLoop(true);
+                }
             }
         };
 
@@ -50,7 +65,6 @@ export const LottieIcon = ({
         if (playerRef.current) {
             if (autoPlay) {
                 playerRef.current.play();
-                playerRef.current.setLoop(true);
             } else {
                 setTimeout(() => {
                     playerRef.current?.setLoop(false);
@@ -71,7 +85,6 @@ export const LottieIcon = ({
                 className={className}
                 ref={playerRef}
                 src={lottieSrc}
-                loop
                 autoplay={autoPlay}
                 style={{ minHeight: height, minWidth: width }}
             />

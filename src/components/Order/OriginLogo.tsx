@@ -13,6 +13,11 @@ export const OriginLogo = ({ orderOrigin }: OriginLogoProps) => {
         //     className={`origin-logo-${orderOrigin.name}`}
         //     {...props}
         // />
-        <RoundLottieIcon imageSrc={orderOrigin.icon || ''} height="25px" width="25px" />
+        <RoundLottieIcon
+            imageSrc={orderOrigin.icon || ''}
+            height="25px"
+            width="25px"
+            className={`origin-logo-${orderOrigin.name}`}
+        />
     );
 };

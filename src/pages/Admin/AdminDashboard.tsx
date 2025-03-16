@@ -10,7 +10,6 @@ import { OriginsTab } from './Tabs/OriginsTab';
 import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
 import { GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
-import { devOnly } from '../../utils';
 import { ResourcesTab } from './Tabs/ResourcesTab';
 
 /*    TODO: About Today
@@ -134,14 +133,13 @@ export const AdminDashboard = () => {
                             icon={<GlobeLottieIcon autoPlay={tabName === 'origins'} />}
                             iconPosition="start"
                         />
-                        {devOnly(
-                            <Tab
-                                value="resources"
-                                label="Resources"
-                                icon={<SettingsLottieIcon autoPlay={tabName === 'resources'} />}
-                                iconPosition="start"
-                            />,
-                        )}
+                        <Tab
+                            value="resources"
+                            label="Resources"
+                            icon={<SettingsLottieIcon autoPlay={tabName === 'resources'} />}
+                            iconPosition="start"
+                        />
+                        ,
                         <Tab
                             value="settings"
                             label="Settings"
@@ -157,11 +155,10 @@ export const AdminDashboard = () => {
                     <TabPanel tabName="origins" value={tabName}>
                         <OriginsTab />
                     </TabPanel>
-                    {devOnly(
-                        <TabPanel tabName="resources" value={tabName}>
-                            <ResourcesTab />
-                        </TabPanel>,
-                    )}
+                    <TabPanel tabName="resources" value={tabName}>
+                        <ResourcesTab />
+                    </TabPanel>
+                    ,
                     <TabPanel tabName="settings" value={tabName}>
                         <SettingsTab />
                     </TabPanel>

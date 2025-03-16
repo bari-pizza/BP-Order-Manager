@@ -13,10 +13,8 @@ interface AddDriverCardProps {
     isOpen: boolean;
 }
 
-const now = new Date();
-const dateAndHour = `${now.getDate()}-${now.getHours()}`;
-
 export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
+    const { resources } = useBariPizzaContext();
     const { drivers, cashTransfers } = useManagerDashboardContext();
     const { constants, drawers } = useBariPizzaContext();
     const { available: availableDrivers, add: addDriver } = drivers;
@@ -33,6 +31,8 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
         },
     });
 
+    const resource = resources.find((r) => r.title === 'Add Driver');
+
     const dummyDrawer: Driver_Drawer = {
         created_at: '2024-08-27T00:00:00.000Z',
         drawer_id: 'add-driver',
@@ -48,7 +48,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
             is_cashier: false,
             last_name: 'Driver',
             phone: '555-555-5555',
-            avatar_src: `https://i.pravatar.cc/300?u=${dateAndHour}`,
+            avatar_src: resource?.src || '',
             is_deleted: false,
         },
     };
