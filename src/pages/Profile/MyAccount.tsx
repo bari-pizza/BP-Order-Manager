@@ -5,7 +5,6 @@ import { AvatarUploader } from './AvatarUploader';
 import { Controller, useForm } from 'react-hook-form';
 import { useRef, useState } from 'react';
 import { Id, toast } from 'react-toastify';
-import { Translate } from 'react-dialect';
 import 'dayjs/locale/es-us';
 import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
@@ -27,7 +26,6 @@ export const MyAccount = () => {
     const { profile } = useUserContext();
     const toastRef = useRef<Id>('');
     const { isMobile } = useLayoutContext();
-    // const { setCurrentLanguage } = useTranslation();
     const [languageSubmitting, setLanguageSubmitting] = useState(false);
 
     const profileLocale = profile?.locale || 'en';
@@ -317,7 +315,7 @@ export const MyAccount = () => {
                                 <SmartTextField
                                     {...params}
                                     value={profileLocale}
-                                    label={<Translate as="span">Language</Translate>}
+                                    label="Language"
                                     isDirty={languageSubmitting}
                                 />
                             )}

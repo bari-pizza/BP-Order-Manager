@@ -22,8 +22,8 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { useClearCache } from '../rickcedlib/hooks/useClearCache';
-import { useTranslation } from 'react-dialect';
-
+// @ts-expect-error remove if module declaration can be fixed
+import { m } from '../paraglide/messages.js';
 interface NavBarItem {
     path?: string;
     icon: JSX.Element;
@@ -41,9 +41,7 @@ export function NavBar() {
     const { isMobile } = useLayoutContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
-    const { translate } = useTranslation();
     const location = useLocation();
-    // const version = `__APP_VERSION__`.split('"').join('');
     const version = `__APP_VERSION__`.replace(/"/g, '');
 
     const queryClient = useQueryClient();
@@ -57,35 +55,34 @@ export function NavBar() {
     const drawerWidth = isMobile ? 65 : 200;
 
     const userListItem: NavBarItem = session
-        ? { path: '/myaccount', icon: <UserAvatar />, text: 'Profile', forMobile: true }
-        : { path: '/login', icon: <UserProfileLottieIcon />, text: 'Login', forMobile: true };
+        ? { path: '/myaccount', icon: <UserAvatar />, text: m.profile(), forMobile: true }
+        : { path: '/login', icon: <UserProfileLottieIcon />, text: m.login(), forMobile: true };
 
     const listItems: NavBarItem[] = [
         {
             path: '/',
             icon: <HomeLottieIcon />,
-            text: translate('Home'),
+            text: 'Home',
             forMobile: true,
         },
         {
-            text: today.isSame(businessDate, 'day') ? translate('Today') : businessDate.format('MM/DD/YYYY'),
+            text: today.isSame(businessDate, 'day') ? m.today() : businessDate.format('MM/DD/YYYY'),
             icon: <TimeLottieIcon />,
             onClick: showBusinessDatePicker,
             forMobile: true,
             className: 'date-picker-button',
         },
-        { path: '/search', icon: <SearchLottieIcon />, text: 'Search', forMobile: false },
+        { path: '/search', icon: <SearchLottieIcon />, text: m.search(), forMobile: false },
         profile?.is_admin && {
             path: '/admin',
             icon: <AdminShieldLottieIcon />,
-            text: translate('Admin'),
+            text: m.admin(),
             forMobile: false,
         },
         profile?.is_manager && {
             path: '/manager',
             icon: <ManagerLottieIcon />,
-            text: translate('Manager'),
-            className: 'Manager',
+            text: m.manager(),
             forMobile: false,
         },
         {
@@ -95,13 +92,13 @@ export function NavBar() {
                     <MarketPlaceLottieIcon />
                 </Badge>
             ),
-            text: translate('Orders'),
+            text: m.orders(),
             forMobile: true,
         },
         {
             path: '/how-to',
             icon: <HelpLottieIcon />,
-            text: translate('How To'),
+            text: m.howTo(),
             forMobile: true,
         },
         userListItem,
@@ -151,7 +148,10 @@ export function NavBar() {
                         <ListItemButton selected={location.pathname === item.path} onClick={item.onClick}>
                             <ListItemIcon>{item.icon}</ListItemIcon>
                             {!isMobile && (
-                                <ListItemText primary={item.text} primaryTypographyProps={{ color: 'primary' }} />
+                                <ListItemText
+                                    primary={item.text}
+                                    primaryTypographyProps={{ color: 'primary', textTransform: 'capitalize' }}
+                                />
                             )}
                         </ListItemButton>
                     </ListItem>

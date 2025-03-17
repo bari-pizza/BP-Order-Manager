@@ -31,12 +31,13 @@ import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
 import { useBusinessDate, useMidnightEffect } from './hooks/data/useBusinessDate.tsx';
-import { TranslationProvider, useTranslation } from 'react-dialect';
 import { enUS, ptBR, esES, Localization } from '@mui/material/locale';
 import 'dayjs/locale/en';
 import 'dayjs/locale/es';
 import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
+// @ts-expect-error missing module declaration
+import { setLocale } from './paraglide/runtime.js';
 
 const router = createBrowserRouter([
     {
@@ -116,18 +117,15 @@ const router = createBrowserRouter([
 
 function App() {
     console.log('rendering app.tsx');
-
     return (
         <QueryClientProvider client={queryClient}>
-            <TranslationProvider languages={['en', 'es', 'pt']} baseLanguage="en">
-                <RouterProvider
-                    router={router}
-                    future={{
-                        v7_startTransition: true,
-                    }}
-                />
-                <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-            </TranslationProvider>
+            <RouterProvider
+                router={router}
+                future={{
+                    v7_startTransition: true,
+                }}
+            />
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
         </QueryClientProvider>
     );
 }
@@ -147,7 +145,6 @@ function Layout() {
     const isMobile = useMediaQuery(
         '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
     );
-    const { setCurrentLanguage } = useTranslation();
     useMidnightEffect();
     // MAYBE include useSubscribeToTable here but these shouldnt be changed often
     const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }, { data: resources }] =
@@ -218,9 +215,9 @@ function Layout() {
 
     useEffect(() => {
         if (profileLocale) {
-            setCurrentLanguage(profileLocale);
+            setLocale(profileLocale, { reload: false });
         }
-    }, [profileLocale, setCurrentLanguage]);
+    }, [profileLocale]);
 
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 

@@ -8,7 +8,6 @@ import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { useQueryClient } from '@tanstack/react-query';
 import { Profile } from '../../typesAndValidators';
-import { Translate } from 'react-dialect';
 
 type FormValues = {
     email: string;
@@ -134,7 +133,7 @@ export function Login() {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    label={<Translate>Password</Translate>}
+                                    label="Password"
                                     variant="outlined"
                                     error={!!errors.password}
                                     helperText={errors.password?.message}

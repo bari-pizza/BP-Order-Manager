@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "vite --host",
         "test": "vitest",
+        "generate": "npx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
         "build": "tsc -b && vite build",
         "check": "tsc -b",
         "serve": "npx serve -s dist",
@@ -14,7 +15,8 @@
         "preview": "vite preview",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
-        "chromatic": "npx chromatic --project-token=chpt_e20b10a74740ccf"
+        "chromatic": "npx chromatic --project-token=chpt_e20b10a74740ccf",
+        "machine-translate": "inlang machine translate --project project.inlang"
     },
     "dependencies": {
         "@emotion/react": "^11.13.0",
@@ -54,6 +56,8 @@
         "@chromatic-com/storybook": "^1.7.0",
         "@eslint/js": "^9.8.0",
         "@faker-js/faker": "^8.4.1",
+        "@inlang/cli": "^3.0.0",
+        "@inlang/paraglide-js": "^2.0.0",
         "@playwright/test": "^1.48.1",
         "@rollup/plugin-replace": "^6.0.2",
         "@storybook/addon-a11y": "^8.2.9",

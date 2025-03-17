@@ -43,7 +43,7 @@ const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
                 <LogoUploader origin={origin} disabled />
                 <Typography variant="h6">{origin.name}</Typography>
             </Stack>
-            <Typography variant="h6">Order {origin.has_order_number ? 'Number' : 'Name'}</Typography>
+            <Typography variant="h6">{origin.has_order_number ? 'Order Number' : 'Order Name'}</Typography>
             <ExampleOrderTypeSelector delivery={origin.can_deliver} />
             <ExamplePaymentSelector cash={cash} card={card} thirdParty={thirdParty} selected={selected} />
             <Typography variant="h6">{origin.can_tip ? 'Accepts' : 'Does not accept'} tips</Typography>

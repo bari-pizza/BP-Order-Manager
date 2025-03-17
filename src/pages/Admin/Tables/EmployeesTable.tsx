@@ -269,7 +269,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'send_email',
-            headerName: 'Send PW Reset Email',
+            headerName: 'Send Email',
             headerAlign: 'center',
             width: 175,
             editable: false,
@@ -354,7 +354,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
     });
 
     return (
-        <Tooltip title="Send password reset email">
+        <Tooltip title="Send Password Reset Email">
             <IconButton
                 onClick={handleConfirmation}
                 disabled={isSubmitting || disabled}

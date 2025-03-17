@@ -14,7 +14,6 @@ import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { getEnv } from '../../../utils';
-// import { useSubscribeToTable } from '../../../hooks/data/useSubscribeToTable';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';
@@ -64,18 +63,6 @@ export const EmployeesTab = () => {
             phone: '',
         },
     });
-    // const { data: initialProfiles } = useSuspenseQuery({
-    //     queryKey: ['profiles'],
-    //     queryFn: () => getAllEmployees(),
-    //     refetchOnWindowFocus: false,
-    //     staleTime: 1000 * 60 * 30,
-    // });
-    // const profiles = useSubscribeToTable({
-    //     tableName: 'Profile',
-    //     initialData: initialProfiles,
-    //     primaryKeys: ['id'],
-    //     queryKey: ['profiles'],
-    // });
     const queryClient = useQueryClient();
 
     const profiles = (queryClient.getQueryData(['profiles']) ?? []) as Profile[];
@@ -100,7 +87,6 @@ export const EmployeesTab = () => {
             body: { email, first_name, last_name, phone },
             headers: {
                 Authorization: `Bearer ${getEnv('VITE_SUPABASE_ANON_KEY')}`,
-                // Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY}`,
             },
         });
 
@@ -115,7 +101,7 @@ export const EmployeesTab = () => {
         }
 
         toast.update(toastRef.current, {
-            render: 'Employee created',
+            render: `Employee ${first_name} ${last_name} created successfully`,
             type: 'success',
             isLoading: false,
             autoClose: 5000,
@@ -151,7 +137,7 @@ export const EmployeesTab = () => {
                         <Controller
                             control={control}
                             name="first_name"
-                            rules={{ required: 'First name is required' }}
+                            rules={{ required: 'First Name is required' }}
                             render={({ field }) => (
                                 <SmartTextField
                                     {...field}
@@ -164,7 +150,7 @@ export const EmployeesTab = () => {
                         <Controller
                             control={control}
                             name="last_name"
-                            rules={{ required: 'Last name is required' }}
+                            rules={{ required: 'Last Name is required' }}
                             render={({ field }) => (
                                 <SmartTextField
                                     {...field}
@@ -194,7 +180,7 @@ export const EmployeesTab = () => {
                 <DialogActions>
                     <Button onClick={close}>Cancel</Button>
                     <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
-                        Add
+                        Save
                     </Button>
                 </DialogActions>
             </Dialog>
