@@ -19,6 +19,7 @@ import { Id, toast } from 'react-toastify';
 import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';
+import { m } from '../../../paraglide/messages';
 
 const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     if (!origin) return null;
@@ -43,7 +44,7 @@ const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
                 <LogoUploader origin={origin} disabled />
                 <Typography variant="h6">{origin.name}</Typography>
             </Stack>
-            <Typography variant="h6">{origin.has_order_number ? 'Order Number' : 'Order Name'}</Typography>
+            <Typography variant="h6">Order {origin.has_order_number ? m.number() : m.name()}</Typography>
             <ExampleOrderTypeSelector delivery={origin.can_deliver} />
             <ExamplePaymentSelector cash={cash} card={card} thirdParty={thirdParty} selected={selected} />
             <Typography variant="h6">{origin.can_tip ? 'Accepts' : 'Does not accept'} tips</Typography>

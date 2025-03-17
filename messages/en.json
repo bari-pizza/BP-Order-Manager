@@ -1,6 +1,5 @@
 {
     "$schema": "https://inlang.com/schema/inlang-message-format",
-    "example_message": "Hello world {username}",
     "profile": "profile",
     "today": "today",
     "search": "search",
@@ -9,5 +8,7 @@
     "orders": "orders",
     "howTo": "how to",
     "login": "login",
-    "home": "home"
+    "home": "home",
+    "number": "number",
+    "name": "name"
 }
