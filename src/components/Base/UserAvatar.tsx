@@ -42,7 +42,7 @@ export const UserAvatar = () => {
         }
         const resource = resources.find((resource) => resource.title === 'Missing Avatar');
         if (resource) {
-            return <RoundLottieIcon imageSrc={resource.src} />;
+            return <RoundLottieIcon imageSrc={resource.src!} />;
         }
         return null;
     }

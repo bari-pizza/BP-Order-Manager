@@ -1,4 +1,13 @@
 {
     "$schema": "https://inlang.com/schema/inlang-message-format",
-    "example_message": "Bom Dia {username}"
+    "example_message": "Bom Dia {username}",
+    "profile": "perfil",
+    "today": "hoje",
+    "search": "pesquisar",
+    "admin": "admin",
+    "manager": "gerente",
+    "orders": "pedidos",
+    "howTo": "ajuda",
+    "login": "entrar",
+    "home": "inicio"
 }

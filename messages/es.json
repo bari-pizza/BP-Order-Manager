@@ -1,5 +1,13 @@
 {
     "$schema": "https://inlang.com/schema/inlang-message-format",
     "example_message": "Buen Día {username}",
-    "profile": "Perfil"
+    "profile": "perfil",
+    "today": "hoy",
+    "search": "buscar",
+    "admin": "admin",
+    "manager": "gerente",
+    "orders": "pedidos",
+    "howTo": "ayuda",
+    "login": "iniciar sesión",
+    "home": "inicio"
 }

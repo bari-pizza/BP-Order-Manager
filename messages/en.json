@@ -3,12 +3,11 @@
     "example_message": "Hello world {username}",
     "profile": "profile",
     "today": "today",
-    "login": "login",
     "search": "search",
     "admin": "admin",
     "manager": "manager",
-    "driver": "driver",
-    "sales": "sales",
     "orders": "orders",
-    "howTo": "how to"
+    "howTo": "how to",
+    "login": "login",
+    "home": "home"
 }
