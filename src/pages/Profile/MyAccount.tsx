@@ -1,11 +1,15 @@
-import { Stack, Button, Typography, TextField, Divider, Skeleton } from '@mui/material';
+import { Stack, Button, Typography, TextField, Divider, Skeleton, Autocomplete } from '@mui/material';
 import { supaClient } from '../../supaClient';
 import { useLayoutContext, useUserContext } from '../../hooks/data/useContextData';
 import { AvatarUploader } from './AvatarUploader';
 import { Controller, useForm } from 'react-hook-form';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Id, toast } from 'react-toastify';
-// import { useConfirmationToast } from '../../toast/useConfirmationToast';
+import { Translate } from 'react-dialect';
+import 'dayjs/locale/es-us';
+import 'dayjs/locale/pt-br';
+import dayjs from 'dayjs';
+import { SmartTextField } from '../../rickcedlib/components/SmartTextField';
 
 // TODO: Add a way to edit profile (avatar_src, first_name, last_name,  password)
 type FormValues = {
@@ -23,6 +27,31 @@ export const MyAccount = () => {
     const { profile } = useUserContext();
     const toastRef = useRef<Id>('');
     const { isMobile } = useLayoutContext();
+    // const { setCurrentLanguage } = useTranslation();
+    const [languageSubmitting, setLanguageSubmitting] = useState(false);
+
+    const profileLocale = profile?.locale || 'en';
+
+    const dictionary: {
+        [languageCode: string]: {
+            dayJSLocale: string;
+
+            text: string;
+        };
+    } = {
+        es: { dayJSLocale: 'es-us', text: 'Español' },
+        pt: { dayJSLocale: 'pt-br', text: 'Português' },
+        en: { dayJSLocale: 'en', text: 'English' },
+    };
+
+    const handleLanguageChange = async (newLanguageCode: string | null) => {
+        if (!newLanguageCode) return;
+        const dayJSLocale = dictionary[newLanguageCode]?.dayJSLocale || 'en';
+        dayjs.locale(dayJSLocale);
+        setLanguageSubmitting(true);
+        await supaClient.from('Profile').update({ locale: newLanguageCode }).eq('id', profile?.id);
+        setLanguageSubmitting(false);
+    };
 
     const {
         handleSubmit,
@@ -276,6 +305,40 @@ export const MyAccount = () => {
                                 );
                             }}
                         />
+                        {/* <SwitchLanguage onChange={handleLanguageChange} /> */}
+                        <Autocomplete
+                            options={['en', 'pt', 'es']}
+                            value={profileLocale}
+                            sx={{ width: 225 }}
+                            // onChange={(event) => handleLanguageChange(event)}
+                            onChange={(_, value) => handleLanguageChange(value)}
+                            renderInput={(params) => (
+                                // <TextField {...params} label="Language" />
+                                <SmartTextField
+                                    {...params}
+                                    value={profileLocale}
+                                    label={<Translate as="span">Language</Translate>}
+                                    isDirty={languageSubmitting}
+                                />
+                            )}
+                            getOptionLabel={(option) => dictionary[option].text}
+                            // getOptionLabel={(option) => drawers.find((d) => d.drawer_id === option)?.name || ''}
+                        />
+                        {/* <TextField
+                            select
+                            id="locale"
+                            label="Language"
+                            value={profileLocale}
+                            onChange={handleLanguageChange}
+                            // options={
+                            //     [
+                            //         { value: 'en', label: 'English' },
+                            //         { value: 'pt', label: 'Portugues' },
+                            //         { value: 'es', label: 'Espanol' },
+                            //     ]
+                            // }
+                            helperText="Please select your language"
+                            > */}
                     </Stack>
                 </Stack>
             </Stack>

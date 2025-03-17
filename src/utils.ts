@@ -124,7 +124,6 @@ export const copyAndCleanLottie = (lottieJSON: unknown, layerName: string, shape
     const primaryColor = '#008764';
     const decomposed = decomposeColor(primaryColor);
     const [r, g, b] = decomposed.values;
-    console.log({ primaryColor, decomposed });
 
     const normalizedR = r / 255;
     const normalizedG = g / 255;

@@ -15,7 +15,6 @@ import {
     ManagerLottieIcon,
     MarketPlaceLottieIcon,
     MobileLottieIcon,
-    // RoundLottieIcon,
     SearchLottieIcon,
     TimeLottieIcon,
     UserProfileLottieIcon,
@@ -23,6 +22,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { useClearCache } from '../rickcedlib/hooks/useClearCache';
+import { useTranslation } from 'react-dialect';
 
 interface NavBarItem {
     path?: string;
@@ -41,6 +41,7 @@ export function NavBar() {
     const { isMobile } = useLayoutContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
+    const { translate } = useTranslation();
     const location = useLocation();
     // const version = `__APP_VERSION__`.split('"').join('');
     const version = `__APP_VERSION__`.replace(/"/g, '');
@@ -63,11 +64,11 @@ export function NavBar() {
         {
             path: '/',
             icon: <HomeLottieIcon />,
-            text: 'Home',
+            text: translate('Home'),
             forMobile: true,
         },
         {
-            text: today.isSame(businessDate, 'day') ? 'Today' : businessDate.format('MM/DD/YYYY'),
+            text: today.isSame(businessDate, 'day') ? translate('Today') : businessDate.format('MM/DD/YYYY'),
             icon: <TimeLottieIcon />,
             onClick: showBusinessDatePicker,
             forMobile: true,
@@ -77,10 +78,16 @@ export function NavBar() {
         profile?.is_admin && {
             path: '/admin',
             icon: <AdminShieldLottieIcon />,
-            text: 'Admin',
+            text: translate('Admin'),
             forMobile: false,
         },
-        profile?.is_manager && { path: '/manager', icon: <ManagerLottieIcon />, text: 'Manager', forMobile: false },
+        profile?.is_manager && {
+            path: '/manager',
+            icon: <ManagerLottieIcon />,
+            text: translate('Manager'),
+            className: 'Manager',
+            forMobile: false,
+        },
         {
             path: '/orders',
             icon: (
@@ -88,13 +95,13 @@ export function NavBar() {
                     <MarketPlaceLottieIcon />
                 </Badge>
             ),
-            text: 'Orders',
+            text: translate('Orders'),
             forMobile: true,
         },
         {
             path: '/how-to',
             icon: <HelpLottieIcon />,
-            text: 'How To',
+            text: translate('How To'),
             forMobile: true,
         },
         userListItem,
@@ -162,7 +169,7 @@ export function NavBar() {
                                 <ListItemText>{version}</ListItemText>
                             </ListItem>
                         </ListItemButton>
-                        <ListItemText>{todaysDate}</ListItemText>
+                        <ListItemText style={{ textTransform: 'capitalize' }}>{todaysDate}</ListItemText>
                     </List>
                 </ListItem>
             </List>

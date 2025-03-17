@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import { Stack, Drawer } from '@mui/material';
@@ -31,8 +31,12 @@ import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
 import { useBusinessDate, useMidnightEffect } from './hooks/data/useBusinessDate.tsx';
-import { ShepherdJourneyProvider } from 'react-shepherd';
-import 'shepherd.js/dist/css/shepherd.css';
+import { TranslationProvider, useTranslation } from 'react-dialect';
+import { enUS, ptBR, esES, Localization } from '@mui/material/locale';
+import 'dayjs/locale/en';
+import 'dayjs/locale/es';
+import 'dayjs/locale/pt-br';
+import dayjs from 'dayjs';
 
 const router = createBrowserRouter([
     {
@@ -115,7 +119,7 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <ShepherdJourneyProvider>
+            <TranslationProvider languages={['en', 'es', 'pt']} baseLanguage="en">
                 <RouterProvider
                     router={router}
                     future={{
@@ -123,7 +127,7 @@ function App() {
                     }}
                 />
                 <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-            </ShepherdJourneyProvider>
+            </TranslationProvider>
         </QueryClientProvider>
     );
 }
@@ -132,7 +136,7 @@ export default App;
 
 const queryClient = new QueryClient();
 
-const theme = createTheme(themeOptions);
+// const theme = createTheme(themeOptions);
 
 function Layout() {
     const { session, profile, loading } = useSession();
@@ -143,6 +147,7 @@ function Layout() {
     const isMobile = useMediaQuery(
         '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
     );
+    const { setCurrentLanguage } = useTranslation();
     useMidnightEffect();
     // MAYBE include useSubscribeToTable here but these shouldnt be changed often
     const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }, { data: resources }] =
@@ -183,6 +188,40 @@ function Layout() {
         });
     const [businessDate] = useBusinessDate();
 
+    const profileLocale = profile?.locale || 'en';
+
+    const { theme, dayJsLocale } = useMemo(() => {
+        if (profileLocale) {
+            const dictionary: {
+                [languageCode: string]: {
+                    dayJSLocale: string;
+                    localization: Localization;
+                    text: string;
+                };
+            } = {
+                es: { dayJSLocale: 'es-us', localization: esES, text: 'Español' },
+                pt: { dayJSLocale: 'pt-br', localization: ptBR, text: 'Português' },
+                en: { dayJSLocale: 'en', localization: enUS, text: 'English' },
+            };
+            const theme = createTheme(themeOptions, dictionary[profileLocale].localization);
+            const dayJsLocale = dictionary[profileLocale].dayJSLocale;
+            return { theme, dayJsLocale };
+        } else {
+            const theme = createTheme(themeOptions, enUS);
+            return { theme, dayJsLocale: 'en' };
+        }
+    }, [profileLocale]);
+
+    useMemo(() => {
+        dayjs.locale(dayJsLocale);
+    }, [dayJsLocale]);
+
+    useEffect(() => {
+        if (profileLocale) {
+            setCurrentLanguage(profileLocale);
+        }
+    }, [profileLocale, setCurrentLanguage]);
+
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
     return (
@@ -191,7 +230,8 @@ function Layout() {
         //     onLoad={() => console.log('Maps API has loaded.')}
         //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
         //     version="beta">
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dayJsLocale}>
             <ThemeProvider theme={theme}>
                 <BariPizzaContext.Provider
                     value={{
@@ -202,7 +242,13 @@ function Layout() {
                         resources,
                     }}>
                     <LayoutContext.Provider
-                        value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth, isMobile }}>
+                        value={{
+                            sideBarRef,
+                            setSideBarWidth,
+                            sideBarSkeletonRef,
+                            setSideBarSkeletonWidth,
+                            isMobile,
+                        }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
                             <ToastContainer />
                             <Stack id="main" direction="row" justifyContent="center">

@@ -1,0 +1,5 @@
+{
+    "content": ["src"],
+    "languages": ["en", "es", "pt"],
+    "baseLanguage": "en"
+}
