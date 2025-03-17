@@ -62,7 +62,7 @@ export function NavBar() {
         {
             path: '/',
             icon: <HomeLottieIcon />,
-            text: 'Home',
+            text: m.home(),
             forMobile: true,
         },
         {

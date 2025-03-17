@@ -214,10 +214,11 @@ function Layout() {
     }, [dayJsLocale]);
 
     useEffect(() => {
-        if (profileLocale) {
-            setLocale(profileLocale, { reload: false });
+        // using profile?.locale here instead of profileLocale so that it only runs once profile is loaded
+        if (profile?.locale) {
+            setLocale(profile?.locale);
         }
-    }, [profileLocale]);
+    }, [profile?.locale]);
 
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
