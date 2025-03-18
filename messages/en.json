@@ -11,5 +11,14 @@
     "home": "home",
     "order_name": "order name",
     "order_number": "order number",
-    "adminDashboard": "admin dashboard"
+    "adminDashboard": "admin dashboard",
+    "employees": "employees",
+    "origins": "origins",
+    "resources": "resources",
+    "settings": "settings",
+    "creating": "creating",
+    "employee": "employee",
+    "addNewEmployee": "add new employee",
+    "addEmployee": "add employee",
+    "employeeCreatedSuccessfully": "Employee {0} {1} created successfully"
 }
