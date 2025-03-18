@@ -8,5 +8,7 @@
     "orders": "pedidos",
     "howTo": "ayuda",
     "login": "iniciar sesión",
-    "home": "inicio"
+    "home": "inicio",
+    "order_name": "nombre del pedido",
+    "order_number": "numero de pedido"
 }

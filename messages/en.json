@@ -9,6 +9,6 @@
     "howTo": "how to",
     "login": "login",
     "home": "home",
-    "number": "number",
-    "name": "name"
+    "order_name": "order name",
+    "order_number": "order number"
 }

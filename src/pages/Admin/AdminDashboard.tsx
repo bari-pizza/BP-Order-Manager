@@ -11,19 +11,8 @@ import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
 import { GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
 import { ResourcesTab } from './Tabs/ResourcesTab';
-
-/*    TODO: About Today
-        Sales
-            Charts
-            Reports
-        Drivers
-            Add driver
-            Remove driver (only if not in use)
-            Close driver (locks driver)
-            Open driver (unlocks driver)
-        Orders
-            Allow for order deletion
-*/
+// @ts-expect-error remove if module declaration can be fixed
+import { m } from '../../paraglide/messages';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -116,7 +105,7 @@ export const AdminDashboard = () => {
                         variant="h3"
                         color="primary"
                         sx={{ textShadow: `1px 1px 1px ${theme.palette.primary.dark}` }}>
-                        Admin Dashboard
+                        {m.adminDashboard()}
                     </Typography>
                 </Stack>
                 <Box>
