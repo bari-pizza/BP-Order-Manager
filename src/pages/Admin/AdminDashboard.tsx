@@ -9,7 +9,7 @@ import { EmployeesTab } from './Tabs/EmployeesTab';
 import { OriginsTab } from './Tabs/OriginsTab';
 import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
-import { GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
+import { FolderLottieIcon, GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
 import { ResourcesTab } from './Tabs/ResourcesTab';
 // @ts-expect-error remove if module declaration can be fixed
 import { m } from '../../paraglide/messages';
@@ -104,6 +104,7 @@ export const AdminDashboard = () => {
                     <Typography
                         variant="h3"
                         color="primary"
+                        textTransform={'capitalize'}
                         sx={{ textShadow: `1px 1px 1px ${theme.palette.primary.dark}` }}>
                         {m.adminDashboard()}
                     </Typography>
@@ -125,7 +126,7 @@ export const AdminDashboard = () => {
                         <Tab
                             value="resources"
                             label="Resources"
-                            icon={<SettingsLottieIcon autoPlay={tabName === 'resources'} />}
+                            icon={<FolderLottieIcon autoPlay={tabName === 'resources'} />}
                             iconPosition="start"
                         />
                         ,

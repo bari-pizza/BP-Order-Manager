@@ -4,6 +4,7 @@ import CarIcon from '../../assets/lottie-icons/Car Icon.json';
 import ChartIcon from '../../assets/lottie-icons/Chart Icon.json';
 import CreditCardIcon from '../../assets/lottie-icons/Credit Card Icon.json';
 import DesktopIcon from '../../assets/lottie-icons/Desktop Icon.json';
+import FolderIcon from '../../assets/lottie-icons/Folder Icon.json';
 import GlobeIcon from '../../assets/lottie-icons/Globe Icon.json';
 import HelpIcon from '../../assets/lottie-icons/Help Icon.json';
 import HomeIcon from '../../assets/lottie-icons/Home Icon.json';
@@ -55,6 +56,10 @@ export const CreditCardLottieIcon = ({ ...props }: LottieIconProps) => {
 
 export const DesktopLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={DesktopIcon} {...props} />;
+};
+
+export const FolderLottieIcon = ({ ...props }: LottieIconProps) => {
+    return <LottieIcon lottieSrc={FolderIcon} {...props} />;
 };
 
 export const GlobeLottieIcon = ({ ...props }: LottieIconProps) => {

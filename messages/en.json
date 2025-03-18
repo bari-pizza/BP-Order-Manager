@@ -10,5 +10,6 @@
     "login": "login",
     "home": "home",
     "order_name": "order name",
-    "order_number": "order number"
+    "order_number": "order number",
+    "adminDashboard": "admin dashboard"
 }

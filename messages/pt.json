@@ -10,5 +10,6 @@
     "login": "entrar",
     "home": "inicio",
     "order_name": "nome do pedido",
-    "order_number": "numero do pedido"
+    "order_number": "numero do pedido",
+    "adminDashboard": "painel de administração"
 }

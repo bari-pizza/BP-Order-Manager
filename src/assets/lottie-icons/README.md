@@ -7,4 +7,4 @@ two tones
 -   black
 -   green (from themeOptions.palette.primary.main #008764)
 
-create new icon component in LottieIcons/index.tsx
+create new icon component in rickcedwhat/LottieIcons/index.tsx
