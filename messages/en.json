@@ -20,5 +20,5 @@
     "employee": "employee",
     "addNewEmployee": "add new employee",
     "addEmployee": "add employee",
-    "employeeCreatedSuccessfully": "Employee {fullName} created successfully"
+    "employeeCreatedSuccessfully": "employee {fullName} created successfully"
 }

@@ -11,5 +11,14 @@
     "home": "inicio",
     "order_name": "nombre del pedido",
     "order_number": "numero de pedido",
-    "adminDashboard": "pandel de administración"
+    "adminDashboard": "pandel de administración",
+    "employees": "empleados",
+    "origins": "origenes",
+    "resources": "recursos",
+    "settings": "configuraciones",
+    "creating": "creando",
+    "employee": "empleado",
+    "addNewEmployee": "agregar nuevo empleado",
+    "addEmployee": "agregar empleado",
+    "employeeCreatedSuccessfully": "empleado {fullName} creado con éxito"
 }
