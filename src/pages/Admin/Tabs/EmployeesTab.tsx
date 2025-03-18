@@ -104,7 +104,7 @@ export const EmployeesTab = () => {
 
         toast.update(toastRef.current, {
             // render: `Employee ${first_name} ${last_name} created successfully`,
-            render: m.employeeCreatedSuccessfully(first_name, last_name),
+            render: m.employeeCreatedSuccessfully({ fullName: `${first_name} ${last_name}` }),
             type: 'success',
             isLoading: false,
             autoClose: 5000,

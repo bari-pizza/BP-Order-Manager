@@ -106,7 +106,7 @@ export const AdminDashboard = () => {
                         color="primary"
                         textTransform={'capitalize'}
                         sx={{ textShadow: `1px 1px 1px ${theme.palette.primary.dark}` }}>
-                        {m.adminDashboard()}
+                        {m.adminDashboard({ fullName: 'John Doe' })}
                     </Typography>
                 </Stack>
                 <Box>
