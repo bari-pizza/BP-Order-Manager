@@ -16,6 +16,7 @@ import MenuIcon from '../../assets/lottie-icons/Menu Icon.json';
 import MobileIcon from '../../assets/lottie-icons/Mobile Icon.json';
 import OrderHistoryIcon from '../../assets/lottie-icons/Order History Icon.json';
 import PickupIcon from '../../assets/lottie-icons/Pickup Icon.json';
+import PizzaIcon from '../../assets/lottie-icons/Pizza Icon.json';
 import RegisterIcon from '../../assets/lottie-icons/Register Icon.json';
 import RoundIcon from '../../assets/lottie-icons/Round Icon.json';
 import SaveIcon from '../../assets/lottie-icons/Save Icon.json';
@@ -147,6 +148,10 @@ export const RoundLottieIcon = ({ imageSrc, ...props }: LottieIconProps & { imag
 
 export const PickupLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={PickupIcon} {...props} />;
+};
+
+export const PizzaLottieIcon = ({ ...props }: LottieIconProps) => {
+    return <LottieIcon lottieSrc={PizzaIcon} {...props} />;
 };
 
 export const SaveLottieIcon = ({ ...props }: LottieIconProps) => {

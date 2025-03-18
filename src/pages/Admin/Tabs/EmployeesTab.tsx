@@ -14,6 +14,7 @@ import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { getEnv } from '../../../utils';
+import { m } from 'framer-motion';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';
@@ -81,7 +82,7 @@ export const EmployeesTab = () => {
     const onSubmit = async (formData: FormValues) => {
         const { email, first_name, last_name, phone } = formData;
 
-        toastRef.current = toast.loading('Creating employee...');
+        toastRef.current = toast.loading(`${m.creating()} ${m.employee()}`);
 
         const { error } = await supaClient.functions.invoke('create-user', {
             body: { email, first_name, last_name, phone },
@@ -101,7 +102,8 @@ export const EmployeesTab = () => {
         }
 
         toast.update(toastRef.current, {
-            render: `Employee ${first_name} ${last_name} created successfully`,
+            // render: `Employee ${first_name} ${last_name} created successfully`,
+            render: m.employeeCreatedSuccessfully(first_name, last_name),
             type: 'success',
             isLoading: false,
             autoClose: 5000,
@@ -114,10 +116,10 @@ export const EmployeesTab = () => {
         <Stack direction="column" alignItems={'center'} gap={2}>
             <EmployeesTable employees={employees} />
             <Button onClick={open} variant="contained">
-                Add New Employee
+                {m.addNewEmployee()}
             </Button>
             <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
-                <DialogTitle>Add Employee</DialogTitle>
+                <DialogTitle>{m.addEmployee()}</DialogTitle>
                 <DialogContent>
                     <Stack direction="column" gap={2} mt={2}>
                         <Controller

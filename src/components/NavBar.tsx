@@ -13,7 +13,7 @@ import {
     HelpLottieIcon,
     HomeLottieIcon,
     ManagerLottieIcon,
-    MarketPlaceLottieIcon,
+    PizzaLottieIcon,
     MobileLottieIcon,
     SearchLottieIcon,
     TimeLottieIcon,
@@ -89,7 +89,7 @@ export function NavBar() {
             path: '/orders',
             icon: (
                 <Badge badgeContent={orderCount} color="primary">
-                    <MarketPlaceLottieIcon />
+                    <PizzaLottieIcon />
                 </Badge>
             ),
             text: m.orders(),

@@ -113,26 +113,26 @@ export const AdminDashboard = () => {
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
                         <Tab
                             value="employees"
-                            label="Employees"
+                            label={m.employees()}
                             icon={<StaffLottieIcon autoPlay={tabName === 'employees'} />}
                             iconPosition="start"
                         />
                         <Tab
                             value="origins"
-                            label="Origins"
+                            label={m.origins()}
                             icon={<GlobeLottieIcon autoPlay={tabName === 'origins'} />}
                             iconPosition="start"
                         />
                         <Tab
                             value="resources"
-                            label="Resources"
+                            label={m.resources()}
                             icon={<FolderLottieIcon autoPlay={tabName === 'resources'} />}
                             iconPosition="start"
                         />
                         ,
                         <Tab
                             value="settings"
-                            label="Settings"
+                            label={m.settings()}
                             icon={<SettingsLottieIcon autoPlay={tabName === 'settings'} />}
                             iconPosition="start"
                         />
