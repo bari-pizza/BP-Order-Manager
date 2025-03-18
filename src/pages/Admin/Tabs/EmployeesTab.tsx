@@ -14,7 +14,8 @@ import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { getEnv } from '../../../utils';
-import { m } from 'framer-motion';
+// @ts-expect-error remove if module declaration can be fixed
+import { m } from '../../../paraglide/messages';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';
