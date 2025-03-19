@@ -90,8 +90,6 @@ export const DrawerAvatar = ({
     const resource = resources.find((resource) => resource.title === keys[drawer.drawer_type]);
     const missingAvatarSrc = resources.find((resource) => resource.title === 'Missing Avatar')?.src;
 
-    console.log({ drawer, resource, resources, key: keys[drawer.drawer_type], missingAvatarSrc });
-
     const imageSrc = ('driver' in drawer && (drawer.driver.avatar_src || missingAvatarSrc)) || resource?.src || '';
 
     const finalAvatarSx = {
@@ -103,8 +101,6 @@ export const DrawerAvatar = ({
         borderColor: theme.palette.primary.main,
         ...sx?.avatar,
     };
-
-    console.log({ finalAvatarSx });
 
     // const avatarChild = createElement(iconMap[drawer.drawer_type], {
     //     sx: sx?.avatarIcon,

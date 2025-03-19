@@ -1,8 +1,10 @@
-import { LottieIcon } from './LottieIcon';
+import { AnimatedLottieIcon, LottieIcon } from './LottieIcon';
 import AdminShieldIcon from '../../assets/lottie-icons/Admin Shield Icon.json';
 import CarIcon from '../../assets/lottie-icons/Car Icon.json';
+import CashIcon from '../../assets/lottie-icons/Cash Icon.json';
 import ChartIcon from '../../assets/lottie-icons/Chart Icon.json';
 import CreditCardIcon from '../../assets/lottie-icons/Credit Card Icon.json';
+import CheckBoxIcon from '../../assets/lottie-icons/CheckBox Icon.json';
 import DesktopIcon from '../../assets/lottie-icons/Desktop Icon.json';
 import FolderIcon from '../../assets/lottie-icons/Folder Icon.json';
 import GlobeIcon from '../../assets/lottie-icons/Globe Icon.json';
@@ -30,7 +32,6 @@ import UploadIcon from '../../assets/lottie-icons/Upload Icon.json';
 import UserProfileIcon from '../../assets/lottie-icons/User Profile Icon.json';
 import { copyAndCleanLottie, urlToRoundedBase64 } from '../../utils';
 import { useQuery } from '@tanstack/react-query';
-
 type LottieIconProps = {
     height?: string;
     width?: string;
@@ -47,8 +48,21 @@ export const CarLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={CarIcon} {...props} />;
 };
 
+export const CashLottieIcon = ({ ...props }: LottieIconProps) => {
+    return <LottieIcon lottieSrc={CashIcon} {...props} />;
+};
+
 export const ChartLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={ChartIcon} {...props} />;
+};
+
+export const CheckBoxLottieIcon = ({
+    checked = false,
+    height = '35px',
+    width = '35px',
+    ...props
+}: LottieIconProps & { checked?: boolean }) => {
+    return <AnimatedLottieIcon lottie={CheckBoxIcon} checked={checked} height={height} width={width} {...props} />;
 };
 
 export const CreditCardLottieIcon = ({ ...props }: LottieIconProps) => {

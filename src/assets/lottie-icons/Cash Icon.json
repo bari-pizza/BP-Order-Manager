@@ -1,0 +1,1421 @@
+{
+    "v": "5.7.5",
+    "fr": 100,
+    "ip": 0,
+    "op": 180,
+    "w": 900,
+    "h": 900,
+    "nm": "Comp 1",
+    "ddd": 0,
+    "metadata": {},
+    "assets": [
+        {
+            "id": "0",
+            "layers": [
+                {
+                    "ddd": 0,
+                    "ind": 1,
+                    "ty": 4,
+                    "nm": "Shape Layer 5",
+                    "sr": 1,
+                    "ks": {
+                        "p": { "a": 0, "k": [-109, 96], "ix": 2 },
+                        "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                        "r": { "a": 0, "k": 0, "ix": 2 },
+                        "o": { "a": 0, "k": 100, "ix": 2 },
+                        "sk": { "a": 0, "k": 0, "ix": 2 },
+                        "sa": { "a": 0, "k": 0, "ix": 2 }
+                    },
+                    "ao": 0,
+                    "shapes": [
+                        {
+                            "ty": "gr",
+                            "nm": "Shape Layer 5",
+                            "it": [
+                                {
+                                    "ty": "el",
+                                    "d": 1,
+                                    "s": { "a": 0, "k": [71.62094876442131, 74.04484977199331], "ix": 2 },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 }
+                                },
+                                {
+                                    "ty": "st",
+                                    "c": { "a": 0, "k": [0, 0, 0], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "w": { "a": 0, "k": 10, "ix": 2 },
+                                    "lc": 1,
+                                    "lj": 1,
+                                    "ml": 4
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": { "a": 0, "k": [0, 0.5294117647058824, 0.39215686274509803], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [203.19671630859375, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        }
+                    ],
+                    "ip": 0,
+                    "op": 181,
+                    "st": 0,
+                    "bm": 0
+                },
+                {
+                    "ddd": 0,
+                    "ind": 2,
+                    "ty": 4,
+                    "nm": "Shape Layer 5 Overscan",
+                    "sr": 1,
+                    "ks": {
+                        "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                        "r": { "a": 0, "k": 0, "ix": 2 },
+                        "o": { "a": 0, "k": 100, "ix": 2 },
+                        "sk": { "a": 0, "k": 0, "ix": 2 },
+                        "sa": { "a": 0, "k": 0, "ix": 2 }
+                    },
+                    "ao": 0,
+                    "shapes": [
+                        {
+                            "ty": "rc",
+                            "d": 1,
+                            "s": { "a": 0, "k": [189, 192], "ix": 2 },
+                            "p": { "a": 0, "k": [94.5, 96], "ix": 2 },
+                            "r": { "a": 0, "k": 0, "ix": 2 }
+                        },
+                        {
+                            "ty": "fl",
+                            "c": { "a": 0, "k": [0, 0, 0], "ix": 2 },
+                            "o": { "a": 0, "k": 0, "ix": 2 },
+                            "r": 1,
+                            "bm": 0
+                        }
+                    ],
+                    "ip": 0,
+                    "op": 181,
+                    "st": 0,
+                    "bm": 0
+                }
+            ]
+        },
+        {
+            "id": "1",
+            "layers": [
+                {
+                    "ddd": 0,
+                    "ind": 3,
+                    "ty": 4,
+                    "nm": "Shape Layer 4",
+                    "sr": 1,
+                    "ks": {
+                        "p": { "a": 0, "k": [-89, 111], "ix": 2 },
+                        "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                        "r": { "a": 0, "k": 0, "ix": 2 },
+                        "o": { "a": 0, "k": 100, "ix": 2 },
+                        "sk": { "a": 0, "k": 0, "ix": 2 },
+                        "sa": { "a": 0, "k": 0, "ix": 2 }
+                    },
+                    "ao": 0,
+                    "shapes": [
+                        {
+                            "ty": "gr",
+                            "nm": "Shape Layer 4",
+                            "it": [
+                                {
+                                    "ty": "rc",
+                                    "d": 1,
+                                    "s": { "a": 0, "k": [176.53063449811955, 99.1295321960319], "ix": 2 },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "r": { "a": 0, "k": 30.78521849804295, "ix": 2 }
+                                },
+                                {
+                                    "ty": "st",
+                                    "c": { "a": 0, "k": [0, 0, 0], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "w": { "a": 0, "k": 10, "ix": 2 },
+                                    "lc": 1,
+                                    "lj": 1,
+                                    "ml": 4
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": { "a": 0, "k": [0, 0.5294117647058824, 0.39215686274509803], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [239.00726318359375, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        }
+                    ],
+                    "ip": 0,
+                    "op": 181,
+                    "st": 0,
+                    "bm": 0
+                },
+                {
+                    "ddd": 0,
+                    "ind": 4,
+                    "ty": 4,
+                    "nm": "Shape Layer 4 Overscan",
+                    "sr": 1,
+                    "ks": {
+                        "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                        "r": { "a": 0, "k": 0, "ix": 2 },
+                        "o": { "a": 0, "k": 100, "ix": 2 },
+                        "sk": { "a": 0, "k": 0, "ix": 2 },
+                        "sa": { "a": 0, "k": 0, "ix": 2 }
+                    },
+                    "ao": 0,
+                    "shapes": [
+                        {
+                            "ty": "rc",
+                            "d": 1,
+                            "s": { "a": 0, "k": [300, 222], "ix": 2 },
+                            "p": { "a": 0, "k": [150, 111], "ix": 2 },
+                            "r": { "a": 0, "k": 0, "ix": 2 }
+                        },
+                        {
+                            "ty": "fl",
+                            "c": { "a": 0, "k": [0, 0, 0], "ix": 2 },
+                            "o": { "a": 0, "k": 0, "ix": 2 },
+                            "r": 1,
+                            "bm": 0
+                        }
+                    ],
+                    "ip": 0,
+                    "op": 181,
+                    "st": 0,
+                    "bm": 0
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "layers": [
+                {
+                    "ddd": 0,
+                    "ind": 5,
+                    "ty": 4,
+                    "nm": "Shape Layer 1",
+                    "sr": 1,
+                    "ks": {
+                        "p": { "a": 0, "k": [409, 270], "ix": 2 },
+                        "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                        "r": { "a": 0, "k": 0, "ix": 2 },
+                        "o": { "a": 0, "k": 100, "ix": 2 },
+                        "sk": { "a": 0, "k": 0, "ix": 2 },
+                        "sa": { "a": 0, "k": 0, "ix": 2 }
+                    },
+                    "ao": 0,
+                    "shapes": [
+                        {
+                            "ty": "gr",
+                            "nm": "Shape Layer 1",
+                            "it": [
+                                {
+                                    "ty": "rc",
+                                    "d": 1,
+                                    "s": { "a": 0, "k": [620.3588381020738, 377.3316283699714], "ix": 2 },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "r": { "a": 0, "k": 30.78521849804295, "ix": 2 }
+                                },
+                                {
+                                    "ty": "st",
+                                    "c": { "a": 0, "k": [0, 0, 0], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "w": { "a": 0, "k": 20, "ix": 2 },
+                                    "lc": 1,
+                                    "lj": 1,
+                                    "ml": 4
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": {
+                                        "a": 0,
+                                        "k": [0.9921568627450981, 0.9725490196078431, 0.9686274509803922],
+                                        "ix": 2
+                                    },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [-17.09320068359375, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        }
+                    ],
+                    "ip": 0,
+                    "op": 181,
+                    "st": 0,
+                    "bm": 0
+                },
+                {
+                    "ddd": 0,
+                    "ind": 6,
+                    "ty": 4,
+                    "nm": "Shape Layer 1 Overscan",
+                    "sr": 1,
+                    "ks": {
+                        "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                        "r": { "a": 0, "k": 0, "ix": 2 },
+                        "o": { "a": 0, "k": 100, "ix": 2 },
+                        "sk": { "a": 0, "k": 0, "ix": 2 },
+                        "sa": { "a": 0, "k": 0, "ix": 2 }
+                    },
+                    "ao": 0,
+                    "shapes": [
+                        {
+                            "ty": "rc",
+                            "d": 1,
+                            "s": { "a": 0, "k": [784, 540], "ix": 2 },
+                            "p": { "a": 0, "k": [392, 270], "ix": 2 },
+                            "r": { "a": 0, "k": 0, "ix": 2 }
+                        },
+                        {
+                            "ty": "fl",
+                            "c": { "a": 0, "k": [0, 0, 0], "ix": 2 },
+                            "o": { "a": 0, "k": 0, "ix": 2 },
+                            "r": 1,
+                            "bm": 0
+                        }
+                    ],
+                    "ip": 0,
+                    "op": 181,
+                    "st": 0,
+                    "bm": 0
+                }
+            ]
+        },
+        {
+            "id": "3",
+            "layers": [
+                {
+                    "ddd": 0,
+                    "ind": 7,
+                    "ty": 4,
+                    "nm": "Wallet Back",
+                    "sr": 1,
+                    "ks": {
+                        "p": { "a": 0, "k": [-41, -143], "ix": 2 },
+                        "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                        "r": { "a": 0, "k": 0, "ix": 2 },
+                        "o": { "a": 0, "k": 100, "ix": 2 },
+                        "sk": { "a": 0, "k": 0, "ix": 2 },
+                        "sa": { "a": 0, "k": 0, "ix": 2 }
+                    },
+                    "ao": 0,
+                    "shapes": [
+                        {
+                            "ty": "gr",
+                            "nm": "Wallet Back",
+                            "it": [
+                                {
+                                    "ty": "rc",
+                                    "d": 1,
+                                    "s": {
+                                        "a": 1,
+                                        "k": [
+                                            {
+                                                "t": 40,
+                                                "s": [620.36, 413.33],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            },
+                                            {
+                                                "t": 60,
+                                                "s": [159.72220460071662, 106.41923779042976],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            },
+                                            {
+                                                "t": 75,
+                                                "s": [159.72, 106.42],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            },
+                                            {
+                                                "t": 90,
+                                                "s": [620.36, 413.33],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            }
+                                        ],
+                                        "ix": 2
+                                    },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "r": { "a": 0, "k": 31.78521849804295, "ix": 2 }
+                                },
+                                {
+                                    "ty": "st",
+                                    "c": { "a": 0, "k": [0, 0, 0], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "w": {
+                                        "a": 1,
+                                        "k": [
+                                            {
+                                                "t": 20,
+                                                "s": [20],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            },
+                                            {
+                                                "t": 60,
+                                                "s": [6],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            },
+                                            {
+                                                "t": 75,
+                                                "s": [6],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            },
+                                            {
+                                                "t": 90,
+                                                "s": [20],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            }
+                                        ],
+                                        "ix": 2
+                                    },
+                                    "lc": 1,
+                                    "lj": 1,
+                                    "ml": 4
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": { "a": 0, "k": [0, 0.5294117647058824, 0.39215686274509803], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0,
+                                    "hd": true
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": {
+                                        "a": 1,
+                                        "k": [
+                                            {
+                                                "t": 0,
+                                                "s": [432.90679931640625, 450],
+                                                "o": { "x": [0], "y": [0] },
+                                                "i": { "x": [0.58], "y": [1] }
+                                            },
+                                            {
+                                                "t": 20,
+                                                "s": [433.92999267578125, 631.7999877929688],
+                                                "o": { "x": [0.4], "y": [0] },
+                                                "i": { "x": [0.8], "y": [1] }
+                                            },
+                                            {
+                                                "t": 60,
+                                                "s": [447.07000732421875, 645.75],
+                                                "o": { "x": [0.42], "y": [0] },
+                                                "i": { "x": [1], "y": [1] }
+                                            },
+                                            {
+                                                "t": 75,
+                                                "s": [447.07000732421875, 645.75],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            },
+                                            {
+                                                "t": 90,
+                                                "s": [433.92999267578125, 631.7999877929688],
+                                                "i": { "x": [0.5172413793103449], "y": [1.4975000381469725] },
+                                                "o": { "x": [0.8], "y": [0] }
+                                            },
+                                            {
+                                                "t": 140,
+                                                "s": [432.9100036621094, 450],
+                                                "i": { "x": [0.75], "y": [0.75] },
+                                                "o": { "x": [0.25], "y": [0.25] }
+                                            }
+                                        ],
+                                        "ix": 2
+                                    },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        }
+                    ],
+                    "ip": 0,
+                    "op": 181,
+                    "st": 0,
+                    "bm": 0
+                },
+                {
+                    "ddd": 0,
+                    "ind": 8,
+                    "ty": 4,
+                    "nm": "Wallet Back Overscan",
+                    "sr": 1,
+                    "ks": {
+                        "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                        "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                        "r": { "a": 0, "k": 0, "ix": 2 },
+                        "o": { "a": 0, "k": 100, "ix": 2 },
+                        "sk": { "a": 0, "k": 0, "ix": 2 },
+                        "sa": { "a": 0, "k": 0, "ix": 2 }
+                    },
+                    "ao": 0,
+                    "shapes": [
+                        {
+                            "ty": "rc",
+                            "d": 1,
+                            "s": { "a": 0, "k": [798, 791], "ix": 2 },
+                            "p": { "a": 0, "k": [399, 395.5], "ix": 2 },
+                            "r": { "a": 0, "k": 0, "ix": 2 }
+                        },
+                        {
+                            "ty": "fl",
+                            "c": { "a": 0, "k": [0, 0, 0], "ix": 2 },
+                            "o": { "a": 0, "k": 0, "ix": 2 },
+                            "r": 1,
+                            "bm": 0
+                        }
+                    ],
+                    "ip": 0,
+                    "op": 181,
+                    "st": 0,
+                    "bm": 0
+                }
+            ]
+        },
+        {
+            "id": "4",
+            "u": "",
+            "p": "data:image/png;base64,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",
+            "w": 219,
+            "h": 199,
+            "e": 1
+        }
+    ],
+    "layers": [
+        {
+            "ddd": 0,
+            "ind": 9,
+            "ty": 3,
+            "nm": "Wallet Front",
+            "sr": 1,
+            "ks": {
+                "p": {
+                    "a": 1,
+                    "k": [
+                        { "t": 0, "s": [450, 468], "o": { "x": [0], "y": [0] }, "i": { "x": [0.58], "y": [1] } },
+                        { "t": 20, "s": [451.0281982421875, 649.7987060546875], "h": 1 },
+                        {
+                            "t": 75,
+                            "s": [451.03005061404264, 649.8000246922793],
+                            "i": { "x": [0.75], "y": [0.75] },
+                            "o": { "x": [0.25], "y": [0.25] }
+                        },
+                        {
+                            "t": 90,
+                            "s": [451.0299987792969, 649.7999877929688],
+                            "i": { "x": [0.5517241379310345], "y": [1.382903109516238] },
+                            "o": { "x": [0.8], "y": [0] }
+                        },
+                        {
+                            "t": 140,
+                            "s": [450, 468],
+                            "i": { "x": [0.75], "y": [0.75] },
+                            "o": { "x": [0.25], "y": [0.25] }
+                        }
+                    ],
+                    "ix": 2
+                },
+                "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                "s": {
+                    "a": 1,
+                    "k": [
+                        {
+                            "t": 40,
+                            "s": [100, 100],
+                            "i": { "x": [0.75], "y": [0.75] },
+                            "o": { "x": [0.25], "y": [0.25] }
+                        },
+                        {
+                            "t": 60,
+                            "s": [25, 25],
+                            "i": { "x": [0.75], "y": [0.75] },
+                            "o": { "x": [0.25], "y": [0.25] }
+                        },
+                        {
+                            "t": 75,
+                            "s": [25, 25],
+                            "i": { "x": [0.75], "y": [0.75] },
+                            "o": { "x": [0.25], "y": [0.25] }
+                        },
+                        {
+                            "t": 90,
+                            "s": [100, 100],
+                            "i": { "x": [0.75], "y": [0.75] },
+                            "o": { "x": [0.25], "y": [0.25] }
+                        }
+                    ],
+                    "ix": 2
+                },
+                "r": { "a": 0, "k": 0, "ix": 2 },
+                "o": { "a": 0, "k": 100, "ix": 2 },
+                "sk": { "a": 0, "k": 0, "ix": 2 },
+                "sa": { "a": 0, "k": 0, "ix": 2 }
+            },
+            "ao": 0,
+            "ip": 0,
+            "op": 181,
+            "st": 0,
+            "bm": 0
+        },
+        {
+            "ddd": 0,
+            "refId": "0",
+            "w": 189,
+            "h": 192,
+            "ind": 10,
+            "ty": 0,
+            "nm": "Shape Layer 5",
+            "sr": 1,
+            "ks": {
+                "p": { "a": 0, "k": [109, -96], "ix": 2 },
+                "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                "r": { "a": 0, "k": 0, "ix": 2 },
+                "o": { "a": 0, "k": 100, "ix": 2 },
+                "sk": { "a": 0, "k": 0, "ix": 2 },
+                "sa": { "a": 0, "k": 0, "ix": 2 }
+            },
+            "ao": 0,
+            "ip": 0,
+            "op": 181,
+            "st": 0,
+            "bm": 0,
+            "parent": 9,
+            "ef": [
+                {
+                    "ty": 25,
+                    "nm": "Drop Shadow",
+                    "mn": "ADBE Drop Shadow",
+                    "ef": [
+                        {
+                            "ty": 2,
+                            "nm": "Shadow Color",
+                            "mn": "ADBE Drop Shadow-0001",
+                            "v": { "a": 0, "k": [0, 0, 0], "ix": 2 }
+                        },
+                        {
+                            "ty": 0,
+                            "nm": "Opacity",
+                            "mn": "ADBE Drop Shadow-0002",
+                            "v": { "a": 0, "k": 127.5, "ix": 2 }
+                        },
+                        {
+                            "ty": 1,
+                            "nm": "Direction",
+                            "mn": "ADBE Drop Shadow-0003",
+                            "v": { "a": 0, "k": 180, "ix": 2 }
+                        },
+                        { "ty": 0, "nm": "Distance", "mn": "ADBE Drop Shadow-0004", "v": { "a": 0, "k": 15, "ix": 2 } },
+                        { "ty": 0, "nm": "Softness", "mn": "ADBE Drop Shadow-0005", "v": { "a": 0, "k": 35, "ix": 2 } }
+                    ],
+                    "np": 5,
+                    "ix": 0,
+                    "en": 1
+                }
+            ]
+        },
+        {
+            "ddd": 0,
+            "refId": "1",
+            "w": 300,
+            "h": 222,
+            "ind": 11,
+            "ty": 0,
+            "nm": "Shape Layer 4",
+            "sr": 1,
+            "ks": {
+                "p": { "a": 0, "k": [89, -111], "ix": 2 },
+                "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                "r": { "a": 0, "k": 0, "ix": 2 },
+                "o": { "a": 0, "k": 100, "ix": 2 },
+                "sk": { "a": 0, "k": 0, "ix": 2 },
+                "sa": { "a": 0, "k": 0, "ix": 2 }
+            },
+            "ao": 0,
+            "ip": 0,
+            "op": 181,
+            "st": 0,
+            "bm": 0,
+            "parent": 9,
+            "ef": [
+                {
+                    "ty": 29,
+                    "nm": "Gaussian Blur2",
+                    "mn": "ADBE Gaussian Blur 2",
+                    "ef": [
+                        {
+                            "ty": 0,
+                            "nm": "Blurriness",
+                            "mn": "ADBE Gaussian Blur 2-0001",
+                            "v": { "a": 0, "k": 5, "ix": 2 }
+                        },
+                        {
+                            "ty": 7,
+                            "nm": "Blur Dimensions",
+                            "mn": "ADBE Gaussian Blur 2-0002",
+                            "v": { "a": 0, "k": 0, "ix": 2 }
+                        },
+                        {
+                            "ty": 4,
+                            "nm": "Repeat Edge Pixels",
+                            "mn": "ADBE Gaussian Blur 2-0003",
+                            "v": { "a": 0, "k": 0, "ix": 2 }
+                        }
+                    ],
+                    "np": 1,
+                    "ix": 0,
+                    "en": 1
+                },
+                {
+                    "ty": 25,
+                    "nm": "Drop Shadow",
+                    "mn": "ADBE Drop Shadow",
+                    "ef": [
+                        {
+                            "ty": 2,
+                            "nm": "Shadow Color",
+                            "mn": "ADBE Drop Shadow-0001",
+                            "v": { "a": 0, "k": [0, 0, 0], "ix": 2 }
+                        },
+                        {
+                            "ty": 0,
+                            "nm": "Opacity",
+                            "mn": "ADBE Drop Shadow-0002",
+                            "v": { "a": 0, "k": 127.5, "ix": 2 }
+                        },
+                        {
+                            "ty": 1,
+                            "nm": "Direction",
+                            "mn": "ADBE Drop Shadow-0003",
+                            "v": { "a": 0, "k": 180, "ix": 2 }
+                        },
+                        { "ty": 0, "nm": "Distance", "mn": "ADBE Drop Shadow-0004", "v": { "a": 0, "k": 15, "ix": 2 } },
+                        { "ty": 0, "nm": "Softness", "mn": "ADBE Drop Shadow-0005", "v": { "a": 0, "k": 35, "ix": 2 } }
+                    ],
+                    "np": 5,
+                    "ix": 0,
+                    "en": 1
+                }
+            ]
+        },
+        {
+            "ddd": 0,
+            "refId": "2",
+            "w": 784,
+            "h": 540,
+            "ind": 12,
+            "ty": 0,
+            "nm": "Shape Layer 1",
+            "sr": 1,
+            "ks": {
+                "p": { "a": 0, "k": [-409, -270], "ix": 2 },
+                "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                "r": { "a": 0, "k": 0, "ix": 2 },
+                "o": { "a": 0, "k": 100, "ix": 2 },
+                "sk": { "a": 0, "k": 0, "ix": 2 },
+                "sa": { "a": 0, "k": 0, "ix": 2 }
+            },
+            "ao": 0,
+            "ip": 0,
+            "op": 181,
+            "st": 0,
+            "bm": 0,
+            "parent": 9,
+            "ef": [
+                {
+                    "ty": 29,
+                    "nm": "Gaussian Blur2",
+                    "mn": "ADBE Gaussian Blur 2",
+                    "ef": [
+                        {
+                            "ty": 0,
+                            "nm": "Blurriness",
+                            "mn": "ADBE Gaussian Blur 2-0001",
+                            "v": { "a": 0, "k": 5, "ix": 2 }
+                        },
+                        {
+                            "ty": 7,
+                            "nm": "Blur Dimensions",
+                            "mn": "ADBE Gaussian Blur 2-0002",
+                            "v": { "a": 0, "k": 0, "ix": 2 }
+                        },
+                        {
+                            "ty": 4,
+                            "nm": "Repeat Edge Pixels",
+                            "mn": "ADBE Gaussian Blur 2-0003",
+                            "v": { "a": 0, "k": 0, "ix": 2 }
+                        }
+                    ],
+                    "np": 1,
+                    "ix": 0,
+                    "en": 1
+                },
+                {
+                    "ty": 25,
+                    "nm": "Drop Shadow",
+                    "mn": "ADBE Drop Shadow",
+                    "ef": [
+                        {
+                            "ty": 2,
+                            "nm": "Shadow Color",
+                            "mn": "ADBE Drop Shadow-0001",
+                            "v": { "a": 0, "k": [0, 0, 0], "ix": 2 }
+                        },
+                        {
+                            "ty": 0,
+                            "nm": "Opacity",
+                            "mn": "ADBE Drop Shadow-0002",
+                            "v": { "a": 0, "k": 127.5, "ix": 2 }
+                        },
+                        {
+                            "ty": 1,
+                            "nm": "Direction",
+                            "mn": "ADBE Drop Shadow-0003",
+                            "v": { "a": 0, "k": 180, "ix": 2 }
+                        },
+                        { "ty": 0, "nm": "Distance", "mn": "ADBE Drop Shadow-0004", "v": { "a": 0, "k": 15, "ix": 2 } },
+                        { "ty": 0, "nm": "Softness", "mn": "ADBE Drop Shadow-0005", "v": { "a": 0, "k": 35, "ix": 2 } }
+                    ],
+                    "np": 5,
+                    "ix": 0,
+                    "en": 1
+                }
+            ]
+        },
+        {
+            "ddd": 0,
+            "ind": 13,
+            "ty": 4,
+            "nm": "Dollar Bill",
+            "sr": 1,
+            "ks": {
+                "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                "r": { "a": 0, "k": 0, "ix": 2 },
+                "o": { "a": 0, "k": 100, "ix": 2 },
+                "sk": { "a": 0, "k": 0, "ix": 2 },
+                "sa": { "a": 0, "k": 0, "ix": 2 }
+            },
+            "ao": 0,
+            "shapes": [
+                {
+                    "ty": "gr",
+                    "it": [
+                        {
+                            "ty": "gr",
+                            "nm": "Shape Layer 11",
+                            "it": [
+                                {
+                                    "ty": "el",
+                                    "d": 1,
+                                    "s": { "a": 0, "k": [79.94314806939596, 75.1465591852322], "ix": 2 },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 }
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": { "a": 0, "k": [0, 0.5294117647058824, 0.39215686274509803], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [190.26473999023438, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        },
+                        {
+                            "ty": "gr",
+                            "it": [
+                                {
+                                    "ty": "gr",
+                                    "it": [
+                                        {
+                                            "ty": "sh",
+                                            "d": 1,
+                                            "ks": {
+                                                "a": 0,
+                                                "k": {
+                                                    "c": true,
+                                                    "v": [
+                                                        [842, 256],
+                                                        [842, -2304],
+                                                        [1006, -2304],
+                                                        [1006, 256],
+                                                        [842, 256]
+                                                    ],
+                                                    "i": [
+                                                        [0, 0],
+                                                        [0, 0],
+                                                        [0, 0],
+                                                        [0, 0],
+                                                        [0, 0]
+                                                    ],
+                                                    "o": [
+                                                        [0, 0],
+                                                        [0, 0],
+                                                        [0, 0],
+                                                        [0, 0],
+                                                        [0, 0]
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "ty": "sh",
+                                            "d": 1,
+                                            "ks": {
+                                                "a": 0,
+                                                "k": {
+                                                    "c": true,
+                                                    "v": [
+                                                        [1315, -1485],
+                                                        [1197.5, -1689],
+                                                        [929, -1762],
+                                                        [730, -1727],
+                                                        [603, -1632],
+                                                        [558, -1495],
+                                                        [587.5, -1384],
+                                                        [668, -1304.5],
+                                                        [781, -1250],
+                                                        [906, -1213],
+                                                        [1098, -1165],
+                                                        [1321.5, -1092],
+                                                        [1514.5, -976],
+                                                        [1650, -807],
+                                                        [1700, -575],
+                                                        [1608, -258.5],
+                                                        [1342.5, -45.5],
+                                                        [923, 31],
+                                                        [508.5, -43],
+                                                        [234.5, -259],
+                                                        [128, -605],
+                                                        [493, -605],
+                                                        [559, -427],
+                                                        [710.5, -321],
+                                                        [920, -286],
+                                                        [1132.5, -322.5],
+                                                        [1276, -424.5],
+                                                        [1329, -578],
+                                                        [1282, -710.5],
+                                                        [1153.5, -798.5],
+                                                        [961, -862],
+                                                        [728, -922],
+                                                        [328.5, -1119.5],
+                                                        [182, -1472],
+                                                        [280.5, -1789],
+                                                        [549, -2000.5],
+                                                        [934, -2076],
+                                                        [1316.5, -2000.5],
+                                                        [1575, -1791.5],
+                                                        [1672, -1485],
+                                                        [1315, -1485]
+                                                    ],
+                                                    "i": [
+                                                        [0, 0],
+                                                        [69, 48.66666666666674],
+                                                        [110, 0],
+                                                        [55.33333333333337, -23.333333333333258],
+                                                        [29.33333333333337, -40],
+                                                        [0.6666666666666288, -51.33333333333326],
+                                                        [-19.66666666666663, -31.333333333333258],
+                                                        [-34, -21.666666666666742],
+                                                        [-41.33333333333337, -14.666666666666742],
+                                                        [-42, -10],
+                                                        [0, 0],
+                                                        [-71.66666666666674, -30.666666666666742],
+                                                        [-57, -46.66666666666663],
+                                                        [-33.33333333333326, -66],
+                                                        [0, -88.66666666666663],
+                                                        [61.33333333333326, -91],
+                                                        [115.66666666666674, -51],
+                                                        [164, 0],
+                                                        [117, 49.333333333333336],
+                                                        [65.66666666666669, 94.66666666666666],
+                                                        [5.333333333333343, 136],
+                                                        [0, 0],
+                                                        [-38.66666666666663, -47.333333333333314],
+                                                        [-62.33333333333337, -23.333333333333314],
+                                                        [-77.33333333333337, 0],
+                                                        [-61, 24.333333333333314],
+                                                        [-34.66666666666674, 43.666666666666686],
+                                                        [-0.6666666666667425, 58.66666666666663],
+                                                        [30.666666666666742, 35],
+                                                        [55, 23.66666666666663],
+                                                        [73.33333333333326, 18.66666666666663],
+                                                        [0, 0],
+                                                        [97.66666666666669, 88.33333333333326],
+                                                        [0, 146.66666666666674],
+                                                        [-65.66666666666666, 90.66666666666674],
+                                                        [-113.33333333333331, 50.33333333333326],
+                                                        [-143.33333333333337, 0],
+                                                        [-109.66666666666674, -50.333333333333485],
+                                                        [-62.66666666666674, -89],
+                                                        [-2, -115.33333333333326],
+                                                        [0, 0]
+                                                    ],
+                                                    "o": [
+                                                        [-9.333333333333258, -87.33333333333326],
+                                                        [-69, -48.66666666666674],
+                                                        [-77.33333333333337, 0],
+                                                        [-55.33333333333337, 23.333333333333258],
+                                                        [-29.33333333333337, 40],
+                                                        [0, 42.66666666666674],
+                                                        [19.66666666666663, 31.333333333333258],
+                                                        [34, 21.666666666666742],
+                                                        [41.33333333333337, 14.666666666666742],
+                                                        [0, 0],
+                                                        [77.33333333333326, 18],
+                                                        [71.66666666666674, 30.666666666666742],
+                                                        [57, 46.66666666666663],
+                                                        [33.33333333333326, 66],
+                                                        [0, 120],
+                                                        [-61.33333333333326, 91],
+                                                        [-115.66666666666674, 51],
+                                                        [-159.33333333333337, 0],
+                                                        [-117, -49.33333333333333],
+                                                        [-65.66666666666666, -94.66666666666669],
+                                                        [0, 0],
+                                                        [5.333333333333314, 71.33333333333337],
+                                                        [38.66666666666663, 47.333333333333314],
+                                                        [62.33333333333337, 23.333333333333314],
+                                                        [80.66666666666663, 0],
+                                                        [61, -24.333333333333314],
+                                                        [34.66666666666674, -43.666666666666686],
+                                                        [-0.6666666666667425, -53.33333333333337],
+                                                        [-30.666666666666742, -35],
+                                                        [-55, -23.66666666666663],
+                                                        [0, 0],
+                                                        [-168.66666666666663, -43.33333333333337],
+                                                        [-97.66666666666666, -88.33333333333326],
+                                                        [0, -120.66666666666674],
+                                                        [65.66666666666669, -90.66666666666674],
+                                                        [113.33333333333337, -50.333333333333485],
+                                                        [145.33333333333326, 0],
+                                                        [109.66666666666674, 50.33333333333326],
+                                                        [62.66666666666674, 89],
+                                                        [0, 0],
+                                                        [0, 0]
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "ty": "tr",
+                                            "p": { "a": 0, "k": [-38.29971590909091, 42.90909090909091], "ix": 2 },
+                                            "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                            "s": { "a": 0, "k": [4.190340909090909, 4.190340909090909], "ix": 2 },
+                                            "r": { "a": 0, "k": 0, "ix": 2 },
+                                            "o": { "a": 0, "k": 100, "ix": 2 },
+                                            "sk": { "a": 0, "k": 0, "ix": 2 },
+                                            "sa": { "a": 0, "k": 0, "ix": 2 }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": { "a": 0, "k": [1, 1, 1], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        },
+                        {
+                            "ty": "gr",
+                            "nm": "Shape Layer 9",
+                            "it": [
+                                {
+                                    "ty": "el",
+                                    "d": 1,
+                                    "s": { "a": 0, "k": [79.94314806939596, 75.1465591852322], "ix": 2 },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 }
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": { "a": 0, "k": [0, 0.5294117647058824, 0.39215686274509803], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [-190.26470947265625, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        },
+                        {
+                            "ty": "gr",
+                            "nm": "Shape Layer 7",
+                            "it": [
+                                {
+                                    "ty": "el",
+                                    "d": 1,
+                                    "s": { "a": 0, "k": [185.46810352099862, 159.88629613879192], "ix": 2 },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 }
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": { "a": 0, "k": [0, 0.5294117647058824, 0.39215686274509803], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        },
+                        {
+                            "ty": "gr",
+                            "nm": "Shape Layer 6",
+                            "it": [
+                                {
+                                    "ty": "rc",
+                                    "d": 1,
+                                    "s": { "a": 0, "k": [570.7940772154872, 223.84081459430865], "ix": 2 },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 }
+                                },
+                                {
+                                    "ty": "st",
+                                    "c": { "a": 0, "k": [0, 0.5294117647058824, 0.39215686274509803], "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "w": { "a": 0, "k": 20, "ix": 2 },
+                                    "lc": 1,
+                                    "lj": 1,
+                                    "ml": 4
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [0.000030517578125, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        },
+                        {
+                            "ty": "gr",
+                            "nm": "Shape Layer 3",
+                            "it": [
+                                {
+                                    "ty": "rc",
+                                    "d": 1,
+                                    "s": { "a": 0, "k": [620.3588006039687, 275.051151324465], "ix": 2 },
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 }
+                                },
+                                {
+                                    "ty": "fl",
+                                    "c": {
+                                        "a": 0,
+                                        "k": [0.27058823529411763, 0.7098039215686275, 0.596078431372549],
+                                        "ix": 2
+                                    },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "r": 1,
+                                    "bm": 0
+                                },
+                                {
+                                    "ty": "tr",
+                                    "p": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                                    "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                                    "r": { "a": 0, "k": 0, "ix": 2 },
+                                    "o": { "a": 0, "k": 100, "ix": 2 },
+                                    "sk": { "a": 0, "k": 0, "ix": 2 },
+                                    "sa": { "a": 0, "k": 0, "ix": 2 }
+                                }
+                            ]
+                        },
+                        {
+                            "ty": "tr",
+                            "p": {
+                                "a": 1,
+                                "k": [
+                                    {
+                                        "t": 0,
+                                        "s": [432.186279296875, 490.11328125],
+                                        "o": { "x": [0], "y": [0] },
+                                        "i": { "x": [0.58], "y": [1] }
+                                    },
+                                    {
+                                        "t": 40,
+                                        "s": [432.8031921386719, 364.9100036621094],
+                                        "i": { "x": [0.75], "y": [0.75] },
+                                        "o": { "x": [0.25], "y": [0.25] }
+                                    },
+                                    {
+                                        "t": 60,
+                                        "s": [432.186279296875, 377],
+                                        "i": { "x": [0.75], "y": [0.75] },
+                                        "o": { "x": [0.25], "y": [0.25] }
+                                    },
+                                    {
+                                        "t": 75,
+                                        "s": [432.186279296875, 377],
+                                        "i": { "x": [0.75], "y": [0.75] },
+                                        "o": { "x": [0.25], "y": [0.25] }
+                                    },
+                                    { "t": 90, "s": [432.79998779296875, 364.9100036621094], "h": 1 },
+                                    {
+                                        "t": 100,
+                                        "s": [432.79998779296875, 364.9100036621094],
+                                        "o": { "x": [0], "y": [0] },
+                                        "i": { "x": [0.58], "y": [1] }
+                                    },
+                                    {
+                                        "t": 140,
+                                        "s": [432.19000244140625, 491.1099853515625],
+                                        "i": { "x": [0.75], "y": [0.75] },
+                                        "o": { "x": [0.25], "y": [0.25] }
+                                    }
+                                ],
+                                "ix": 2
+                            },
+                            "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                            "s": {
+                                "a": 1,
+                                "k": [
+                                    {
+                                        "t": 40,
+                                        "s": [100.00000713724322, 100.0000071372432],
+                                        "o": { "x": [0.42], "y": [0] },
+                                        "i": { "x": [1], "y": [1] }
+                                    },
+                                    {
+                                        "t": 60,
+                                        "s": [132.78378962331715, 132.78378962331712],
+                                        "o": { "x": [0], "y": [0] },
+                                        "i": { "x": [0.58], "y": [1] }
+                                    },
+                                    {
+                                        "t": 75,
+                                        "s": [132.78, 132.78],
+                                        "i": { "x": [0.75], "y": [0.75] },
+                                        "o": { "x": [0.25], "y": [0.25] }
+                                    },
+                                    {
+                                        "t": 90,
+                                        "s": [100.32265907998227, 100.32265907998226],
+                                        "i": { "x": [0.75], "y": [0.75] },
+                                        "o": { "x": [0.25], "y": [0.25] }
+                                    }
+                                ],
+                                "ix": 2
+                            },
+                            "r": { "a": 0, "k": -0.12850603753261525, "ix": 2 },
+                            "o": { "a": 0, "k": 100, "ix": 2 },
+                            "sk": { "a": 0, "k": 0, "ix": 2 },
+                            "sa": { "a": 0, "k": 0, "ix": 2 }
+                        }
+                    ]
+                }
+            ],
+            "ip": 0,
+            "op": 181,
+            "st": 0,
+            "bm": 0
+        },
+        {
+            "ddd": 0,
+            "refId": "3",
+            "w": 798,
+            "h": 791,
+            "ind": 14,
+            "ty": 0,
+            "nm": "Wallet Back",
+            "sr": 1,
+            "ks": {
+                "p": { "a": 0, "k": [41, 143], "ix": 2 },
+                "a": { "a": 0, "k": [0, 0], "ix": 2 },
+                "s": { "a": 0, "k": [100, 100], "ix": 2 },
+                "r": { "a": 0, "k": 0, "ix": 2 },
+                "o": { "a": 0, "k": 100, "ix": 2 },
+                "sk": { "a": 0, "k": 0, "ix": 2 },
+                "sa": { "a": 0, "k": 0, "ix": 2 }
+            },
+            "ao": 0,
+            "ip": 0,
+            "op": 181,
+            "st": 0,
+            "bm": 0,
+            "ef": [
+                {
+                    "ty": 29,
+                    "nm": "Gaussian Blur2",
+                    "mn": "ADBE Gaussian Blur 2",
+                    "ef": [
+                        {
+                            "ty": 0,
+                            "nm": "Blurriness",
+                            "mn": "ADBE Gaussian Blur 2-0001",
+                            "v": { "a": 0, "k": 5, "ix": 2 }
+                        },
+                        {
+                            "ty": 7,
+                            "nm": "Blur Dimensions",
+                            "mn": "ADBE Gaussian Blur 2-0002",
+                            "v": { "a": 0, "k": 0, "ix": 2 }
+                        },
+                        {
+                            "ty": 4,
+                            "nm": "Repeat Edge Pixels",
+                            "mn": "ADBE Gaussian Blur 2-0003",
+                            "v": { "a": 0, "k": 0, "ix": 2 }
+                        }
+                    ],
+                    "np": 1,
+                    "ix": 0,
+                    "en": 1
+                },
+                {
+                    "ty": 25,
+                    "nm": "Drop Shadow",
+                    "mn": "ADBE Drop Shadow",
+                    "ef": [
+                        {
+                            "ty": 2,
+                            "nm": "Shadow Color",
+                            "mn": "ADBE Drop Shadow-0001",
+                            "v": { "a": 0, "k": [0, 0, 0], "ix": 2 }
+                        },
+                        {
+                            "ty": 0,
+                            "nm": "Opacity",
+                            "mn": "ADBE Drop Shadow-0002",
+                            "v": { "a": 0, "k": 127.5, "ix": 2 }
+                        },
+                        {
+                            "ty": 1,
+                            "nm": "Direction",
+                            "mn": "ADBE Drop Shadow-0003",
+                            "v": { "a": 0, "k": 180, "ix": 2 }
+                        },
+                        { "ty": 0, "nm": "Distance", "mn": "ADBE Drop Shadow-0004", "v": { "a": 0, "k": 15, "ix": 2 } },
+                        { "ty": 0, "nm": "Softness", "mn": "ADBE Drop Shadow-0005", "v": { "a": 0, "k": 35, "ix": 2 } }
+                    ],
+                    "np": 5,
+                    "ix": 0,
+                    "en": 1
+                }
+            ]
+        },
+        {
+            "ddd": 0,
+            "refId": "4",
+            "ind": 15,
+            "ty": 2,
+            "nm": "image.png 1",
+            "sr": 1,
+            "ks": {
+                "p": { "a": 0, "k": [450.0000305175781, 450], "ix": 2 },
+                "a": { "a": 0, "k": [109.5, 99.5], "ix": 2 },
+                "s": { "a": 0, "k": [558.6709884900554, 558.6709884900554], "ix": 2 },
+                "r": { "a": 0, "k": 0, "ix": 2 },
+                "o": { "a": 0, "k": 100, "ix": 2 },
+                "sk": { "a": 0, "k": 0, "ix": 2 },
+                "sa": { "a": 0, "k": 0, "ix": 2 }
+            },
+            "ao": 0,
+            "ip": 0,
+            "op": 181,
+            "st": 0,
+            "bm": 0,
+            "hd": true
+        }
+    ],
+    "markers": []
+}
