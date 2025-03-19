@@ -49,12 +49,12 @@
         "pt": "inicio",
         "es": "inicio"
     },
-    "order_name": {
+    "orderName": {
         "en": "order name",
         "pt": "nome do pedido",
         "es": "nombre del pedido"
     },
-    "order_number": {
+    "orderNumber": {
         "en": "order number",
         "pt": "número do pedido",
         "es": "número de pedido"
@@ -104,10 +104,20 @@
         "pt": "adicionar {targetName}",
         "es": "agregar {targetName}"
     },
-    "targetcreatedSuccessfully": {
+    "targetCreatedSuccessfully": {
         "en": "{targetName} {fullName} created successfully",
         "pt": "{targetName} {fullName} criado com sucesso",
         "es": "{targetName} {fullName} creado con éxito"
+    },
+    "targetDeletedSuccessfully": {
+        "en": "{targetName} {fullName} deleted successfully",
+        "pt": "{targetName} {fullName} apagado com sucesso",
+        "es": "{targetName} {fullName} eliminado con éxito"
+    },
+    "targetRestoredSuccessfully": {
+        "en": "{targetName} {fullName} restored successfully",
+        "pt": "{targetName} {fullName} restaurado com sucesso",
+        "es": "{targetName} {fullName} restaurado con éxito"
     },
     "firstName": {
         "en": "first name",
@@ -143,6 +153,11 @@
         "en": "delete",
         "pt": "apagar",
         "es": "eliminar"
+    },
+    "deleting": {
+        "en": "deleting",
+        "pt": "apagando",
+        "es": "eliminando"
     },
     "toDeleteTarget": {
         "en": "to delete {targetName}",
@@ -188,5 +203,10 @@
         "en": "to send password a reset email to {targetName}",
         "pt": "enviar correio electronico de redefinicao de senha para {targetName}",
         "es": "enviar correo electronico de restablecimiento de contraseña para {targetName}"
+    },
+    "sentPWResetEmail": {
+        "en": "sent password reset email",
+        "pt": "enviado correio electronico de redefinicao de senha",
+        "es": "enviado correo electronico de restablecimiento de contraseña"
     }
 }

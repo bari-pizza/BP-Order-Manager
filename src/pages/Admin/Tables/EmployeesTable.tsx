@@ -20,7 +20,6 @@ import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { useRef, useState } from 'react';
 import { supaClient } from '../../../supaClient';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
-// @ts-expect-error remove if module declaration can be fixed
 import { m } from '../../../paraglide/messages';
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
@@ -33,7 +32,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         // TODO: show deleted employees at the bottom
         const { id, first_name, last_name } = employee;
         const fullName = `${first_name} ${last_name}`;
-        toastRef.current = toast.loading(m.deleting({ target: m.employee(), fullName }));
+        toastRef.current = toast.loading(`${m.deleting()} ${m.employee()} ${fullName}`);
         const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: true });
         if (error) {
             toast.update(toastRef.current, {
@@ -45,7 +44,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: m.deletedSuccessfully({ target: m.employee(), fullName }),
+                render: m.targetDeletedSuccessfully({ targetName: m.employee(), fullName }),
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -86,8 +85,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         message: (employee) => {
             const { first_name, last_name } = employee;
             const fullName = `${first_name} ${last_name}`;
-            return m.areYouSureYouWant({ message: m.toDelete({ fullName }) });
-            return `Are you sure you want to delete ${fullName}?`;
+            return m.areYouSureYouWant({ message: `${m.toDelete()} ${fullName}` });
         },
         confirmProps: {
             color: 'error',
@@ -323,7 +321,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
 
     const handlePasswordReset = async () => {
         setIsSubmitting(true);
-        toastRef.current = toast.loading(m.sendingPWResetEmailTo({ email }));
+        toastRef.current = toast.loading(m.sendingPWResetEmailToTarget({ targetName: email }));
         await supaClient.auth.resetPasswordForEmail(email, { redirectTo: '/myaccount' }).then(({ error }) => {
             if (error) {
                 toast.update(toastRef.current, {
@@ -334,7 +332,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
                 });
             } else {
                 toast.update(toastRef.current, {
-                    render: m.sentPWResetEmail({ email }),
+                    render: m.sentPWResetEmail(),
                     type: 'success',
                     isLoading: false,
                     autoClose: 5000,

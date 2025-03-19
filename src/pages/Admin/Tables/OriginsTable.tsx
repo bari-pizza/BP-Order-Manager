@@ -20,7 +20,7 @@ import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';
 // @ts-expect-error remove if module declaration can be fixed
-import { m } from '../../../paraglide/messages';
+import { m } from '../../../paraglide/messages2';
 
 const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     if (!origin) return null;

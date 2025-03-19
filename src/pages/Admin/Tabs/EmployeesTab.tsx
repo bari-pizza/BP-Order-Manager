@@ -104,7 +104,7 @@ export const EmployeesTab = () => {
 
         toast.update(toastRef.current, {
             // render: `Employee ${first_name} ${last_name} created successfully`,
-            render: m.employeeCreatedSuccessfully({ fullName: `${first_name} ${last_name}` }),
+            render: m.targetCreatedSuccessfully({ targetName: m.employee(), fullName: `${first_name} ${last_name}` }),
             type: 'success',
             isLoading: false,
             autoClose: 5000,
@@ -117,10 +117,10 @@ export const EmployeesTab = () => {
         <Stack direction="column" alignItems={'center'} gap={2}>
             <EmployeesTable employees={employees} />
             <Button onClick={open} variant="contained">
-                {m.addNewEmployee()}
+                {m.addNewTarget({ targetName: m.employee() })}
             </Button>
             <Dialog open={isOpen} onClose={close} fullWidth maxWidth="sm">
-                <DialogTitle>{m.addEmployee()}</DialogTitle>
+                <DialogTitle>{m.addTarget({ targetName: m.employee() })}</DialogTitle>
                 <DialogContent>
                     <Stack direction="column" gap={2} mt={2}>
                         <Controller

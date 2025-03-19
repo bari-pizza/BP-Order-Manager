@@ -10,8 +10,8 @@
   "howTo": "ajuda",
   "login": "entrar",
   "home": "inicio",
-  "order_name": "nome do pedido",
-  "order_number": "número do pedido",
+  "orderName": "nome do pedido",
+  "orderNumber": "número do pedido",
   "adminDashboard": "painel de administração",
   "employees": "funcionários",
   "origins": "origens",
@@ -21,7 +21,9 @@
   "employee": "funcionário",
   "addNewTarget": "adicionar novo {targetName}",
   "addTarget": "adicionar {targetName}",
-  "targetcreatedSuccessfully": "{targetName} {fullName} criado com sucesso",
+  "targetCreatedSuccessfully": "{targetName} {fullName} criado com sucesso",
+  "targetDeletedSuccessfully": "{targetName} {fullName} apagado com sucesso",
+  "targetRestoredSuccessfully": "{targetName} {fullName} restaurado com sucesso",
   "firstName": "nome",
   "lastName": "sobrenome",
   "email": "correio electronico",
@@ -29,6 +31,7 @@
   "areYouSureYouWant": "tem certeza que voce quer {message}?",
   "toRestoreTarget": "restorar {targetName}",
   "delete": "apagar",
+  "deleting": "apagando",
   "toDeleteTarget": "apagar {targetName}",
   "cancel": "cancelar",
   "restore": "restorar",
@@ -37,5 +40,6 @@
   "sendEmail": "enviar correio electronico",
   "sendingPWResetEmailToTarget": "enviando correio electronico para {targetName}",
   "sendPWResetEmail": "enviar correio electronico de redefinicao de senha",
-  "toSendPWResetEmailToTarget": "enviar correio electronico de redefinicao de senha para {targetName}"
+  "toSendPWResetEmailToTarget": "enviar correio electronico de redefinicao de senha para {targetName}",
+  "sentPWResetEmail": "enviado correio electronico de redefinicao de senha"
 }

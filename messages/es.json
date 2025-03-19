@@ -10,8 +10,8 @@
   "howTo": "ayuda",
   "login": "iniciar sesión",
   "home": "inicio",
-  "order_name": "nombre del pedido",
-  "order_number": "número de pedido",
+  "orderName": "nombre del pedido",
+  "orderNumber": "número de pedido",
   "adminDashboard": "pandel de administración",
   "employees": "empleados",
   "origins": "origenes",
@@ -21,7 +21,9 @@
   "employee": "empleado",
   "addNewTarget": "agregar nuevo {targetName}",
   "addTarget": "agregar {targetName}",
-  "targetcreatedSuccessfully": "{targetName} {fullName} creado con éxito",
+  "targetCreatedSuccessfully": "{targetName} {fullName} creado con éxito",
+  "targetDeletedSuccessfully": "{targetName} {fullName} eliminado con éxito",
+  "targetRestoredSuccessfully": "{targetName} {fullName} restaurado con éxito",
   "firstName": "nombre",
   "lastName": "apellido",
   "email": "correo electronico",
@@ -29,6 +31,7 @@
   "areYouSureYouWant": "estas segura que quieres {message}?",
   "toRestoreTarget": "restorar {targetName}",
   "delete": "eliminar",
+  "deleting": "eliminando",
   "toDeleteTarget": "eliminar {targetName}",
   "cancel": "cancelar",
   "restore": "restorar",
@@ -37,5 +40,6 @@
   "sendEmail": "enviar correo electronico",
   "sendingPWResetEmailToTarget": "enviando correo electronico para {targetName}",
   "sendPWResetEmail": "enviar correo electronico de restablecimiento de contraseña",
-  "toSendPWResetEmailToTarget": "enviar correo electronico de restablecimiento de contraseña para {targetName}"
+  "toSendPWResetEmailToTarget": "enviar correo electronico de restablecimiento de contraseña para {targetName}",
+  "sentPWResetEmail": "enviado correo electronico de restablecimiento de contraseña"
 }

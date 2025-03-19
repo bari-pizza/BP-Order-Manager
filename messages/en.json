@@ -10,8 +10,8 @@
   "howTo": "how to",
   "login": "login",
   "home": "home",
-  "order_name": "order name",
-  "order_number": "order number",
+  "orderName": "order name",
+  "orderNumber": "order number",
   "adminDashboard": "admin dashboard",
   "employees": "employees",
   "origins": "origins",
@@ -21,7 +21,9 @@
   "employee": "employee",
   "addNewTarget": "add new {targetName}",
   "addTarget": "add {targetName}",
-  "targetcreatedSuccessfully": "{targetName} {fullName} created successfully",
+  "targetCreatedSuccessfully": "{targetName} {fullName} created successfully",
+  "targetDeletedSuccessfully": "{targetName} {fullName} deleted successfully",
+  "targetRestoredSuccessfully": "{targetName} {fullName} restored successfully",
   "firstName": "first name",
   "lastName": "last name",
   "email": "email",
@@ -29,6 +31,7 @@
   "areYouSureYouWant": "are you sure you want {message}?",
   "toRestoreTarget": "to restore {targetName}",
   "delete": "delete",
+  "deleting": "deleting",
   "toDeleteTarget": "to delete {targetName}",
   "cancel": "cancel",
   "restore": "restore",
@@ -37,5 +40,6 @@
   "sendEmail": "send email",
   "sendingPWResetEmailToTarget": "sending password reset email to {targetName}",
   "sendPWResetEmail": "send password reset email",
-  "toSendPWResetEmailToTarget": "to send password a reset email to {targetName}"
+  "toSendPWResetEmailToTarget": "to send password a reset email to {targetName}",
+  "sentPWResetEmail": "sent password reset email"
 }

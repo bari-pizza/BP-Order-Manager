@@ -16,7 +16,10 @@ export default defineConfig({
         // https://stackoverflow.com/questions/72097831/popper-styled-default-is-not-a-function-mui-5-6-0-material-ui
     },
     plugins: [
-        paraglideVitePlugin({ project: './project.inlang', outdir: './src/paraglide' }),
+        paraglideVitePlugin({
+            project: './project.inlang',
+            outdir: './src/paraglide',
+        }),
         react(),
         replace({
             __APP_VERSION__: JSON.stringify(packageJson.version),

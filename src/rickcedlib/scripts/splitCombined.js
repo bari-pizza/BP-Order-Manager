@@ -5,6 +5,8 @@ function splitMessagesJson() {
     const enPath = 'messages/en.json';
     const ptPath = 'messages/pt.json';
     const esPath = 'messages/es.json';
+    const dtsPath = 'src/paraglide/messages.d.ts';
+
     try {
         const inputData = JSON.parse(fs.readFileSync(combinedJSON, 'utf8'));
 
@@ -12,20 +14,38 @@ function splitMessagesJson() {
         const ptData = { $schema: 'https://inlang.com/schema/inlang-message-format' };
         const esData = { $schema: 'https://inlang.com/schema/inlang-message-format' };
 
+        const dtsContent = [];
+        dtsContent.push('export const m = {');
+
         Object.keys(inputData).forEach((key) => {
             if (key !== '$schema') {
                 enData[key] = inputData[key].en || '';
                 ptData[key] = inputData[key].pt || '';
                 esData[key] = inputData[key].es || '';
             }
+            // Generate TypeScript declaration
+            const params = [];
+            const regex = /\{(\w+)\}/g;
+            let match;
+            while ((match = regex.exec(inputData[key].en || ''))) {
+                params.push(`${match[1]}: String`);
+            }
+
+            const paramString = params.length > 0 ? `{ ${params.join(', ')} }` : '';
+            dtsContent.push(`${key}:(${paramString}) => String,`);
         });
+
+        dtsContent.push('};');
 
         fs.writeFileSync(enPath, JSON.stringify(enData, null, 2), 'utf8');
         fs.writeFileSync(ptPath, JSON.stringify(ptData, null, 2), 'utf8');
         fs.writeFileSync(esPath, JSON.stringify(esData, null, 2), 'utf8');
+        fs.writeFileSync(dtsPath, dtsContent.join('\n'), 'utf8'); // Write the .d.ts file
     } catch (error) {
         console.error('Error splitting locale JSONs:', error);
     }
 }
 
 splitMessagesJson();
+
+console.log('Locale JSONs split successfully');

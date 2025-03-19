@@ -12,7 +12,7 @@ import { Suspense } from 'react';
 import { FolderLottieIcon, GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
 import { ResourcesTab } from './Tabs/ResourcesTab';
 // @ts-expect-error remove if module declaration can be fixed
-import { m } from '../../paraglide/messages';
+import { m } from '../../paraglide/messages2';
 
 interface TabPanelProps {
     children?: React.ReactNode;
