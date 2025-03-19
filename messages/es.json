@@ -20,5 +20,11 @@
     "employee": "empleado",
     "addNewEmployee": "agregar nuevo empleado",
     "addEmployee": "agregar empleado",
-    "employeeCreatedSuccessfully": "empleado {fullName} creado con éxito"
+    "employeeCreatedSuccessfully": "empleado {fullName} creado con éxito",
+    "firstName": "nombre",
+    "lastName": "apellido",
+    "email": "correo electronico",
+    "phone": "telefono",
+    "areYouSureYouWant": "estas segura que quieres",
+    "toRestore": "restorar {targetName}"
 }
