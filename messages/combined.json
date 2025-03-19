@@ -149,15 +149,20 @@
         "pt": "restorar {targetName}",
         "es": "restorar {targetName}"
     },
+    "restoringTarget": {
+        "en": "restoring {targetName} {fullName}",
+        "pt": "restorando {targetName} {fullName}",
+        "es": "restorando {targetName} {fullName}"
+    },
     "delete": {
         "en": "delete",
         "pt": "apagar",
         "es": "eliminar"
     },
-    "deleting": {
-        "en": "deleting",
-        "pt": "apagando",
-        "es": "eliminando"
+    "deletingTarget": {
+        "en": "deleting {targetName} {fullName}",
+        "pt": "apagando {targetName} {fullName}",
+        "es": "eliminando {targetName} {fullName}"
     },
     "toDeleteTarget": {
         "en": "to delete {targetName}",

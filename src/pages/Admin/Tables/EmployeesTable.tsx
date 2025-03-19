@@ -32,7 +32,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         // TODO: show deleted employees at the bottom
         const { id, first_name, last_name } = employee;
         const fullName = `${first_name} ${last_name}`;
-        toastRef.current = toast.loading(`${m.deleting()} ${m.employee()} ${fullName}`);
+        toastRef.current = toast.loading(m.deletingTarget({ targetName: m.employee(), fullName }));
         const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: true });
         if (error) {
             toast.update(toastRef.current, {
@@ -60,7 +60,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const restoreEmployee = async (employee: Employee) => {
         const { id } = employee;
         const fullName = `${employee.first_name} ${employee.last_name}`;
-        toastRef.current = toast.loading(m.restoring({ target: m.employee(), fullName }));
+        toastRef.current = toast.loading(m.restoringTarget({ targetName: m.employee(), fullName }));
         const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: false });
         if (error) {
             toast.update(toastRef.current, {
@@ -72,7 +72,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: m.restoredSuccessfully({ target: m.employee(), fullName }),
+                render: m.targetRestoredSuccessfully({ targetName: m.employee(), fullName }),
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -85,7 +85,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         message: (employee) => {
             const { first_name, last_name } = employee;
             const fullName = `${first_name} ${last_name}`;
-            return m.areYouSureYouWant({ message: `${m.toDelete()} ${fullName}` });
+            return m.areYouSureYouWant({ message: m.toDeleteTarget({ targetName: fullName }) });
         },
         confirmProps: {
             color: 'error',
@@ -110,7 +110,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         message: (employee) => {
             const { first_name, last_name } = employee;
             const fullName = `${first_name} ${last_name}`;
-            return m.areYouSureYouWant({ message: m.toRestore({ targetName: fullName }) });
+            return m.areYouSureYouWant({ message: m.toRestoreTarget({ targetName: fullName }) });
         },
         confirmProps: {
             color: 'primary',
@@ -176,7 +176,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'actions',
             type: 'actions',
-            headerName: m.actions(),
+            headerName: m.profile(),
             width: 100,
             cellClassName: 'actions',
             getActions: ({ id, row }) => {
@@ -343,7 +343,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
     };
 
     const { handleConfirmation } = useConfirmationToast({
-        message: m.areYouSureYouWant({ message: m.toSendPWResetEmailTo({ email }) }),
+        message: m.areYouSureYouWant({ message: m.toSendPWResetEmailToTarget({ targetName: email }) }),
         confirmProps: {
             handler: handlePasswordReset,
             buttonText: 'Send',

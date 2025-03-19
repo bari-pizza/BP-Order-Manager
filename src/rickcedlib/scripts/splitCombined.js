@@ -15,8 +15,8 @@ function splitMessagesJson() {
         const esData = { $schema: 'https://inlang.com/schema/inlang-message-format' };
 
         const dtsContent = [];
-        dtsContent.push('export const m = {');
-
+        dtsContent.push('/* eslint-disable @typescript-eslint/no-unused-vars */\nexport const m = {');
+        // (params: { targetName: string; fullName: string })
         Object.keys(inputData).forEach((key) => {
             if (key !== '$schema') {
                 enData[key] = inputData[key].en || '';
@@ -28,11 +28,11 @@ function splitMessagesJson() {
             const regex = /\{(\w+)\}/g;
             let match;
             while ((match = regex.exec(inputData[key].en || ''))) {
-                params.push(`${match[1]}: String`);
+                params.push(`${match[1]}: string`);
             }
 
-            const paramString = params.length > 0 ? `{ ${params.join(', ')} }` : '';
-            dtsContent.push(`${key}:(${paramString}) => String,`);
+            const paramString = params.length > 0 ? `params:{${params.join('; ')}}` : '';
+            dtsContent.push(`${key}:( ${paramString}) => string,`);
         });
 
         dtsContent.push('};');
