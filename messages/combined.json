@@ -56,17 +56,17 @@
     },
     "order_number": {
         "en": "order number",
-        "pt": "numero do pedido",
-        "es": "numero de pedido"
+        "pt": "número do pedido",
+        "es": "número de pedido"
     },
     "adminDashboard": {
         "en": "admin dashboard",
-        "pt": "painel de administracao",
+        "pt": "painel de administração",
         "es": "pandel de administración"
     },
     "employees": {
         "en": "employees",
-        "pt": "funcionarios",
+        "pt": "funcionários",
         "es": "empleados"
     },
     "origins": {
@@ -81,7 +81,7 @@
     },
     "settings": {
         "en": "settings",
-        "pt": "configuracoes",
+        "pt": "configurações",
         "es": "configuraciones"
     },
     "creating": {
@@ -91,23 +91,23 @@
     },
     "employee": {
         "en": "employee",
-        "pt": "funcionario",
+        "pt": "funcionário",
         "es": "empleado"
     },
-    "addNewEmployee": {
-        "en": "add new employee",
-        "pt": "adicionar novo funcionario",
-        "es": "agregar nuevo empleado"
+    "addNewTarget": {
+        "en": "add new {targetName}",
+        "pt": "adicionar novo {targetName}",
+        "es": "agregar nuevo {targetName}"
     },
-    "addEmployee": {
-        "en": "add employee",
-        "pt": "adicionar funcionario",
-        "es": "agregar empleado"
+    "addTarget": {
+        "en": "add {targetName}",
+        "pt": "adicionar {targetName}",
+        "es": "agregar {targetName}"
     },
-    "employeeCreatedSuccessfully": {
-        "en": "employee {fullName} created successfully",
-        "pt": "funcionario {fullName} criado com sucesso",
-        "es": "empleado {fullName} creado con éxito"
+    "targetcreatedSuccessfully": {
+        "en": "{targetName} {fullName} created successfully",
+        "pt": "{targetName} {fullName} criado com sucesso",
+        "es": "{targetName} {fullName} creado con éxito"
     },
     "firstName": {
         "en": "first name",
@@ -134,59 +134,59 @@
         "pt": "tem certeza que voce quer {message}?",
         "es": "estas segura que quieres {message}?"
     },
-    "toRestore": {
+    "toRestoreTarget": {
         "en": "to restore {targetName}",
         "pt": "restorar {targetName}",
         "es": "restorar {targetName}"
     },
-    "toDelete": {
+    "delete": {
+        "en": "delete",
+        "pt": "apagar",
+        "es": "eliminar"
+    },
+    "toDeleteTarget": {
         "en": "to delete {targetName}",
-        "pt": "to delete {targetName}",
-        "es": "to delete {targetName}"
+        "pt": "apagar {targetName}",
+        "es": "eliminar {targetName}"
     },
     "cancel": {
         "en": "cancel",
-        "pt": "cancel",
-        "es": "cancel"
-    },
-    "delete": {
-        "en": "delete",
-        "pt": "delete",
-        "es": "delete"
+        "pt": "cancelar",
+        "es": "cancelar"
     },
     "restore": {
         "en": "restore",
-        "pt": "restore",
-        "es": "restore"
+        "pt": "restorar",
+        "es": "restorar"
     },
     "operationFailed": {
         "en": "operation failed - try again!",
-        "pt": "operation failed - try again!",
-        "es": "operation failed - try again!"
+        "pt": "operação falhou - tente novamente!",
+        "es": "operación fallida - inténtalo de nuevo!"
     },
     "actions": {
         "en": "actions",
-        "pt": "actions",
-        "es": "actions"
+        "pt": "ações",
+        "es": "acciones"
     },
     "sendEmail": {
         "en": "send email",
-        "pt": "send email",
-        "es": "send email"
+        "pt": "enviar correio electronico",
+        "es": "enviar correo electronico"
     },
-    "sendingPWResetEmailTo": {
-        "en": "sending password reset email to {email}",
-        "pt": "sending password reset email to {email}",
-        "es": "sending password reset email to {email}"
+    "sendingPWResetEmailToTarget": {
+        "en": "sending password reset email to {targetName}",
+        "pt": "enviando correio electronico para {targetName}",
+        "es": "enviando correo electronico para {targetName}"
     },
     "sendPWResetEmail": {
         "en": "send password reset email",
-        "pt": "send password reset email",
-        "es": "send password reset email"
+        "pt": "enviar correio electronico de redefinicao de senha",
+        "es": "enviar correo electronico de restablecimiento de contraseña"
     },
-    "toSendPWResetEmailTo": {
-        "en": "to send password a reset email to {email}",
-        "pt": "to send password a reset email to {email}",
-        "es": "to send password a reset email to {email}"
+    "toSendPWResetEmailToTarget": {
+        "en": "to send password a reset email to {targetName}",
+        "pt": "enviar correio electronico de redefinicao de senha para {targetName}",
+        "es": "enviar correo electronico de restablecimiento de contraseña para {targetName}"
     }
 }
