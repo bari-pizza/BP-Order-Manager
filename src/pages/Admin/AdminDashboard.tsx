@@ -11,8 +11,7 @@ import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
 import { FolderLottieIcon, GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
 import { ResourcesTab } from './Tabs/ResourcesTab';
-// @ts-expect-error remove if module declaration can be fixed
-import { m } from '../../paraglide/messages2';
+import { m } from '../../paraglide/messages';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -106,7 +105,7 @@ export const AdminDashboard = () => {
                         color="primary"
                         textTransform={'capitalize'}
                         sx={{ textShadow: `1px 1px 1px ${theme.palette.primary.dark}` }}>
-                        {m.adminDashboard({ fullName: 'John Doe' })}
+                        {m.adminDashboard()}
                     </Typography>
                 </Stack>
                 <Box>

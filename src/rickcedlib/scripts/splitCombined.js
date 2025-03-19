@@ -32,7 +32,7 @@ function splitMessagesJson() {
             }
 
             const paramString = params.length > 0 ? `params:{${params.join('; ')}}` : '';
-            dtsContent.push(`${key}:( ${paramString}) => string,`);
+            dtsContent.push(`${key}:( ${paramString}) => '',`);
         });
 
         dtsContent.push('};');

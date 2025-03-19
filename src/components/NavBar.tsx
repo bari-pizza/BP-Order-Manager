@@ -22,8 +22,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { useClearCache } from '../rickcedlib/hooks/useClearCache';
-// @ts-expect-error remove if module declaration can be fixed
-import { m } from '../paraglide/messages2.js';
+import { m } from '../paraglide/messages.js';
 interface NavBarItem {
     path?: string;
     icon: JSX.Element;

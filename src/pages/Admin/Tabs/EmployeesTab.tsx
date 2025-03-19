@@ -14,7 +14,6 @@ import { useRef } from 'react';
 import { Id, toast } from 'react-toastify';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { getEnv } from '../../../utils';
-// @ts-expect-error remove if module declaration can be fixed
 import { m } from '../../../paraglide/messages';
 
 const sortEmployees = (a: Profile, b: Profile) => {

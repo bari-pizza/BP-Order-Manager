@@ -19,8 +19,7 @@ import { Id, toast } from 'react-toastify';
 import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';
-// @ts-expect-error remove if module declaration can be fixed
-import { m } from '../../../paraglide/messages2';
+import { m } from '../../../paraglide/messages';
 
 const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     if (!origin) return null;
@@ -46,7 +45,7 @@ const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
                 <Typography variant="h6">{origin.name}</Typography>
             </Stack>
             <Typography variant="h6" textTransform={'capitalize'}>
-                {origin.has_order_number ? m.order_number() : m.order_name()}
+                {origin.has_order_number ? m.orderNumber() : m.orderName()}
             </Typography>
             <ExampleOrderTypeSelector delivery={origin.can_deliver} />
             <ExamplePaymentSelector cash={cash} card={card} thirdParty={thirdParty} selected={selected} />
