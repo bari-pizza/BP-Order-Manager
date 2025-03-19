@@ -8,9 +8,9 @@ function splitMessagesJson() {
     try {
         const inputData = JSON.parse(fs.readFileSync(combinedJSON, 'utf8'));
 
-        const enData = {};
-        const ptData = {};
-        const esData = {};
+        const enData = { $schema: 'https://inlang.com/schema/inlang-message-format' };
+        const ptData = { $schema: 'https://inlang.com/schema/inlang-message-format' };
+        const esData = { $schema: 'https://inlang.com/schema/inlang-message-format' };
 
         Object.keys(inputData).forEach((key) => {
             if (key !== '$schema') {
