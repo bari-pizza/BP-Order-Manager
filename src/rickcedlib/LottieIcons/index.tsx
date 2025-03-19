@@ -38,6 +38,7 @@ type LottieIconProps = {
     loop?: boolean;
     autoPlay?: boolean;
     className?: string;
+    playOnce?: boolean;
 };
 
 export const AdminShieldLottieIcon = ({ ...props }: LottieIconProps) => {
@@ -154,7 +155,6 @@ export const RoundLottieIcon = ({ imageSrc, ...props }: LottieIconProps & { imag
             loop={false}
             lottieSrc={lottieData as string}
             className={`lottie-round ${className || ''}`}
-            playOnce
             {...rest}
         />
     );

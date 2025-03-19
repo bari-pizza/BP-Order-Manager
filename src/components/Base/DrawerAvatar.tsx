@@ -25,6 +25,7 @@ type DrawerAvatarProps = {
     variant?: 'standard' | 'border';
     sx?: DrawerCardOverrideSX;
     drawer?: Drawer | Driver_Drawer;
+    playOnce?: boolean;
     // props?: DrawerCardSlotProps;
     // drawerRef?: React.RefObject<HTMLDivElement>;
     isLocked?: boolean;
@@ -67,6 +68,7 @@ export const DrawerAvatar = ({
     size = 'medium',
     variant = 'standard',
     sx,
+    playOnce = false,
     // props,
     // drawerRef,
     isLocked = false,
@@ -126,6 +128,7 @@ export const DrawerAvatar = ({
                 height={finalAvatarSx.height as string}
                 width={finalAvatarSx.width as string}
                 className={'drawer-avatar-' + drawer.drawer_id}
+                playOnce={playOnce}
             />
             {/* <Avatar
                 className={'drawer-avatar-' + drawer.drawer_id}

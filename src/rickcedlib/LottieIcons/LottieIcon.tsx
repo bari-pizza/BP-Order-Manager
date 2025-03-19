@@ -133,7 +133,6 @@ export const AnimatedLottieIcon = ({
                 }
                 setPrevState(newState);
                 animationRef.current.interactivity?.goToState(newState, options);
-                console.log(`go to state: ${newState}`);
             }
         },
         [animationRef, prevState],
