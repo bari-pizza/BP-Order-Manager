@@ -112,7 +112,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         message: (employee) => {
             const { first_name, last_name } = employee;
             const fullName = `${first_name} ${last_name}`;
-            return m.areYouSureYouWant({ message: m.toRestore({ fullName }) });
+            return m.areYouSureYouWant({ message: m.toRestore({ targetName: fullName }) });
         },
         confirmProps: {
             color: 'primary',
@@ -206,7 +206,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'last_name',
-            headerName: m.lastName()
+            headerName: m.lastName(),
             width: 150,
             editable: true,
             renderEditCell: (params) => {
@@ -215,7 +215,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'email',
-            headerName: m.email()
+            headerName: m.email(),
             width: 200,
             editable: true,
             renderEditCell: (params) => {
@@ -289,6 +289,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                         '& .MuiButtonBase-root': { color: 'text.disabled' },
                         '& .actions .MuiButtonBase-root': { color: 'primary.main' },
                     },
+                    '.MuiDataGrid-columnHeader': { textTransform: 'capitalize' },
                 }}
                 pageSizeOptions={[5, 10, 25]}
                 disableVirtualization
@@ -322,7 +323,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
 
     const handlePasswordReset = async () => {
         setIsSubmitting(true);
-        toastRef.current = toast.loading(m.sendingPWResetEmail({ email }));
+        toastRef.current = toast.loading(m.sendingPWResetEmailTo({ email }));
         await supaClient.auth.resetPasswordForEmail(email, { redirectTo: '/myaccount' }).then(({ error }) => {
             if (error) {
                 toast.update(toastRef.current, {
@@ -344,7 +345,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
     };
 
     const { handleConfirmation } = useConfirmationToast({
-        message:m.areYouSureYouWant({ message: m.toSendPWResetEmail({ email }) }),
+        message: m.areYouSureYouWant({ message: m.toSendPWResetEmailTo({ email }) }),
         confirmProps: {
             handler: handlePasswordReset,
             buttonText: 'Send',
@@ -357,7 +358,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
     });
 
     return (
-        <Tooltip title={m.sendPWResetEmail()}>
+        <Tooltip sx={{ textTransform: 'capitalize' }} title={m.sendPWResetEmail()}>
             <IconButton
                 onClick={handleConfirmation}
                 disabled={isSubmitting || disabled}
