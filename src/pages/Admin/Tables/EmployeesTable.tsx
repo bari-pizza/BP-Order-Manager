@@ -176,7 +176,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'actions',
             type: 'actions',
-            headerName: m.profile(),
+            headerName: m.actions(),
             width: 100,
             cellClassName: 'actions',
             getActions: ({ id, row }) => {

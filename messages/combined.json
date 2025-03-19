@@ -69,10 +69,20 @@
         "pt": "funcionários",
         "es": "empleados"
     },
+    "origin": {
+        "en": "origin",
+        "pt": "origem",
+        "es": "origen"
+    },
     "origins": {
         "en": "origins",
         "pt": "origens",
         "es": "origenes"
+    },
+    "resource": {
+        "en": "resource",
+        "pt": "recursos",
+        "es": "recursos"
     },
     "resources": {
         "en": "resources",
@@ -118,6 +128,11 @@
         "en": "{targetName} {fullName} restored successfully",
         "pt": "{targetName} {fullName} restaurado com sucesso",
         "es": "{targetName} {fullName} restaurado con éxito"
+    },
+    "name": {
+        "en": "name",
+        "pt": "nome",
+        "es": "nombre"
     },
     "firstName": {
         "en": "first name",
@@ -213,5 +228,60 @@
         "en": "sent password reset email",
         "pt": "enviado correio electronico de redefinicao de senha",
         "es": "enviado correo electronico de restablecimiento de contraseña"
+    },
+    "originPreview": {
+        "en": "origin preview",
+        "pt": "previa de origem",
+        "es": "previa de origen"
+    },
+    "save": {
+        "en": "save",
+        "pt": "salvar",
+        "es": "guardar"
+    },
+    "saveChanges": {
+        "en": "save changes",
+        "pt": "salvar alteracoes",
+        "es": "guardar cambios"
+    },
+    "noChangesDetected": {
+        "en": "no changes detected",
+        "pt": "nao foram detectadas alteracoes",
+        "es": "no se detectaron cambios"
+    },
+    "icon": {
+        "en": "icon",
+        "pt": "icone",
+        "es": "icono"
+    },
+    "canDeliver": {
+        "en": "can deliver",
+        "pt": "entregavel",
+        "es": "entregable"
+    },
+    "canTip": {
+        "en": "can tip",
+        "pt": "pode dar gorjeta",
+        "es": "puede dar propina"
+    },
+    "hasOrderNumber": {
+        "en": "has order number",
+        "pt": "tem numero de pedido",
+        "es": "tiene numero de pedido"
+    },
+    "hasOrderName": {
+        "en": "has order name",
+        "pt": "tem nome de pedido",
+        "es": "tiene nombre de pedido"
+    },
+    "defaultIsPrepaid": {
+        "en": "default is prepaid",
+        "pt": "padrao eh pago",
+        "es": "predeterminado es pago"
+    },
+    "isPrepaidToggleable": {
+        "en": "is prepaid toggleable",
+        "pt": "e pago toggleavel",
+        "es": "es pago toggleable"
     }
 }
