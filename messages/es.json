@@ -25,6 +25,6 @@
     "lastName": "apellido",
     "email": "correo electronico",
     "phone": "telefono",
-    "areYouSureYouWant": "estas segura que quieres",
+    "areYouSureYouWant": "estas segura que quieres {message}?",
     "toRestore": "restorar {targetName}"
 }

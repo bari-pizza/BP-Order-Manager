@@ -3,7 +3,7 @@
 // TODO: create a toast.confirmation wrapper - should have an onConfirm function
 
 import { Button, ButtonProps, Stack, Typography, TypographyProps } from '@mui/material';
-
+import { capitalizeFirstWord } from '../utils';
 import { toast } from 'react-toastify';
 
 type useConfirmationToastProps<T> = {
@@ -49,7 +49,7 @@ export const useConfirmationToast = <T,>({
             toast.dismiss(toastId);
         };
 
-        const messageString = typeof message === 'string' ? message : message(args);
+        const messageString = capitalizeFirstWord(typeof message === 'string' ? message : message(args));
 
         const content = (
             <Stack
