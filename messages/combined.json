@@ -276,7 +276,7 @@
     },
     "defaultIsPrepaid": {
         "en": "default is prepaid",
-        "pt": "padrao eh pago",
+        "pt": "pre-definidoo e pre-pago",
         "es": "predeterminado es pago"
     },
     "isPrepaidToggleable": {
@@ -285,7 +285,7 @@
         "es": "es pago toggleable"
     },
     "title": {
-        "en": "title3",
+        "en": "title",
         "pt": "titulo",
         "es": "titulo"
     }
