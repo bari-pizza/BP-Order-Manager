@@ -3,6 +3,9 @@
     "private": true,
     "version": "0.0.11",
     "type": "module",
+    "engines": {
+        "node": ">=16.0.0"
+    },
     "scripts": {
         "messages_split": "node src/rickcedlib/scripts/splitCombined.js",
         "messages_combine": "node src/rickcedlib/scripts/combineMessages.js",
