@@ -9,9 +9,17 @@ type ResourceUploaderProps = {
     onSuccess?: (downloadURL: string) => void;
     onError?: (error: Error) => void;
     disabled?: boolean;
+    isAnimated?: boolean;
 };
 
-export const ResourceUploader = ({ resource, onUpload, onSuccess, onError, disabled }: ResourceUploaderProps) => {
+export const ResourceUploader = ({
+    resource,
+    onUpload,
+    onSuccess,
+    onError,
+    disabled,
+    isAnimated,
+}: ResourceUploaderProps) => {
     const { resourceMutations } = useResourceCRUD({ queryKey: ['resources'] });
     const { startToast, successToast, errorToast } = useUploadToast({
         messages: {
@@ -47,5 +55,13 @@ export const ResourceUploader = ({ resource, onUpload, onSuccess, onError, disab
         originalURL: resource.src || '',
     };
 
-    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="large" />;
+    return (
+        <ImageUploader
+            {...imageUploaderProps}
+            disabled={disabled}
+            size="large"
+            style={{ height: '60px', width: '60px' }}
+            isAnimated={isAnimated}
+        />
+    );
 };
