@@ -34,7 +34,7 @@ export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
         },
     ];
     return (
-        <Stack direction="column" minHeight="300px" width="100%">
+        <Stack direction="column" flex={1} overflow="hidden" width="100%">
             <DataGrid
                 sx={{
                     '.MuiDataGrid-columnHeader': { textTransform: 'capitalize' },

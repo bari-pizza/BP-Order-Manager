@@ -17,44 +17,7 @@ import {
     RegisterLottieIcon,
     SettingsLottieIcon,
 } from '../../rickcedlib/LottieIcons';
-
-/*    TODO: About Today
-        Sales
-            Charts
-            Reports
-        Drivers
-            Add driver
-            Remove driver (only if not in use)
-            Close driver (locks driver)
-            Open driver (unlocks driver)
-        Orders
-            Allow for order deletion
-*/
-
-interface TabPanelProps {
-    children?: React.ReactNode;
-    tabName: TabName;
-    value: TabName;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, tabName, ...other } = props;
-
-    return (
-        <div
-            style={{
-                height: '100%',
-            }}
-            className="hover-scroll"
-            role="tabpanel"
-            hidden={value !== tabName}
-            id={`simple-tabpanel-${tabName}`}
-            aria-labelledby={`simple-tab-${tabName}`}
-            {...other}>
-            <div className="hover-scroll-content">{value === tabName && <Box sx={{ p: 3 }}>{children}</Box>}</div>
-        </div>
-    );
-}
+import { TabPanel } from '../../rickcedlib/components/TabPanel';
 
 type TabName = ManagerDashboardTabName;
 

@@ -113,7 +113,7 @@ export const EmployeesTab = () => {
     };
 
     return (
-        <Stack direction="column" alignItems={'center'} gap={2}>
+        <Stack direction="column" alignItems={'center'} gap={2} height="100%">
             <EmployeesTable employees={employees} />
             <Button onClick={open} variant="contained">
                 {m.addNewTarget({ targetName: m.employee() })}

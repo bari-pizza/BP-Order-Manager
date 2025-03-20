@@ -18,7 +18,7 @@ export const OrdersTab = () => {
         };
     });
     return (
-        <Stack direction="column">
+        <Stack direction="column" height="100%">
             <OrdersTable orders={tableOrders} />
         </Stack>
     );
