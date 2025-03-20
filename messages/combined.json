@@ -283,5 +283,10 @@
         "en": "is prepaid toggleable",
         "pt": "e pago toggleavel",
         "es": "es pago toggleable"
+    },
+    "title": {
+        "en": "title3",
+        "pt": "titulo",
+        "es": "titulo"
     }
 }

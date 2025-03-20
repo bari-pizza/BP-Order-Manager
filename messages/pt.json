@@ -56,5 +56,6 @@
   "hasOrderNumber": "tem numero de pedido",
   "hasOrderName": "tem nome de pedido",
   "defaultIsPrepaid": "padrao eh pago",
-  "isPrepaidToggleable": "eh pago toggleavel"
+  "isPrepaidToggleable": "e pago toggleavel",
+  "title": "titulo"
 }

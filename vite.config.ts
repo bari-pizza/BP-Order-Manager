@@ -7,6 +7,7 @@ import { qrcode } from 'vite-plugin-qrcode';
 import { VitePWA } from 'vite-plugin-pwa';
 import replace from '@rollup/plugin-replace';
 import packageJson from './package.json';
+import { runScriptOnFileSave } from './src/rickcedlib/plugins/runScriptOnFileSave';
 // https://www.npmjs.com/package/vite-plugin-pwa/v/0.9.1
 
 // https://vitejs.dev/config/
@@ -20,6 +21,7 @@ export default defineConfig({
             project: './project.inlang',
             outdir: './src/paraglide',
         }),
+        runScriptOnFileSave('messages/combined.json', 'npm run messages_split'),
         react(),
         replace({
             __APP_VERSION__: JSON.stringify(packageJson.version),

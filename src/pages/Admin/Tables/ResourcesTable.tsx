@@ -2,6 +2,7 @@ import { Stack } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Resource } from '../../../typesAndValidators';
 import { ResourceUploader } from '../ResourceUploader';
+import { m } from '../../../paraglide/messages';
 
 export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
     const rows = resources;
@@ -9,7 +10,7 @@ export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
     const columns: GridColDef<Resource>[] = [
         {
             field: 'title',
-            headerName: 'Title',
+            headerName: m.title(),
             flex: 4,
         },
         {
