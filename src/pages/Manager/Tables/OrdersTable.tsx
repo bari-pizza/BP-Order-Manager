@@ -20,21 +20,6 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
 
     const columns: GridColDef<OrderWithFullDetails>[] = [
         {
-            field: 'drawer',
-            headerName: 'Drawer',
-            flex: 1,
-            renderCell: (params) => {
-                const { row } = params;
-                const { drawer, driver } = row;
-                return (
-                    <Stack direction="row" alignItems="end" height="100%" spacing={2}>
-                        <DrawerAvatar drawer={driver ?? drawer} variant="border" playOnce />
-                        <Typography alignSelf="center">{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
-                    </Stack>
-                );
-            },
-        },
-        {
             field: 'number/name',
             headerName: 'Order #',
             flex: 1,
@@ -53,6 +38,21 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                         <OriginLogo orderOrigin={origin} playOnce />
                         <OrderTypeIcon orderType={order_type} />
                         <span>{order_number ?? order_name}</span>
+                    </Stack>
+                );
+            },
+        },
+        {
+            field: 'drawer',
+            headerName: 'Drawer',
+            flex: 1,
+            renderCell: (params) => {
+                const { row } = params;
+                const { drawer, driver } = row;
+                return (
+                    <Stack direction="row" alignItems="end" height="100%" spacing={2}>
+                        <DrawerAvatar drawer={driver ?? drawer} variant="border" playOnce />
+                        <Typography alignSelf="center">{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
                     </Stack>
                 );
             },
