@@ -20,11 +20,8 @@ export default defineConfig({
         paraglideVitePlugin({
             project: './project.inlang',
             outdir: './src/paraglide',
-            // options: {
-            //     emitGitIgnore: false,
-            //     emitPrettierIgnore: false,
-            //     emitDts: true,
-            // },
+            emitGitIgnore: false,
+            emitPrettierIgnore: false,
         }),
         runScriptOnFileSave('messages/combined.json', 'npm run messages_split'),
         react(),
