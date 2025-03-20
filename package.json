@@ -12,7 +12,7 @@
         "dev": "vite --host",
         "test": "vitest",
         "generate": "npx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
-        "build": "paraglide-js compile && tsc -b && vite build",
+        "build": "paraglide-js compile && npm run messages_split && tsc -b && vite build",
         "check": "tsc -b",
         "serve": "npx serve -s dist",
         "start": "vite preview",
