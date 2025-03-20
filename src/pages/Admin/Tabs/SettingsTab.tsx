@@ -129,7 +129,7 @@ export const SettingsTab = () => {
          */
     };
     return (
-        <LabeledStack label="Settings" spacing={2} alignItems="center">
+        <LabeledStack label="Settings" spacing={2} alignItems="center" height="100%">
             <Controller
                 name="default_delivery_fee_in_cents"
                 control={control}

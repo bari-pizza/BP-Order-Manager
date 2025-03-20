@@ -77,6 +77,7 @@ export const LabeledStack = forwardRef<HTMLDivElement, LabeledStackProps>(
                     border: `2px solid ${color}`,
                     borderRadius: '4px',
                     padding: theme.spacing(2),
+                    marginTop: theme.spacing(1.5),
                     ...stackSx,
                 }}>
                 <Typography

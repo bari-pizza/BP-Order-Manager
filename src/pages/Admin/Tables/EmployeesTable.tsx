@@ -278,7 +278,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
     ];
     return (
-        <Stack direction="column" minHeight="300px">
+        <Stack direction="column" flex={1} overflow="hidden" width="100%">
             <DataGrid
                 sx={{
                     '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },

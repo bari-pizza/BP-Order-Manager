@@ -24,7 +24,7 @@ export const CardsTab = () => {
         });
     });
     return (
-        <Stack direction="column">
+        <Stack direction="column" height="100%">
             <CardsTable payments={tablePayments} />
         </Stack>
     );

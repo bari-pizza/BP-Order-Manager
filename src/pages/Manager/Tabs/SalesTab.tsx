@@ -9,7 +9,7 @@ export const SalesTab = () => {
     const [activeTable, setActiveTable] = useState<'table1' | 'table2'>('table1');
 
     return (
-        <Stack justifyContent="center" gap={2} direction="row" width="100%">
+        <Stack justifyContent="center" gap={2} direction="row" width="100%" height="100%">
             {activeTable === 'table1' && <Table1 portalContainer={portalContainer} />}
             {activeTable === 'table2' && <div>Table 2 goes here</div>}
             <SideBar width={300}>

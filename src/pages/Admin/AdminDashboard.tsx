@@ -12,30 +12,7 @@ import { Suspense } from 'react';
 import { FolderLottieIcon, GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
 import { ResourcesTab } from './Tabs/ResourcesTab';
 import { m } from '../../paraglide/messages';
-
-interface TabPanelProps {
-    children?: React.ReactNode;
-    tabName: TabName;
-    value: TabName;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, tabName, ...other } = props;
-
-    return (
-        <div
-            style={{
-                height: '100%',
-            }}
-            role="tabpanel"
-            hidden={value !== tabName}
-            id={`simple-tabpanel-${tabName}`}
-            aria-labelledby={`simple-tab-${tabName}`}
-            {...other}>
-            {value === tabName && <Box sx={{ p: 3 }}>{children}</Box>}
-        </div>
-    );
-}
+import { TabPanel } from '../../rickcedlib/components/TabPanel';
 
 type TabName = AdminDashboardTabName;
 
@@ -147,7 +124,6 @@ export const AdminDashboard = () => {
                     <TabPanel tabName="resources" value={tabName}>
                         <ResourcesTab />
                     </TabPanel>
-                    ,
                     <TabPanel tabName="settings" value={tabName}>
                         <SettingsTab />
                     </TabPanel>

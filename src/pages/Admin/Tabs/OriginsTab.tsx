@@ -72,7 +72,7 @@ export const OriginsTab = () => {
     const sortedOrigins = [...origins].sort(sortOrigins);
 
     return (
-        <Stack direction="column" alignItems={'center'} gap={2}>
+        <Stack direction="column" alignItems={'center'} gap={2} height="100%">
             <OriginsTable origins={sortedOrigins} />
             <Button onClick={open} variant="contained">
                 Add New Order Origin

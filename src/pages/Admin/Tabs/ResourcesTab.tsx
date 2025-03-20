@@ -25,7 +25,7 @@ export const ResourcesTab = () => {
     const sortedResources = [...resources].sort(sortResources);
 
     return (
-        <Stack direction="column" alignItems={'center'} gap={2}>
+        <Stack direction="column" alignItems={'center'} gap={2} height={'100%'}>
             <ResourcesTable resources={sortedResources} />
         </Stack>
     );

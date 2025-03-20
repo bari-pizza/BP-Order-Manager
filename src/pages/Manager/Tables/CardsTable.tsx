@@ -67,7 +67,7 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
         },
     ];
     return (
-        <Stack direction="column" minHeight="300px">
+        <Stack direction="column" height="100%">
             <DataGrid
                 rows={rows}
                 columns={columns}
