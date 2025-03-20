@@ -15,7 +15,7 @@ export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
         },
         {
             field: 'src',
-            headerName: 'Icon',
+            headerName: m.icon(),
             headerAlign: 'center',
             flex: 6,
             editable: true,
@@ -36,6 +36,9 @@ export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
     return (
         <Stack direction="column" minHeight="300px" width="100%">
             <DataGrid
+                sx={{
+                    '.MuiDataGrid-columnHeader': { textTransform: 'capitalize' },
+                }}
                 rows={rows}
                 columns={columns}
                 disableVirtualization
