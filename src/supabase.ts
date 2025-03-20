@@ -455,6 +455,7 @@ export type Database = {
           is_deleted: boolean
           is_manager: boolean
           last_name: string | null
+          locale: string
           phone: string | null
         }
         Insert: {
@@ -467,6 +468,7 @@ export type Database = {
           is_deleted?: boolean
           is_manager?: boolean
           last_name?: string | null
+          locale?: string
           phone?: string | null
         }
         Update: {
@@ -479,6 +481,7 @@ export type Database = {
           is_deleted?: boolean
           is_manager?: boolean
           last_name?: string | null
+          locale?: string
           phone?: string | null
         }
         Relationships: []

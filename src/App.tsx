@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import { Stack, Drawer } from '@mui/material';
@@ -31,8 +31,13 @@ import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
 import { useBusinessDate, useMidnightEffect } from './hooks/data/useBusinessDate.tsx';
-import { ShepherdJourneyProvider } from 'react-shepherd';
-import 'shepherd.js/dist/css/shepherd.css';
+import { enUS, ptBR, esES, Localization } from '@mui/material/locale';
+import 'dayjs/locale/en';
+import 'dayjs/locale/es';
+import 'dayjs/locale/pt-br';
+import dayjs from 'dayjs';
+// @ts-expect-error missing module declaration
+import { setLocale } from './paraglide/runtime.js';
 
 const router = createBrowserRouter([
     {
@@ -112,18 +117,15 @@ const router = createBrowserRouter([
 
 function App() {
     console.log('rendering app.tsx');
-
     return (
         <QueryClientProvider client={queryClient}>
-            <ShepherdJourneyProvider>
-                <RouterProvider
-                    router={router}
-                    future={{
-                        v7_startTransition: true,
-                    }}
-                />
-                <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-            </ShepherdJourneyProvider>
+            <RouterProvider
+                router={router}
+                future={{
+                    v7_startTransition: true,
+                }}
+            />
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
         </QueryClientProvider>
     );
 }
@@ -132,7 +134,7 @@ export default App;
 
 const queryClient = new QueryClient();
 
-const theme = createTheme(themeOptions);
+// const theme = createTheme(themeOptions);
 
 function Layout() {
     const { session, profile, loading } = useSession();
@@ -183,6 +185,41 @@ function Layout() {
         });
     const [businessDate] = useBusinessDate();
 
+    const profileLocale = profile?.locale || 'en';
+
+    const { theme, dayJsLocale } = useMemo(() => {
+        if (profileLocale) {
+            const dictionary: {
+                [languageCode: string]: {
+                    dayJSLocale: string;
+                    localization: Localization;
+                    text: string;
+                };
+            } = {
+                es: { dayJSLocale: 'es-us', localization: esES, text: 'Español' },
+                pt: { dayJSLocale: 'pt-br', localization: ptBR, text: 'Português' },
+                en: { dayJSLocale: 'en', localization: enUS, text: 'English' },
+            };
+            const theme = createTheme(themeOptions, dictionary[profileLocale].localization);
+            const dayJsLocale = dictionary[profileLocale].dayJSLocale;
+            return { theme, dayJsLocale };
+        } else {
+            const theme = createTheme(themeOptions, enUS);
+            return { theme, dayJsLocale: 'en' };
+        }
+    }, [profileLocale]);
+
+    useMemo(() => {
+        dayjs.locale(dayJsLocale);
+    }, [dayJsLocale]);
+
+    useEffect(() => {
+        // using profile?.locale here instead of profileLocale so that it only runs once profile is loaded
+        if (profile?.locale) {
+            setLocale(profile?.locale);
+        }
+    }, [profile?.locale]);
+
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
     return (
@@ -191,7 +228,8 @@ function Layout() {
         //     onLoad={() => console.log('Maps API has loaded.')}
         //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
         //     version="beta">
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dayJsLocale}>
             <ThemeProvider theme={theme}>
                 <BariPizzaContext.Provider
                     value={{
@@ -202,7 +240,13 @@ function Layout() {
                         resources,
                     }}>
                     <LayoutContext.Provider
-                        value={{ sideBarRef, setSideBarWidth, sideBarSkeletonRef, setSideBarSkeletonWidth, isMobile }}>
+                        value={{
+                            sideBarRef,
+                            setSideBarWidth,
+                            sideBarSkeletonRef,
+                            setSideBarSkeletonWidth,
+                            isMobile,
+                        }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
                             <ToastContainer />
                             <Stack id="main" direction="row" justifyContent="center">

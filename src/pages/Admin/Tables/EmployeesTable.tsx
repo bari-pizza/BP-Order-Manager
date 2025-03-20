@@ -20,6 +20,7 @@ import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { useRef, useState } from 'react';
 import { supaClient } from '../../../supaClient';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
+import { m } from '../../../paraglide/messages';
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<Employee>({ data: employees });
@@ -31,7 +32,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         // TODO: show deleted employees at the bottom
         const { id, first_name, last_name } = employee;
         const fullName = `${first_name} ${last_name}`;
-        toastRef.current = toast.loading(`Deleting employee ${fullName}`);
+        toastRef.current = toast.loading(m.deletingTarget({ targetName: m.employee(), fullName }));
         const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: true });
         if (error) {
             toast.update(toastRef.current, {
@@ -43,7 +44,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: `Employee ${fullName} deleted successfully`,
+                render: m.targetDeletedSuccessfully({ targetName: m.employee(), fullName }),
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -59,7 +60,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const restoreEmployee = async (employee: Employee) => {
         const { id } = employee;
         const fullName = `${employee.first_name} ${employee.last_name}`;
-        toastRef.current = toast.loading(`Restoring employee ${fullName}`);
+        toastRef.current = toast.loading(m.restoringTarget({ targetName: m.employee(), fullName }));
         const { error } = await supaClient.rpc('update_employee', { p_id: id, p_is_deleted: false });
         if (error) {
             toast.update(toastRef.current, {
@@ -71,7 +72,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: `Employee ${fullName} restored successfully`,
+                render: m.targetRestoredSuccessfully({ targetName: m.employee(), fullName }),
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -84,7 +85,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         message: (employee) => {
             const { first_name, last_name } = employee;
             const fullName = `${first_name} ${last_name}`;
-            return `Are you sure you want to delete ${fullName}?`;
+            return m.areYouSureYouWant({ message: m.toDeleteTarget({ targetName: fullName }) });
         },
         confirmProps: {
             color: 'error',
@@ -92,7 +93,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             handler: (employee) => {
                 const { id } = employee;
                 if (!id) {
-                    toast.error('Operation failed - try again!');
+                    toast.error(m.operationFailed());
                     return;
                 }
                 deleteEmployee(employee);
@@ -109,7 +110,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         message: (employee) => {
             const { first_name, last_name } = employee;
             const fullName = `${first_name} ${last_name}`;
-            return `Are you sure you want to restore ${fullName}?`;
+            return m.areYouSureYouWant({ message: m.toRestoreTarget({ targetName: fullName }) });
         },
         confirmProps: {
             color: 'primary',
@@ -117,7 +118,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             handler: (employee) => {
                 const { id } = employee;
                 if (!id) {
-                    toast.error('Operation failed - try again!');
+                    toast.error(m.operationFailed());
                     return;
                 }
                 restoreEmployee(employee);
@@ -175,7 +176,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'actions',
             type: 'actions',
-            headerName: 'Actions',
+            headerName: m.actions(),
             width: 100,
             cellClassName: 'actions',
             getActions: ({ id, row }) => {
@@ -194,7 +195,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'first_name',
-            headerName: 'First Name',
+            headerName: m.firstName(),
             width: 150,
             editable: true,
             renderEditCell: (params) => {
@@ -203,7 +204,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'last_name',
-            headerName: 'Last Name',
+            headerName: m.lastName(),
             width: 150,
             editable: true,
             renderEditCell: (params) => {
@@ -212,7 +213,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'email',
-            headerName: 'Email',
+            headerName: m.email(),
             width: 200,
             editable: true,
             renderEditCell: (params) => {
@@ -221,7 +222,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'phone',
-            headerName: 'Phone',
+            headerName: m.phone(),
             width: 150,
             editable: true,
             renderEditCell: (params) => {
@@ -230,7 +231,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'is_admin',
-            headerName: 'Admin',
+            headerName: m.admin(),
             width: 100,
             headerAlign: 'center',
             editable: true,
@@ -243,7 +244,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'is_manager',
-            headerName: 'Manager',
+            headerName: m.manager(),
             width: 100,
             editable: true,
             headerAlign: 'center',
@@ -256,7 +257,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'is_driver',
-            headerName: 'Driver',
+            headerName: m.driver(),
             width: 100,
             editable: true,
             headerAlign: 'center',
@@ -269,7 +270,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         },
         {
             field: 'send_email',
-            headerName: 'Send PW Reset Email',
+            headerName: m.sendEmail(),
             headerAlign: 'center',
             width: 175,
             editable: false,
@@ -286,6 +287,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                         '& .MuiButtonBase-root': { color: 'text.disabled' },
                         '& .actions .MuiButtonBase-root': { color: 'primary.main' },
                     },
+                    '.MuiDataGrid-columnHeader': { textTransform: 'capitalize' },
                 }}
                 pageSizeOptions={[5, 10, 25]}
                 disableVirtualization
@@ -319,7 +321,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
 
     const handlePasswordReset = async () => {
         setIsSubmitting(true);
-        toastRef.current = toast.loading(`Sending password reset email to ${email}`);
+        toastRef.current = toast.loading(m.sendingPWResetEmailToTarget({ targetName: email }));
         await supaClient.auth.resetPasswordForEmail(email, { redirectTo: '/myaccount' }).then(({ error }) => {
             if (error) {
                 toast.update(toastRef.current, {
@@ -330,7 +332,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
                 });
             } else {
                 toast.update(toastRef.current, {
-                    render: `Password reset email sent to ${email}`,
+                    render: m.sentPWResetEmail(),
                     type: 'success',
                     isLoading: false,
                     autoClose: 5000,
@@ -341,7 +343,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
     };
 
     const { handleConfirmation } = useConfirmationToast({
-        message: `Are you sure you want to send a password reset email to ${email}?`,
+        message: m.areYouSureYouWant({ message: m.toSendPWResetEmailToTarget({ targetName: email }) }),
         confirmProps: {
             handler: handlePasswordReset,
             buttonText: 'Send',
@@ -354,7 +356,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
     });
 
     return (
-        <Tooltip title="Send password reset email">
+        <Tooltip sx={{ textTransform: 'capitalize' }} title={m.sendPWResetEmail()}>
             <IconButton
                 onClick={handleConfirmation}
                 disabled={isSubmitting || disabled}

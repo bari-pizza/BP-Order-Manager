@@ -48,7 +48,7 @@ export const OriginsTab = () => {
 
     const onSubmit = async (data: FormValues) => {
         console.log(data);
-        toastRef.current = toast.loading('Adding new origin...');
+        toastRef.current = toast.loading(`Adding origin: ${data.name}`);
         const { error } = await supaClient.from('OrderOrigin').insert({ name: data.name });
         if (error) {
             toast.update(toastRef.current, {
@@ -89,7 +89,7 @@ export const OriginsTab = () => {
                                 <SmartTextField
                                     {...field}
                                     label="Name"
-                                    placeholder="New Origin"
+                                    placeholder="Name"
                                     isDirty={dirtyFields.name}
                                     error={!!errors.name}
                                     helperText={errors.name?.message}

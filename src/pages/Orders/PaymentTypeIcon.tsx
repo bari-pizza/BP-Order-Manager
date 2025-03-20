@@ -1,13 +1,10 @@
 import { Tooltip } from '@mui/material';
 import { PaymentType } from '../../typesAndValidators';
-import { Money as CashIcon } from '@mui/icons-material';
-import { CreditCardLottieIcon, ThirdPartyLottieIcon } from '../../rickcedlib/LottieIcons';
+import { CashLottieIcon, CreditCardLottieIcon, ThirdPartyLottieIcon } from '../../rickcedlib/LottieIcons';
 
 export const PaymentTypeIcon = ({ paymentType }: { paymentType?: PaymentType }) => {
     if (!paymentType) return null;
-    let icon = <CashIcon />;
-    // TODO: replace with lottie icon
-    // once I do, remove color as a prop
+    let icon = <CashLottieIcon />;
     if (paymentType === 'card') {
         icon = <CreditCardLottieIcon />;
     } else if (paymentType === 'third_party') {

@@ -25,6 +25,7 @@ type DrawerAvatarProps = {
     variant?: 'standard' | 'border';
     sx?: DrawerCardOverrideSX;
     drawer?: Drawer | Driver_Drawer;
+    playOnce?: boolean;
     // props?: DrawerCardSlotProps;
     // drawerRef?: React.RefObject<HTMLDivElement>;
     isLocked?: boolean;
@@ -67,6 +68,7 @@ export const DrawerAvatar = ({
     size = 'medium',
     variant = 'standard',
     sx,
+    playOnce = false,
     // props,
     // drawerRef,
     isLocked = false,
@@ -88,10 +90,9 @@ export const DrawerAvatar = ({
     };
 
     const resource = resources.find((resource) => resource.title === keys[drawer.drawer_type]);
+    const missingAvatarSrc = resources.find((resource) => resource.title === 'Missing Avatar')?.src;
 
-    console.log({ drawer, resource, resources, key: keys[drawer.drawer_type] });
-
-    const imageSrc = ('driver' in drawer && drawer.driver.avatar_src) || resource?.src || '';
+    const imageSrc = ('driver' in drawer && (drawer.driver.avatar_src || missingAvatarSrc)) || resource?.src || '';
 
     const finalAvatarSx = {
         ...(size === 'small' ? smallStyle : {}),
@@ -102,8 +103,6 @@ export const DrawerAvatar = ({
         borderColor: theme.palette.primary.main,
         ...sx?.avatar,
     };
-
-    console.log({ finalAvatarSx });
 
     // const avatarChild = createElement(iconMap[drawer.drawer_type], {
     //     sx: sx?.avatarIcon,
@@ -129,6 +128,7 @@ export const DrawerAvatar = ({
                 height={finalAvatarSx.height as string}
                 width={finalAvatarSx.width as string}
                 className={'drawer-avatar-' + drawer.drawer_id}
+                playOnce={playOnce}
             />
             {/* <Avatar
                 className={'drawer-avatar-' + drawer.drawer_id}

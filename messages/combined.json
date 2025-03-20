@@ -1,0 +1,292 @@
+{
+    "profile": {
+        "en": "profile",
+        "pt": "perfil",
+        "es": "perfil"
+    },
+    "today": {
+        "en": "today",
+        "pt": "hoje",
+        "es": "hoy"
+    },
+    "search": {
+        "en": "search",
+        "pt": "pesquisar",
+        "es": "buscar"
+    },
+    "admin": {
+        "en": "admin",
+        "pt": "admin",
+        "es": "admin"
+    },
+    "manager": {
+        "en": "manager",
+        "pt": "gerente",
+        "es": "gerente"
+    },
+    "driver": {
+        "en": "driver",
+        "pt": "driver",
+        "es": "driver"
+    },
+    "orders": {
+        "en": "orders",
+        "pt": "pedidos",
+        "es": "pedidos"
+    },
+    "howTo": {
+        "en": "how to",
+        "pt": "ajuda",
+        "es": "ayuda"
+    },
+    "login": {
+        "en": "login",
+        "pt": "entrar",
+        "es": "iniciar sesión"
+    },
+    "home": {
+        "en": "home",
+        "pt": "inicio",
+        "es": "inicio"
+    },
+    "orderName": {
+        "en": "order name",
+        "pt": "nome do pedido",
+        "es": "nombre del pedido"
+    },
+    "orderNumber": {
+        "en": "order number",
+        "pt": "número do pedido",
+        "es": "número de pedido"
+    },
+    "adminDashboard": {
+        "en": "admin dashboard",
+        "pt": "painel de administração",
+        "es": "pandel de administración"
+    },
+    "employees": {
+        "en": "employees",
+        "pt": "funcionários",
+        "es": "empleados"
+    },
+    "origin": {
+        "en": "origin",
+        "pt": "origem",
+        "es": "origen"
+    },
+    "origins": {
+        "en": "origins",
+        "pt": "origens",
+        "es": "origenes"
+    },
+    "resource": {
+        "en": "resource",
+        "pt": "recursos",
+        "es": "recursos"
+    },
+    "resources": {
+        "en": "resources",
+        "pt": "recursos",
+        "es": "recursos"
+    },
+    "settings": {
+        "en": "settings",
+        "pt": "configurações",
+        "es": "configuraciones"
+    },
+    "creating": {
+        "en": "creating",
+        "pt": "criando",
+        "es": "creando"
+    },
+    "employee": {
+        "en": "employee",
+        "pt": "funcionário",
+        "es": "empleado"
+    },
+    "addNewTarget": {
+        "en": "add new {targetName}",
+        "pt": "adicionar novo {targetName}",
+        "es": "agregar nuevo {targetName}"
+    },
+    "addTarget": {
+        "en": "add {targetName}",
+        "pt": "adicionar {targetName}",
+        "es": "agregar {targetName}"
+    },
+    "targetCreatedSuccessfully": {
+        "en": "{targetName} {fullName} created successfully",
+        "pt": "{targetName} {fullName} criado com sucesso",
+        "es": "{targetName} {fullName} creado con éxito"
+    },
+    "targetDeletedSuccessfully": {
+        "en": "{targetName} {fullName} deleted successfully",
+        "pt": "{targetName} {fullName} apagado com sucesso",
+        "es": "{targetName} {fullName} eliminado con éxito"
+    },
+    "targetRestoredSuccessfully": {
+        "en": "{targetName} {fullName} restored successfully",
+        "pt": "{targetName} {fullName} restaurado com sucesso",
+        "es": "{targetName} {fullName} restaurado con éxito"
+    },
+    "name": {
+        "en": "name",
+        "pt": "nome",
+        "es": "nombre"
+    },
+    "firstName": {
+        "en": "first name",
+        "pt": "nome",
+        "es": "nombre"
+    },
+    "lastName": {
+        "en": "last name",
+        "pt": "sobrenome",
+        "es": "apellido"
+    },
+    "email": {
+        "en": "email",
+        "pt": "correio electronico",
+        "es": "correo electronico"
+    },
+    "phone": {
+        "en": "phone",
+        "pt": "telefone",
+        "es": "telefono"
+    },
+    "areYouSureYouWant": {
+        "en": "are you sure you want {message}?",
+        "pt": "tem certeza que voce quer {message}?",
+        "es": "estas segura que quieres {message}?"
+    },
+    "toRestoreTarget": {
+        "en": "to restore {targetName}",
+        "pt": "restorar {targetName}",
+        "es": "restorar {targetName}"
+    },
+    "restoringTarget": {
+        "en": "restoring {targetName} {fullName}",
+        "pt": "restorando {targetName} {fullName}",
+        "es": "restorando {targetName} {fullName}"
+    },
+    "delete": {
+        "en": "delete",
+        "pt": "apagar",
+        "es": "eliminar"
+    },
+    "deletingTarget": {
+        "en": "deleting {targetName} {fullName}",
+        "pt": "apagando {targetName} {fullName}",
+        "es": "eliminando {targetName} {fullName}"
+    },
+    "toDeleteTarget": {
+        "en": "to delete {targetName}",
+        "pt": "apagar {targetName}",
+        "es": "eliminar {targetName}"
+    },
+    "cancel": {
+        "en": "cancel",
+        "pt": "cancelar",
+        "es": "cancelar"
+    },
+    "restore": {
+        "en": "restore",
+        "pt": "restorar",
+        "es": "restorar"
+    },
+    "operationFailed": {
+        "en": "operation failed - try again!",
+        "pt": "operação falhou - tente novamente!",
+        "es": "operación fallida - inténtalo de nuevo!"
+    },
+    "actions": {
+        "en": "actions",
+        "pt": "ações",
+        "es": "acciones"
+    },
+    "sendEmail": {
+        "en": "send email",
+        "pt": "enviar correio electronico",
+        "es": "enviar correo electronico"
+    },
+    "sendingPWResetEmailToTarget": {
+        "en": "sending password reset email to {targetName}",
+        "pt": "enviando correio electronico para {targetName}",
+        "es": "enviando correo electronico para {targetName}"
+    },
+    "sendPWResetEmail": {
+        "en": "send password reset email",
+        "pt": "enviar correio electronico de redefinicao de senha",
+        "es": "enviar correo electronico de restablecimiento de contraseña"
+    },
+    "toSendPWResetEmailToTarget": {
+        "en": "to send password a reset email to {targetName}",
+        "pt": "enviar correio electronico de redefinicao de senha para {targetName}",
+        "es": "enviar correo electronico de restablecimiento de contraseña para {targetName}"
+    },
+    "sentPWResetEmail": {
+        "en": "sent password reset email",
+        "pt": "enviado correio electronico de redefinicao de senha",
+        "es": "enviado correo electronico de restablecimiento de contraseña"
+    },
+    "originPreview": {
+        "en": "origin preview",
+        "pt": "previa de origem",
+        "es": "previa de origen"
+    },
+    "save": {
+        "en": "save",
+        "pt": "salvar",
+        "es": "guardar"
+    },
+    "saveChanges": {
+        "en": "save changes",
+        "pt": "salvar alteracoes",
+        "es": "guardar cambios"
+    },
+    "noChangesDetected": {
+        "en": "no changes detected",
+        "pt": "nao foram detectadas alteracoes",
+        "es": "no se detectaron cambios"
+    },
+    "icon": {
+        "en": "icon",
+        "pt": "icone",
+        "es": "icono"
+    },
+    "canDeliver": {
+        "en": "can deliver",
+        "pt": "entregavel",
+        "es": "entregable"
+    },
+    "canTip": {
+        "en": "can tip",
+        "pt": "pode dar gorjeta",
+        "es": "puede dar propina"
+    },
+    "hasOrderNumber": {
+        "en": "has order number",
+        "pt": "tem numero de pedido",
+        "es": "tiene numero de pedido"
+    },
+    "hasOrderName": {
+        "en": "has order name",
+        "pt": "tem nome de pedido",
+        "es": "tiene nombre de pedido"
+    },
+    "defaultIsPrepaid": {
+        "en": "default is prepaid",
+        "pt": "padrao eh pago",
+        "es": "predeterminado es pago"
+    },
+    "isPrepaidToggleable": {
+        "en": "is prepaid toggleable",
+        "pt": "e pago toggleavel",
+        "es": "es pago toggleable"
+    },
+    "title": {
+        "en": "title3",
+        "pt": "titulo",
+        "es": "titulo"
+    }
+}

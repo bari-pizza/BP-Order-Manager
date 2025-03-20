@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, useState } from 'react';
 import {
     Button,
     ButtonGroup,
@@ -37,9 +37,7 @@ export const OrderDashboard = () => {
 const OrderDashboardDesktop = () => {
     const { drivers } = useDrivers();
     const { open, close, isOpen } = useDialogProps();
-    const { open: handleOpen, close: handleClose, isOpen: openSpeedDial } = useDialogProps();
     const { ticket, drawer, orders, summaries, businessDay } = useOrdersDrawersTickets();
-    const startSelectorRef = useRef<HTMLButtonElement>(null);
 
     return (
         <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers, summaries }}>
@@ -51,17 +49,6 @@ const OrderDashboardDesktop = () => {
                 <Suspense fallback={<OrderTicketAreaSkeleton />}>
                     <OrderTicketArea />
                 </Suspense>
-                <SpeedDial
-                    id="my-speed-dial"
-                    ariaLabel="SpeedDial"
-                    sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1500 }}
-                    icon={<BoltIcon />}
-                    color="secondary"
-                    onClose={handleClose}
-                    onOpen={handleOpen}
-                    open={openSpeedDial}>
-                    <SpeedDialAction ref={startSelectorRef} icon={<AddIcon />} tooltipTitle={'Add Order'} />
-                </SpeedDial>
             </Stack>
             <SideBar width="300px">
                 <Stack alignContent="center" justifyContent="center" direction="column" height="100%">

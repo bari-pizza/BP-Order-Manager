@@ -19,6 +19,7 @@ import { Id, toast } from 'react-toastify';
 import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';
+import { m } from '../../../paraglide/messages';
 
 const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     if (!origin) return null;
@@ -43,7 +44,9 @@ const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
                 <LogoUploader origin={origin} disabled />
                 <Typography variant="h6">{origin.name}</Typography>
             </Stack>
-            <Typography variant="h6">Order {origin.has_order_number ? 'Number' : 'Name'}</Typography>
+            <Typography variant="h6" textTransform={'capitalize'}>
+                {origin.has_order_number ? m.orderNumber() : m.orderName()}
+            </Typography>
             <ExampleOrderTypeSelector delivery={origin.can_deliver} />
             <ExamplePaymentSelector cash={cash} card={card} thirdParty={thirdParty} selected={selected} />
             <Typography variant="h6">{origin.can_tip ? 'Accepts' : 'Does not accept'} tips</Typography>
@@ -67,7 +70,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     };
 
     const { handleConfirmation: confirmEdit } = useConfirmationToast<OriginRow>({
-        message: 'Origin Preview',
+        message: m.originPreview(),
         messageProps: { variant: 'h3' },
         position: 'center',
         renderBody: (origin) => {
@@ -82,7 +85,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { is_pending, ...origin } = newRow;
                 if (!id) {
-                    toast.error('Operation failed - try again!');
+                    toast.error(m.operationFailed());
                     return;
                 }
                 orderOriginMutations.update(origin);
@@ -91,7 +94,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                     [id]: { mode: GridRowModes.View, ignoreModifications: true },
                 });
             },
-            buttonText: 'Save Changes',
+            buttonText: m.saveChanges(),
         },
         cancelProps: {
             handler: (originRow) => {
@@ -105,7 +108,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
 
     const processRowUpdate = (newRow: OriginRow, oldRow: OriginRow) => {
         if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
-            toast.info('No changes to save');
+            toast.info(m.noChangesDetected());
             return {
                 ...newRow,
                 is_pending: false,
@@ -124,7 +127,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
 
     const deleteOrigin = async (origin: OrderOrigin) => {
         const { origin_id: id, name } = origin;
-        toastRef.current = toast.loading(`Deleting origin: ${name}`);
+        toastRef.current = toast.loading(m.deletingTarget({ targetName: m.origin(), fullName: name }));
         const { error } = await supaClient.from('OrderOrigin').update({ is_deleted: true }).eq('origin_id', id);
         if (error) {
             toast.update(toastRef.current, {
@@ -136,7 +139,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: `Origin ${name} deleted successfully`,
+                render: m.targetDeletedSuccessfully({ targetName: m.origin(), fullName: name }),
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -151,7 +154,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
 
     const restoreOrigin = async (origin: OrderOrigin) => {
         const { origin_id: id, name } = origin;
-        toastRef.current = toast.loading(`Restoring origin ${name}`);
+        toastRef.current = toast.loading(m.restoringTarget({ targetName: m.origin(), fullName: name }));
         const { error } = await supaClient.from('OrderOrigin').update({ is_deleted: false }).eq('origin_id', id);
         if (error) {
             toast.update(toastRef.current, {
@@ -163,7 +166,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             return;
         } else {
             toast.update(toastRef.current, {
-                render: `Origin ${name} restored successfully`,
+                render: m.targetRestoredSuccessfully({ targetName: m.origin(), fullName: name }),
                 type: 'success',
                 isLoading: false,
                 autoClose: 5000,
@@ -172,14 +175,15 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     };
 
     const { handleConfirmation: confirmDelete } = useConfirmationToast<OriginRow>({
-        message: (origin) => `Are you sure you want to delete ${origin.name}?`,
+        message: (origin) =>
+            m.areYouSureYouWant({ message: m.toDeleteTarget({ targetName: m.origin() + ' ' + origin.name }) }),
         confirmProps: {
             color: 'error',
             variant: 'outlined',
             handler: (origin) => {
                 const { origin_id: id } = origin;
                 if (!id) {
-                    toast.error('Operation failed - try again!');
+                    toast.error(m.operationFailed());
                     return;
                 }
                 deleteOrigin(origin);
@@ -195,7 +199,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     const { handleConfirmation: confirmRestore } = useConfirmationToast<OriginRow>({
         message: (origin) => {
             const { name } = origin;
-            return `Are you sure you want to restore ${name}?`;
+            return m.areYouSureYouWant({ message: m.toRestoreTarget({ targetName: name }) });
         },
         confirmProps: {
             color: 'primary',
@@ -203,7 +207,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             handler: (origin) => {
                 const id = origin.origin_id;
                 if (!id) {
-                    toast.error('Operation failed - try again!');
+                    toast.error(m.operationFailed());
                     return;
                 }
                 restoreOrigin(origin);
@@ -220,7 +224,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         {
             field: 'actions',
             type: 'actions',
-            headerName: 'Edit',
+            headerName: m.actions(),
             width: 100,
             cellClassName: 'actions',
             getActions: ({ row }) => {
@@ -245,7 +249,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
         {
             field: 'name',
-            headerName: 'Name',
+            headerName: m.name(),
             width: 150,
             editable: true,
             renderEditCell: (params) => {
@@ -254,7 +258,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
         {
             field: 'icon',
-            headerName: 'Icon',
+            headerName: m.icon(),
             width: 100,
             editable: true,
             renderCell: (params) => {
@@ -278,7 +282,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
         {
             field: 'can_deliver',
-            headerName: 'Can Deliver',
+            headerName: m.canDeliver(),
             width: 150,
             editable: true,
 
@@ -292,7 +296,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
         {
             field: 'can_tip',
-            headerName: 'Can Tip',
+            headerName: m.canTip(),
             width: 150,
             editable: true,
             headerAlign: 'center',
@@ -305,7 +309,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
         {
             field: 'has_order_number',
-            headerName: 'Has Order Number',
+            headerName: m.hasOrderNumber(),
             width: 150,
             editable: true,
             headerAlign: 'center',
@@ -318,7 +322,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
         {
             field: 'default_is_prepaid',
-            headerName: 'Default Is Prepaid',
+            headerName: m.defaultIsPrepaid(),
             width: 150,
             editable: true,
             headerAlign: 'center',
@@ -331,7 +335,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         },
         {
             field: 'is_prepaid_toggleable',
-            headerName: 'Is Prepaid Toggleable',
+            headerName: m.isPrepaidToggleable(),
             width: 150,
             editable: true,
             headerAlign: 'center',
@@ -359,6 +363,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                         '& .MuiButtonBase-root': { color: 'text.disabled' },
                         '& .actions .MuiButtonBase-root': { color: 'primary.main' },
                     },
+                    '.MuiDataGrid-columnHeader': { textTransform: 'capitalize' },
                 }}
                 disableVirtualization
                 rows={rows}

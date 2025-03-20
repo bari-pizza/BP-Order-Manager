@@ -13,9 +13,8 @@ import {
     HelpLottieIcon,
     HomeLottieIcon,
     ManagerLottieIcon,
-    MarketPlaceLottieIcon,
+    PizzaLottieIcon,
     MobileLottieIcon,
-    // RoundLottieIcon,
     SearchLottieIcon,
     TimeLottieIcon,
     UserProfileLottieIcon,
@@ -23,7 +22,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { useClearCache } from '../rickcedlib/hooks/useClearCache';
-
+import { m } from '../paraglide/messages.js';
 interface NavBarItem {
     path?: string;
     icon: JSX.Element;
@@ -42,7 +41,6 @@ export function NavBar() {
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const location = useLocation();
-    // const version = `__APP_VERSION__`.split('"').join('');
     const version = `__APP_VERSION__`.replace(/"/g, '');
 
     const queryClient = useQueryClient();
@@ -56,45 +54,50 @@ export function NavBar() {
     const drawerWidth = isMobile ? 65 : 200;
 
     const userListItem: NavBarItem = session
-        ? { path: '/myaccount', icon: <UserAvatar />, text: 'Profile', forMobile: true }
-        : { path: '/login', icon: <UserProfileLottieIcon />, text: 'Login', forMobile: true };
+        ? { path: '/myaccount', icon: <UserAvatar />, text: m.profile(), forMobile: true }
+        : { path: '/login', icon: <UserProfileLottieIcon />, text: m.login(), forMobile: true };
 
     const listItems: NavBarItem[] = [
         {
             path: '/',
             icon: <HomeLottieIcon />,
-            text: 'Home',
+            text: m.home(),
             forMobile: true,
         },
         {
-            text: today.isSame(businessDate, 'day') ? 'Today' : businessDate.format('MM/DD/YYYY'),
+            text: today.isSame(businessDate, 'day') ? m.today() : businessDate.format('MM/DD/YYYY'),
             icon: <TimeLottieIcon />,
             onClick: showBusinessDatePicker,
             forMobile: true,
             className: 'date-picker-button',
         },
-        { path: '/search', icon: <SearchLottieIcon />, text: 'Search', forMobile: false },
+        { path: '/search', icon: <SearchLottieIcon />, text: m.search(), forMobile: false },
         profile?.is_admin && {
             path: '/admin',
             icon: <AdminShieldLottieIcon />,
-            text: 'Admin',
+            text: m.admin(),
             forMobile: false,
         },
-        profile?.is_manager && { path: '/manager', icon: <ManagerLottieIcon />, text: 'Manager', forMobile: false },
+        profile?.is_manager && {
+            path: '/manager',
+            icon: <ManagerLottieIcon />,
+            text: m.manager(),
+            forMobile: false,
+        },
         {
             path: '/orders',
             icon: (
                 <Badge badgeContent={orderCount} color="primary">
-                    <MarketPlaceLottieIcon />
+                    <PizzaLottieIcon />
                 </Badge>
             ),
-            text: 'Orders',
+            text: m.orders(),
             forMobile: true,
         },
         {
             path: '/how-to',
             icon: <HelpLottieIcon />,
-            text: 'How To',
+            text: m.howTo(),
             forMobile: true,
         },
         userListItem,
@@ -144,7 +147,10 @@ export function NavBar() {
                         <ListItemButton selected={location.pathname === item.path} onClick={item.onClick}>
                             <ListItemIcon>{item.icon}</ListItemIcon>
                             {!isMobile && (
-                                <ListItemText primary={item.text} primaryTypographyProps={{ color: 'primary' }} />
+                                <ListItemText
+                                    primary={item.text}
+                                    primaryTypographyProps={{ color: 'primary', textTransform: 'capitalize' }}
+                                />
                             )}
                         </ListItemButton>
                     </ListItem>
@@ -162,7 +168,7 @@ export function NavBar() {
                                 <ListItemText>{version}</ListItemText>
                             </ListItem>
                         </ListItemButton>
-                        <ListItemText>{todaysDate}</ListItemText>
+                        <ListItemText style={{ textTransform: 'capitalize' }}>{todaysDate}</ListItemText>
                     </List>
                 </ListItem>
             </List>

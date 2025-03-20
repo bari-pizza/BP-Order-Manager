@@ -50,6 +50,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
             phone: '555-555-5555',
             avatar_src: resource?.src || '',
             is_deleted: false,
+            locale: 'en',
         },
     };
 

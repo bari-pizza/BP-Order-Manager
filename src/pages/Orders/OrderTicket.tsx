@@ -1,7 +1,5 @@
 import { useRef } from 'react';
 import { Card, Typography, CardActionArea, Skeleton, Stack, Divider } from '@mui/material';
-import LocalPizzaOutlinedIcon from '@mui/icons-material/LocalPizzaOutlined';
-import LocalPizzaRoundedIcon from '@mui/icons-material/LocalPizzaRounded';
 import { Order_Payment } from '../../typesAndValidators';
 import { OrderEditor } from './OrderEditor/OrderEditor';
 import { useDialogProps } from '../../hooks/ui/useDialogProps';
@@ -12,7 +10,7 @@ import { OrderTypeIcon } from '../../components/Order/OrderTypeIcon';
 import { OriginLogo } from '../../components/Order/OriginLogo';
 import { PaymentTypeIcon } from './PaymentTypeIcon';
 import { formatCurrency } from '../../utils';
-import { LockLottieIcon } from '../../rickcedlib/LottieIcons';
+import { LockLottieIcon, CheckBoxLottieIcon } from '../../rickcedlib/LottieIcons';
 import { useMobile } from '../../hooks/data/useMobile';
 
 interface OrderTicketMobileProps {
@@ -71,7 +69,9 @@ const OrderTicketMobile = ({ order }: OrderTicketMobileProps) => {
                     <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
                         <Typography
                             variant="h5"
-                            className={`${order.order_name ? 'order-name' : 'order-number'} ${isRepeat(order.order_name ?? order.order_number, true) ? 'repeated-name-or-number' : ''}`}>
+                            className={`${order.order_name ? 'order-name' : 'order-number'} ${
+                                isRepeat(order.order_name ?? order.order_number, true) ? 'repeated-name-or-number' : ''
+                            }`}>
                             {order.order_name ?? `Order #${order.order_number || 'N/A'}`}
                         </Typography>
                         <PaymentTypeIcon paymentType={initialPayment?.payment_type} />
@@ -180,26 +180,23 @@ const OrderTicketDesktop = ({ order, toggleSelected, selected }: OrderTicketProp
         <Card variant="elevation" sx={cardSX} raised className="lottie-icon-container order-ticket">
             <CardActionArea onClick={handleSelect} sx={{ backgroundColor: theme.palette.primary.light }}>
                 <Stack direction="column">
-                    <Stack direction="row" m={1} mb={0} justifyContent="space-between" alignItems="center">
+                    <Stack
+                        direction="row"
+                        m={1}
+                        mb={0}
+                        justifyContent="space-between"
+                        alignItems="center"
+                        className="lottie-icon-container">
                         <Typography
                             variant="h5"
-                            className={`${order.order_name ? 'order-name' : 'order-number'} ${orders.isRepeat(order.order_name ?? order.order_number, true) ? 'repeated-name-or-number' : ''}`}>
+                            className={`${order.order_name ? 'order-name' : 'order-number'} ${
+                                orders.isRepeat(order.order_name ?? order.order_number, true)
+                                    ? 'repeated-name-or-number'
+                                    : ''
+                            }`}>
                             {order.order_name ?? `Order #${order.order_number || 'N/A'}`}
                         </Typography>
-                        {selected ? (
-                            <>
-                                <LocalPizzaRoundedIcon color={'primary'} ref={ticketRef} />
-                                <img
-                                    src="../../assets/pizza slice.png"
-                                    alt="pizza"
-                                    width="24px"
-                                    height="24px"
-                                    style={{ position: 'fixed', opacity: 0 }}
-                                />
-                            </>
-                        ) : (
-                            <LocalPizzaOutlinedIcon className="hide-when-animating" />
-                        )}
+                        <CheckBoxLottieIcon height="24px" width="24px" checked={selected} />
                     </Stack>
                 </Stack>
             </CardActionArea>

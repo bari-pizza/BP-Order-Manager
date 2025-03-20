@@ -9,21 +9,9 @@ import { EmployeesTab } from './Tabs/EmployeesTab';
 import { OriginsTab } from './Tabs/OriginsTab';
 import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
-import { GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
+import { FolderLottieIcon, GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
 import { ResourcesTab } from './Tabs/ResourcesTab';
-
-/*    TODO: About Today
-        Sales
-            Charts
-            Reports
-        Drivers
-            Add driver
-            Remove driver (only if not in use)
-            Close driver (locks driver)
-            Open driver (unlocks driver)
-        Orders
-            Allow for order deletion
-*/
+import { m } from '../../paraglide/messages';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -115,34 +103,35 @@ export const AdminDashboard = () => {
                     <Typography
                         variant="h3"
                         color="primary"
+                        textTransform={'capitalize'}
                         sx={{ textShadow: `1px 1px 1px ${theme.palette.primary.dark}` }}>
-                        Admin Dashboard
+                        {m.adminDashboard()}
                     </Typography>
                 </Stack>
                 <Box>
                     <Tabs value={tabName} onChange={(_, tab) => handleChange(tab)} variant="fullWidth" sx={sx}>
                         <Tab
                             value="employees"
-                            label="Employees"
+                            label={m.employees()}
                             icon={<StaffLottieIcon autoPlay={tabName === 'employees'} />}
                             iconPosition="start"
                         />
                         <Tab
                             value="origins"
-                            label="Origins"
+                            label={m.origins()}
                             icon={<GlobeLottieIcon autoPlay={tabName === 'origins'} />}
                             iconPosition="start"
                         />
                         <Tab
                             value="resources"
-                            label="Resources"
-                            icon={<SettingsLottieIcon autoPlay={tabName === 'resources'} />}
+                            label={m.resources()}
+                            icon={<FolderLottieIcon autoPlay={tabName === 'resources'} />}
                             iconPosition="start"
                         />
                         ,
                         <Tab
                             value="settings"
-                            label="Settings"
+                            label={m.settings()}
                             icon={<SettingsLottieIcon autoPlay={tabName === 'settings'} />}
                             iconPosition="start"
                         />

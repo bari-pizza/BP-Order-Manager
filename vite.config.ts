@@ -1,3 +1,4 @@
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 import { defineConfig } from 'vite';
@@ -6,6 +7,7 @@ import { qrcode } from 'vite-plugin-qrcode';
 import { VitePWA } from 'vite-plugin-pwa';
 import replace from '@rollup/plugin-replace';
 import packageJson from './package.json';
+import { runScriptOnFileSave } from './src/rickcedlib/plugins/runScriptOnFileSave';
 // https://www.npmjs.com/package/vite-plugin-pwa/v/0.9.1
 
 // https://vitejs.dev/config/
@@ -15,6 +17,11 @@ export default defineConfig({
         // https://stackoverflow.com/questions/72097831/popper-styled-default-is-not-a-function-mui-5-6-0-material-ui
     },
     plugins: [
+        paraglideVitePlugin({
+            project: './project.inlang',
+            outdir: './src/paraglide',
+        }),
+        runScriptOnFileSave('messages/combined.json', 'npm run messages_split'),
         react(),
         replace({
             __APP_VERSION__: JSON.stringify(packageJson.version),
@@ -63,9 +70,10 @@ export default defineConfig({
             },
         }),
     ],
-    test: {
-        globals: true,
-        environment: 'jsdom',
-        setupFiles: './vitest.setup.ts',
-    },
+    // test: {
+    // only for vitest: https://stackoverflow.com/questions/72146352/vitest-defineconfig-test-does-not-exist-in-type-userconfigexport
+    //     globals: true,
+    //     environment: 'jsdom',
+    //     setupFiles: './vitest.setup.ts',
+    // },
 });

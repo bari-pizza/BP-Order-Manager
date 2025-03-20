@@ -1,9 +1,12 @@
-import { LottieIcon } from './LottieIcon';
+import { AnimatedLottieIcon, LottieIcon } from './LottieIcon';
 import AdminShieldIcon from '../../assets/lottie-icons/Admin Shield Icon.json';
 import CarIcon from '../../assets/lottie-icons/Car Icon.json';
+import CashIcon from '../../assets/lottie-icons/Cash Icon.json';
 import ChartIcon from '../../assets/lottie-icons/Chart Icon.json';
 import CreditCardIcon from '../../assets/lottie-icons/Credit Card Icon.json';
+import CheckBoxIcon from '../../assets/lottie-icons/CheckBox Icon.json';
 import DesktopIcon from '../../assets/lottie-icons/Desktop Icon.json';
+import FolderIcon from '../../assets/lottie-icons/Folder Icon.json';
 import GlobeIcon from '../../assets/lottie-icons/Globe Icon.json';
 import HelpIcon from '../../assets/lottie-icons/Help Icon.json';
 import HomeIcon from '../../assets/lottie-icons/Home Icon.json';
@@ -15,6 +18,7 @@ import MenuIcon from '../../assets/lottie-icons/Menu Icon.json';
 import MobileIcon from '../../assets/lottie-icons/Mobile Icon.json';
 import OrderHistoryIcon from '../../assets/lottie-icons/Order History Icon.json';
 import PickupIcon from '../../assets/lottie-icons/Pickup Icon.json';
+import PizzaIcon from '../../assets/lottie-icons/Pizza Icon.json';
 import RegisterIcon from '../../assets/lottie-icons/Register Icon.json';
 import RoundIcon from '../../assets/lottie-icons/Round Icon.json';
 import SaveIcon from '../../assets/lottie-icons/Save Icon.json';
@@ -28,13 +32,13 @@ import UploadIcon from '../../assets/lottie-icons/Upload Icon.json';
 import UserProfileIcon from '../../assets/lottie-icons/User Profile Icon.json';
 import { copyAndCleanLottie, urlToRoundedBase64 } from '../../utils';
 import { useQuery } from '@tanstack/react-query';
-
 type LottieIconProps = {
     height?: string;
     width?: string;
     loop?: boolean;
     autoPlay?: boolean;
     className?: string;
+    playOnce?: boolean;
 };
 
 export const AdminShieldLottieIcon = ({ ...props }: LottieIconProps) => {
@@ -45,8 +49,21 @@ export const CarLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={CarIcon} {...props} />;
 };
 
+export const CashLottieIcon = ({ ...props }: LottieIconProps) => {
+    return <LottieIcon lottieSrc={CashIcon} {...props} />;
+};
+
 export const ChartLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={ChartIcon} {...props} />;
+};
+
+export const CheckBoxLottieIcon = ({
+    checked = false,
+    height = '35px',
+    width = '35px',
+    ...props
+}: LottieIconProps & { checked?: boolean }) => {
+    return <AnimatedLottieIcon lottie={CheckBoxIcon} checked={checked} height={height} width={width} {...props} />;
 };
 
 export const CreditCardLottieIcon = ({ ...props }: LottieIconProps) => {
@@ -55,6 +72,10 @@ export const CreditCardLottieIcon = ({ ...props }: LottieIconProps) => {
 
 export const DesktopLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={DesktopIcon} {...props} />;
+};
+
+export const FolderLottieIcon = ({ ...props }: LottieIconProps) => {
+    return <LottieIcon lottieSrc={FolderIcon} {...props} />;
 };
 
 export const GlobeLottieIcon = ({ ...props }: LottieIconProps) => {
@@ -97,61 +118,35 @@ export const RegisterLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={RegisterIcon} {...props} />;
 };
 
-// export const RoundLottieIcon = ({ imageSrc, ...props }: LottieIconProps & { imageSrc: string }) => {
-//     const originalLottieData = copyAndCleanLottie(RoundIcon, 'Front Side', 'Front Side', 'it.1.c.k');
-//     const [lottieData, setLottieData] = useState(originalLottieData);
-
-//     useEffect(() => {
-//         console.log(`running effect with imageSrc: ${imageSrc}`);
-//         if (imageSrc) {
-//             urlToRoundedBase64(imageSrc)
-//                 .then((base64) => {
-//                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//                     setLottieData((prev: any) => {
-//                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//                         const assets: any = prev.assets;
-//                         assets[0].p = base64;
-//                         return { ...prev, assets };
-//                     }); // Update the state
-//                 })
-//                 .catch((error) => {
-//                     console.error('Error converting URL to rounded base64:', error);
-//                 });
-//         }
-//     }, [imageSrc]);
-
-//     return <LottieIcon lottieSrc={lottieData as string} className="lottie-round" {...props} />;
-// };
-
 // with react query
 export const RoundLottieIcon = ({ imageSrc, ...props }: LottieIconProps & { imageSrc?: string }) => {
-    const {
-        data: lottieData,
-        isLoading,
-        isError,
-    } = useQuery({
-        queryKey: ['round-lottie-icon', imageSrc],
+    const queryKey = ['round-lottie-icon', imageSrc];
+    const localStorageKey = `round-lottie-icon-${imageSrc}`;
+    const { data: lottieData } = useQuery({
+        queryKey: queryKey,
         queryFn: async () => {
-            if (!imageSrc) {
-                return copyAndCleanLottie(RoundIcon, 'Front Side', 'Front Side', 'it.1.c.k');
+            const cachedData = localStorage.getItem(localStorageKey);
+            if (cachedData) {
+                return JSON.parse(cachedData);
             }
-            const base64 = await urlToRoundedBase64(imageSrc);
-            const updatedLottieData = copyAndCleanLottie(RoundIcon, 'Front Side', 'Front Side', 'it.1.c.k');
-            // @ts-expect-error not worth the effort to write a type for lottiedata
-            updatedLottieData.assets[0].p = base64;
+
+            let updatedLottieData;
+            if (!imageSrc) {
+                updatedLottieData = copyAndCleanLottie(RoundIcon, 'Front Side', 'Front Side', 'it.1.c.k');
+            } else {
+                const base64 = await urlToRoundedBase64(imageSrc);
+                updatedLottieData = copyAndCleanLottie(RoundIcon, 'Front Side', 'Front Side', 'it.1.c.k');
+                // @ts-expect-error not worth the effort to write a type for lottiedata
+                updatedLottieData.assets[0].p = base64;
+            }
+
+            localStorage.setItem(localStorageKey, JSON.stringify(updatedLottieData));
             return updatedLottieData;
         },
         staleTime: Infinity,
-        enabled: !!imageSrc,
+        enabled: true,
+        gcTime: Infinity,
     });
-
-    if (isLoading) {
-        return <div>Loading...</div>; // Or a loading spinner
-    }
-
-    if (isError) {
-        return <div>Error loading Lottie data.</div>; // Or an error message
-    }
 
     const { className, ...rest } = props;
 
@@ -160,7 +155,6 @@ export const RoundLottieIcon = ({ imageSrc, ...props }: LottieIconProps & { imag
             loop={false}
             lottieSrc={lottieData as string}
             className={`lottie-round ${className || ''}`}
-            playOnce
             {...rest}
         />
     );
@@ -168,6 +162,10 @@ export const RoundLottieIcon = ({ imageSrc, ...props }: LottieIconProps & { imag
 
 export const PickupLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={PickupIcon} {...props} />;
+};
+
+export const PizzaLottieIcon = ({ ...props }: LottieIconProps) => {
+    return <LottieIcon lottieSrc={PizzaIcon} {...props} />;
 };
 
 export const SaveLottieIcon = ({ ...props }: LottieIconProps) => {
