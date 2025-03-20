@@ -263,8 +263,14 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             editable: true,
             renderCell: (params) => {
                 return (
-                    <Stack direction="row" alignItems="center" height="100%" spacing={2} justifyContent="center">
-                        <LogoUploader origin={params.row} disabled />
+                    <Stack
+                        direction="row"
+                        alignItems="end"
+                        height="100%"
+                        spacing={2}
+                        justifyContent="center"
+                        className="lottie-icon-container">
+                        <LogoUploader origin={params.row} disabled isAnimated />
                     </Stack>
                 );
             },
@@ -274,8 +280,8 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                     params.api.setEditCellValue({ id: params.id, field: 'icon', value: downloadURL });
                 };
                 return (
-                    <Stack direction="row" alignItems="center" height="100%" spacing={2} justifyContent="center">
-                        <LogoUploader origin={params.row} onSuccess={onSuccess} />
+                    <Stack direction="row" alignItems="end" height="100%" spacing={2} justifyContent="center">
+                        <LogoUploader origin={params.row} onSuccess={onSuccess} isAnimated />
                     </Stack>
                 );
             },
@@ -357,7 +363,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                         '& .MuiButtonBase-root': { color: 'text.disabled' },
                         '& .actions .MuiButtonBase-root': { color: 'primary.main' },
                     },
-                    '& .MuiDataGrid-cell--editing': { padding: 0 },
+                    '& .MuiDataGrid-cell--editing': { padding: 0, justifyContent: 'center' },
                     '& .row-is-pending': {
                         color: 'text.disabled',
                         '& .MuiButtonBase-root': { color: 'text.disabled' },

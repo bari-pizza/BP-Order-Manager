@@ -9,9 +9,10 @@ type LogoUploaderProps = {
     onSuccess?: (downloadURL: string) => void;
     onError?: (error: Error) => void;
     disabled?: boolean;
+    isAnimated?: boolean;
 };
 
-export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }: LogoUploaderProps) => {
+export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled, isAnimated }: LogoUploaderProps) => {
     const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['order_origins'] });
     const { startToast, successToast, errorToast } = useUploadToast({
         messages: {
@@ -47,5 +48,5 @@ export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }:
         originalURL: origin.icon || '',
     };
 
-    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="medium" />;
+    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="medium" isAnimated={isAnimated} />;
 };

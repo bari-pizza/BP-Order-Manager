@@ -26,8 +26,8 @@ export const ResourcesTable = ({ resources }: { resources: Resource[] }) => {
                     params.api.setEditCellValue({ id: params.id, field: 'src', value: downloadURL });
                 };
                 return (
-                    <Stack direction="row" alignItems="center" height="100%" spacing={2} justifyContent="center">
-                        <ResourceUploader resource={params.row} onSuccess={onSuccess} />
+                    <Stack direction="row" alignItems="end" height="100%" spacing={2} justifyContent="center">
+                        <ResourceUploader resource={params.row} onSuccess={onSuccess} isAnimated />
                     </Stack>
                 );
             },

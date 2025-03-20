@@ -3,6 +3,7 @@ import { useImageUpload } from '../../../hooks/upload/useImageUpload';
 import { BucketName } from '../../../typesAndValidators';
 import { Stack } from '@mui/material';
 import { RoundImage } from '../RoundImage';
+import { RoundLottieIcon } from '../../../rickcedlib/LottieIcons';
 export const ImageUploader = ({
     bucketName,
     basePath,
@@ -14,6 +15,7 @@ export const ImageUploader = ({
     disabled,
     size,
     style,
+    isAnimated = false,
 }: {
     bucketName: BucketName;
     basePath: string;
@@ -25,6 +27,7 @@ export const ImageUploader = ({
     disabled?: boolean;
     size?: 'small' | 'medium' | 'large' | 'xlarge';
     style?: React.CSSProperties;
+    isAnimated?: boolean;
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const { handleFileChange, uploadedImagePath } = useImageUpload({
@@ -41,16 +44,23 @@ export const ImageUploader = ({
         <Stack
             onClick={disabled ? undefined : () => inputRef.current?.click()}
             justifyContent="center"
-            // height="100%"
             sx={disabled ? { pointerEvents: 'none' } : { cursor: 'pointer' }}>
             <input type="file" onChange={handleFileChange} hidden ref={inputRef} />
-            <RoundImage
-                src={uploadedImagePath || originalURL || ''}
-                alt="uploaded image"
-                style={style}
-                size={size}
-                variant="border"
-            />
+            {isAnimated ? (
+                <RoundLottieIcon
+                    imageSrc={uploadedImagePath || originalURL || ''}
+                    height={style?.height as string}
+                    width={style?.height as string}
+                />
+            ) : (
+                <RoundImage
+                    src={uploadedImagePath || originalURL || ''}
+                    alt="uploaded image"
+                    style={style}
+                    size={size}
+                    variant="border"
+                />
+            )}
         </Stack>
     );
 };
