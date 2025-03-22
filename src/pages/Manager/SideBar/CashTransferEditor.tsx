@@ -80,8 +80,8 @@ const getFormValues = (cashTransfer: CashTransfer | NewCashTransfer, drawerID: s
                 ? 'to'
                 : 'spent'
             : cashTransfer.source
-              ? 'from'
-              : 'received';
+            ? 'from'
+            : 'received';
     return {
         cashTransfer,
         toFromSpentReceived: toFromSpentReceived as 'spent' | 'received' | 'to' | 'from',
@@ -118,8 +118,6 @@ export const CashTransferEditor = ({
               completedFirstStep: definedValues?.completedFirstStep ?? false,
           }
         : getFormValues(cashTransfer, drawerID);
-
-    console.log({ defaultValues });
 
     const {
         control,
@@ -174,7 +172,7 @@ export const CashTransferEditor = ({
     const { handleConfirmation: handleDeletionConfirmation } = useConfirmationToast({
         message: 'Are you sure you want to delete this cash transfer?',
         confirmProps: {
-            handler: () => handleSubmit(onDelete),
+            handler: handleSubmit(onDelete),
             buttonText: 'Delete',
             color: 'error',
         },

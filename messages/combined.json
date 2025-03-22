@@ -298,5 +298,20 @@
         "en": "desktop",
         "pt": "desktop",
         "es": "escritorio"
+    },
+    "selectBusinessDate": {
+        "en": "select business date",
+        "pt": "selecionar data",
+        "es": "seleccione fecha"
+    },
+    "loading": {
+        "en": "loading",
+        "pt": "carregando",
+        "es": "cargando"
+    },
+    "updatingTarget": {
+        "en": "updating {targetName}",
+        "pt": "atualizando {targetName}",
+        "es": "actualizando {targetName}"
     }
 }

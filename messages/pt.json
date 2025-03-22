@@ -59,5 +59,8 @@
   "isPrepaidToggleable": "e pago toggleavel",
   "title": "titulo",
   "mobile": "mobile",
-  "desktop": "desktop"
+  "desktop": "desktop",
+  "selectBusinessDate": "selecionar data",
+  "loading": "carregando",
+  "updatingTarget": "atualizando {targetName}"
 }

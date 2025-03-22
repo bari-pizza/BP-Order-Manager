@@ -9,6 +9,7 @@ import 'dayjs/locale/es-us';
 import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
 import { SmartTextField } from '../../rickcedlib/components/SmartTextField';
+import { m } from '../../paraglide/messages';
 
 // TODO: Add a way to edit profile (avatar_src, first_name, last_name,  password)
 type FormValues = {
@@ -22,13 +23,15 @@ type FormValues = {
     phone: string;
 };
 
+type ValidLanguageCode = 'en' | 'es' | 'pt';
+
 export const MyAccount = () => {
     const { profile } = useUserContext();
     const toastRef = useRef<Id>('');
     const { isMobile } = useLayoutContext();
     const [languageSubmitting, setLanguageSubmitting] = useState(false);
 
-    const profileLocale = profile?.locale || 'en';
+    const profileLocale = (profile?.locale || 'en') as ValidLanguageCode;
 
     const dictionary: {
         [languageCode: string]: {
@@ -42,13 +45,14 @@ export const MyAccount = () => {
         en: { dayJSLocale: 'en', text: 'English' },
     };
 
-    const handleLanguageChange = async (newLanguageCode: string | null) => {
+    const handleLanguageChange = async (newLanguageCode: ValidLanguageCode | null) => {
         if (!newLanguageCode) return;
         const dayJSLocale = dictionary[newLanguageCode]?.dayJSLocale || 'en';
         dayjs.locale(dayJSLocale);
         setLanguageSubmitting(true);
         await supaClient.from('Profile').update({ locale: newLanguageCode }).eq('id', profile?.id);
         setLanguageSubmitting(false);
+        toast.info(m.loading({}, { locale: newLanguageCode }) + ` ${dictionary[newLanguageCode]?.text}...`);
     };
 
     const {
@@ -97,7 +101,7 @@ export const MyAccount = () => {
     const updatingPassword = watch('updatingPassword');
 
     const onSubmit = async ({ first_name, last_name, phone, email }: FormValues) => {
-        toastRef.current = toast.loading('Updating profile...');
+        toastRef.current = toast.loading(m.updatingTarget({ targetName: m.profile() }));
 
         if (dirtyFields.email) {
             await supaClient.auth.updateUser({ email }).then(({ error }) => {
@@ -309,7 +313,7 @@ export const MyAccount = () => {
                             value={profileLocale}
                             sx={{ width: 225 }}
                             // onChange={(event) => handleLanguageChange(event)}
-                            onChange={(_, value) => handleLanguageChange(value)}
+                            onChange={(_, value) => handleLanguageChange(value as ValidLanguageCode)}
                             renderInput={(params) => (
                                 // <TextField {...params} label="Language" />
                                 <SmartTextField
