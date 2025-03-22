@@ -288,5 +288,15 @@
         "en": "title",
         "pt": "titulo",
         "es": "titulo"
+    },
+    "mobile": {
+        "en": "mobile",
+        "pt": "mobile",
+        "es": "movil"
+    },
+    "desktop": {
+        "en": "desktop",
+        "pt": "desktop",
+        "es": "escritorio"
     }
 }

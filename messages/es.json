@@ -57,5 +57,7 @@
   "hasOrderName": "tiene nombre de pedido",
   "defaultIsPrepaid": "predeterminado es pago",
   "isPrepaidToggleable": "es pago toggleable",
-  "title": "titulo"
+  "title": "titulo",
+  "mobile": "movil",
+  "desktop": "escritorio"
 }

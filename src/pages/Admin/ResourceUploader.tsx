@@ -60,7 +60,7 @@ export const ResourceUploader = ({
             {...imageUploaderProps}
             disabled={disabled}
             size="large"
-            style={{ height: '60px', width: '60px' }}
+            style={{ height: '80px', width: '80px' }}
             isAnimated={isAnimated}
         />
     );
