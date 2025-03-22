@@ -57,5 +57,7 @@
   "hasOrderName": "tem nome de pedido",
   "defaultIsPrepaid": "pre-definidoo e pre-pago",
   "isPrepaidToggleable": "e pago toggleavel",
-  "title": "titulo"
+  "title": "titulo",
+  "mobile": "mobile",
+  "desktop": "desktop"
 }

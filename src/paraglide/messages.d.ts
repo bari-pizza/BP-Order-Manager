@@ -58,4 +58,6 @@ hasOrderName:( ) => '',
 defaultIsPrepaid:( ) => '',
 isPrepaidToggleable:( ) => '',
 title:( ) => '',
+mobile:( ) => '',
+desktop:( ) => '',
 };

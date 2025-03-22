@@ -57,5 +57,7 @@
   "hasOrderName": "has order name",
   "defaultIsPrepaid": "default is prepaid",
   "isPrepaidToggleable": "is prepaid toggleable",
-  "title": "title"
+  "title": "title",
+  "mobile": "mobile",
+  "desktop": "desktop"
 }

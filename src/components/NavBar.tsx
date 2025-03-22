@@ -1,4 +1,19 @@
-import { Toolbar, Drawer, List, ListItemButton, ListItemText, ListItem, ListItemIcon, Badge } from '@mui/material';
+import {
+    Toolbar,
+    Drawer,
+    List,
+    ListItemButton,
+    ListItemText,
+    ListItem,
+    ListItemIcon,
+    Badge,
+    Dialog,
+    Button,
+    DialogActions,
+    DialogContent,
+    Typography,
+    Stack,
+} from '@mui/material';
 import { useBusinessDatePicker } from './BusinessDatePicker/useBusinessDatePicker';
 import { useBusinessDate } from '../hooks/data/useBusinessDate';
 import { UserAvatar } from './Base/UserAvatar';
@@ -15,7 +30,6 @@ import {
     ManagerLottieIcon,
     PizzaLottieIcon,
     MobileLottieIcon,
-    SearchLottieIcon,
     TimeLottieIcon,
     UserProfileLottieIcon,
 } from '../rickcedlib/LottieIcons';
@@ -23,6 +37,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { useClearCache } from '../rickcedlib/hooks/useClearCache';
 import { m } from '../paraglide/messages.js';
+import { useDialogProps } from '../hooks/ui/useDialogProps.js';
 interface NavBarItem {
     path?: string;
     icon: JSX.Element;
@@ -35,21 +50,20 @@ interface NavBarItem {
 const today = dayjs();
 
 export function NavBar() {
-    const clearCacheAndReload = useClearCache();
     const { session, profile } = useUserContext();
     const { isMobile } = useLayoutContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
-    const location = useLocation();
+    const { open, close, isOpen } = useDialogProps();
+    const clearCacheAndReload = useClearCache();
     const version = `__APP_VERSION__`.replace(/"/g, '');
+    const location = useLocation();
 
     const queryClient = useQueryClient();
     const orders = (
         profile ? queryClient.getQueryData(['orders', businessDate.format('YYYY-MM-DD')]) ?? [] : []
     ) as Order_Payment[];
     const orderCount = (isMobile ? orders.filter((o) => o.drawer_id === profile?.id) : orders).length;
-
-    const todaysDate = dayjs().format('ddd MMM D, YYYY');
 
     const drawerWidth = isMobile ? 65 : 200;
 
@@ -64,14 +78,7 @@ export function NavBar() {
             text: m.home(),
             forMobile: true,
         },
-        {
-            text: today.isSame(businessDate, 'day') ? m.today() : businessDate.format('MM/DD/YYYY'),
-            icon: <TimeLottieIcon />,
-            onClick: showBusinessDatePicker,
-            forMobile: true,
-            className: 'date-picker-button',
-        },
-        { path: '/search', icon: <SearchLottieIcon />, text: m.search(), forMobile: false },
+        // { path: '/search', icon: <SearchLottieIcon />, text: m.search(), forMobile: false },
         profile?.is_admin && {
             path: '/admin',
             icon: <AdminShieldLottieIcon />,
@@ -98,6 +105,19 @@ export function NavBar() {
             path: '/how-to',
             icon: <HelpLottieIcon />,
             text: m.howTo(),
+            forMobile: true,
+        },
+        {
+            text: today.isSame(businessDate, 'day') ? m.today() : businessDate.format('MM/DD/YYYY'),
+            icon: <TimeLottieIcon />,
+            onClick: showBusinessDatePicker,
+            forMobile: true,
+            className: 'date-picker-button',
+        },
+        {
+            text: isMobile ? m.mobile() : m.desktop(),
+            icon: isMobile ? <MobileLottieIcon /> : <DesktopLottieIcon />,
+            onClick: open,
             forMobile: true,
         },
         userListItem,
@@ -132,6 +152,9 @@ export function NavBar() {
                             padding: 0,
                         },
                     },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-evenly',
                 }}>
                 {listItems.map((item) => (
                     <ListItem
@@ -155,25 +178,20 @@ export function NavBar() {
                         </ListItemButton>
                     </ListItem>
                 ))}
-                {/* TODO: replace with Lottice Icon */}
-                <ListItem
-                    sx={{ position: 'absolute', bottom: 10, textAlign: 'center' }}
-                    className="lottie-icon-container">
-                    <List>
-                        <ListItemButton onClick={clearCacheAndReload}>
-                            <ListItem id="bpom-version">
-                                <ListItemIcon sx={{ justifyContent: 'center' }}>
-                                    {isMobile ? <MobileLottieIcon /> : <DesktopLottieIcon />}
-                                </ListItemIcon>
-                                <ListItemText>{version}</ListItemText>
-                            </ListItem>
-                        </ListItemButton>
-                        <ListItemText style={{ textTransform: 'capitalize' }}>{todaysDate}</ListItemText>
-                    </List>
-                </ListItem>
             </List>
 
             {businessDatePicker}
+            <Dialog open={isOpen} onClose={close}>
+                <DialogContent sx={{ textAlign: 'center' }}>
+                    <Stack alignItems="center" justifyContent="center" direction="column" spacing={1}>
+                        <Typography variant="h5">Current Version: {version}</Typography>
+                        <Typography variant="body1">Maintained by Cedrick Catalan</Typography>
+                    </Stack>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={clearCacheAndReload}>Look for updates</Button>
+                </DialogActions>
+            </Dialog>
         </Drawer>
     );
 }

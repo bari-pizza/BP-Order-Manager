@@ -284,6 +284,16 @@ export const HowTo = () => {
                     url: '',
                     for: 'Mobile',
                 },
+                {
+                    title: 'Downloading the App',
+                    url: '',
+                    for: 'Desktop',
+                },
+                {
+                    title: 'Downloading the App',
+                    url: '',
+                    for: 'Mobile',
+                },
             ],
         },
     ];
