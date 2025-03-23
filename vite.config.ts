@@ -8,7 +8,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import replace from '@rollup/plugin-replace';
 import packageJson from './package.json';
 import { runScriptOnFileSave } from './src/rickcedlib/plugins/runScriptOnFileSave';
-import { runScriptOnDevBuild } from './src/rickcedlib/plugins/runScriptOnDevBuild';
+import { runScriptOnDevListening } from './src/rickcedlib/plugins/runScriptOnDevListening';
 // https://www.npmjs.com/package/vite-plugin-pwa/v/0.9.1
 
 // https://vitejs.dev/config/
@@ -25,7 +25,7 @@ export default defineConfig({
             emitPrettierIgnore: false,
         }),
         runScriptOnFileSave('messages/combined.json', 'npm run messages_split'),
-        runScriptOnDevBuild('messages_split'),
+        runScriptOnDevListening('messages_split'),
         react(),
         replace({
             __APP_VERSION__: JSON.stringify(packageJson.version),
