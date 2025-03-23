@@ -1,7 +1,7 @@
 {
     "name": "bari-pizza-order-manger",
     "private": true,
-    "version": "0.1.1",
+    "version": "0.1.2",
     "type": "module",
     "engines": {
         "node": ">=16.0.0"
@@ -21,7 +21,10 @@
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "chromatic": "npx chromatic --project-token=chpt_e20b10a74740ccf",
-        "machine-translate": "inlang machine translate --project project.inlang"
+        "machine-translate": "inlang machine translate --project project.inlang",
+        "patch": "node src/rickcedlib/scripts/updateVersion.js",
+        "minor": "node src/rickcedlib/scripts/updateVersion.js minor",
+        "major": "node src/rickcedlib/scripts/updateVersion.js major"
     },
     "dependencies": {
         "@emotion/react": "^11.13.0",
