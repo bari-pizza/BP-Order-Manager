@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Stack, Typography, TextField, Divider, Button, IconButton, InputAdornment } from '@mui/material';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { useRef } from 'react';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../../toast/toastWrapper';
 import { useQueryClient } from '@tanstack/react-query';
 import { Profile } from '../../typesAndValidators';
 

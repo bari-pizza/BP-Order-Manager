@@ -5,7 +5,7 @@ import { ContextMenu } from '../../components/Base/ContextMenu';
 import { useSmartNavigate } from '../../hooks/navigation/useSmartNavigate';
 import { OpenInNew as OpenInNewIcon, RemoveCircleOutline as RemoveDriverIcon } from '@mui/icons-material';
 import { deepmerge } from '@mui/utils';
-import { toast } from 'react-toastify';
+import { toast } from '../../toast/toastWrapper';
 import { useConfirmationToast } from '../../toast/useConfirmationToast';
 
 interface DrawerCardProps {

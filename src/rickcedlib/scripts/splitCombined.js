@@ -31,8 +31,8 @@ function splitMessagesJson() {
                 params.push(`${match[1]}: string`);
             }
 
-            // const paramString = params.length > 0 ? `params:{${params.join('; ')}}, ` : '';
-            const paramString = `params?:{${params.join('; ')}}, `;
+            const paramString = params.length > 0 ? `params:{${params.join('; ')}}, ` : 'params?:null, ';
+            // const paramString = `params?:{${params.join('; ')}}, `;
             const optionsString = "options?:{locale?: 'en' | 'pt' | 'es'}";
             dtsContent.push(`${key}:( ${paramString}${optionsString}) => '',`);
             // dtsContent.push(`${key}:( ${paramString}) => '',`);

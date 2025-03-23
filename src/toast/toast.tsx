@@ -1,5 +1,6 @@
 // DEPRECATED - USE src/api/helpers.tsx instead
-import { toast, UpdateOptions } from 'react-toastify';
+import { UpdateOptions } from 'react-toastify';
+import { toast } from '../toast/toastWrapper';
 
 // TODO: add a way to undo changes
 

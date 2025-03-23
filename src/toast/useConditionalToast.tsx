@@ -1,4 +1,4 @@
-import { toast } from 'react-toastify';
+import { toast } from '../toast/toastWrapper';
 import { Profile } from '../typesAndValidators';
 import { useSession } from '../hooks/data/useSession';
 

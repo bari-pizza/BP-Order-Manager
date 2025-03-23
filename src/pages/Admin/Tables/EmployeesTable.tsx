@@ -15,7 +15,7 @@ import { CellEditCheckbox, CellCheckbox } from '../../../components/Base/DataGri
 import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
 import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
 import { Email as EmailIcon } from '@mui/icons-material';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../../../toast/toastWrapper';
 import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { useRef, useState } from 'react';
 import { supaClient } from '../../../supaClient';

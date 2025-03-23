@@ -9,11 +9,10 @@ import { formatCurrency } from '../../../utils';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useManagerDashboardContext } from '../../../hooks/data/useContextData';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
-import { toast } from 'react-toastify';
+import { toast } from '../../../toast/toastWrapper';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { OrderEditor } from '../../Orders/OrderEditor/OrderEditor';
 import { useOrdersDrawersTickets } from '../../../hooks/data/useOrdersDrawersTickets';
-// import { toast } from 'react-toastify';
 
 export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
     const rows = orders;

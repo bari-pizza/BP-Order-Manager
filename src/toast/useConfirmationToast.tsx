@@ -4,7 +4,7 @@
 
 import { Button, ButtonProps, Stack, Typography, TypographyProps } from '@mui/material';
 import { capitalizeFirstWord } from '../utils';
-import { toast } from 'react-toastify';
+import { toast } from '../toast/toastWrapper';
 
 type useConfirmationToastProps<T> = {
     message: string | ((args: T) => string);
@@ -77,15 +77,24 @@ export const useConfirmationToast = <T,>({
             className = 'Toastify__toast-container--center';
         }
 
-        toast(content, {
-            toastId, // Use the same ID
-            type: 'info',
-            icon: false,
-            autoClose: false,
-            position,
-            closeButton: false,
+        // toast(content, {
+        //     toastId, // Use the same ID
+        //     type: 'info',
+        //     icon: false,
+        //     autoClose: false,
+        //     position,
+        //     closeButton: false,
+        //     className,
+        //     // closeButton: () => <CustomCloseButton onClose={handleCancel} />,
+        // });
+        toast.update(toastId, {
+            render: content,
             className,
-            // closeButton: () => <CustomCloseButton onClose={handleCancel} />,
+            closeButton: false,
+            position,
+            autoClose: false,
+            icon: false,
+            type: 'info',
         });
     };
 

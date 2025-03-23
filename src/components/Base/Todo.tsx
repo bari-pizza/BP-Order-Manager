@@ -1,6 +1,6 @@
 import { Box, Tooltip } from '@mui/material';
 import styles from './Todo.module.css';
-import { toast } from 'react-toastify';
+import { toast } from '../../toast/toastWrapper';
 import { getEnv } from '../../utils';
 
 export const Todo = ({ message, children }: { message?: string; children: React.ReactNode }) => {

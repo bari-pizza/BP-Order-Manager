@@ -4,7 +4,7 @@ import { useLayoutContext, useUserContext } from '../../hooks/data/useContextDat
 import { AvatarUploader } from './AvatarUploader';
 import { Controller, useForm } from 'react-hook-form';
 import { useRef, useState } from 'react';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../../toast/toastWrapper';
 import 'dayjs/locale/es-us';
 import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
@@ -52,7 +52,7 @@ export const MyAccount = () => {
         setLanguageSubmitting(true);
         await supaClient.from('Profile').update({ locale: newLanguageCode }).eq('id', profile?.id);
         setLanguageSubmitting(false);
-        toast.info(m.loading({}, { locale: newLanguageCode }) + ` ${dictionary[newLanguageCode]?.text}...`);
+        toast.info(m.loading(null, { locale: newLanguageCode }) + ` ${dictionary[newLanguageCode]?.text}...`);
     };
 
     const {

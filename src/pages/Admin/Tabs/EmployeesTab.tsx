@@ -11,7 +11,7 @@ import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { Controller, useForm } from 'react-hook-form';
 import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../../../toast/toastWrapper';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { getEnv } from '../../../utils';
 import { m } from '../../../paraglide/messages';

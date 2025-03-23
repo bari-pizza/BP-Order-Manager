@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { toast } from 'react-toastify';
+import { toast } from '../../toast/toastWrapper';
 
 const today = dayjs();
 

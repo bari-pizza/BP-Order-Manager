@@ -3,7 +3,7 @@ import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useLayoutContext } from '../../hooks/data/useContextData';
-import { toast } from 'react-toastify';
+import { toast } from '../../toast/toastWrapper';
 
 type Story = {
     title: string;
