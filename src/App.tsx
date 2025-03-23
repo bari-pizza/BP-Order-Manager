@@ -252,6 +252,7 @@ function Layout() {
                             <Stack
                                 id="main"
                                 direction="row"
+                                height="100vh"
                                 justifyContent="center"
                                 className={isMobile ? 'for-mobile' : ''}>
                                 <NavBar />
