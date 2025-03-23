@@ -35,6 +35,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
 import { m } from '../paraglide/messages.js';
 import { useDialogProps } from '../hooks/ui/useDialogProps.js';
+import { getEnv } from '../utils.js';
+
 interface NavBarItem {
     path?: string;
     icon: JSX.Element;
@@ -53,6 +55,7 @@ export function NavBar() {
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const { open, close, isOpen } = useDialogProps();
     const version = `__APP_VERSION__`.replace(/"/g, '');
+    const environment = getEnv('MODE');
     const location = useLocation();
 
     const queryClient = useQueryClient();
@@ -181,6 +184,7 @@ export function NavBar() {
                 <DialogContent sx={{ textAlign: 'center' }}>
                     <Stack alignItems="center" justifyContent="center" direction="column" spacing={1} height="300">
                         <Typography variant="h5">Current Version: {version}</Typography>
+                        <Typography variant="body1">Environment: {environment}</Typography>
                         <Typography variant="body1">Maintained by Cedrick Catalan</Typography>
                     </Stack>
                 </DialogContent>

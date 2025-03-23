@@ -44,11 +44,10 @@ function splitMessagesJson() {
         fs.writeFileSync(ptPath, JSON.stringify(ptData, null, 2), 'utf8');
         fs.writeFileSync(esPath, JSON.stringify(esData, null, 2), 'utf8');
         fs.writeFileSync(dtsPath, dtsContent.join('\n'), 'utf8'); // Write the .d.ts file
+        console.log('Locale JSONs split successfully.');
     } catch (error) {
         console.error('Error splitting locale JSONs:', error);
     }
 }
 
 splitMessagesJson();
-
-console.log('Locale JSONs split successfully');
