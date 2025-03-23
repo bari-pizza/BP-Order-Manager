@@ -11,7 +11,7 @@
         "messages_combine": "node src/rickcedlib/scripts/combineMessages.js",
         "dev": "vite --host",
         "test": "vitest",
-        "generate": "npx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
+        "generate": "npx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/paraglide && npm run messages_split",
         "build": "tsc -b && vite build",
         "check": "tsc -b",
         "serve": "npx serve -s dist",
