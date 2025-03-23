@@ -63,4 +63,8 @@ desktop:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 selectBusinessDate:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 loading:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 updatingTarget:( params:{targetName: string}, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
+development:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
+production:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
+maintainedByTarget:( params:{targetName: string}, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
+lastUpdated:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 };

@@ -62,5 +62,9 @@
   "desktop": "escritorio",
   "selectBusinessDate": "seleccione fecha",
   "loading": "cargando",
-  "updatingTarget": "actualizando {targetName}"
+  "updatingTarget": "actualizando {targetName}",
+  "development": "desarrollo",
+  "production": "produccion",
+  "maintainedByTarget": "mantenido por {targetName}",
+  "lastUpdated": "actualizado"
 }

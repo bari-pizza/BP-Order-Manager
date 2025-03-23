@@ -184,8 +184,15 @@ export function NavBar() {
                 <DialogContent sx={{ textAlign: 'center' }}>
                     <Stack alignItems="center" justifyContent="center" direction="column" spacing={1} height="300">
                         <Typography variant="h5">Current Version: {version}</Typography>
-                        <Typography variant="body1">Environment: {environment}</Typography>
-                        <Typography variant="body1">Maintained by Cedrick Catalan</Typography>
+                        <Typography variant="body1" textTransform={'capitalize'}>
+                            Environment: {environment === 'dev' ? m.development() : m.production()}
+                        </Typography>
+                        <Typography variant="body1" textTransform={'capitalize'}>
+                            {m.lastUpdated()} {BUILD_DATE}
+                        </Typography>
+                        <Typography variant="body1" textTransform={'capitalize'}>
+                            {m.maintainedByTarget({ targetName: 'Cedrick Catalan' })}
+                        </Typography>
                     </Stack>
                 </DialogContent>
             </Dialog>

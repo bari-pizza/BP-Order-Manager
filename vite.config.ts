@@ -9,6 +9,7 @@ import replace from '@rollup/plugin-replace';
 import packageJson from './package.json';
 import { runScriptOnFileSave } from './src/rickcedlib/plugins/runScriptOnFileSave';
 import { runScriptOnDevListening } from './src/rickcedlib/plugins/runScriptOnDevListening';
+import dayjs from 'dayjs';
 // https://www.npmjs.com/package/vite-plugin-pwa/v/0.9.1
 
 // https://vitejs.dev/config/
@@ -16,6 +17,9 @@ export default defineConfig({
     optimizeDeps: {
         include: ['@emotion/styled', '@emotion/react', '@mui/material/Tooltip'],
         // https://stackoverflow.com/questions/72097831/popper-styled-default-is-not-a-function-mui-5-6-0-material-ui
+    },
+    define: {
+        BUILD_DATE: JSON.stringify(dayjs().format('YYYY-MM-DD')),
     },
     plugins: [
         paraglideVitePlugin({

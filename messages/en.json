@@ -62,5 +62,9 @@
   "desktop": "desktop",
   "selectBusinessDate": "select business date",
   "loading": "loading",
-  "updatingTarget": "updating {targetName}"
+  "updatingTarget": "updating {targetName}",
+  "development": "development",
+  "production": "production",
+  "maintainedByTarget": "maintained by {targetName}",
+  "lastUpdated": "last updated"
 }

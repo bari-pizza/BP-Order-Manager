@@ -313,5 +313,25 @@
         "en": "updating {targetName}",
         "pt": "atualizando {targetName}",
         "es": "actualizando {targetName}"
+    },
+    "development": {
+        "en": "development",
+        "pt": "desenvolvimento",
+        "es": "desarrollo"
+    },
+    "production": {
+        "en": "production",
+        "pt": "producao",
+        "es": "produccion"
+    },
+    "maintainedByTarget": {
+        "en": "maintained by {targetName}",
+        "pt": "mantido por {targetName}",
+        "es": "mantenido por {targetName}"
+    },
+    "lastUpdated": {
+        "en": "last updated",
+        "pt": "atualizado",
+        "es": "actualizado"
     }
 }
