@@ -10,7 +10,7 @@ const pt_updatingtarget = /** @type {(inputs: { targetName: NonNullable<unknown>
 };
 
 const es_updatingtarget = /** @type {(inputs: { targetName: NonNullable<unknown> }) => string} */ (i) => {
-	return `actualizando ${i.targetName} `
+	return `actualizando ${i.targetName}`
 };
 
 /**

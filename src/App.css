@@ -8,6 +8,7 @@ body {
     visibility: hidden;
 }
 
+.for-mobile .hover-scroll,
 .hover-scroll-content,
 .hover-scroll:hover,
 .hover-scroll:focus {
