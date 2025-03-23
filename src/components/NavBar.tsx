@@ -8,8 +8,6 @@ import {
     ListItemIcon,
     Badge,
     Dialog,
-    Button,
-    DialogActions,
     DialogContent,
     Typography,
     Stack,
@@ -35,7 +33,6 @@ import {
 } from '../rickcedlib/LottieIcons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
-import { useClearCache } from '../rickcedlib/hooks/useClearCache';
 import { m } from '../paraglide/messages.js';
 import { useDialogProps } from '../hooks/ui/useDialogProps.js';
 interface NavBarItem {
@@ -55,7 +52,6 @@ export function NavBar() {
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const { open, close, isOpen } = useDialogProps();
-    const clearCacheAndReload = useClearCache();
     const version = `__APP_VERSION__`.replace(/"/g, '');
     const location = useLocation();
 
@@ -183,14 +179,11 @@ export function NavBar() {
             {businessDatePicker}
             <Dialog open={isOpen} onClose={close}>
                 <DialogContent sx={{ textAlign: 'center' }}>
-                    <Stack alignItems="center" justifyContent="center" direction="column" spacing={1}>
+                    <Stack alignItems="center" justifyContent="center" direction="column" spacing={1} height="300">
                         <Typography variant="h5">Current Version: {version}</Typography>
                         <Typography variant="body1">Maintained by Cedrick Catalan</Typography>
                     </Stack>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={clearCacheAndReload}>Look for updates</Button>
-                </DialogActions>
             </Dialog>
         </Drawer>
     );

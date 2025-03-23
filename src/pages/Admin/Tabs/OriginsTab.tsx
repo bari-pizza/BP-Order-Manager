@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
 import { useRef } from 'react';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../../../toast/toastWrapper';
 import { OrderOrigin } from '../../../typesAndValidators';
 import { supaClient } from '../../../supaClient';
 

@@ -15,7 +15,7 @@ import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { LogoUploader } from '../LogoUploader';
 import { useOrderOriginCRUD } from '../../../api/orderOrigin';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../../../toast/toastWrapper';
 import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';

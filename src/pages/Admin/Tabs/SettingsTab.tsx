@@ -5,7 +5,7 @@ import { TextFieldWithMask } from '../../../rickcedlib/components/TextFieldWithM
 import { Autocomplete, Button } from '@mui/material';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { supaClient } from '../../../supaClient';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../../../toast/toastWrapper';
 import { useRef } from 'react';
 
 type FormValues = {

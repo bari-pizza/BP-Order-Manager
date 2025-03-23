@@ -1,7 +1,7 @@
 import { PostgrestError, PostgrestResponse } from '@supabase/supabase-js';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../toast/toastWrapper';
 import { OneOfType } from '../typesAndValidators';
 
 export type Payload<T> =

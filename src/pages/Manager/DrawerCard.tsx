@@ -5,7 +5,7 @@ import { ContextMenu } from '../../components/Base/ContextMenu';
 import { useSmartNavigate } from '../../hooks/navigation/useSmartNavigate';
 import { OpenInNew as OpenInNewIcon, RemoveCircleOutline as RemoveDriverIcon } from '@mui/icons-material';
 import { deepmerge } from '@mui/utils';
-import { toast } from 'react-toastify';
+import { toast } from '../../toast/toastWrapper';
 import { useConfirmationToast } from '../../toast/useConfirmationToast';
 
 interface DrawerCardProps {
@@ -91,11 +91,10 @@ const DrawerContextMenu = ({ drawer }: { drawer: Drawer | Driver_Drawer }) => {
     };
 
     const { handleConfirmation: handleConfirmRemoveDriver } = useConfirmationToast<Driver_Drawer>({
-        // message: 'Are you sure you want to remove this driver from today?',
         message: (driver) => `Are you sure you want to remove ${driver.name} from today?`,
         confirmProps: {
             handler: () => drivers.remove(drawer as Driver_Drawer),
-            buttonText: 'Delete',
+            buttonText: 'Remove',
             color: 'error',
         },
         cancelProps: {

@@ -249,7 +249,11 @@ function Layout() {
                         }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
                             <ToastContainer />
-                            <Stack id="main" direction="row" justifyContent="center">
+                            <Stack
+                                id="main"
+                                direction="row"
+                                justifyContent="center"
+                                className={isMobile ? 'for-mobile' : ''}>
                                 <NavBar />
                                 <Stack id="content" direction="column" overflow="auto" width={'100%'}>
                                     <Outlet />

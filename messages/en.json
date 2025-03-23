@@ -59,5 +59,8 @@
   "isPrepaidToggleable": "is prepaid toggleable",
   "title": "title",
   "mobile": "mobile",
-  "desktop": "desktop"
+  "desktop": "desktop",
+  "selectBusinessDate": "select business date",
+  "loading": "loading",
+  "updatingTarget": "updating {targetName}"
 }

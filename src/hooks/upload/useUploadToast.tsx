@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Id, toast } from 'react-toastify';
+import { Id, toast } from '../../toast/toastWrapper';
 
 type UseUploadToastProps = {
     messages: {

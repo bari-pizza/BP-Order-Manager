@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { supaClient } from '../../supaClient';
-import { toast } from 'react-toastify';
+import { toast } from '../../toast/toastWrapper';
 import {
     BusinessDayDrawerSummary,
     BusinessDayDriver,
