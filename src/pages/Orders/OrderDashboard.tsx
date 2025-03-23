@@ -134,8 +134,14 @@ const OrderDashboardMobile = () => {
         const bank = bankTransfers[0]?.amount_in_cents;
         const hours = summary.hours_in_cents;
         const hoursInCents = summary.hours_in_cents;
-        const other = otherTransfers.reduce((total, transfer) => total + transfer.amount_in_cents, 0);
-        const pmts = pmtTransfers.reduce((total, transfer) => total + transfer.amount_in_cents, 0);
+        const other = otherTransfers.reduce(
+            (total, transfer) => total + (driver?.drawer_id === transfer.source ? -1 : 1) * transfer.amount_in_cents,
+            0,
+        );
+        const pmts = pmtTransfers.reduce(
+            (total, transfer) => total + (driver?.drawer_id === transfer.source ? -1 : 1) * transfer.amount_in_cents,
+            0,
+        );
 
         orders.forEach((order) => {
             total += order.total_in_cents;
