@@ -136,15 +136,9 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-    console.log('rendering app.tsx');
     return (
         <QueryClientProvider client={queryClient}>
-            <RouterProvider
-                router={router}
-                future={{
-                    v7_startTransition: true,
-                }}
-            />
+            <RouterProvider router={router} />
             <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
         </QueryClientProvider>
     );
