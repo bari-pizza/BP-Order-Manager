@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import { Stack, Drawer } from '@mui/material';
@@ -14,19 +14,20 @@ import './App.css';
 import { LayoutContext } from './context/LayoutContext.tsx';
 import { UserContext } from './context/UserContext.tsx';
 import { useSession } from './hooks/data/useSession.ts';
-import { OrderDashboard, OrderDashboardSkeleton } from './pages/Orders/OrderDashboard.tsx';
+import { OrderDashboardSkeleton } from './pages/Orders/OrderDashboardSkeleton.tsx';
 import { PageMissing } from './components/PageMissing.tsx';
 import { Home } from './pages/Home/Home.tsx';
-import { MyAccount, MyAccountSkeleton } from './pages/Profile/MyAccount.tsx';
+import { MyAccount } from './pages/Profile/MyAccount.tsx';
+import { MyAccountSkeleton } from './pages/Profile/MyAccountSkeleton.tsx';
 import { Login } from './pages/Profile/Login.tsx';
 import { HowTo } from './pages/HowTo/HowTo.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllAppSettings, getAllDrawers, getAllDrivers, getAllOrigins, getAllResources } from './supabaseQueries.ts';
 import { BariPizzaContext } from './context/BariPizzaContext.tsx';
-import { AdminDashboard, AdminDashboardSkeleton } from './pages/Admin/AdminDashboard.tsx';
+import { AdminDashboardSkeleton } from './pages/Admin/AdminDashboardSkeleton.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ManagerDashboard, ManagerDashboardSkeleton } from './pages/Manager/ManagerDashboard.tsx';
+import { ManagerDashboardSkeleton } from './pages/Manager/ManagerDashboardSkeleton.tsx';
 import { UnderConstruction } from './UnderConstruction.tsx';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSetupAllSubscriptions } from './hooks/data/useSubscribeToTable.tsx';
@@ -39,25 +40,22 @@ import dayjs from 'dayjs';
 // @ts-expect-error missing module declaration
 import { setLocale } from './paraglide/runtime.js';
 
-// import { createBrowserRouter, lazy, Suspense } from 'react-router-dom';
-// import ErrorBoundary from './components/ErrorBoundary';
-// import Layout from './components/Layout';
-// import MyAccountSkeleton from './components/MyAccountSkeleton';
-// import OrderDashboardSkeleton from './components/OrderDashboardSkeleton';
-// import AdminDashboardSkeleton from './components/AdminDashboardSkeleton';
-// import ManagerDashboardSkeleton from './components/ManagerDashboardSkeleton';
-// import ProtectedRoute from './components/ProtectedRoute';
-
 // // Lazy load components
-// const Home = lazy(() => import('./pages/Home/Home'));
-// const PageMissing = lazy(() => import('./components/PageMissing'));
-// const UnderConstruction = lazy(() => import('./UnderConstruction'));
-// const HowTo = lazy(() => import('./pages/HowTo/HowTo'));
-// const OrderDashboard = lazy(() => import('./pages/Orders/OrderDashboard'));
-// const Login = lazy(() => import('./pages/Profile/Login'));
-// const MyAccount = lazy(() => import('./pages/Profile/MyAccount'));
-// const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard'));
-// const ManagerDashboard = lazy(() => import('./pages/Manager/ManagerDashboard'));
+const OrderDashboard = lazy(() =>
+    import('./pages/Orders/OrderDashboard').then((module) => ({
+        default: module.OrderDashboard,
+    })),
+);
+const AdminDashboard = lazy(() =>
+    import('./pages/Admin/AdminDashboard').then((module) => ({
+        default: module.AdminDashboard,
+    })),
+);
+const ManagerDashboard = lazy(() =>
+    import('./pages/Manager/ManagerDashboard').then((module) => ({
+        default: module.ManagerDashboard,
+    })),
+);
 
 const router = createBrowserRouter([
     {

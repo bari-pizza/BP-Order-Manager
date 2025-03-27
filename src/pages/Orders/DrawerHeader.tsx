@@ -1,6 +1,5 @@
 import { Stack, StackOwnProps } from '@mui/material';
 import { DrawerCard, UnassignedDrawerAvatar } from './DrawerCard';
-import { DrawerAvatarSkeleton } from '../../components/Base/DrawerAvatar';
 import { useBariPizzaContext, useOrderDashboardContext } from '../../hooks/data/useContextData';
 import { ContextMenu } from '../../components/Base/ContextMenu';
 
@@ -35,17 +34,6 @@ export const DrawerHeader = () => {
                     </ContextMenu>
                 );
             })}
-        </Stack>
-    );
-};
-
-export const DrawerHeaderSkeleton = () => {
-    return (
-        <Stack {...stackProps}>
-            <DrawerAvatarSkeleton />
-            <DrawerAvatarSkeleton />
-            <DrawerAvatarSkeleton />
-            <DrawerAvatarSkeleton />
         </Stack>
     );
 };
