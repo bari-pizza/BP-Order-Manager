@@ -1,11 +1,12 @@
 // runScriptOnDevBuild.ts
 import { exec } from 'child_process';
-import { ViteDevServer } from 'vite';
+import { ViteDevServer, PluginOption } from 'vite';
 
-export const runScriptOnDevListening = (scriptName: string) => {
+export const runScriptOnDevListening = (scriptName: string): PluginOption => {
     console.log('runScriptOnDevBuild');
     return {
         name: 'run-script-on-dev-build',
+        apply: 'serve', // Only apply in development mode
         configureServer(server: ViteDevServer) {
             server.httpServer?.once('listening', () => {
                 console.log('Vite server started, running script...');
