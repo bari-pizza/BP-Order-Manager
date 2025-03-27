@@ -39,6 +39,26 @@ import dayjs from 'dayjs';
 // @ts-expect-error missing module declaration
 import { setLocale } from './paraglide/runtime.js';
 
+// import { createBrowserRouter, lazy, Suspense } from 'react-router-dom';
+// import ErrorBoundary from './components/ErrorBoundary';
+// import Layout from './components/Layout';
+// import MyAccountSkeleton from './components/MyAccountSkeleton';
+// import OrderDashboardSkeleton from './components/OrderDashboardSkeleton';
+// import AdminDashboardSkeleton from './components/AdminDashboardSkeleton';
+// import ManagerDashboardSkeleton from './components/ManagerDashboardSkeleton';
+// import ProtectedRoute from './components/ProtectedRoute';
+
+// // Lazy load components
+// const Home = lazy(() => import('./pages/Home/Home'));
+// const PageMissing = lazy(() => import('./components/PageMissing'));
+// const UnderConstruction = lazy(() => import('./UnderConstruction'));
+// const HowTo = lazy(() => import('./pages/HowTo/HowTo'));
+// const OrderDashboard = lazy(() => import('./pages/Orders/OrderDashboard'));
+// const Login = lazy(() => import('./pages/Profile/Login'));
+// const MyAccount = lazy(() => import('./pages/Profile/MyAccount'));
+// const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard'));
+// const ManagerDashboard = lazy(() => import('./pages/Manager/ManagerDashboard'));
+
 const router = createBrowserRouter([
     {
         path: '/',
