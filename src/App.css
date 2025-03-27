@@ -1,6 +1,13 @@
 body {
     margin: 0;
-    overscroll-behavior: none;
+    /* overscroll-behavior: none; */
+    overflow: hidden;
+}
+
+#root {
+    height: 100vh;
+    overflow-y: auto; /* hidden */
+    -webkit-overflow-scrolling: touch;
 }
 
 .hover-scroll {
