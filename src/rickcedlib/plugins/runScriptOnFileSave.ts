@@ -5,6 +5,7 @@ import { exec } from 'child_process';
 export function runScriptOnFileSave(filePath: string, script: string): Plugin {
     return {
         name: 'run-script-on-file-save',
+        apply: 'serve', // Only apply in development mode
         configureServer(server) {
             server.watcher.add(filePath); // Watch the specified file
 
