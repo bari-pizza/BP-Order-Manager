@@ -13,9 +13,10 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Bolt as BoltIcon, ReceiptLong as ReceiptLongIcon } from '@mui/icons-material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
-import { DrawerHeader, DrawerHeaderSkeleton } from './DrawerHeader';
+import { DrawerHeader } from './DrawerHeader';
+import { DrawerHeaderSkeleton } from './DrawerHeaderSkeleton';
 import { OrderEditor } from './OrderEditor/OrderEditor';
-import { SideBar, SideBarSkeleton } from '../../components/SideBar';
+import { SideBar } from '../../components/SideBar';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
 import { OrderTicketArea, OrderTicketAreaSkeleton } from './OrderTicketArea';
 import { useDrivers } from '../../hooks/data/useDrivers';
@@ -307,19 +308,5 @@ const OrderDashboardMobile = () => {
                 )}
             </Stack>
         </>
-    );
-};
-
-export const OrderDashboardSkeleton = () => {
-    return (
-        <Stack direction="column" sx={{ height: '100%' }} mt={2}>
-            <DrawerHeaderSkeleton />
-            <Divider />
-            <OrderTicketAreaSkeleton />
-            <SideBarSkeleton width="300px">
-                <Button disabled>Add Order</Button>
-                <Button disabled>Toggle Tickets</Button>
-            </SideBarSkeleton>
-        </Stack>
     );
 };

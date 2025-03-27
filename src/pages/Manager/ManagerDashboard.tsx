@@ -1,4 +1,4 @@
-import { Box, Skeleton, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import { Box, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useLocalStorage } from '../../hooks/data/useLocalStorage';
 import { ManagerDashboardContext } from '../../context/ManagerDashboardContext';
 import { useOrdersDrawersTickets } from '../../hooks/data/useOrdersDrawersTickets';
@@ -151,8 +151,4 @@ export const ManagerDashboard = () => {
             </Stack>
         </ManagerDashboardContext.Provider>
     );
-};
-
-export const ManagerDashboardSkeleton = () => {
-    return <Skeleton variant="rectangular" height="100%" width="100%" />;
 };

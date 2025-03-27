@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import dayjs from 'dayjs';
 import { toast } from '../../toast/toastWrapper';
 

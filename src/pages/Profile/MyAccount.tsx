@@ -1,4 +1,4 @@
-import { Stack, Button, Typography, TextField, Divider, Skeleton, Autocomplete } from '@mui/material';
+import { Stack, Button, Typography, TextField, Divider, Autocomplete } from '@mui/material';
 import { supaClient } from '../../supaClient';
 import { useLayoutContext, useUserContext } from '../../hooks/data/useContextData';
 import { AvatarUploader } from './AvatarUploader';
@@ -180,15 +180,18 @@ export const MyAccount = () => {
             margin={4}
             alignItems="center"
             justifyContent="space-between">
-            <Typography variant="h3">My Account</Typography>
+            <Typography variant="h3" textAlign="center">
+                My Account
+            </Typography>
 
             <Stack
                 direction={isMobile ? 'column' : 'row'}
                 height="-webkit-fill-available"
                 spacing={2}
                 m={4}
+                width="100%"
                 flexGrow={1}>
-                <Stack direction="column" alignItems="center" width="300px" p={2} spacing={4}>
+                <Stack direction="column" alignItems="center" width={isMobile ? '100%' : '50%'} p={2} spacing={4}>
                     <AvatarUploader profile={profile} />
                     {isEditing ? (
                         <Stack direction="column" spacing={2}>
@@ -249,7 +252,13 @@ export const MyAccount = () => {
                     />
                 </Stack>
                 {!isMobile && <Divider orientation="vertical" flexItem />}
-                <Stack direction="column" gap={2} width="300px" p={2} justifyContent="space-evenly" alignItems="center">
+                <Stack
+                    direction="column"
+                    gap={2}
+                    width={isMobile ? '100%' : '50%'}
+                    p={2}
+                    justifyContent="space-evenly"
+                    alignItems="center">
                     <Stack direction="column" alignItems="center" gap={2}>
                         {updatingPassword && (
                             <>
@@ -347,14 +356,6 @@ export const MyAccount = () => {
             <Button onClick={handleLogout} sx={{ width: 'fit-content' }}>
                 Logout
             </Button>
-        </Stack>
-    );
-};
-
-export const MyAccountSkeleton = () => {
-    return (
-        <Stack direction="column" sx={{ height: '100%' }} mt={2}>
-            <Skeleton variant="rectangular" width="100%" height="100%" />
         </Stack>
     );
 };

@@ -18,7 +18,7 @@ import { UserAvatar } from './Base/UserAvatar';
 import { useLayoutContext, useUserContext } from '../hooks/data/useContextData';
 import { SmartLink } from './SmartNavigate';
 import dayjs from 'dayjs';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 import {
     AdminShieldLottieIcon,

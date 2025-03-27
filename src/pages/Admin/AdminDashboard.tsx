@@ -151,7 +151,3 @@ TODO: allow us to create reports
         Sales, cc sales, sales by origin, sales by driver, etc         
     
 */
-
-export const AdminDashboardSkeleton = () => {
-    return <Skeleton variant="rectangular" width="100%" height="100%" />;
-};

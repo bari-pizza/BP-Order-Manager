@@ -55,9 +55,11 @@ export const DrawersTab = () => {
             ref={ref}
             justifyContent={'start'}
             gap={2}
+            p={1}
             direction="row"
             width="100%"
             height="100%"
+            alignItems={'flex-start'}
             flexWrap={'wrap'}>
             <AnimatePresence>
                 {combinedDrawersAndDrivers.map((drawer) => {
