@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import { Stack, Drawer } from '@mui/material';
 import { NavBar } from './components/NavBar';

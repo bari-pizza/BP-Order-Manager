@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Link, Navigate, Path, To, useLocation, LinkProps } from 'react-router-dom';
+import { Link, Navigate, Path, To, useLocation, LinkProps } from 'react-router';
 
 type SmartLinkProps = LinkProps & {
     keepSearchParams?: boolean | string[];
