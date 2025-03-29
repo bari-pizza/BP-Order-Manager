@@ -1,14 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "npm run build"
+buildCommand = "npm install && npm run build"
 
 [deploy]
 startCommand = "npx serve -s dist"
 healthcheckPath = "/"
 healthcheckTimeout = 5000
 restartPolicyType = "never"
-
-[deploy.multiRegionConfig]
-
-[deploy.multiRegionConfig."us-east4"]
-numReplicas = 1
