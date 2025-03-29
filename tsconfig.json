@@ -4,7 +4,7 @@
     "compilerOptions": {
         "allowJs": true,
         "types": ["jest", "node", "testing-library__jest-dom"],
-        "paths": { "../../paraglide/messages/_index": ["./src/types/messages.d.ts"] },
-        "typeRoots": ["./src/types", "./node_modules/@types"]
+        "paths": { "../../paraglide/messages/_index": ["./src/types/messages.d.ts"] }
+        // "typeRoots": ["./src/types", "./node_modules/@types"]
     }
 }
