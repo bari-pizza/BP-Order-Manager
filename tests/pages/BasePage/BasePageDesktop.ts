@@ -10,6 +10,6 @@ export class BasePageDesktop extends BasePage {
     async navigateToManager() {
         await this.navigateToHref('/manager');
         // make sure page has loaded
-        await expect(this.page.locator('_react=ManagerDashboard').nth(0)).toBeVisible();
+        await expect(this.page.locator('.manager-dashboard').nth(0)).toBeVisible();
     }
 }

@@ -6,8 +6,7 @@ import { formatCurrency } from '../../../src/utils';
 import { Logger } from '../../utils/Logger';
 
 export abstract class TicketPageBase extends BasePage {
-    // protected orderEditor: Locator = this.page.locator('text=Order Editor').locator('..');
-    protected orderEditor: Locator = this.page.locator('_react=OrderEditor');
+    protected orderEditor: Locator = this.page.locator('.order-editor');
     protected backDrop: Locator = this.page.locator('.MuiBackdrop-root.MuiModal-backdrop');
     protected driver: { email: string; name: string };
     constructor(page: Page, context: BrowserContext, browser: Browser, driver?: { email: string; name: string }) {

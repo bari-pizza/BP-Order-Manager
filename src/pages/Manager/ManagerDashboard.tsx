@@ -80,7 +80,7 @@ export const ManagerDashboard = () => {
                 combinedDrawersAndDrivers: drawers.concat(drivers.todays),
                 businessDay,
             }}>
-            <Stack height="100vh" width="100%" sx={{ overflowY: 'hidden' }}>
+            <Stack height="100vh" width="100%" sx={{ overflowY: 'hidden' }} className="manager-dashboard">
                 <Stack m={2}>
                     <Typography
                         variant="h3"

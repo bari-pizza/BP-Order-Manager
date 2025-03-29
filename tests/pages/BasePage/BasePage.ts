@@ -92,7 +92,9 @@ export abstract class BasePage {
                             postData: JSON.stringify(modifiedData),
                         });
                         console.log(
-                            `Mocked created_at for order ${p_order_json.order_name || p_order_json.order_number} as: ${BasePage.mockedCreatedAt.toISOString()}`,
+                            `Mocked created_at for order ${
+                                p_order_json.order_name || p_order_json.order_number
+                            } as: ${BasePage.mockedCreatedAt.toISOString()}`,
                         );
                     } else {
                         console.warn('Request to create_new_order_from_json had no postData.');
@@ -178,7 +180,7 @@ export abstract class BasePage {
     async navigateToOrders() {
         await this.navigateToHref('/orders');
         // make sure page has loaded
-        await expect(this.page.locator('_react=OrderDashboard').nth(0)).toBeVisible();
+        await expect(this.page.locator('.order-dashboard').nth(0)).toBeVisible();
     }
 
     async loginWithCredentials(email: string, password: string) {

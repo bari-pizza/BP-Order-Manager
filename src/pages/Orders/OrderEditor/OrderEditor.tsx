@@ -450,7 +450,7 @@ export const OrderEditor = ({
 
     if (isOpen) {
         return (
-            <Stack direction="column" m={2} height="100%">
+            <Stack direction="column" m={2} height="100%" className="order-editor">
                 <Typography variant="h5" textAlign={'center'}>
                     Order Editor
                 </Typography>
@@ -557,7 +557,7 @@ const OrderEditorDialog = ({
     };
 
     return (
-        <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
+        <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm" className="order-editor">
             <DialogTitle>Order Editor</DialogTitle>
             <DialogContent sx={{ minHeight: 250 }}>
                 {!editablePaymentID ? (
