@@ -11,7 +11,7 @@ import { SettingsTab } from './Tabs/SettingsTab';
 import { Suspense } from 'react';
 import { FolderLottieIcon, GlobeLottieIcon, SettingsLottieIcon, StaffLottieIcon } from '../../rickcedlib/LottieIcons';
 import { ResourcesTab } from './Tabs/ResourcesTab';
-import { m } from '../../paraglide/messages';
+import { m } from '../../types/messages';
 import { TabPanel } from '../../rickcedlib/components/TabPanel';
 
 type TabName = AdminDashboardTabName;

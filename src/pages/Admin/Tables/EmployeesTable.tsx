@@ -20,7 +20,7 @@ import { useDataGrid } from '../../../hooks/ui/useDataGrid';
 import { useRef, useState } from 'react';
 import { supaClient } from '../../../supaClient';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
-import { m } from '../../../paraglide/messages';
+import { m } from '../../../types/messages';
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<Employee>({ data: employees });

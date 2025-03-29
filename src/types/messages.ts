@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-export const m = {
+// @ts-expect-error m has no types
+import { m as originalM } from '../paraglide/messages';
+export const m = originalM as {
 profile:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 today:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 search:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',

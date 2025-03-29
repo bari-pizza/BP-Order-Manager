@@ -14,7 +14,7 @@ import { useRef } from 'react';
 import { Id, toast } from '../../../toast/toastWrapper';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { getEnv } from '../../../utils';
-import { m } from '../../../paraglide/messages';
+import { m } from '../../../types/messages';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';

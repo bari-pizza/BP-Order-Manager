@@ -25,8 +25,6 @@ export default defineConfig({
         paraglideVitePlugin({
             project: './project.inlang',
             outdir: './src/paraglide',
-            emitGitIgnore: false,
-            emitPrettierIgnore: false,
         }),
         runScriptOnFileSave('messages/combined.json', 'npm run messages_split'),
         runScriptOnDevListening('messages_split'),
