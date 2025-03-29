@@ -42,7 +42,7 @@ const OrderDashboardDesktop = () => {
 
     return (
         <OrderDashboardContext.Provider value={{ ticket, drawer, orders, drivers, summaries }}>
-            <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2}>
+            <Stack direction="column" sx={{ height: '100vh', overflowY: 'hidden' }} mt={2} className="order-dashboard">
                 <Suspense fallback={<DrawerHeaderSkeleton />}>
                     <DrawerHeader />
                 </Suspense>
@@ -282,7 +282,7 @@ const OrderDashboardMobile = () => {
                     <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
                 )}
             </SpeedDial>
-            <Stack direction="column">
+            <Stack direction="column" className="order-dashboard">
                 {orders.length ? (
                     <ScrollableWindow>
                         <Grid alignItems="center" rowGap={3} container columnGap={1} justifyContent="center">

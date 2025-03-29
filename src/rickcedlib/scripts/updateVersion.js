@@ -36,7 +36,7 @@ function updateVersion(versionPart = 'patch') {
         fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
         fs.writeFileSync(packageLockJsonPath, JSON.stringify(packageLockJson, null, 2) + '\n');
 
-        console.log(`Version updated to ${packageJson.version}`);
+        console.log(`Version updated to ${packageJson.version}\n`);
         return packageJson.version;
     } catch (error) {
         console.error('Error updating version:', error);
