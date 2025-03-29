@@ -1,9 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "npm install && npm run build"
+buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npx serve -s dist"
 healthcheckPath = "/"
-healthcheckTimeout = 100
-restartPolicyType = "never"
+healthcheckTimeout = 5000
+restartPolicyType = "on-failure"
