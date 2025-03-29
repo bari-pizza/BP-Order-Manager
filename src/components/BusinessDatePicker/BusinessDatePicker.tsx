@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import dayjs from 'dayjs';
 import { useBusinessDate } from '../../hooks/data/useBusinessDate';
-import { m } from '../../paraglide/messages';
+import { m } from '../../types/messages';
 
 interface BusinessDatePickerProps {
     open: boolean;

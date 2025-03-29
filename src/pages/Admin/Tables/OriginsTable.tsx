@@ -19,7 +19,7 @@ import { Id, toast } from '../../../toast/toastWrapper';
 import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';
-import { m } from '../../../paraglide/messages';
+import { m } from '../../../types/messages';
 
 const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     if (!origin) return null;

@@ -5,7 +5,7 @@ function splitMessagesJson() {
     const enPath = 'messages/en.json';
     const ptPath = 'messages/pt.json';
     const esPath = 'messages/es.json';
-    const dtsPath = 'src/paraglide/messages.d.ts';
+    const dtsPath = 'src/types/messages.ts';
 
     try {
         const inputData = JSON.parse(fs.readFileSync(combinedJSON, 'utf8'));
@@ -15,8 +15,12 @@ function splitMessagesJson() {
         const esData = { $schema: 'https://inlang.com/schema/inlang-message-format' };
 
         const dtsContent = [];
-        dtsContent.push('/* eslint-disable @typescript-eslint/no-unused-vars */\nexport const m = {');
-        // (params: { targetName: string; fullName: string })
+        // dtsContent.push('/* eslint-disable @typescript-eslint/no-unused-vars */\nexport const m = {');
+        dtsContent.push(
+            `// @ts-expect-error m has no types
+import { m as originalM } from '../paraglide/messages';
+export const m = originalM as {`,
+        );
         Object.keys(inputData).forEach((key) => {
             if (key !== '$schema') {
                 enData[key] = inputData[key].en || '';

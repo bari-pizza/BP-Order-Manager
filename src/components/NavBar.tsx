@@ -33,7 +33,7 @@ import {
 } from '../rickcedlib/LottieIcons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Order_Payment } from '../typesAndValidators';
-import { m } from '../paraglide/messages.js';
+import { m } from '../types/messages';
 import { useDialogProps } from '../hooks/ui/useDialogProps.js';
 import { getEnv } from '../utils.js';
 
