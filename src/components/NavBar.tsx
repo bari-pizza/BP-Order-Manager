@@ -50,7 +50,7 @@ const today = dayjs();
 
 export function NavBar() {
     const { session, profile } = useUserContext();
-    const { isMobile } = useLayoutContext();
+    const { isMobile, isPWA } = useLayoutContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const { open, close, isOpen } = useDialogProps();
@@ -192,6 +192,9 @@ export function NavBar() {
                         </Typography>
                         <Typography variant="body1" textTransform={'capitalize'}>
                             {m.maintainedByTarget({ targetName: 'Cedrick Catalan' })}
+                        </Typography>
+                        <Typography variant="body1" textTransform={'capitalize'}>
+                            {isPWA ? '' : 'NOT'} running in PWA mode
                         </Typography>
                     </Stack>
                 </DialogContent>

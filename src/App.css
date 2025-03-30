@@ -1,12 +1,11 @@
 body {
     margin: 0;
-    /* overscroll-behavior: none; */
     overflow: hidden;
 }
 
 #root {
     height: 100vh;
-    overflow-y: auto; /* hidden */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
 

@@ -39,6 +39,7 @@ import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
 // @ts-expect-error missing module declaration
 import { setLocale } from './paraglide/runtime.js';
+import { toast } from './toast/toastWrapper.tsx';
 
 // // Lazy load components
 const OrderDashboard = lazy(() =>
@@ -157,6 +158,7 @@ function Layout() {
     const isMobile = useMediaQuery(
         '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
     );
+    const isPWA = useMediaQuery('(display-mode: standalone)');
     useMidnightEffect();
     // MAYBE include useSubscribeToTable here but these shouldnt be changed often
     const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }, { data: resources }] =
@@ -234,6 +236,14 @@ function Layout() {
 
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
+    useEffect(() => {
+        if (isMobile && !isPWA) {
+            toast.error('Please install the app for better experience', {
+                autoClose: false,
+            });
+        }
+    }, [isMobile, isPWA]);
+
     return (
         // <APIProvider
         //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
@@ -258,6 +268,7 @@ function Layout() {
                             sideBarSkeletonRef,
                             setSideBarSkeletonWidth,
                             isMobile,
+                            isPWA,
                         }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
                             <ToastContainer />

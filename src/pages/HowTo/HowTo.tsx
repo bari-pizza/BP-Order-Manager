@@ -267,7 +267,7 @@ export const HowTo = () => {
             ],
         },
         {
-            section: 'App Settings',
+            section: 'App Usage',
             stories: [
                 {
                     title: 'Changing a Setting',
@@ -275,22 +275,17 @@ export const HowTo = () => {
                     for: 'Desktop',
                 },
                 {
-                    title: 'Check for Updates',
+                    title: 'Downloading the App',
                     url: '',
                     for: 'Desktop',
                 },
                 {
-                    title: 'Check for Updates',
+                    title: 'Downloading the App on IOS',
                     url: '',
                     for: 'Mobile',
                 },
                 {
-                    title: 'Downloading the App',
-                    url: '',
-                    for: 'Desktop',
-                },
-                {
-                    title: 'Downloading the App',
+                    title: 'Downloading the App on Android',
                     url: '',
                     for: 'Mobile',
                 },
