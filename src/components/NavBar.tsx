@@ -115,7 +115,17 @@ export function NavBar() {
         },
         {
             text: isMobile ? m.mobile() : m.desktop(),
-            icon: isMobile ? <MobileLottieIcon /> : <DesktopLottieIcon />,
+            icon: isMobile ? (
+                isPWA ? (
+                    <MobileLottieIcon />
+                ) : (
+                    <Badge badgeContent="!" color="error">
+                        <MobileLottieIcon />
+                    </Badge>
+                )
+            ) : (
+                <DesktopLottieIcon />
+            ),
             onClick: open,
             forMobile: true,
         },

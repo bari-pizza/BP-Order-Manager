@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
-import { Stack, Drawer } from '@mui/material';
+import { Stack, Drawer, Button, Box, Typography, Icon } from '@mui/material';
 import { NavBar } from './components/NavBar';
 // import { APIProvider } from '@vis.gl/react-google-maps';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -238,9 +238,41 @@ function Layout() {
 
     useEffect(() => {
         if (isMobile && !isPWA) {
-            toast.error('Please install the app for better experience', {
-                autoClose: false,
-            });
+            toast.info(
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column', // Stack elements vertically
+                        alignItems: 'center', // Center elements horizontally
+                        justifyContent: 'center', // Center elements vertically
+                        padding: '24px',
+                        backgroundColor: 'primary',
+                        color: 'white',
+                        borderRadius: '8px',
+                    }}>
+                    <Typography variant="h6" align="center" gutterBottom>
+                        Install App to Home Screen for Best Experience
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        onClick={() =>
+                            toast.info('This should open documentation showing how to install on IOS or Android')
+                        }>
+                        Install
+                    </Button>
+                </Box>,
+                {
+                    autoClose: false,
+                    closeOnClick: false,
+                    draggable: false,
+                    icon: false,
+                    position: 'bottom-center',
+                    style: { background: 'purple', color: 'white' },
+                },
+            );
+            /**
+             
+             */
         }
     }, [isMobile, isPWA]);
 
