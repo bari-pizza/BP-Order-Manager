@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
-import { Stack, Drawer, Button, Box, Typography, Icon } from '@mui/material';
+import { Stack, Drawer, Button, Box, Typography } from '@mui/material';
 import { NavBar } from './components/NavBar';
 // import { APIProvider } from '@vis.gl/react-google-maps';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
