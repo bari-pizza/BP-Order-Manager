@@ -10,7 +10,7 @@ interface ScrollableWindowProps {
 export const ScrollableWindow = ({ children, height = '100vh', gradientHeight = 80 }: ScrollableWindowProps) => {
     return (
         <Stack
-            className="scroll-wrapper"
+            className="scrollable-window-wrapper"
             sx={{
                 position: 'relative',
                 height,
@@ -39,6 +39,7 @@ export const ScrollableWindow = ({ children, height = '100vh', gradientHeight = 
                     height: '100%',
                     overflowY: 'auto',
                     padding: `${gradientHeight / 2}px 0`,
+                    overscrollBehaviorY: 'none',
                     // backgroundColor: '#fff',
                     // backgroundColor: 'rgb(249 127 127 / 80%)',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',

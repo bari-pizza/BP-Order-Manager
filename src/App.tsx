@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
-import { Stack, Drawer } from '@mui/material';
+import { Stack, Drawer, Button, Box, Typography } from '@mui/material';
 import { NavBar } from './components/NavBar';
 // import { APIProvider } from '@vis.gl/react-google-maps';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -39,6 +39,7 @@ import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
 // @ts-expect-error missing module declaration
 import { setLocale } from './paraglide/runtime.js';
+import { toast } from './toast/toastWrapper.tsx';
 
 // // Lazy load components
 const OrderDashboard = lazy(() =>
@@ -157,6 +158,7 @@ function Layout() {
     const isMobile = useMediaQuery(
         '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
     );
+    const isPWA = useMediaQuery('(display-mode: standalone)');
     useMidnightEffect();
     // MAYBE include useSubscribeToTable here but these shouldnt be changed often
     const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }, { data: resources }] =
@@ -234,6 +236,46 @@ function Layout() {
 
     useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
+    useEffect(() => {
+        if (isMobile && !isPWA) {
+            toast.info(
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column', // Stack elements vertically
+                        alignItems: 'center', // Center elements horizontally
+                        justifyContent: 'center', // Center elements vertically
+                        padding: '24px',
+                        backgroundColor: 'primary',
+                        color: 'white',
+                        borderRadius: '8px',
+                    }}>
+                    <Typography variant="h6" align="center" gutterBottom>
+                        Install App to Home Screen for Best Experience
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        onClick={() =>
+                            toast.info('This should open documentation showing how to install on IOS or Android')
+                        }>
+                        Install
+                    </Button>
+                </Box>,
+                {
+                    autoClose: false,
+                    closeOnClick: false,
+                    draggable: false,
+                    icon: false,
+                    position: 'bottom-center',
+                    style: { background: 'purple', color: 'white' },
+                },
+            );
+            /**
+             
+             */
+        }
+    }, [isMobile, isPWA]);
+
     return (
         // <APIProvider
         //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
@@ -258,6 +300,7 @@ function Layout() {
                             sideBarSkeletonRef,
                             setSideBarSkeletonWidth,
                             isMobile,
+                            isPWA,
                         }}>
                         <UserContext.Provider value={{ session, profile, loading }}>
                             <ToastContainer />

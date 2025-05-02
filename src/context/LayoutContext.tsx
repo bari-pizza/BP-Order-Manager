@@ -6,6 +6,7 @@ interface LayoutContextProps {
     sideBarSkeletonRef: React.RefObject<HTMLDivElement> | null;
     setSideBarSkeletonWidth: (width: string | number) => void;
     isMobile: boolean;
+    isPWA: boolean;
 }
 
 export const LayoutContext = createContext<LayoutContextProps>({
@@ -14,6 +15,7 @@ export const LayoutContext = createContext<LayoutContextProps>({
     sideBarSkeletonRef: null,
     setSideBarSkeletonWidth: () => {},
     isMobile: false,
+    isPWA: false,
 });
 
 // for dealing with Sidebar. Only called by Sidebar.tsx

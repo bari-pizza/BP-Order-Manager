@@ -93,7 +93,7 @@ export function Login() {
             return;
         }
         toast.update(toastRef.current, {
-            render: `Welcome back ${profile.first_name}!`,
+            render: `Welcome ${profile.first_name}!`,
             type: 'success',
             isLoading: false,
             autoClose: 5000,
