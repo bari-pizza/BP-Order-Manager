@@ -13,11 +13,68 @@ This guide covers deploying the Bari Pizza Order Manager to production. The app 
 
 ## Deployment Platforms
 
-### Option 1: Railway (Recommended - Already Configured)
+### Option 1: Vercel (Recommended - FREE & Fast) ⭐
 
-Railway is preconfigured in `railway.toml`.
+**Best choice for maximizing profit margin while maintaining quality.**
+
+**Pros:**
+- ✅ Completely FREE for this use case
+- ✅ Excellent performance (global CDN)
+- ✅ Automatic HTTPS
+- ✅ Perfect for React/Vite apps
+- ✅ Easy deployment
+- ✅ Automatic deployments on git push
+
+**Cons:**
+- None for this app size
 
 #### Steps:
+
+1. **Install Vercel CLI**
+   ```bash
+   npm install -g vercel
+   ```
+
+2. **Login to Vercel**
+   ```bash
+   vercel login
+   ```
+
+3. **Deploy from Project Root**
+   ```bash
+   cd /workspace
+   vercel --prod
+   ```
+
+4. **Configure Environment Variables**
+   - Go to [vercel.com/dashboard](https://vercel.com/dashboard)
+   - Select your project
+   - Settings → Environment Variables
+   - Add:
+     ```
+     VITE_SUPABASE_URL=your-production-supabase-url
+     VITE_SUPABASE_ANON_KEY=your-production-supabase-anon-key
+     ```
+   - Redeploy: `vercel --prod`
+
+5. **Automatic Deployments (Optional)**
+   - Connect GitHub repo in Vercel dashboard
+   - Auto-deploy on push to main branch
+   - Preview deployments for PRs
+
+6. **Custom Domain (Optional)**
+   - Go to Settings → Domains
+   - Add your custom domain
+   - Vercel provides DNS instructions
+   - SSL is automatic
+
+**Cost: FREE** (100GB bandwidth/month - more than enough)
+
+### Option 2: Railway (Alternative - Already Configured)
+
+Railway is preconfigured in `railway.toml` but costs $5-10/month.
+
+**Only use if you prefer Railway over Vercel's free tier.**
 
 1. **Create Railway Account**
    - Go to [railway.app](https://railway.app)
@@ -41,45 +98,7 @@ Railway is preconfigured in `railway.toml`.
    - Wait for deployment to complete (5-10 minutes)
    - Your app will be available at `https://your-project.railway.app`
 
-5. **Custom Domain (Optional)**
-   - Go to Settings > Domains
-   - Add your custom domain
-   - Follow DNS configuration instructions
-
-#### Railway Configuration
-
-The app uses the following Railway configuration (`railway.toml`):
-
-```toml
-[build]
-builder = "NIXPACKS"
-
-[deploy]
-startCommand = "npm run serve"
-restartPolicyType = "NEVER"
-```
-
-### Option 2: Vercel
-
-1. **Install Vercel CLI**
-   ```bash
-   npm install -g vercel
-   ```
-
-2. **Login**
-   ```bash
-   vercel login
-   ```
-
-3. **Deploy**
-   ```bash
-   vercel --prod
-   ```
-
-4. **Environment Variables**
-   - Go to Vercel dashboard
-   - Project Settings > Environment Variables
-   - Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+**Cost: ~$5/month** (hobby tier with $5 credit)
 
 ### Option 3: Netlify
 
@@ -402,28 +421,45 @@ npm run check
 
 ## Cost Estimates
 
-### Free Tier (Suitable for Small Pizzeria)
+### ⭐ Recommended Free Tier Setup (Perfect for Small Pizzeria)
 
-- **Railway:** Free tier includes:
-  - $5/month credit
-  - Should be sufficient for low-traffic app
+- **Vercel:** FREE
+  - 100GB bandwidth/month
+  - Unlimited deployments
+  - Automatic HTTPS & CDN
   
-- **Supabase:** Free tier includes:
-  - 500MB database
+- **Supabase:** FREE
+  - 500MB database (~50,000 orders)
   - 1GB file storage
   - 50,000 monthly active users
-  - Pauses after 1 week inactivity (upgrade to $25/mo to prevent)
+  - ⚠️ Pauses after 7 days inactivity (won't happen with daily usage)
+  
+- **Sentry:** FREE
+  - 5,000 errors/month
+  - Error monitoring
 
-**Total:** $0-30/month
+**Total Cost: $0/month** 🎉
 
-### Paid Tier (Recommended for Production)
+**Note:** For a single pizzeria using the app daily, the free tier is MORE than sufficient. The Supabase pause only triggers after 7 days of zero activity, which won't happen in production use.
 
-- **Railway:** ~$5-10/month
-- **Supabase:** $25/month (Pro tier - no pausing)
+### If You Need More (Unlikely)
 
-**Total:** ~$30-35/month
+- **Supabase Pro:** $25/month
+  - Only if you exceed 500MB database (years of orders)
+  - Or want guaranteed uptime SLA
+  - Or need daily backups
+  
+- **Vercel Pro:** $20/month
+  - Only if you exceed 100GB bandwidth (very high traffic)
 
-Still cheaper than Bubble's $30/month + more features!
+**Realistic Cost for 1 Pizzeria:** $0/month  
+**Realistic Cost for 5 Pizzerias:** $0-25/month
+
+**Much better than Bubble's $30/month!**
+
+### Detailed Cost Analysis
+
+See [COST_OPTIMIZATION.md](./COST_OPTIMIZATION.md) for detailed breakdown and profit maximization strategies.
 
 ## Security Best Practices
 
