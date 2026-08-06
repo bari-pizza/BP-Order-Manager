@@ -40,9 +40,17 @@ cp .env.example .env
 Edit `.env` and add your Supabase credentials:
 
 ```env
+# Supabase Configuration
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Test Credentials (for Playwright E2E tests)
+# Create a test user in Supabase with Manager or Admin role
+TEST_USER_EMAIL=your-test-user@example.com
+TEST_USER_PASSWORD=your-secure-test-password
 ```
+
+**Important:** Never commit your `.env` file to git. It's already in `.gitignore`.
 
 ### 5. Set Up Database Schema
 

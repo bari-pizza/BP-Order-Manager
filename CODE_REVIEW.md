@@ -53,13 +53,15 @@ This is a **well-structured React application** built by hand without AI assista
 
 ### 🔴 HIGH PRIORITY
 
-#### 1. **Hardcoded Credentials in Tests**
+#### 1. **Hardcoded Credentials in Tests** ✅ FIXED
 ```typescript
-// tests/e2e/fullDay.test.ts:13
-await combinedPages.loginWithCredentials('jrajulialmeida@gmail.com', 'Password1234!');
+// FIXED: Now uses environment variables
+const testEmail = process.env.TEST_USER_EMAIL;
+const testPassword = process.env.TEST_USER_PASSWORD;
+await combinedPages.loginWithCredentials(testEmail, testPassword);
 ```
-**Risk:** Exposed credentials in version control  
-**Fix:** Move to environment variables or test fixtures
+**Was:** Exposed credentials in version control  
+**Fixed:** Moved to environment variables (.env file)
 
 #### 2. **No Environment Variable Documentation**
 - No `.env.example` file exists

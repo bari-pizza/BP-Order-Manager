@@ -50,6 +50,12 @@ export class CombinedPages {
     }
 
     async initMobileBrowsers() {
+        const testPassword = process.env.TEST_USER_PASSWORD;
+        
+        if (!testPassword) {
+            throw new Error('TEST_USER_PASSWORD must be set in .env file');
+        }
+        
         for (const driver of BasePage.todaysDrivers) {
             const mobileBrowser = await chromium.launch({ headless: false });
             const mobileContext = await mobileBrowser.newContext({
@@ -57,7 +63,7 @@ export class CombinedPages {
             });
             const mobilePage = await mobileContext.newPage();
             const ordersPageMobile = new OrdersPageMobile(mobilePage, mobileContext, mobileBrowser, this, driver);
-            await ordersPageMobile.loginWithCredentials(driver.email, 'Password1234!');
+            await ordersPageMobile.loginWithCredentials(driver.email, testPassword);
             this.mobileOrdersPages.push(ordersPageMobile);
         }
     }
