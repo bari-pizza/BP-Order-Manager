@@ -38,7 +38,6 @@ export const SettingsTab = () => {
     const toastRef = useRef<Id>('');
 
     const onSubmit: SubmitHandler<FormValues> = async (rawData) => {
-        console.log(rawData);
         const settingsMap = {
             default_delivery_fee_in_cents: 'delivery_fee_in_cents',
             default_driver_starting_cash: 'driver_starting_cash_in_cents',
@@ -65,7 +64,6 @@ export const SettingsTab = () => {
                     .eq('setting_name', settingName);
 
                 if (error) {
-                    console.error(`Failed to update setting: ${settingName}`, error);
                     toast.update(toastRef.current, {
                         type: 'error',
                         render: `Could not update ${settingName}: ${error.message}`,
@@ -75,7 +73,6 @@ export const SettingsTab = () => {
                     return null;
                 }
 
-                console.log(`Updated setting: ${settingName}`);
                 return settingName;
             });
 

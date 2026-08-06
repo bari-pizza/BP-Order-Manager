@@ -163,7 +163,6 @@ const RenderDeleteButton = ({ payments, orderID }: { payments: Payment[]; orderI
             color: 'error',
             variant: 'outlined',
             handler: (orderID) => {
-                console.log(`trying to delete ${orderID}`);
                 deleteOrder(orderID);
             },
             buttonText: 'Delete',

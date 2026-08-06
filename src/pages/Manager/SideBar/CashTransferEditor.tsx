@@ -142,7 +142,6 @@ export const CashTransferEditor = ({
         if (isExistingCashTransfer(cashTransfer)) {
             cashTransfers.update(cashTransfer);
         } else {
-            console.log({ cashTransfer });
             cashTransfers.create(cashTransfer);
             reset({
                 cashTransfer: {

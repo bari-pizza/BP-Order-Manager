@@ -206,7 +206,6 @@ export const useOrdersDrawersTickets = () => {
         const drawerID = drawer.drawer_id;
         const handleSuccess = (response: RPCPayload['data']) => {
             const unsuccessfulOrderIDs = response?.failures.flatMap((failure) => Object.keys(failure)) || [];
-            console.log({ response, unsuccessfulOrderIDs });
             setSelectedTickets(unsuccessfulOrderIDs);
             setHandlingDrawerClick(false);
         };

@@ -276,7 +276,6 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             },
             renderEditCell: (params) => {
                 const onSuccess = (downloadURL: string) => {
-                    console.log(`saving ${downloadURL}`);
                     params.api.setEditCellValue({ id: params.id, field: 'icon', value: downloadURL });
                 };
                 return (

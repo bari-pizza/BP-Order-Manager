@@ -6,6 +6,5 @@ type LoggerProps = {
 };
 
 export const Logger = ({ message, children }: LoggerProps) => {
-    console.log('Logging:', message);
     return <>{children}</>;
 };

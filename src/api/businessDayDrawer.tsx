@@ -30,7 +30,6 @@ const upsertBusinessDayDrawer: SupabaseInteractor<BusinessDayDrawerSummary, Busi
 //         .select('*')
 //         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 //     if (error) {
-//         console.error(error);
 //         return [];
 //     }
 //     if (!data || data.length === 0) return [];
@@ -54,7 +53,6 @@ const reopenBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; busines
     drawerID,
     businessDate,
 }) => {
-    console.log('calling unlock drawer');
     const { data } = await supaClient.rpc('unlock_drawer', {
         p_drawer_id: drawerID,
         p_business_date: businessDate.format('YYYY-MM-DD'),
@@ -82,12 +80,10 @@ const useUpsertBusinessDayDrawer = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to save data`,
         },
         handleSuccess: (data) => {
-            console.log(data);
-            // thing do to on success
+            // Success callback
         },
         handleFailure: (error) => {
-            console.log(error);
-            // thing to do on failure
+            // Failure callback
         },
     });
 };
@@ -115,7 +111,7 @@ const useCloseBusinessDayDrawer = ({
             errors: (error) => error!.message,
         },
         forEachError: (error) => {
-            console.error({ error }, 'forEachError');
+            // Error already handled by mutation
         },
         handleSuccess(response) {
             const handleSuccess = handleSuccessRef.current['closeBusinessDayDrawer'];
@@ -155,7 +151,7 @@ const useReopenBusinessDayDrawer = ({
             errors: (error) => error!.message,
         },
         forEachError: (error) => {
-            console.error({ error }, 'forEachError');
+            // Error already handled by mutation
         },
         handleSuccess(response) {
             const handleSuccess = handleSuccessRef.current['reopenBusinessDayDrawer'];
@@ -224,7 +220,6 @@ export const useBusinessDayDrawerAPI = ({ businessDate }: { businessDate: dayjs.
                 handleSuccess?: (response: RPCPayload['data']) => void;
                 handleFailure?: (error: PostgrestError | Error) => void;
             }) => {
-                console.log('reopening drawer', drawerID);
                 if (handleSuccess) {
                     handleSuccessRef.current['reopenBusinessDayDrawer'] = handleSuccess;
                 }

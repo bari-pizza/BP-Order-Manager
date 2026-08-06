@@ -47,7 +47,6 @@ export const OriginsTab = () => {
     } = useForm<FormValues>({ defaultValues: { name: '' } });
 
     const onSubmit = async (data: FormValues) => {
-        console.log(data);
         toastRef.current = toast.loading(`Adding origin: ${data.name}`);
         const { error } = await supaClient.from('OrderOrigin').insert({ name: data.name });
         if (error) {

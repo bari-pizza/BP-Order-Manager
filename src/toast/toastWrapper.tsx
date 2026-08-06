@@ -4,7 +4,6 @@ const capitalizeFirstLetter = (message: any) => {
     if (typeof message === 'string') {
         return message.charAt(0).toUpperCase() + message.slice(1);
     } else {
-        console.log(`Could not capitalize ${message} because it is not a string`);
         return message;
     }
 };

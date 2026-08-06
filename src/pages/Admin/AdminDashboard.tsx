@@ -58,7 +58,6 @@ export const AdminDashboard = () => {
                     onClick: drawer.onClick,
                     current: drawer.current,
                     close: (drawer: Drawer | Driver_Drawer) => {
-                        console.log('close drawer', drawer);
                     }, // some supabase mutation
                     reOpen: () => {}, // some supabase mutation
                 },

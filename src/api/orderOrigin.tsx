@@ -30,11 +30,9 @@ const useCreateNewOrderOrigin = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to create new order origin`,
         },
         handleSuccess: (data) => {
-            console.log(data);
             // thing do to on success
         },
         handleFailure: (error) => {
-            console.log(error);
             // thing to do on failure
         },
     });
@@ -52,11 +50,9 @@ const useUpdateNewOrderOrigin = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to save changes`,
         },
         handleSuccess: (data) => {
-            console.log(data);
             // thing do to on success
         },
         handleFailure: (error) => {
-            console.log(error);
             // thing to do on failure
         },
     });

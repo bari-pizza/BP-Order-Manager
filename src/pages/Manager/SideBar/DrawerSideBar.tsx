@@ -203,7 +203,6 @@ export const DrawerSideBar = () => {
     };
 
     const handleReopenDrawerClick = () => {
-        console.log(`Reopening drawer ${currentDrawer.name}`);
         drawers.reOpen(currentDrawer);
     };
 

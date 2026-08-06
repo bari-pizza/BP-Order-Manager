@@ -43,7 +43,6 @@ export const useSession = (): SupashipUserInfo => {
 
     useEffect(() => {
         if (profile?.is_deleted) {
-            console.log('user deleted');
             supaClient.auth.signOut();
             queryClient.setQueryData(['session'], null);
         }

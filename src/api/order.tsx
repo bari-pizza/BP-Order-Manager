@@ -31,14 +31,12 @@ import { removeOrdersFromDrawer } from '../supabaseQueries';
 //         const orderSubscription = supaClient
 //             .channel('custom-all-channel')
 //             .on('postgres_changes', { event: '*', schema: 'public', table: 'Order' }, (payload) => {
-//                 console.log('Change received!', payload);
 //             })
 //             .subscribe();
 
 //         const paymentSubscription = supaClient
 //             .channel('custom-all-channel')
 //             .on('postgres_changes', { event: '*', schema: 'public', table: 'Payment' }, (payload) => {
-//                 console.log('Change received!', payload);
 //             })
 //             .subscribe();
 
@@ -63,7 +61,7 @@ const subscribeToOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
                 table: 'Order',
                 filter: `business_date=eq.${businessDate.format('YYYY-MM-DD')}`,
             },
-            (payload) => console.log(payload),
+            () => {}, // Subscription callback
         )
         .subscribe();
     return channel;
@@ -85,7 +83,6 @@ const subscribeToOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
 //         .order('order_number', { ascending: true });
 
 //     if (error) {
-//         console.error(error);
 //         return [];
 //     }
 //     if (!data || data.length === 0) return [];
@@ -201,7 +198,6 @@ const useDeleteOrder = ({ queryKey }: { queryKey: string[] }) => {
 //             errors: (error) => error!.message,
 //         },
 //         forEachError: (error) => {
-//             console.error({ error }, 'forEachError');
 //         },
 //     });
 // };
@@ -230,7 +226,6 @@ const useAddOrdersToDrawer = ({
         },
         forEachError: (error) => {
             // toast.error(error);
-            console.error({ error }, 'forEachError');
         },
         handleSuccess(response) {
             const handleSuccess = handleSuccessRef.current['addOrdersToDrawer'];
@@ -270,17 +265,15 @@ const useRemoveOrdersFromDrawer = ({
             errors: (error) => error!.message,
         },
         forEachError: (order) => {
-            console.error({ order });
+            // Error already handled by mutation
         },
         handleSuccess(response) {
-            console.log({ response }, 'handleSuccess');
             const handleSuccess = handleSuccessRef.current['removeOrdersFromDrawer'];
             if (handleSuccess) {
                 handleSuccess(response);
             }
         },
         handleFailure(error) {
-            console.error({ error }, 'handleFailure');
             const handleFailure = handleFailureRef.current['removeOrdersFromDrawer'];
             if (handleFailure) {
                 handleFailure(error);

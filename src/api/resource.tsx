@@ -10,13 +10,11 @@ import { Resource } from '../typesAndValidators';
 // };
 
 const updateResource: SupabaseInteractor<Resource, Resource> = async (resource) => {
-    console.log('updating', resource);
     const payload = (await supaClient
         .from('Resource')
         .update([resource])
         .eq('title', resource.title)
         .select('*')) as Payload<Resource>;
-    console.log({ payload });
     return handlePayload<Resource>(payload);
 };
 
@@ -32,11 +30,9 @@ const updateResource: SupabaseInteractor<Resource, Resource> = async (resource) 
 //             errors: () => `Failed to create new order origin`,
 //         },
 //         handleSuccess: (data) => {
-//             console.log(data);
 //             // thing do to on success
 //         },
 //         handleFailure: (error) => {
-//             console.log(error);
 //             // thing to do on failure
 //         },
 //     });
@@ -54,11 +50,9 @@ const useUpdateResource = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to save changes`,
         },
         handleSuccess: (data) => {
-            console.log(data);
             // thing do to on success
         },
         handleFailure: (error) => {
-            console.log(error);
             // thing to do on failure
         },
     });

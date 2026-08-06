@@ -64,7 +64,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         this.setState({ errorInfo });
-        console.error(error, errorInfo, 'ErrorBoundary');
     }
 
     toggleDetails = () => {

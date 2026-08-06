@@ -167,7 +167,6 @@ export const useInteractionHandler = <T, U>({
         onError: (error: Error) => {
             // I think this only happens when an error is thrown
             // might need to add error throwing in the interactor
-            console.log({ error });
             toast.update(toastRef.current, {
                 render: <div dangerouslySetInnerHTML={{ __html: error.message }} />,
                 type: 'error',
@@ -216,7 +215,6 @@ export const useRPCInteractionHandler = <T,>({
             }
         },
         onSuccess: (payload) => {
-            console.log({ payload });
             // if (payload.data?.successes.length === 0) {
             //     throw new Error('Failed to save changes: ' + payload?.error);
             // }
