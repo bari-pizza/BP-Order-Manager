@@ -31,14 +31,14 @@ import { removeOrdersFromDrawer } from '../supabaseQueries';
 //         const orderSubscription = supaClient
 //             .channel('custom-all-channel')
 //             .on('postgres_changes', { event: '*', schema: 'public', table: 'Order' }, (payload) => {
-//                 console.log('Change received!', payload);
+//                 // debug removed
 //             })
 //             .subscribe();
 
 //         const paymentSubscription = supaClient
 //             .channel('custom-all-channel')
 //             .on('postgres_changes', { event: '*', schema: 'public', table: 'Payment' }, (payload) => {
-//                 console.log('Change received!', payload);
+//                 // debug removed
 //             })
 //             .subscribe();
 
@@ -85,7 +85,7 @@ const subscribeToOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
 //         .order('order_number', { ascending: true });
 
 //     if (error) {
-//         console.error(error);
+//         // debug removed
 //         return [];
 //     }
 //     if (!data || data.length === 0) return [];
@@ -201,7 +201,7 @@ const useDeleteOrder = ({ queryKey }: { queryKey: string[] }) => {
 //             errors: (error) => error!.message,
 //         },
 //         forEachError: (error) => {
-//             console.error({ error }, 'forEachError');
+//             // debug removed
 //         },
 //     });
 // };

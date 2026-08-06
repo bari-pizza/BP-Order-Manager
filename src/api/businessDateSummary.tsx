@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 //         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
 //     if (error) {
-//         console.error(error);
+//         // debug removed
 //         return [] as BusinessDaySummary[];
 //     }
 //     if (!data || data.length === 0) return [] as BusinessDaySummary[];
@@ -51,11 +51,9 @@ const useUpsertBusinessDaySummary = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to update db`,
         },
         handleSuccess: (data) => {
-            console.log(data);
             // thing do to on success
         },
         handleFailure: (error) => {
-            console.log(error);
             // thing to do on failure
         },
     });

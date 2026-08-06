@@ -18,7 +18,6 @@ const updatePayment: SupabaseInteractor<Payment, Payment> = async (payment) => {
 
 const deletePayment: SupabaseInteractor<Payment, Payment> = async (payment) => {
     const payload = await supaClient.from('Payment').delete().eq('payment_id', payment.payment_id).select();
-    console.log({ payload });
     return handlePayload<Payment>(payload);
 };
 
@@ -33,7 +32,6 @@ const useCreateNewPayment = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to create new payment.`,
         },
         handleSuccess: (data) => {
-            console.log({ data });
         },
     });
 };

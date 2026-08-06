@@ -30,7 +30,7 @@ const upsertBusinessDayDrawer: SupabaseInteractor<BusinessDayDrawerSummary, Busi
 //         .select('*')
 //         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 //     if (error) {
-//         console.error(error);
+//         // debug removed
 //         return [];
 //     }
 //     if (!data || data.length === 0) return [];

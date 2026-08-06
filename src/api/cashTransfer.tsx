@@ -40,7 +40,6 @@ const useCreateNewCashTransfer = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to create new cash transfer.`,
         },
         handleSuccess: (data) => {
-            console.log({ data });
         },
     });
 };

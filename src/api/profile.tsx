@@ -10,7 +10,6 @@ const createNewProfile: SupabaseInteractor<NewProfile, Profile> = async (newProf
 };
 
 const updateProfile: SupabaseInteractor<Profile, Profile> = async (profile) => {
-    console.log('updating', profile);
     const payload = (await supaClient
         .from('Profile')
         .update([profile])
@@ -31,11 +30,9 @@ const useCreateNewProfile = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to create new profile`,
         },
         handleSuccess: (data) => {
-            console.log(data);
             // thing do to on success
         },
         handleFailure: (error) => {
-            console.log(error);
             // thing to do on failure
         },
     });
@@ -53,11 +50,9 @@ const useUpdateNewProfile = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to save changes to profile`,
         },
         handleSuccess: (data) => {
-            console.log(data);
             // thing do to on success
         },
         handleFailure: (error) => {
-            console.log(error);
             // thing to do on failure
         },
     });

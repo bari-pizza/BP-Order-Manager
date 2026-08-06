@@ -26,11 +26,9 @@ const useTemplateInteraction = ({ queryKey }: { queryKey: string[] }) => {
             errors: () => `Failed to update db`,
         },
         handleSuccess: (data) => {
-            console.log(data);
             // thing do to on success
         },
         handleFailure: (error) => {
-            console.log(error);
             // thing to do on failure
         },
     });
