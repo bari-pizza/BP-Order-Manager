@@ -11,7 +11,6 @@ import dayjs from 'dayjs';
 //         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
 //     if (error) {
-//         // debug removed
 //         return [] as BusinessDaySummary[];
 //     }
 //     if (!data || data.length === 0) return [] as BusinessDaySummary[];

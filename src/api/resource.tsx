@@ -30,11 +30,9 @@ const updateResource: SupabaseInteractor<Resource, Resource> = async (resource) 
 //             errors: () => `Failed to create new order origin`,
 //         },
 //         handleSuccess: (data) => {
-//             // debug removed
 //             // thing do to on success
 //         },
 //         handleFailure: (error) => {
-//             // debug removed
 //             // thing to do on failure
 //         },
 //     });
