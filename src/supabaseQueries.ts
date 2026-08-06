@@ -31,7 +31,6 @@ const validateBusinessDate = (businessDate: dayjs.Dayjs) => {
         supabaseDate.parse({ year, month, day });
         return { month, day, year };
     } catch (error) {
-        console.error(error);
         return { month, day, year, error };
     }
 };
@@ -46,14 +45,12 @@ export const handleResponse = <T>({
     shouldThrow?: boolean;
 }) => {
     if (error) {
-        console.error(error);
         if (shouldThrow) {
             throw error;
         }
         return [] as T[];
     }
     if (!data) {
-        console.error('data is null');
         return [] as T[];
     }
     if (!Array.isArray(data)) {
@@ -66,7 +63,6 @@ export const getAllDrawers = async () => {
     const { data, error } = await supaClient.from('Drawer').select('*').neq('drawer_type', 'driver');
 
     if (error) {
-        console.error(error);
         return [] as Drawer[];
     }
 
@@ -81,13 +77,12 @@ const convertToDriverDrawer = (dirtyDriverDrawer: DirtyDriverDrawer): Driver_Dra
 };
 
 export const getAllDrivers = async () => {
-    const { data, error } = await supaClient
+    const { data, error} = await supaClient
         .from('Driver')
         .select('drawer:Drawer(*), driver:Profile(*)')
         .eq('is_deleted', false);
 
     if (error) {
-        console.error(error);
         return [] as Driver_Drawer[];
     }
 
@@ -98,7 +93,6 @@ export const getAllDrivers = async () => {
 export const getAllOrigins = async () => {
     const { data, error } = await supaClient.from('OrderOrigin').select('*').order('name', { ascending: true });
     if (error) {
-        console.error(error);
         return [] as OrderOrigin[];
     }
 
@@ -108,7 +102,6 @@ export const getAllOrigins = async () => {
 export const getAllResources = async () => {
     const { data, error } = await supaClient.from('Resource').select('*');
     if (error) {
-        console.error(error);
         return [] as Resource[];
     }
 
@@ -146,7 +139,6 @@ export const getAllAppSettings = async () => {
     }
 
     if (error) {
-        console.error(error);
         return constants;
     }
 
@@ -263,7 +255,6 @@ export const queryFnWrapper = <T>(fn: () => Promise<T>, timeout: number): (() =>
 
 export const createNewOrder = async ({ newOrder }: { newOrder: NewOrder & { initial_payment_type: PaymentType } }) => {
     const { data, error } = await supaClient.rpc('create_new_order_from_json', { p_order_json: newOrder });
-    console.log({ data });
     return handleResponse<Order>({ data, error, shouldThrow: true });
 };
 
@@ -281,7 +272,6 @@ export const addOrdersToDrawer = async ({ orderIDs, drawerID }: { orderIDs: stri
         p_order_ids: orderIDs,
     });
     if (error) {
-        console.error(error);
         throw error;
     } else {
         return data;
@@ -294,9 +284,7 @@ export const removeOrdersFromDrawer = async ({ orderIDs, drawerID }: { orderIDs:
         p_drawer_id: drawerID,
         p_order_ids: orderIDs,
     });
-    console.log({ data });
     if (error) {
-        console.error(error);
         throw error;
     } else {
         return data;

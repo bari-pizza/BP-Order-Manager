@@ -63,7 +63,7 @@ const subscribeToOrders = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
                 table: 'Order',
                 filter: `business_date=eq.${businessDate.format('YYYY-MM-DD')}`,
             },
-            (payload) => console.log(payload),
+            () => {}, // Subscription callback
         )
         .subscribe();
     return channel;
@@ -230,7 +230,6 @@ const useAddOrdersToDrawer = ({
         },
         forEachError: (error) => {
             // toast.error(error);
-            console.error({ error }, 'forEachError');
         },
         handleSuccess(response) {
             const handleSuccess = handleSuccessRef.current['addOrdersToDrawer'];
@@ -270,17 +269,15 @@ const useRemoveOrdersFromDrawer = ({
             errors: (error) => error!.message,
         },
         forEachError: (order) => {
-            console.error({ order });
+            // Error already handled by mutation
         },
         handleSuccess(response) {
-            console.log({ response }, 'handleSuccess');
             const handleSuccess = handleSuccessRef.current['removeOrdersFromDrawer'];
             if (handleSuccess) {
                 handleSuccess(response);
             }
         },
         handleFailure(error) {
-            console.error({ error }, 'handleFailure');
             const handleFailure = handleFailureRef.current['removeOrdersFromDrawer'];
             if (handleFailure) {
                 handleFailure(error);
