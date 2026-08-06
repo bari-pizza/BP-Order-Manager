@@ -34,7 +34,6 @@ export const useClearCache = () => {
 
             window.location.reload();
         } catch (error) {
-            console.error('Error clearing cache and reloading:', error);
             alert('There was an error clearing the cache. Please try again.');
         }
     }, []);

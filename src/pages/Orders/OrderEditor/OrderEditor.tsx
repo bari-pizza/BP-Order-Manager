@@ -143,13 +143,11 @@ export const OrderEditor = ({
     const createNewOrderMutation = useMutation({
         mutationFn: createNewOrder,
         onSuccess: (data) => {
-            console.log({ data });
             close();
             reset();
         },
 
         onError: (error) => {
-            console.error('Issue creating new order', error);
             setError('root', { message: "Couldn't create new order" });
         },
     });
@@ -160,7 +158,6 @@ export const OrderEditor = ({
             reset(data[0]);
         },
         onError: (error) => {
-            console.error(`Issue updating order: "${order?.order_id}`, error);
             reset();
             setError('root', { message: "Couldn't update order" });
         },
@@ -192,7 +189,9 @@ export const OrderEditor = ({
 
     const invalidInitialPaymentType = !isValidPaymentType(watch('initial_payment_type'), currentOrigin);
 
-    if (invalidDrawer) console.log({ currentDrawer, is_third_party, currentOrderType });
+    if (invalidDrawer) {
+        // Debug: Invalid drawer state
+    }
 
     useEffect(() => {
         if (order) {
@@ -417,8 +416,6 @@ export const OrderEditor = ({
     };
 
     const onError: SubmitErrorHandler<FieldErrors> = (fields) => {
-        console.log({ fields, errors, currentOrderName, currentOrderNumber });
-        console.error('Invalid form submission');
     };
 
     const handleCancel = () => {

@@ -140,26 +140,21 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const updateEmployeeMutation = useMutation({
         mutationFn: (employee: Employee) => {
             const { is_driver, ...profile } = employee;
-            console.log({ profile, is_driver });
             return updateEmployee(profile, is_driver);
         },
         onSuccess: (data) => {
-            console.log({ data });
             const { profile, driver } = data[0];
             const updatedRow = {
                 ...profile,
                 is_driver: driver && !driver.is_deleted,
             };
-            console.log({ updatedRow });
             setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
         },
         onError: (error) => {
-            console.log({ error });
         },
     });
 
     const processRowUpdate = (newRow: GridRowModel) => {
-        console.log('processRowUpdate', newRow);
         const updatedRow = {
             ...(newRow as Employee),
         };

@@ -76,7 +76,6 @@ export const useDrivers = () => {
         mutationFn: ({ drawerID, businessDate }: { drawerID: string; businessDate: dayjs.Dayjs }) =>
             removeDriverFromBusinessDay({ drawerID, businessDate }),
         onSuccess: (data) => {
-            console.log({ data });
             queryClient.invalidateQueries({ queryKey: ['businessDayDrivers', businessDate.format('YYYY-MM-DD')] });
             const handleOutcome = toastRef.current['remove'];
             handleOutcome({ data: data as unknown as DataWithError });

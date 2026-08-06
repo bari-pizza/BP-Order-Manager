@@ -173,7 +173,6 @@ const getAllDaysOrders = async ({ businessDate }: { businessDate: dayjs.Dayjs })
         .order('order_number', { ascending: true });
 
     if (error) {
-        console.error(error);
         return [];
     }
     if (!data || data.length === 0) return [];
@@ -186,7 +185,6 @@ const getAllDaysPayments = async ({ businessDate }: { businessDate: dayjs.Dayjs 
     const { data, error } = await supaClient.from('Payment').select('*').eq('business_date', formattedDate);
 
     if (error) {
-        console.error(error);
         return [];
     }
     if (!data || data.length === 0) return [];
@@ -201,7 +199,6 @@ const getBusinessDaySummary = async ({ businessDate }: { businessDate: dayjs.Day
         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
     if (error) {
-        console.error(error);
         return [] as BusinessDaySummary[];
     }
     if (!data || data.length === 0) return [] as BusinessDaySummary[];
@@ -216,7 +213,6 @@ const getBusinessDayDrawerSummaries = async ({ businessDate }: { businessDate: d
         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
     if (error) {
-        console.error(error);
         return [] as BusinessDayDrawerSummary[];
     }
     if (!data || data.length === 0) return [] as BusinessDayDrawerSummary[];
@@ -231,7 +227,6 @@ const getCashTransfers = async ({ businessDate }: { businessDate: dayjs.Dayjs })
         .eq('business_date', businessDate.format('YYYY-MM-DD'));
 
     if (error) {
-        console.error(error);
         return [] as CashTransfer[];
     }
 

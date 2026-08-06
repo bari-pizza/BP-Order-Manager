@@ -147,7 +147,6 @@ export const editLottieLayerProperty = (
 
     const targetLayer = layers.find((layer) => layer.nm === layerName);
     if (!targetLayer) {
-        console.error(`Layer "${layerName}" not found.`);
         return lottieJson; // Return original if layer not found
     }
     let targetObject = targetLayer; // Start with the layer
@@ -158,7 +157,6 @@ export const editLottieLayerProperty = (
         if (targetShape) {
             targetObject = targetShape; // If shapeName provided, target the shape
         } else {
-            console.error(`Shape "${shapeName}" not found in layer "${layerName}".`);
             return lottieJson;
         }
     }
@@ -169,7 +167,6 @@ export const editLottieLayerProperty = (
     for (let i = 0; i < pathParts.length - 1; i++) {
         currentObj = currentObj[pathParts[i]] as { [key: string]: unknown };
         if (!currentObj) {
-            console.error(`Property path "${propPath}" not found.`);
             return lottieJson;
         }
     }
@@ -179,7 +176,6 @@ export const editLottieLayerProperty = (
     if (currentObj && currentObj.hasOwnProperty(lastProp)) {
         currentObj[lastProp] = newValue;
     } else {
-        console.error(`Property "${lastProp}" not found.`);
         return lottieJson;
     }
 

@@ -38,20 +38,15 @@ export const useImageUpload = ({
 
         try {
             if (originalPath) {
-                console.log(` delete this: ${basePath ? `${basePath}/` : ''}${originalPath}`);
-                console.log({ originalPath });
                 const { error: removeError, data } = await supaClient.storage
                     .from(bucketName)
                     .remove([`${basePath ? `${basePath}/` : ''}${originalPath}`]);
-                console.log({ removeError, data });
             }
-            console.log(` upload this: ${filePath}`);
             const { error: uploadError } = await supaClient.storage.from(bucketName).upload(filePath, file, {
                 cacheControl: '3600',
                 upsert: false,
             });
 
-            console.log({ uploadError });
 
             if (uploadError) {
                 throw uploadError;

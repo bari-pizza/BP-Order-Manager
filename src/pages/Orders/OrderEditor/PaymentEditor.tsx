@@ -38,7 +38,6 @@ type FormValues = Payment;
 
 const createNewPayment = async (newPayment: NewPayment) => {
     const { data, error } = await supaClient.from('Payment').insert([newPayment]).select('*');
-    console.log({ data });
     return handleResponse<Payment>({ data, error, shouldThrow: true });
 };
 
@@ -48,7 +47,6 @@ const updatePayment = async (payment: Payment) => {
         .update(payment)
         .eq('payment_id', payment.payment_id)
         .select('*');
-    console.log({ data });
     return handleResponse<Payment>({ data, error, shouldThrow: true });
 };
 
@@ -99,23 +97,19 @@ export const PaymentEditor = ({
     const createNewPaymentMutation = useMutation({
         mutationFn: createNewPayment,
         onSuccess: (data) => {
-            console.log({ data });
             // reset the form
         },
 
         onError: (error) => {
-            console.error('Issue creating new order', error);
         },
     });
 
     const updatePaymentMutation = useMutation({
         mutationFn: updatePayment,
         onSuccess: (data) => {
-            console.log({ data });
         },
 
         onError: (error) => {
-            console.error('Issue updating order', error);
         },
     });
 
