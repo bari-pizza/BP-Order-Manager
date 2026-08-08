@@ -11,7 +11,6 @@ import {
     useInteractionHandler,
     useRPCInteractionHandler,
 } from './helpers';
-// import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { PostgrestError } from '@supabase/supabase-js';
 import { removeOrdersFromDrawer } from '../supabaseQueries';

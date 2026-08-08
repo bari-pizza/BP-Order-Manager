@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider, Outlet } from 'react-router';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import { Stack, Drawer, Button, Box, Typography } from '@mui/material';
 import { NavBar } from './components/NavBar';
-// import { APIProvider } from '@vis.gl/react-google-maps';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { themeOptions } from './theme/theme.ts';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -147,7 +146,6 @@ export default App;
 
 const queryClient = new QueryClient();
 
-// const theme = createTheme(themeOptions);
 
 function Layout() {
     const { session, profile, loading } = useSession();
@@ -278,7 +276,6 @@ function Layout() {
 
     return (
         // <APIProvider
-        //     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
         //     onLoad={() => console.log('Maps API has loaded.')}
         //     solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
         //     version="beta">
