@@ -1,17 +1,3 @@
-// import { Avatar, Skeleton } from '@mui/material';
-import { useBariPizzaContext, useUserContext } from '../../hooks/data/useContextData';
-import { RoundLottieIcon } from '../../rickcedlib/LottieIcons';
-
-// const avatarSX = {
-//     height: 35,
-//     width: 35,
-//     bgcolor: 'primary.main',
-//     border: '3px solid',
-//     borderColor: 'primary.main',
-// };
-
-// export const UserAvatar = () => {
-//     const { session, profile } = useUserContext();
 //     let userAvatar = <Skeleton variant="circular" height={30} width={30} />;
 //     if (profile) {
 //         const fullName = `${profile.first_name} ${profile.last_name}`;

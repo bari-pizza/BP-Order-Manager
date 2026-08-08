@@ -66,6 +66,7 @@ export const getAllDrawers = async () => {
         return [] as Drawer[];
     }
 
+    // Type assertion needed: Supabase returns generic type that doesn't match our specific Drawer type
     return data as unknown as Drawer[];
 };
 

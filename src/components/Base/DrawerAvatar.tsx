@@ -9,12 +9,6 @@ import {
     DrawerCardOverrideSX,
     // DrawerCardSlotProps
 } from './DrawerCardBase';
-// import { OverridableComponent } from '@mui/material/OverridableComponent';
-// import {
-//     PointOfSale as PointOfSaleIcon,
-//     DeliveryDining as DeliveryDiningIcon,
-//     Face as FaceIcon,
-// } from '@mui/icons-material';
 // import { createElement } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { LockLottieIcon, RoundLottieIcon } from '../../rickcedlib/LottieIcons';

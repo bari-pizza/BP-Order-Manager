@@ -10,7 +10,6 @@ import {
 } from './helpers';
 import { BusinessDayDrawerSummary } from '../typesAndValidators';
 import dayjs from 'dayjs';
-// import { useSuspenseQuery } from '@tanstack/react-query';
 import { PostgrestError } from '@supabase/supabase-js';
 import { useRef } from 'react';
 
@@ -24,17 +23,6 @@ const upsertBusinessDayDrawer: SupabaseInteractor<BusinessDayDrawerSummary, Busi
     return handlePayload<BusinessDayDrawerSummary>(payload);
 };
 
-// const getAllBusinessDayDrawers = async ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-//     const { data, error } = await supaClient
-//         .from('BusinessDayDrawer')
-//         .select('*')
-//         .eq('business_date', businessDate.format('YYYY-MM-DD'));
-//     if (error) {
-//         return [];
-//     }
-//     if (!data || data.length === 0) return [];
-
-//     return data as unknown as BusinessDayDrawerSummary[];
 // };
 
 const closeBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; businessDate: dayjs.Dayjs }> = async ({
@@ -61,12 +49,6 @@ const reopenBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; busines
     return data as unknown as RPCPayload;
 };
 
-// const useGetAllBusinessDayDrawers = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-//     return useSuspenseQuery({
-//         queryKey: ['businessDayDrawers', businessDate.format('YYYY-MM-DD')],
-//         queryFn: () => getAllBusinessDayDrawers({ businessDate }),
-//     });
-// };
 
 const useUpsertBusinessDayDrawer = ({ queryKey }: { queryKey: string[] }) => {
     return useInteractionHandler<BusinessDayDrawerSummary, BusinessDayDrawerSummary>({

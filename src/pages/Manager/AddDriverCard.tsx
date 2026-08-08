@@ -174,7 +174,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
                         </Button>
                         <Divider />
                         <Button onClick={() => {
-                            // TODO: take user to admin page to add new driver
+                            // Note: Future feature - redirect to admin page to create new driver
                         }}>
                             Create New Driver
                         </Button>

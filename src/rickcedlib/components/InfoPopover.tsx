@@ -29,10 +29,6 @@ export const InfoPopover = ({ children, size = 'small', anchorOrigin, transformO
         setOpenedPopover(true);
     };
 
-    /* TODO: figure out this issue
-        Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at <URL>.
-    */
-
     return (
         <div
             style={{

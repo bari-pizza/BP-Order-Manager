@@ -1,5 +1,3 @@
-// TODO: create a simple toast.error wrapper that uses a sad pizza icon
-// TODO: create a simple toast.success wrapper that uses a happy pizza icon
 // TODO: create a toast.confirmation wrapper - should have an onConfirm function
 
 import { Button, ButtonProps, Stack, Typography, TypographyProps } from '@mui/material';
