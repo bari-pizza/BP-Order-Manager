@@ -1,4 +1,5 @@
 import React, { Component, ReactNode } from 'react';
+import * as Sentry from '@sentry/react';
 
 interface ErrorBoundaryProps {
     children: ReactNode;
@@ -28,6 +29,17 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         this.setState({ errorInfo });
+        
+        // Send error to Sentry in production
+        if (import.meta.env.PROD) {
+            Sentry.captureException(error, {
+                contexts: {
+                    react: {
+                        componentStack: errorInfo.componentStack,
+                    },
+                },
+            });
+        }
     }
 
     toggleDetails = () => {

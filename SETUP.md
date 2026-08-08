@@ -48,11 +48,27 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 # Create a test user in Supabase with Manager or Admin role
 TEST_USER_EMAIL=your-test-user@example.com
 TEST_USER_PASSWORD=your-secure-test-password
+
+# Sentry (Production Error Monitoring - Optional)
+# Leave empty in development - Sentry only runs in production builds
+VITE_SENTRY_DSN=https://your-key@sentry.io/project-id
 ```
 
 **Important:** Never commit your `.env` file to git. It's already in `.gitignore`.
 
-### 5. Set Up Database Schema
+### 5. (Optional) Set Up Sentry Error Monitoring
+
+Sentry captures errors in production and sends them to a dashboard for monitoring.
+
+**Setup:**
+1. Go to [sentry.io](https://sentry.io) and create a free account
+2. Create a new project → Select **React**
+3. Copy your **DSN** (Data Source Name)
+4. Add to `.env`: `VITE_SENTRY_DSN=https://your-key@sentry.io/project-id`
+
+**Note:** Sentry is configured to run **only in production builds**, not in development or CI/tests.
+
+### 6. Set Up Database Schema
 
 The application requires specific tables in Supabase. You need to:
 
