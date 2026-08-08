@@ -10,7 +10,15 @@ test.beforeAll(async () => {
     Logger.startLog();
     Logger.setLogLevel('debug');
     combinedPages = await CombinedPages.create();
-    await combinedPages.loginWithCredentials('jrajulialmeida@gmail.com', 'Password1234!');
+    
+    const testEmail = process.env.TEST_USER_EMAIL;
+    const testPassword = process.env.TEST_USER_PASSWORD;
+    
+    if (!testEmail || !testPassword) {
+        throw new Error('TEST_USER_EMAIL and TEST_USER_PASSWORD must be set in .env file');
+    }
+    
+    await combinedPages.loginWithCredentials(testEmail, testPassword);
 });
 
 test.afterAll(async () => {
