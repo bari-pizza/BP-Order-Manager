@@ -33,5 +33,4 @@ export const MotionWrapper = ({
     );
 };
 
-// TODO: add notes
-// NOTE:added just "layout" - if this causes bugs, just remove that part and nothing else
+// NOTE: added just "layout" - if this causes bugs, just remove that part and nothing else
