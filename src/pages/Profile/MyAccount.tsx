@@ -11,7 +11,6 @@ import dayjs from 'dayjs';
 import { SmartTextField } from '../../rickcedlib/components/SmartTextField';
 import { m } from '../../types/messages';
 
-// TODO: Add a way to edit profile (avatar_src, first_name, last_name,  password)
 type FormValues = {
     isEditing: boolean;
     updatingPassword: boolean;

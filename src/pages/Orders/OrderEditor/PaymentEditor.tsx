@@ -50,7 +50,8 @@ const updatePayment = async (payment: Payment) => {
     return handleResponse<Payment>({ data, error, shouldThrow: true });
 };
 
-// TODO: explain that food is not included in this system and should be handled separately
+// Note: This system tracks delivery tips and payments only.
+// Food costs and menu items should be handled in a separate POS/ordering system.
 
 export const PaymentEditor = ({
     payment,

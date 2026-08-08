@@ -62,13 +62,17 @@ grep -r "console\." src/ --exclude-dir=node_modules > console-logs.txt
 ```markdown
 ## Priority: 🔴 Critical | Time: 30 min | Phase: 1
 
-## Problem
-Hardcoded credentials in `tests/e2e/fullDay.test.ts`:
+## Problem ✅ FIXED
+Hardcoded credentials have been removed from test files.
+
+**Solution:**
 ```typescript
-await combinedPages.loginWithCredentials('jrajulialmeida@gmail.com', 'Password1234!');
+const testEmail = process.env.TEST_USER_EMAIL;
+const testPassword = process.env.TEST_USER_PASSWORD;
+await combinedPages.loginWithCredentials(testEmail, testPassword);
 ```
 
-**Risk:** Credentials exposed in git history
+**Security:** Credentials now stored in `.env` file (not committed to git)
 
 ## Solution
 

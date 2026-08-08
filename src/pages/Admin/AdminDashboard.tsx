@@ -132,21 +132,3 @@ export const AdminDashboard = () => {
     );
 };
 
-/* TODO: ADMIN DASHBOARD
-
-    
-
-TODO: should show registers (Drawers.drawer_type === "register")
-    allows admin to create new registers or rename existing ones
-    
-TODO: allow us to create reports
-    allows to choose day / date-range
-    
-    day tables
-        orders table (toggleable)
-        payments table (toggleable)
-
-    daily/weekly/monthly report
-        Sales, cc sales, sales by origin, sales by driver, etc         
-    
-*/
