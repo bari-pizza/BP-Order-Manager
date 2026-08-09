@@ -1,6 +1,6 @@
-import { useBariPizzaContext, useUserContext } from '@/hooks/data/useContextData';
-import { RoundLottieIcon } from '@/rickcedlib/LottieIcons';
-import type { Resource } from '@/types/types';
+import { useBariPizzaContext, useUserContext } from '../../hooks/data/useContextData';
+import { RoundLottieIcon } from '../../rickcedlib/LottieIcons';
+import type { Resource } from '../../types/types';
 
 export const UserAvatar = () => {
     const { resources } = useBariPizzaContext();
