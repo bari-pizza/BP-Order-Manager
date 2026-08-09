@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/react';
 import App from './App.tsx';
 // import './index.css'
 
-// Initialize Sentry only in production
+// Initialize Sentry only in production (never in dev/CI)
 if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
     Sentry.init({
         dsn: import.meta.env.VITE_SENTRY_DSN,
