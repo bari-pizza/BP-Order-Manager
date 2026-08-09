@@ -54,6 +54,7 @@ This guide covers deploying the Bari Pizza Order Manager to production. The app 
      ```
      VITE_SUPABASE_URL=your-production-supabase-url
      VITE_SUPABASE_ANON_KEY=your-production-supabase-anon-key
+     VITE_SENTRY_DSN=your-sentry-dsn-here (optional but recommended)
      ```
    - Redeploy: `vercel --prod`
 
@@ -216,37 +217,63 @@ Set up Supabase monitoring:
 - Monitor API usage
 - Set up alerts for high error rates
 
-## Monitoring & Error Tracking
+## Monitoring & Error Tracking (Sentry) - Recommended ⭐
 
-### Recommended: Sentry Integration
+**Sentry is pre-configured and production-ready!** Just add your DSN to start monitoring.
+
+### Why Use Sentry?
+- ✅ **Real-time error notifications** - Get alerted when users hit errors
+- ✅ **Stack traces** - See exactly where errors occur  
+- ✅ **User context** - Know which users are affected
+- ✅ **Performance monitoring** - Track slow pages
+- ✅ **Session replay** - Watch what users did before an error
+- ✅ **FREE tier**: 5,000 errors/month (plenty for a single pizzeria)
+
+### Setup (5 minutes):
 
 1. **Create Sentry Account**
    - Go to [sentry.io](https://sentry.io)
-   - Create new project (React)
+   - Sign up for free account
 
-2. **Install Sentry**
-   ```bash
-   npm install @sentry/react @sentry/tracing
-   ```
+2. **Create React Project**
+   - New Project → Select **React**
+   - Name it "Bari Pizza Order Manager"
 
-3. **Configure Sentry**
-   ```typescript
-   // src/main.tsx
-   import * as Sentry from "@sentry/react";
-   
-   if (import.meta.env.PROD) {
-     Sentry.init({
-       dsn: "your-sentry-dsn",
-       integrations: [new Sentry.BrowserTracing()],
-       tracesSampleRate: 0.1,
-     });
-   }
-   ```
+3. **Copy Your DSN**
+   - Settings → Projects → [Your Project] → Client Keys (DSN)
+   - Copy the DSN (looks like: `https://abc123@o123.ingest.sentry.io/456`)
 
 4. **Add to Environment Variables**
    ```
-   VITE_SENTRY_DSN=your-sentry-dsn
+   VITE_SENTRY_DSN=your-sentry-dsn-here
    ```
+   - **Vercel**: Settings → Environment Variables
+   - **Railway**: Settings → Variables  
+   - **Netlify**: Site settings → Environment
+
+5. **Redeploy**
+   - Sentry will start capturing errors automatically!
+
+### What Gets Captured?
+- ✅ Unhandled JavaScript errors
+- ✅ Promise rejections
+- ✅ React component errors (via Error Boundary)
+- ✅ Network failures
+- ✅ Performance metrics (10% sampling)
+- ✅ Session replays on errors (with privacy protection)
+
+### Testing Sentry
+After deployment, open browser console and run:
+```javascript
+throw new Error("Test Sentry Integration");
+```
+Check your Sentry dashboard - error should appear in seconds!
+
+### Privacy & Performance
+- **Production only**: Disabled in development and CI
+- **Privacy**: Text and media masked in replays
+- **Lightweight**: 10% performance sampling
+- **No PII**: Emails/names not sent by default
 
 ## Rollback Strategy
 
