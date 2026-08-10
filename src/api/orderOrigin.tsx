@@ -12,7 +12,7 @@ const createNewOrderOrigin: SupabaseInteractor<NewOrderOrigin, OrderOrigin> = as
 const updateOrderOrigin: SupabaseInteractor<OrderOrigin, OrderOrigin> = async (orderOrigin) => {
     const payload = (await supaClient
         .from('OrderOrigin')
-        .update([orderOrigin])
+        .update(orderOrigin)
         .eq('origin_id', orderOrigin.origin_id)
         .select('*')) as Payload<OrderOrigin>;
     return handlePayload<OrderOrigin>(payload);
