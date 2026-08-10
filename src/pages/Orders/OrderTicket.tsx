@@ -53,6 +53,10 @@ const OrderTicketMobile = ({ order }: OrderTicketMobileProps) => {
 
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id);
 
+    if (!orderOrigin) {
+        return null; // Skip rendering if origin not found
+    }
+
     const { payments } = order;
 
     const initialPayment = payments?.[0];
@@ -166,6 +170,10 @@ const OrderTicketDesktop = ({ order, toggleSelected, selected }: OrderTicketProp
     };
 
     const orderOrigin = origins.find((origin) => origin.origin_id === order.origin_id);
+
+    if (!orderOrigin) {
+        return null; // Skip rendering if origin not found
+    }
 
     const { payments } = order;
 

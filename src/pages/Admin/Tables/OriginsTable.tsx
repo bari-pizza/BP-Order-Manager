@@ -89,9 +89,8 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             return;
         }
 
-        // Show preview of first changed origin (or we could show all)
-        const firstDirty = dirtyRows[0];
-        confirmSave(firstDirty, dirtyRows.length);
+        // Show preview of first changed origin
+        confirmSave(dirtyRows);
     };
 
     const handleCancelAll = () => {
@@ -185,8 +184,8 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         }
     };
 
-    const saveAllChanges = async (count: number) => {
-        const dirtyRows = getDirtyRows();
+    const saveAllChanges = async (dirtyRows: OriginRow[]) => {
+        const count = dirtyRows.length;
         toastRef.current = toast.loading(`Saving ${count} change(s)...`);
 
         const promises = dirtyRows.map((row) => orderOriginMutations.update(row));
@@ -211,15 +210,15 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         }
     };
 
-    const { handleConfirmation: confirmSave } = useConfirmationToast<OriginRow>({
-        message: (_, count) => `Save ${count} change(s)?`,
+    const { handleConfirmation: confirmSave } = useConfirmationToast<OriginRow[]>({
+        message: (origins) => `Save ${origins.length} change(s)?`,
         messageProps: { variant: 'h3' },
         position: 'center',
-        renderBody: (origin) => <ExampleOrigin origin={origin} />,
+        renderBody: (origins) => <ExampleOrigin origin={origins[0]} />,
         confirmProps: {
             color: 'primary',
             variant: 'contained',
-            handler: (_, count) => saveAllChanges(count),
+            handler: (origins) => saveAllChanges(origins),
             buttonText: m.saveChanges(),
         },
         cancelProps: {
