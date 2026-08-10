@@ -1,25 +1,21 @@
-import { Stack, Typography } from '@mui/material';
+import { Alert, Button, Collapse, Stack, Typography } from '@mui/material';
 import {
     DataGrid,
     GridColDef,
-    GridEventListener,
-    GridRowEditStopReasons,
-    GridRowModes,
-    GridRowModesModel,
+    GridRowId,
+    GridRowSelectionModel,
 } from '@mui/x-data-grid';
 import { OrderOrigin } from '../../../typesAndValidators';
-import { CellCheckbox, CellEditCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
-import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
-import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
-import { useDataGrid } from '../../../hooks/ui/useDataGrid';
+import { CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
 import { LogoUploader } from '../LogoUploader';
 import { useOrderOriginCRUD } from '../../../api/orderOrigin';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { Id, toast } from '../../../toast/toastWrapper';
 import { supaClient } from '../../../supaClient';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';
 import { m } from '../../../types/messages';
+import { SaveOutlined, UndoOutlined, DeleteOutline, RestoreOutlined } from '@mui/icons-material';
 
 const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     if (!origin) return null;
@@ -54,229 +50,230 @@ const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     );
 };
 
-// TODO: useConfirmationToast to confirm changes (add body to toast, allow for centering)
-
-type OriginRow = OrderOrigin & { is_pending?: boolean };
+type OriginRow = OrderOrigin;
 
 export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
-    const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<OriginRow>({ data: origins });
+    const [rows, setRows] = useState<OriginRow[]>(origins);
+    const [dirtyRowIds, setDirtyRowIds] = useState<Set<GridRowId>>(new Set());
+    const [originalRows, setOriginalRows] = useState<Map<GridRowId, OriginRow>>(new Map());
+    const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
     const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['origins'] });
     const toastRef = useRef<Id>('');
 
-    const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-            event.defaultMuiPrevented = true;
+    const getDirtyRows = () => {
+        return rows.filter((row) => dirtyRowIds.has(row.origin_id));
+    };
+
+    const handleCellEdit = (newRow: OriginRow) => {
+        const originalRow = originalRows.get(newRow.origin_id);
+        
+        // If this is the first edit, save the original
+        if (!originalRow) {
+            setOriginalRows((prev) => new Map(prev.set(newRow.origin_id, rows.find(r => r.origin_id === newRow.origin_id)!)));
+        }
+
+        // Update the row
+        setRows((prev) => prev.map((row) => (row.origin_id === newRow.origin_id ? newRow : row)));
+
+        // Mark as dirty
+        setDirtyRowIds((prev) => new Set(prev.add(newRow.origin_id)));
+
+        return newRow;
+    };
+
+    const handleSaveAll = () => {
+        const dirtyRows = getDirtyRows();
+        
+        if (dirtyRows.length === 0) {
+            toast.info(m.noChangesDetected());
+            return;
+        }
+
+        // Show preview of first changed origin (or we could show all)
+        const firstDirty = dirtyRows[0];
+        confirmSave(firstDirty, dirtyRows.length);
+    };
+
+    const handleCancelAll = () => {
+        // Revert all dirty rows to original
+        setRows((prev) =>
+            prev.map((row) => {
+                const original = originalRows.get(row.origin_id);
+                return original || row;
+            })
+        );
+        setDirtyRowIds(new Set());
+        setOriginalRows(new Map());
+        toast.info('All changes cancelled');
+    };
+
+    const handleDelete = async () => {
+        const selected = rows.filter((row) => selectionModel.includes(row.origin_id));
+        
+        if (selected.length === 0) {
+            toast.error('No origins selected');
+            return;
+        }
+
+        confirmDelete(selected);
+    };
+
+    const handleRestore = async () => {
+        const selected = rows.filter((row) => selectionModel.includes(row.origin_id) && row.is_deleted);
+        
+        if (selected.length === 0) {
+            toast.error('No deleted origins selected');
+            return;
+        }
+
+        confirmRestore(selected);
+    };
+
+    const deleteOrigins = async (origins: OrderOrigin[]) => {
+        toastRef.current = toast.loading(`Deleting ${origins.length} origin(s)...`);
+        
+        const promises = origins.map((origin) =>
+            supaClient.from('OrderOrigin').update({ is_deleted: true }).eq('origin_id', origin.origin_id)
+        );
+
+        const results = await Promise.all(promises);
+        const errors = results.filter((r) => r.error);
+
+        if (errors.length > 0) {
+            toast.update(toastRef.current, {
+                render: `Failed to delete ${errors.length} origin(s)`,
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+        } else {
+            toast.update(toastRef.current, {
+                render: `Successfully deleted ${origins.length} origin(s)`,
+                type: 'success',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            setSelectionModel([]);
         }
     };
 
-    const { handleConfirmation: confirmEdit } = useConfirmationToast<OriginRow>({
-        message: m.originPreview(),
+    const restoreOrigins = async (origins: OrderOrigin[]) => {
+        toastRef.current = toast.loading(`Restoring ${origins.length} origin(s)...`);
+        
+        const promises = origins.map((origin) =>
+            supaClient.from('OrderOrigin').update({ is_deleted: false }).eq('origin_id', origin.origin_id)
+        );
+
+        const results = await Promise.all(promises);
+        const errors = results.filter((r) => r.error);
+
+        if (errors.length > 0) {
+            toast.update(toastRef.current, {
+                render: `Failed to restore ${errors.length} origin(s)`,
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+        } else {
+            toast.update(toastRef.current, {
+                render: `Successfully restored ${origins.length} origin(s)`,
+                type: 'success',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            setSelectionModel([]);
+        }
+    };
+
+    const saveAllChanges = async (count: number) => {
+        const dirtyRows = getDirtyRows();
+        toastRef.current = toast.loading(`Saving ${count} change(s)...`);
+
+        const promises = dirtyRows.map((row) => orderOriginMutations.update(row));
+
+        try {
+            await Promise.all(promises);
+            toast.update(toastRef.current, {
+                render: `Successfully saved ${count} change(s)`,
+                type: 'success',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            setDirtyRowIds(new Set());
+            setOriginalRows(new Map());
+        } catch (error) {
+            toast.update(toastRef.current, {
+                render: `Failed to save changes`,
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+        }
+    };
+
+    const { handleConfirmation: confirmSave } = useConfirmationToast<OriginRow>({
+        message: (_, count) => `Save ${count} change(s)?`,
         messageProps: { variant: 'h3' },
         position: 'center',
-        renderBody: (origin) => {
-            return <ExampleOrigin origin={origin} />;
-        },
+        renderBody: (origin) => <ExampleOrigin origin={origin} />,
         confirmProps: {
             color: 'primary',
             variant: 'contained',
-            handler: (originRow) => {
-                const newRow = originRow;
-                const id = newRow.origin_id;
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { is_pending, ...origin } = newRow;
-                if (!id) {
-                    toast.error(m.operationFailed());
-                    return;
-                }
-                orderOriginMutations.update(origin);
-                setRowModesModel({
-                    ...rowModesModel,
-                    [id]: { mode: GridRowModes.View, ignoreModifications: true },
-                });
-            },
+            handler: (_, count) => saveAllChanges(count),
             buttonText: m.saveChanges(),
         },
         cancelProps: {
-            handler: (originRow) => {
-                const oldRow = originRow!;
-                const id = oldRow.origin_id;
-                oldRow.is_pending = false;
-                setRows((prev) => prev.map((row) => (row.origin_id === id ? oldRow : row)));
-            },
+            handler: () => {},
         },
     });
 
-    const processRowUpdate = (newRow: OriginRow, oldRow: OriginRow) => {
-        if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
-            toast.info(m.noChangesDetected());
-            return {
-                ...newRow,
-                is_pending: false,
-            };
-        }
-        confirmEdit(newRow, oldRow);
-        return {
-            ...newRow,
-            is_pending: true,
-        };
-    };
-
-    const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-        setRowModesModel(newRowModesModel);
-    };
-
-    const deleteOrigin = async (origin: OrderOrigin) => {
-        const { origin_id: id, name } = origin;
-        toastRef.current = toast.loading(m.deletingTarget({ targetName: m.origin(), fullName: name }));
-        const { error } = await supaClient.from('OrderOrigin').update({ is_deleted: true }).eq('origin_id', id);
-        if (error) {
-            toast.update(toastRef.current, {
-                render: error.message,
-                type: 'error',
-                isLoading: false,
-                autoClose: 5000,
-            });
-            return;
-        } else {
-            toast.update(toastRef.current, {
-                render: m.targetDeletedSuccessfully({ targetName: m.origin(), fullName: name }),
-                type: 'success',
-                isLoading: false,
-                autoClose: 5000,
-            });
-            // take row out of edit mode
-            setRowModesModel({
-                ...rowModesModel,
-                [id]: { mode: GridRowModes.View },
-            });
-        }
-    };
-
-    const restoreOrigin = async (origin: OrderOrigin) => {
-        const { origin_id: id, name } = origin;
-        toastRef.current = toast.loading(m.restoringTarget({ targetName: m.origin(), fullName: name }));
-        const { error } = await supaClient.from('OrderOrigin').update({ is_deleted: false }).eq('origin_id', id);
-        if (error) {
-            toast.update(toastRef.current, {
-                render: error.message,
-                type: 'error',
-                isLoading: false,
-                autoClose: 5000,
-            });
-            return;
-        } else {
-            toast.update(toastRef.current, {
-                render: m.targetRestoredSuccessfully({ targetName: m.origin(), fullName: name }),
-                type: 'success',
-                isLoading: false,
-                autoClose: 5000,
-            });
-        }
-    };
-
-    const { handleConfirmation: confirmDelete } = useConfirmationToast<OriginRow>({
-        message: (origin) =>
-            m.areYouSureYouWant({ message: m.toDeleteTarget({ targetName: m.origin() + ' ' + origin.name }) }),
+    const { handleConfirmation: confirmDelete } = useConfirmationToast<OrderOrigin[]>({
+        message: (origins) => `Delete ${origins.length} origin(s)?`,
         confirmProps: {
             color: 'error',
             variant: 'outlined',
-            handler: (origin) => {
-                const { origin_id: id } = origin;
-                if (!id) {
-                    toast.error(m.operationFailed());
-                    return;
-                }
-                deleteOrigin(origin);
-                setRowModesModel({
-                    ...rowModesModel,
-                    [id]: { mode: GridRowModes.View, ignoreModifications: true },
-                });
-            },
+            handler: (origins) => deleteOrigins(origins),
             buttonText: 'Delete',
         },
     });
 
-    const { handleConfirmation: confirmRestore } = useConfirmationToast<OriginRow>({
-        message: (origin) => {
-            const { name } = origin;
-            return m.areYouSureYouWant({ message: m.toRestoreTarget({ targetName: name }) });
-        },
+    const { handleConfirmation: confirmRestore } = useConfirmationToast<OrderOrigin[]>({
+        message: (origins) => `Restore ${origins.length} origin(s)?`,
         confirmProps: {
             color: 'primary',
             variant: 'contained',
-            handler: (origin) => {
-                const id = origin.origin_id;
-                if (!id) {
-                    toast.error(m.operationFailed());
-                    return;
-                }
-                restoreOrigin(origin);
-                setRowModesModel({
-                    ...rowModesModel,
-                    [id]: { mode: GridRowModes.View, ignoreModifications: true },
-                });
-            },
+            handler: (origins) => restoreOrigins(origins),
             buttonText: 'Restore',
         },
     });
 
     const columns: GridColDef<OriginRow>[] = [
         {
-            field: 'actions',
-            type: 'actions',
-            headerName: m.actions(),
-            width: 100,
-            cellClassName: 'actions',
-            getActions: ({ row }) => {
-                const { origin_id, is_deleted } = row;
-                if (is_deleted) {
-                    return createCellActions(
-                        origin_id,
-                        rowModesModel,
-                        setRowModesModel,
-                        () => confirmRestore(row),
-                        is_deleted,
-                    );
-                }
-                return createCellActions(
-                    origin_id,
-                    rowModesModel,
-                    setRowModesModel,
-                    () => confirmDelete(row),
-                    is_deleted,
-                );
-            },
-        },
-        {
             field: 'name',
             headerName: m.name(),
             width: 150,
             editable: true,
-            renderEditCell: (params) => {
-                return <CellEditTextField params={params} field="name" />;
-            },
         },
         {
-            field: 'icon',
+            field: 'logo_src',
             headerName: m.icon(),
             width: 100,
             editable: true,
-            renderCell: (params) => {
-                return (
-                    <Stack
-                        direction="row"
-                        alignItems="end"
-                        height="100%"
-                        spacing={2}
-                        justifyContent="center"
-                        className="lottie-icon-container">
-                        <LogoUploader origin={params.row} disabled isAnimated />
-                    </Stack>
-                );
-            },
+            renderCell: (params) => (
+                <Stack
+                    direction="row"
+                    alignItems="end"
+                    height="100%"
+                    spacing={2}
+                    justifyContent="center"
+                    className="lottie-icon-container">
+                    <LogoUploader origin={params.row} disabled isAnimated />
+                </Stack>
+            ),
             renderEditCell: (params) => {
                 const onSuccess = (downloadURL: string) => {
-                    params.api.setEditCellValue({ id: params.id, field: 'icon', value: downloadURL });
+                    const newRow = { ...params.row, logo_src: downloadURL };
+                    handleCellEdit(newRow);
                 };
                 return (
                     <Stack direction="row" alignItems="end" height="100%" spacing={2} justifyContent="center">
@@ -288,105 +285,146 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         {
             field: 'can_deliver',
             headerName: m.canDeliver(),
-            width: 150,
+            width: 120,
             editable: true,
-
+            type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => {
-                return <CellCheckbox params={params} />;
-            },
-            renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="can_deliver" />;
-            },
+            renderCell: (params) => <CellCheckbox params={params} />,
         },
         {
             field: 'can_tip',
             headerName: m.canTip(),
-            width: 150,
+            width: 120,
             editable: true,
+            type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => {
-                return <CellCheckbox params={params} />;
-            },
-            renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="can_tip" />;
-            },
+            renderCell: (params) => <CellCheckbox params={params} />,
         },
         {
             field: 'has_order_number',
             headerName: m.hasOrderNumber(),
             width: 150,
             editable: true,
+            type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => {
-                return <CellCheckbox params={params} />;
-            },
-            renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="has_order_number" />;
-            },
+            renderCell: (params) => <CellCheckbox params={params} />,
         },
         {
             field: 'default_is_prepaid',
             headerName: m.defaultIsPrepaid(),
             width: 150,
             editable: true,
+            type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => {
-                return <CellCheckbox params={params} />;
-            },
-            renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="default_is_prepaid" />;
-            },
+            renderCell: (params) => <CellCheckbox params={params} />,
         },
         {
             field: 'is_prepaid_toggleable',
             headerName: m.isPrepaidToggleable(),
-            width: 150,
+            width: 180,
             editable: true,
+            type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => {
-                return <CellCheckbox params={params} />;
-            },
-            renderEditCell: (params) => {
-                return <CellEditCheckbox params={params} field="is_prepaid_toggleable" />;
-            },
+            renderCell: (params) => <CellCheckbox params={params} />,
         },
     ];
+
+    const hasDirtyRows = dirtyRowIds.size > 0;
+    const hasSelection = selectionModel.length > 0;
+    const selectedDeletedOrigins = rows.filter((r) => selectionModel.includes(r.origin_id) && r.is_deleted);
+
     return (
-        <Stack direction="column" flex={1} overflow="hidden" width="100%">
+        <Stack direction="column" flex={1} overflow="hidden" width="100%" spacing={2}>
+            {/* Save Changes Banner */}
+            <Collapse in={hasDirtyRows}>
+                <Alert
+                    severity="warning"
+                    icon={<SaveOutlined />}
+                    action={
+                        <Stack direction="row" spacing={1}>
+                            <Button
+                                size="small"
+                                variant="contained"
+                                color="primary"
+                                startIcon={<SaveOutlined />}
+                                onClick={handleSaveAll}>
+                                Save {dirtyRowIds.size} Change{dirtyRowIds.size !== 1 ? 's' : ''}
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                color="inherit"
+                                startIcon={<UndoOutlined />}
+                                onClick={handleCancelAll}>
+                                Cancel All
+                            </Button>
+                        </Stack>
+                    }>
+                    <Typography variant="body2">
+                        You have {dirtyRowIds.size} unsaved change{dirtyRowIds.size !== 1 ? 's' : ''}
+                    </Typography>
+                </Alert>
+            </Collapse>
+
+            {/* Bulk Actions Banner */}
+            <Collapse in={hasSelection}>
+                <Alert
+                    severity="info"
+                    action={
+                        <Stack direction="row" spacing={1}>
+                            {selectedDeletedOrigins.length > 0 && (
+                                <Button
+                                    size="small"
+                                    variant="contained"
+                                    color="primary"
+                                    startIcon={<RestoreOutlined />}
+                                    onClick={handleRestore}>
+                                    Restore {selectedDeletedOrigins.length}
+                                </Button>
+                            )}
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                startIcon={<DeleteOutline />}
+                                onClick={handleDelete}>
+                                Delete {selectionModel.length}
+                            </Button>
+                        </Stack>
+                    }>
+                    <Typography variant="body2">
+                        {selectionModel.length} origin{selectionModel.length !== 1 ? 's' : ''} selected
+                    </Typography>
+                </Alert>
+            </Collapse>
+
             <DataGrid
                 sx={{
-                    '& .row-is-edit': { border: '2px solid', borderColor: 'primary.main' },
+                    '& .row-is-dirty': { 
+                        bgcolor: 'warning.light',
+                        '&:hover': { bgcolor: 'warning.main' }
+                    },
                     '& .row-is-deleted': {
                         color: 'text.disabled',
-                        '& .MuiButtonBase-root': { color: 'text.disabled' },
-                        '& .actions .MuiButtonBase-root': { color: 'primary.main' },
-                    },
-                    '& .MuiDataGrid-cell--editing': { padding: 0, justifyContent: 'center' },
-                    '& .row-is-pending': {
-                        color: 'text.disabled',
-                        '& .MuiButtonBase-root': { color: 'text.disabled' },
-                        '& .actions .MuiButtonBase-root': { color: 'primary.main' },
+                        textDecoration: 'line-through',
                     },
                     '.MuiDataGrid-columnHeader': { textTransform: 'capitalize' },
                 }}
-                disableVirtualization
                 rows={rows}
                 columns={columns}
-                editMode="row"
-                rowModesModel={rowModesModel}
-                onRowModesModelChange={handleRowModesModelChange}
-                onRowEditStop={handleRowEditStop}
-                processRowUpdate={processRowUpdate}
-                getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
+                checkboxSelection
+                disableRowSelectionOnClick
+                rowSelectionModel={selectionModel}
+                onRowSelectionModelChange={setSelectionModel}
+                processRowUpdate={handleCellEdit}
+                getRowSpacing={() => ({ top: 5, bottom: 5 })}
                 getRowId={(row) => row.origin_id}
                 getRowClassName={(params) => {
+                    const isDirty = dirtyRowIds.has(params.id);
                     const isDeleted = params.row.is_deleted;
-                    const isPending = params.row.is_pending;
-                    if (isPending) return 'row-is-pending';
+                    if (isDirty) return 'row-is-dirty';
                     if (isDeleted) return 'row-is-deleted';
-                    const isEditing = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-                    return isEditing ? 'row-is-edit' : '';
+                    return '';
                 }}
             />
         </Stack>
