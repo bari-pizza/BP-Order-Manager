@@ -9,7 +9,7 @@ export const OrdersTab = () => {
     const tableOrders: OrderWithFullDetails[] = orders.all.map((order) => {
         const drawer = drawers.all.find((drawer) => drawer.drawer_id === order.drawer_id);
         const driver = drivers.todays.find((driver) => driver.drawer_id === order.drawer_id);
-        const origin = origins.find((origin) => origin.origin_id === order.origin_id)!;
+        const origin = origins.find((origin) => origin.origin_id === order.origin_id);
         return {
             ...order,
             drawer,

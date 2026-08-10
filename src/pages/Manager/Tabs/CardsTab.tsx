@@ -12,7 +12,7 @@ export const CardsTab = () => {
             if (payment.payment_type === 'card') {
                 const drawer = drawers.all.find((drawer) => drawer.drawer_id === order.drawer_id);
                 const driver = drivers.todays.find((driver) => driver.drawer_id === order.drawer_id);
-                const origin = origins.find((origin) => origin.origin_id === order.origin_id)!;
+                const origin = origins.find((origin) => origin.origin_id === order.origin_id);
                 tablePayments.push({
                     ...payment,
                     order,

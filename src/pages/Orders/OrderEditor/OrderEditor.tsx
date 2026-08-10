@@ -110,10 +110,11 @@ export const OrderEditor = ({
 
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
+        const defaultOrigin = origins.find((o) => o.name === 'Bari Pizza') || origins[0];
         return {
             business_date: businessDate.format('YYYY-MM-DD'),
             last_updated_by: profile?.id,
-            origin_id: origins.find((o) => o.name === 'Bari Pizza')!.origin_id,
+            origin_id: defaultOrigin?.origin_id || '',
             order_number: null,
             order_name: null,
             order_type: 'delivery' as OrderType,
@@ -165,13 +166,13 @@ export const OrderEditor = ({
 
     const drawersAndDrivers: (Drawer | Driver_Drawer)[] = [...drawers, ...todaysDrivers];
 
-    const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'))!;
+    const currentOrigin = origins.find((origin) => origin.origin_id === watch('origin_id'));
     const currentOrderName = watch('order_name');
     const currentOrderNumber = watch('order_number');
     const currentOrderType = watch('order_type');
     const currentDrawer = drawersAndDrivers.find((drawer) => drawer.drawer_id === watch('drawer_id')) || null;
 
-    const { can_deliver, has_order_number, is_third_party } = currentOrigin;
+    const { can_deliver = false, has_order_number = false, is_third_party = false } = currentOrigin || {};
 
     const validOrigins = (driverDrawerID ? origins.filter((origin) => origin.can_deliver) : origins).filter(
         (origin) => !origin.is_deleted,
