@@ -1,0 +1,24 @@
+# Code Owners for Bari Pizza Order Manager
+# 
+# These users will be automatically requested for review when PRs are opened
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+* @rickcedwhat
+
+# Frontend components
+/src/components/ @rickcedwhat
+/src/pages/ @rickcedwhat
+
+# Database and API
+/src/api/ @rickcedwhat
+/src/supabaseQueries.ts @rickcedwhat
+
+# Configuration files
+*.json @rickcedwhat
+*.yml @rickcedwhat
+*.yaml @rickcedwhat
+.github/ @rickcedwhat
+
+# Documentation
+*.md @rickcedwhat
