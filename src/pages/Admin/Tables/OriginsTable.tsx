@@ -65,20 +65,25 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     };
 
     const handleCellEdit = (newRow: OriginRow) => {
-        const originalRow = originalRows.get(newRow.origin_id);
-        
-        // If this is the first edit, save the original
-        if (!originalRow) {
-            setOriginalRows((prev) => new Map(prev.set(newRow.origin_id, rows.find(r => r.origin_id === newRow.origin_id)!)));
+        const currentRow = rows.find((row) => row.origin_id === newRow.origin_id);
+        if (currentRow && JSON.stringify(currentRow) === JSON.stringify(newRow)) {
+            return newRow;
         }
 
-        // Update the row
-        setRows((prev) => prev.map((row) => (row.origin_id === newRow.origin_id ? newRow : row)));
+        const originalRow = originalRows.get(newRow.origin_id);
 
-        // Mark as dirty
+        if (!originalRow && currentRow) {
+            setOriginalRows((prev) => new Map(prev.set(newRow.origin_id, currentRow)));
+        }
+
+        setRows((prev) => prev.map((row) => (row.origin_id === newRow.origin_id ? newRow : row)));
         setDirtyRowIds((prev) => new Set(prev.add(newRow.origin_id)));
 
         return newRow;
+    };
+
+    const toggleBoolean = (row: OriginRow, field: keyof OriginRow) => {
+        handleCellEdit({ ...row, [field]: !row[field] });
     };
 
     const handleSaveAll = () => {
@@ -285,46 +290,51 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
             field: 'can_deliver',
             headerName: m.canDeliver(),
             width: 120,
-            editable: true,
             type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => <CellCheckbox params={params} />,
+            renderCell: (params) => (
+                <CellCheckbox params={params} onChange={() => toggleBoolean(params.row, 'can_deliver')} />
+            ),
         },
         {
             field: 'can_tip',
             headerName: m.canTip(),
             width: 120,
-            editable: true,
             type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => <CellCheckbox params={params} />,
+            renderCell: (params) => (
+                <CellCheckbox params={params} onChange={() => toggleBoolean(params.row, 'can_tip')} />
+            ),
         },
         {
             field: 'has_order_number',
             headerName: m.hasOrderNumber(),
             width: 150,
-            editable: true,
             type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => <CellCheckbox params={params} />,
+            renderCell: (params) => (
+                <CellCheckbox params={params} onChange={() => toggleBoolean(params.row, 'has_order_number')} />
+            ),
         },
         {
             field: 'default_is_prepaid',
             headerName: m.defaultIsPrepaid(),
             width: 150,
-            editable: true,
             type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => <CellCheckbox params={params} />,
+            renderCell: (params) => (
+                <CellCheckbox params={params} onChange={() => toggleBoolean(params.row, 'default_is_prepaid')} />
+            ),
         },
         {
             field: 'is_prepaid_toggleable',
             headerName: m.isPrepaidToggleable(),
             width: 180,
-            editable: true,
             type: 'boolean',
             headerAlign: 'center',
-            renderCell: (params) => <CellCheckbox params={params} />,
+            renderCell: (params) => (
+                <CellCheckbox params={params} onChange={() => toggleBoolean(params.row, 'is_prepaid_toggleable')} />
+            ),
         },
     ];
 
