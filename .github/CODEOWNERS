@@ -4,21 +4,21 @@
 # See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # Default owner for everything in the repo
-* @rickcedwhat
+* @rickcedwhat @baripizza
 
 # Frontend components
-/src/components/ @rickcedwhat
-/src/pages/ @rickcedwhat
+/src/components/ @rickcedwhat @baripizza
+/src/pages/ @rickcedwhat @baripizza
 
 # Database and API
-/src/api/ @rickcedwhat
-/src/supabaseQueries.ts @rickcedwhat
+/src/api/ @rickcedwhat @baripizza
+/src/supabaseQueries.ts @rickcedwhat @baripizza
 
 # Configuration files
-*.json @rickcedwhat
-*.yml @rickcedwhat
-*.yaml @rickcedwhat
-.github/ @rickcedwhat
+*.json @rickcedwhat @baripizza
+*.yml @rickcedwhat @baripizza
+*.yaml @rickcedwhat @baripizza
+.github/ @rickcedwhat @baripizza
 
 # Documentation
-*.md @rickcedwhat
+*.md @rickcedwhat @baripizza
