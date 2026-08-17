@@ -68,32 +68,29 @@ export const useConfirmationToast = <T,>({
             </Stack>
         );
 
-        let className;
+        let toastPosition = position;
+        let className: string | undefined;
 
-        if (position === 'center') {
-            position = 'top-center';
+        if (toastPosition === 'center') {
+            toastPosition = 'top-center';
             className = 'Toastify__toast-container--center';
         }
 
-        // toast(content, {
-        //     toastId, // Use the same ID
-        //     type: 'info',
-        //     icon: false,
-        //     autoClose: false,
-        //     position,
-        //     closeButton: false,
-        //     className,
-        //     // closeButton: () => <CustomCloseButton onClose={handleCancel} />,
-        // });
-        toast.update(toastId, {
-            render: content,
+        const toastOptions = {
+            toastId,
+            type: 'info' as const,
+            icon: false as const,
+            autoClose: false as const,
+            position: toastPosition,
+            closeButton: false as const,
             className,
-            closeButton: false,
-            position,
-            autoClose: false,
-            icon: false,
-            type: 'info',
-        });
+        };
+
+        if (toast.isActive(toastId)) {
+            toast.update(toastId, { render: content, ...toastOptions });
+        } else {
+            toast.show(content, toastOptions);
+        }
     };
 
     return { handleConfirmation };
