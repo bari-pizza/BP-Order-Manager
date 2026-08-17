@@ -7,6 +7,7 @@ import {
     Order,
     Order_Payment,
     OrderOrigin,
+    OrderType,
     Payment,
     PaymentType,
     validators,
