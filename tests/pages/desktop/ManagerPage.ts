@@ -1,8 +1,8 @@
-import { Browser, BrowserContext, Locator, Page, expect } from '@playwright/test';
+import { expect, type Browser, type BrowserContext, type Locator, type Page } from '@playwright/test';
 import { BasePageDesktop } from '../BasePage/BasePageDesktop';
 import { CloseDrawerProcess } from '../../utils/CloseDrawerProcess';
-import { faker } from '@faker-js/faker/locale/en_US';
 import { BasePage } from '../BasePage/BasePage';
+import { TEST_ACCOUNTS } from '../../utils/testAccounts';
 
 type DrawerIdentifier = string | number;
 
@@ -122,44 +122,58 @@ export class ManagerPage extends BasePageDesktop {
             throw new Error('Drawer locator is null');
         }
 
-        const driverEmail = await drawerLocator.getAttribute('data-user-email');
-        if (driverEmail && driverName) {
-            this.logInfo(`Added driver ${driverName} with email ${driverEmail}`);
-            BasePage.todaysDrivers.push({ email: driverEmail, name: driverName });
+        const driverEmail =
+            (await drawerLocator.getAttribute('data-user-email')) ||
+            TEST_ACCOUNTS.find((account) => `${account.first_name} ${account.last_name}` === driverName)?.email;
+        if (!driverEmail || !driverName) {
+            throw new Error(`Added driver ${driverName} but could not read their email`);
         }
+        this.logInfo(`Added driver ${driverName} with email ${driverEmail}`);
+        BasePage.todaysDrivers.push({ email: driverEmail, name: driverName });
     }
 
     async closeDriver(drawerLocator: Locator) {
         await this.clickDrawer(drawerLocator);
-        await this.closeDrawerProcess.completeCloseDriver(faker.number.int({ min: 5, max: 12 }));
+        const reopen = this.page.getByRole('button', { name: 'Reopen Drawer' });
+        if (await reopen.isVisible()) {
+            return;
+        }
+        await this.closeDrawerProcess.completeCloseDriver();
         this.logInfo(`Closed driver ${await drawerLocator.allTextContents()}`);
     }
 
     async closeDrivers() {
-        const drivers = await this.page
-            .locator('#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-driver')
-            .all();
-        for (const driver of drivers) {
-            console.log('closing driver:', await driver.allTextContents());
-            await this.closeDriver(driver);
+        const drivers = this.page.locator('#simple-tabpanel-drawers .drawer-card-button-driver');
+        const count = await drivers.count();
+        for (let i = 0; i < count; i += 1) {
+            console.log('closing driver:', await drivers.nth(i).allInnerTexts());
+            await this.closeDriver(drivers.nth(i));
         }
     }
 
     async closeOtherDrawers() {
-        const registers = await this.page
-            .locator('#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-register')
-            .all();
-        for (const drawer of registers) {
-            await this.clickDrawer(drawer);
+        const registers = this.page.locator('#simple-tabpanel-drawers .drawer-card-button-register');
+        const registerCount = await registers.count();
+        for (let i = 0; i < registerCount; i += 1) {
+            await this.clickDrawer(registers.nth(i));
+            const reopen = this.page.getByRole('button', { name: 'Reopen Drawer' });
+            if (await reopen.isVisible()) {
+                continue;
+            }
             await this.closeDrawerProcess.completeCloseRegister();
-            this.logInfo(`Closed drawer ${await drawer.allTextContents()}`);
+            this.logInfo(`Closed drawer ${await registers.nth(i).allInnerTexts()}`);
         }
-        const thirdPartyDrawer = this.page.locator(
-            '#simple-tabpanel-drawers .MuiButtonBase-root.drawer-card-button-third_party',
-        );
-        await this.clickDrawer(thirdPartyDrawer);
-        await this.closeDrawerProcess.completeCloseThirdParty();
-        this.logInfo(`Closed drawer third party drawer`);
+        const thirdPartyDrawers = this.page.locator('#simple-tabpanel-drawers .drawer-card-button-third_party');
+        const thirdPartyCount = await thirdPartyDrawers.count();
+        for (let i = 0; i < thirdPartyCount; i += 1) {
+            await this.clickDrawer(thirdPartyDrawers.nth(i));
+            const reopen = this.page.getByRole('button', { name: 'Reopen Drawer' });
+            if (await reopen.isVisible()) {
+                continue;
+            }
+            await this.closeDrawerProcess.completeCloseThirdParty();
+            this.logInfo(`Closed drawer ${await thirdPartyDrawers.nth(i).allInnerTexts()}`);
+        }
     }
 
     async closeDrawers() {
@@ -174,8 +188,14 @@ export class ManagerPage extends BasePageDesktop {
 
     async closeBusinessDay() {
         await this.openCloseDayPopup();
-        await this.closeBusinessDayButton.click();
-        await this.page.waitForTimeout(5000);
+        const closeDay = this.closeBusinessDayButton;
+        if (await closeDay.isDisabled()) {
+            throw new Error(`Cannot close day yet: ${await this.closeBusinessDayPopup.innerText()}`);
+        }
+        await closeDay.click();
+        await expect(this.page.getByRole('button', { name: 'Show Business Day Summary' })).toBeVisible({
+            timeout: 15_000,
+        });
         this.logInfo('Closed business day');
     }
 

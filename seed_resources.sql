@@ -2,11 +2,11 @@
 -- Safe to re-run. Requires a unique constraint on "Resource".title
 -- (the live schema uses title as the row identity).
 
-INSERT INTO "Resource" (title, src)
+INSERT INTO "Resource" (title, src, bucket_name)
 VALUES
-    ('Register', NULL),
-    ('Third Party Pickup', NULL),
-    ('Unassigned Drawer', NULL),
-    ('Missing Avatar', NULL),
-    ('Add Driver', NULL)
+    ('Register', '', 'resources'),
+    ('Third Party Pickup', '', 'resources'),
+    ('Unassigned Drawer', '', 'resources'),
+    ('Missing Avatar', '', 'resources'),
+    ('Add Driver', '', 'resources')
 ON CONFLICT (title) DO NOTHING;

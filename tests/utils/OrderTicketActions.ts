@@ -1,5 +1,5 @@
-import { Locator, Page, expect } from '@playwright/test';
-import { OrderData, orderOriginsWithTypes } from './data';
+import { expect, type Locator, type Page } from '@playwright/test';
+import { orderOriginsWithTypes, type OrderData } from './data';
 
 export class OrderTicketActions {
     // find ticket based on order info (order_number, order_name, origin, order_type, payment_type, total_in_cents)

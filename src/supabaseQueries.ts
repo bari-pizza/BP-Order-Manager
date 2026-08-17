@@ -61,7 +61,11 @@ export const handleResponse = <T>({
 };
 
 export const getAllDrawers = async () => {
-    const { data, error } = await supaClient.from('Drawer').select('*').neq('drawer_type', 'driver');
+    const { data, error } = await supaClient
+        .from('Drawer')
+        .select('*')
+        .neq('drawer_type', 'driver')
+        .neq('drawer_type', 'unassigned');
 
     if (error) {
         return [] as Drawer[];

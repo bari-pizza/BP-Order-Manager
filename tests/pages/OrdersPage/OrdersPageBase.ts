@@ -1,7 +1,7 @@
-import { Browser, BrowserContext, expect, Page } from '@playwright/test';
+import { expect, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { BasePage } from '../BasePage/BasePage';
 import { faker } from '@faker-js/faker/locale/en_US';
-import { OrderData, orderOriginsWithTypes } from '../../utils/data';
+import { orderOriginsWithTypes, type OrderData } from '../../utils/data';
 import { TicketPageBase } from '../TicketPage/TicketPageBase';
 import { formatCurrency } from '../../../src/utils';
 import { CombinedPages } from './CombinedOrdersPages';
@@ -237,12 +237,12 @@ export abstract class OrdersPageBase extends BasePage {
         await this.clickAddOrder();
 
         let success = false;
-        while (!success) {
-            // await this.startTimeout(3, `Choosing origin: ${origin.name}`);
+        let attempts = 0;
+        while (!success && attempts < 3) {
+            attempts += 1;
             await this.chooseOrigin(origin.name);
 
             if (!isMobile) {
-                // await this.startTimeout(3, `Choosing order type: ${orderType}`);
                 await this.chooseOrderType(orderType);
             }
             if (orderNumber) {
@@ -251,26 +251,40 @@ export abstract class OrdersPageBase extends BasePage {
                 await this.setOrderName(orderName);
             }
 
-            // await this.startTimeout(3, `Setting total: ${total_in_cents}`);
             await this.setTotalInCents(total_in_cents);
-
-            // await this.startTimeout(3, `Setting payment type: ${paymentType}`);
             await this.setPaymentType(paymentType);
-
-            // await this.startTimeout(3, 'Confirming order');
             success = await this.confirmOrder();
+        }
+        if (!success) {
+            throw new Error(
+                `Could not save order after ${attempts} attempts (${origin.name} ${orderType} ${paymentType})`,
+            );
         }
     }
 
     async confirmOrder() {
-        await this.page.locator('text=Save').click();
-        // save button should disappear
+        const editor = this.page.locator('.order-editor');
+        const totalInput = this.page.locator(`//label[text()='Total']/following::input[1]`);
+        const previousTotal = await totalInput.inputValue();
+        await editor.getByRole('button', { name: 'Save', exact: true }).click();
+
+        const rootError = editor.locator('.MuiTypography-root').filter({ hasText: /Couldn|Required|Must/ });
         try {
-            await expect(this.page.locator('text=Save')).not.toBeVisible();
+            await expect(totalInput).toHaveValue('$0.00', { timeout: 15_000 });
+            if (previousTotal === '$0.00') {
+                throw new Error('Total was already $0.00 before save');
+            }
             this.logInfo('Order saved successfully');
             return true;
         } catch (e) {
-            this.logError(new Error('Failed to save order - ' + e.message), 'confirmOrder');
+            const helper = await this.page.locator('.MuiFormHelperText-root').allInnerTexts();
+            const extra = await rootError.allInnerTexts();
+            this.logError(
+                new Error(
+                    `Failed to save order - ${e.message}. Field errors: ${JSON.stringify(helper)} Root: ${JSON.stringify(extra)}`,
+                ),
+                'confirmOrder',
+            );
             return false;
         }
     }

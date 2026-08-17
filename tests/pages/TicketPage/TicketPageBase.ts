@@ -1,7 +1,7 @@
-import { Browser, BrowserContext, expect, Locator, Page } from '@playwright/test';
+import { expect, type Browser, type BrowserContext, type Locator, type Page } from '@playwright/test';
 import { BasePage } from '../BasePage/BasePage';
-import { OrderData, orderOriginsWithTypes } from '../../utils/data';
-import { Payment } from '../../../src/typesAndValidators';
+import { orderOriginsWithTypes, type OrderData } from '../../utils/data';
+import type { Payment } from '../../../src/typesAndValidators';
 import { formatCurrency } from '../../../src/utils';
 import { Logger } from '../../utils/Logger';
 
@@ -118,8 +118,21 @@ export abstract class TicketPageBase extends BasePage {
     }
 
     async closeTicket() {
-        await this.orderEditor.press('Escape');
-        await expect(this.orderEditor).not.toBeVisible();
+        if (!(await this.orderEditor.isVisible())) {
+            return;
+        }
+        await this.page.keyboard.press('Escape');
+        if (await this.orderEditor.isVisible()) {
+            const backdrop = this.page.locator('.MuiBackdrop-root.MuiModal-backdrop');
+            if (await backdrop.first().isVisible()) {
+                await backdrop.first().click({ force: true, position: { x: 5, y: 5 } }).catch(() => undefined);
+            }
+        }
+        const cancel = this.orderEditor.getByRole('button', { name: 'Cancel' });
+        if (await this.orderEditor.isVisible() && (await cancel.isEnabled())) {
+            await cancel.click();
+        }
+        await expect(this.orderEditor).toBeHidden({ timeout: 10_000 });
     }
 
     async openTicketIfClosed(ticket: Locator) {
@@ -187,8 +200,7 @@ export abstract class TicketPageBase extends BasePage {
             } catch (e) {
                 failures++;
                 if (failures > 3) {
-                    this.logError(e, `${this.driver.name} failed to edit tip`);
-                    return;
+                    throw e;
                 }
             }
         }

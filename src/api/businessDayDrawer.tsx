@@ -29,10 +29,13 @@ const closeBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; business
     drawerID,
     businessDate,
 }) => {
-    const { data } = await supaClient.rpc('lock_drawer', {
+    const { data, error } = await supaClient.rpc('lock_drawer', {
         p_drawer_id: drawerID,
         p_business_date: businessDate.format('YYYY-MM-DD'),
     });
+    if (error) {
+        throw error;
+    }
 
     return data as unknown as RPCPayload;
 };
@@ -41,10 +44,13 @@ const reopenBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; busines
     drawerID,
     businessDate,
 }) => {
-    const { data } = await supaClient.rpc('unlock_drawer', {
+    const { data, error } = await supaClient.rpc('unlock_drawer', {
         p_drawer_id: drawerID,
         p_business_date: businessDate.format('YYYY-MM-DD'),
     });
+    if (error) {
+        throw error;
+    }
 
     return data as unknown as RPCPayload;
 };
@@ -158,7 +164,7 @@ export const useBusinessDayDrawerAPI = ({ businessDate }: { businessDate: dayjs.
     const handleFailureRef = useRef<{
         [key: string]: (error: PostgrestError | Error) => void;
     }>({});
-    const queryKey = ['businessDayDrawers', businessDate.format('YYYY-MM-DD')];
+    const queryKey = ['businessDayDrawerSummaries', businessDate.format('YYYY-MM-DD')];
     const closeBusinessDayDrawerMutation = useCloseBusinessDayDrawer({
         queryKey,
         handleSuccessRef,

@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { TicketPageBase } from './TicketPageBase';
 
 export class TicketPageMobile extends TicketPageBase {

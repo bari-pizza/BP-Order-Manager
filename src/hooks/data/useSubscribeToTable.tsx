@@ -392,7 +392,10 @@ export const useSetupAllSubscriptions = ({
                                         });
                                     }
                                     const newOrder = payload.new as Order;
-                                    newData = [...currentData, newOrder];
+                                    const list = currentData ?? [];
+                                    newData = list.some((order) => order.order_id === newOrder.order_id)
+                                        ? list
+                                        : [...list, newOrder];
                                 }
                                 break;
                             case 'UPDATE':
@@ -541,7 +544,10 @@ export const useSetupAllSubscriptions = ({
                         (currentData: Payment[]) => {
                             let newData = currentData;
                             if (eventType === 'INSERT') {
-                                newData = [...currentData, newPayment];
+                                const list = currentData ?? [];
+                                newData = list.some((payment) => payment.payment_id === newPayment.payment_id)
+                                    ? list
+                                    : [...list, newPayment];
                             }
 
                             // TODO: lets see if I can get orders from queryClient and check them to see if a payment belongs to this user or not

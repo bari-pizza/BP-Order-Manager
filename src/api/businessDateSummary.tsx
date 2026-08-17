@@ -38,7 +38,7 @@ const useUpsertBusinessDaySummary = ({ queryKey }: { queryKey: string[] }) => {
 };
 
 export const useBusinessDaySummaryAPI = ({ businessDate }: { businessDate: dayjs.Dayjs }) => {
-    const queryKey = ['businessDaySummary', businessDate.format('YYYY-MM-DD')];
+    const queryKey = ['businessDaySummaries', businessDate.format('YYYY-MM-DD')];
 
     const upsert = useUpsertBusinessDaySummary({ queryKey }).mutate;
 

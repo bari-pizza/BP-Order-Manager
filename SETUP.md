@@ -44,10 +44,8 @@ Edit `.env` and add your Supabase credentials:
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
-# Test Credentials (for Playwright E2E tests)
-# Create a test user in Supabase with Manager or Admin role
-TEST_USER_EMAIL=your-test-user@example.com
-TEST_USER_PASSWORD=your-secure-test-password
+# Required for e2e seed (creates test users). Never prefix with VITE_
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Sentry (Production Error Monitoring - Optional)
 # Leave empty in development - Sentry only runs in production builds
@@ -127,7 +125,7 @@ Your application requires some initial data:
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://localhost:6309`
 
 ### Run Tests
 
@@ -135,9 +133,31 @@ The application will be available at `http://localhost:5173`
 # Unit tests
 npm run test
 
-# E2E tests (requires development server running)
-npx playwright test --project=dev
+# E2E tests (requires `npm run dev` and a seeded test database)
+npm run test:e2e
 ```
+
+Playwright runs **one worker, serially**, and only against `http://localhost:6309` by default. Production is opt-in.
+
+To run against production (wipes **today's** live orders):
+
+```bash
+PLAYWRIGHT_PROD=1 npx playwright test --project=prod
+```
+
+#### E2E seed and test users
+
+Each test wipes **today's** transactional rows (`Order`, `Payment`, `CashTransfer`, `BusinessDayDrawer`, `BusinessDayDriver`, `BusinessDaySummary`) and creates these accounts if they are missing (password `testtest`):
+
+- `test.admin@gmail.com` — manager/admin (desktop login)
+- `test.driver1@gmail.com` — driver
+- `test.driver2@gmail.com` — driver
+
+Your real employees are left alone. Seed resets those three passwords every run so the tests always know them.
+
+Until there is a separate dev database, these accounts can also sign into production. Change `TEST_ACCOUNT_PASSWORD` if you want something less obvious. `test` is too short for Supabase (minimum 6 characters).
+
+Set `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` in `.env`.
 
 ### Build for Production
 

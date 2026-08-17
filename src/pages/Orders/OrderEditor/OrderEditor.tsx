@@ -4,9 +4,10 @@ import {
     Drawer,
     Driver_Drawer,
     NewOrder,
+    Order,
     Order_Payment,
     OrderOrigin,
-    OrderType,
+    Payment,
     PaymentType,
     validators,
 } from '../../../typesAndValidators';
@@ -28,31 +29,7 @@ import { motion } from 'framer-motion';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { useSession } from '../../../hooks/data/useSession';
 import { useDrivers } from '../../../hooks/data/useDrivers';
-
-const isValidDrawer = (
-    drawer: Drawer | null,
-    is_third_party: boolean,
-    order_type: OrderType,
-    driverDrawerID?: string,
-) => {
-    if (!drawer) return true;
-    const { drawer_type } = drawer;
-
-    if (driverDrawerID) return drawer.drawer_id === driverDrawerID;
-
-    if (order_type === 'delivery' && drawer_type === 'driver') {
-        return true;
-    }
-    if (order_type === 'pickup') {
-        if (is_third_party && drawer_type === 'third_party') {
-            return true;
-        }
-        if (!is_third_party && drawer_type === 'register') {
-            return true;
-        }
-    }
-    return false;
-};
+import { isValidDrawer } from '../../../utils';
 
 const paymentTypes: { value: PaymentType; label: string }[] = [
     {
@@ -110,7 +87,7 @@ export const OrderEditor = ({
 
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
-        const defaultOrigin = origins.find((o) => o.name === 'Bari Pizza') || origins[0];
+        const defaultOrigin = origins.find((origin) => !origin.is_third_party && !origin.is_deleted) || origins[0];
         return {
             business_date: businessDate.format('YYYY-MM-DD'),
             last_updated_by: profile?.id,
@@ -134,18 +111,51 @@ export const OrderEditor = ({
         reset,
         watch,
         setValue,
+        getValues,
     } = useForm<FormValues>({
         defaultValues: forNewOrder ? defaultNewOrder : order,
         reValidateMode: 'onChange',
     });
 
-    // const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
     const createNewOrderMutation = useMutation({
         mutationFn: createNewOrder,
-        onSuccess: (data) => {
-            close();
-            reset();
+        onSuccess: (created) => {
+            const createdOrder = (Array.isArray(created) ? created[0] : created) as Order_Payment;
+            const dateKey = businessDate.format('YYYY-MM-DD');
+            const createdPayments = createdOrder.payments ?? [];
+            const { payments: _payments, ...orderRow } = createdOrder;
+
+            queryClient.setQueryData(['orders', dateKey], (current: Order[] | undefined) => {
+                const list = current ?? [];
+                if (!orderRow.order_id || list.some((order) => order.order_id === orderRow.order_id)) {
+                    return list;
+                }
+                return [...list, orderRow];
+            });
+            if (createdPayments.length > 0) {
+                queryClient.setQueryData(['payments', dateKey], (current: Payment[] | undefined) => {
+                    const list = current ?? [];
+                    const existingIds = new Set(list.map((payment) => payment.payment_id));
+                    return [...list, ...createdPayments.filter((payment) => !existingIds.has(payment.payment_id))];
+                });
+            }
+
+            const values = getValues();
+            const usedNumber = Number(values.order_number);
+            reset({
+                ...defaultNewOrder,
+                origin_id: values.origin_id,
+                order_type: values.order_type,
+                drawer_id: values.drawer_id,
+                initial_payment_type:
+                    'initial_payment_type' in values ? values.initial_payment_type : defaultNewOrder.initial_payment_type,
+                order_number: Number.isFinite(usedNumber) && usedNumber > 0 ? usedNumber + 1 : null,
+                order_name: null,
+                phone: null,
+                total_in_cents: 0,
+            });
         },
 
         onError: (error) => {

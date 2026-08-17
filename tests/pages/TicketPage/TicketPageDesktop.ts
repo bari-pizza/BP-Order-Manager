@@ -1,4 +1,4 @@
-import { Locator, Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { TicketPageBase } from './TicketPageBase';
 
 export class TicketPageDesktop extends TicketPageBase {
