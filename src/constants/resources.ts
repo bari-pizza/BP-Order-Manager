@@ -1,6 +1,13 @@
 import { Resource } from '../typesAndValidators';
 
+export const IN_HOUSE_ORIGIN_RESOURCE_TITLE = 'Bari Pizza';
+
 export const REQUIRED_RESOURCES: Array<Resource & { description: string }> = [
+    {
+        title: IN_HOUSE_ORIGIN_RESOURCE_TITLE,
+        src: null,
+        description: 'Logo for in-house Bari Pizza orders on tickets.',
+    },
     {
         title: 'Register',
         src: null,

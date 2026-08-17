@@ -23,6 +23,9 @@ export const CloseBusinessDayCard = () => {
     const openOrders: Order[] = [];
 
     combinedDrawersAndDrivers.forEach((drawer) => {
+        if (drawer.drawer_type === 'unassigned' || drawer.name === 'Unassigned') {
+            return;
+        }
         if (!summaries.byDrawerID(drawer.drawer_id)?.is_locked) {
             openDrawers.push(drawer);
         }

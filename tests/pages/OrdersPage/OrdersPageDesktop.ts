@@ -1,5 +1,5 @@
-import { Browser, BrowserContext, Locator, Page } from '@playwright/test';
-import { OrderData } from '../../utils/data';
+import { expect, type Browser, type BrowserContext, type Locator, type Page } from '@playwright/test';
+import type { OrderData } from '../../utils/data';
 import { faker } from '@faker-js/faker/locale/en_US';
 import { OrdersPageBase } from './OrdersPageBase';
 import { TicketPageDesktop } from '../TicketPage/TicketPageDesktop';
@@ -16,8 +16,13 @@ export class OrdersPageDesktop extends OrdersPageBase {
     }
 
     async clickAddOrder() {
-        await this.page.locator('.MuiButton-contained:has-text("Add Order")').isVisible();
-        await this.page.locator('.MuiButton-contained:has-text("Add Order")').click();
+        const editor = this.page.locator('.order-editor');
+        if (await editor.isVisible()) {
+            return;
+        }
+        await expect(this.page.locator('#add-order-button')).toBeVisible({ timeout: 15_000 });
+        await this.page.locator('#add-order-button').click();
+        await expect(editor).toBeVisible();
     }
 
     async getDriverCount() {
@@ -52,7 +57,7 @@ export class OrdersPageDesktop extends OrdersPageBase {
         }
 
         await drawerLocator.click({ timeout: 5000, delay: 100 });
-        await this.page.waitForTimeout(1000);
+        await this.page.waitForTimeout(200);
     }
 
     async rightClickDrawer(drawerLocator: Locator | null) {
@@ -88,40 +93,54 @@ export class OrdersPageDesktop extends OrdersPageBase {
     }
 
     async assignAllOrdersToRandomDrawers() {
-        // make sure we're on unassigned orders
-        const unassignedDrawer = await this.getDrawer('Unassigned');
-        const thirdPartyDrawer = await this.getDrawer('Third Party Pickup');
-        const registerDrawer1 = await this.getDrawer('Drawer 1');
-        const registerDrawer2 = await this.getDrawer('Drawer 2');
-        const driverCount = await this.getDriverCount();
-        const driverDrawers: Locator[] = [];
-        for (let i = 0; i < driverCount; i++) {
-            const driverDrawer = await this.getDrawer(i + 4);
-            driverDrawers.push(driverDrawer);
-        }
+        const unassignedDrawer = this.page.locator('.drawer-card-button-unassigned').first();
+        const thirdPartyDrawers = this.page.locator('.drawer-card-button-third_party');
+        const registerDrawers = this.page.locator('.drawer-card-button-register');
+        const driverDrawers = this.page.locator('.drawer-card-button-driver');
+        const registerCount = await registerDrawers.count();
+        const driverCount = await driverDrawers.count();
+        const thirdPartyCount = await thirdPartyDrawers.count();
+
         await this.clickDrawer(unassignedDrawer);
 
         let orderTicketsCount = await this.page.locator('.order-ticket').count();
         while (orderTicketsCount > 0) {
             const { lastTicket, orderData } = await this.ticketPage.getLastTicketAndOrder();
             const { orderType, origin } = orderData;
+            const ticketLabel = orderData.orderNumber
+                ? `Order #${orderData.orderNumber}`
+                : orderData.orderName || 'ticket';
+            const ticket = this.page.locator('.order-ticket').filter({ hasText: ticketLabel }).first();
             await this.ticketPage.toggleTicketSelection(lastTicket);
+
             if (orderType === 'pickup') {
                 if (origin.is_third_party) {
-                    await this.clickDrawer(thirdPartyDrawer);
-                } else {
-                    const randomDrawer = faker.number.int({ min: 1, max: 2 });
-                    if (randomDrawer === 1) {
-                        await this.clickDrawer(registerDrawer1);
-                    } else if (randomDrawer === 2) {
-                        await this.clickDrawer(registerDrawer2);
+                    if (thirdPartyCount === 0) {
+                        throw new Error(`No third-party drawer to assign ${ticketLabel}`);
                     }
+                    await this.clickDrawer(thirdPartyDrawers.nth(faker.number.int({ min: 0, max: thirdPartyCount - 1 })));
+                } else {
+                    if (registerCount === 0) {
+                        throw new Error(`No register drawer to assign ${ticketLabel}`);
+                    }
+                    await this.clickDrawer(registerDrawers.nth(faker.number.int({ min: 0, max: registerCount - 1 })));
                 }
             } else {
-                if (driverCount === 0) return;
-                const driverIndex = faker.number.int({ min: 0, max: driverCount - 1 });
-                await this.clickDrawer(driverDrawers[driverIndex]);
+                if (driverCount === 0) {
+                    throw new Error(`No driver drawer to assign ${ticketLabel}`);
+                }
+                await this.clickDrawer(driverDrawers.nth(faker.number.int({ min: 0, max: driverCount - 1 })));
             }
+
+            const errorToast = this.page.locator('.Toastify__toast--error');
+            await Promise.race([
+                ticket.waitFor({ state: 'hidden', timeout: 15_000 }),
+                errorToast.waitFor({ state: 'visible', timeout: 15_000 }),
+            ]).catch(() => undefined);
+            if (await errorToast.isVisible()) {
+                throw new Error(`Assign ${ticketLabel} failed: ${await errorToast.innerText()}`);
+            }
+            await expect(ticket).toBeHidden({ timeout: 5_000 });
             await this.clickDrawer(unassignedDrawer);
             orderTicketsCount = await this.page.locator('.order-ticket').count();
         }
@@ -144,6 +163,11 @@ export class OrdersPageDesktop extends OrdersPageBase {
     async assignOrders() {
         this.logInfo(`Manager assigning orders to random drawers`);
         await this.navigateToOrders();
+        const editor = this.page.locator('.order-editor');
+        if (await editor.isVisible()) {
+            await editor.getByRole('button', { name: 'Cancel' }).click();
+            await expect(editor).toBeHidden({ timeout: 10_000 });
+        }
         await this.assignAllOrdersToRandomDrawers();
     }
 }

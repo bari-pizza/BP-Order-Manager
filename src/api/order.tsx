@@ -130,10 +130,13 @@ const addOrdersToDrawer: SupabaseRPCInteractor<{ orderIDs: string[]; drawerID: s
     orderIDs,
     drawerID,
 }) => {
-    const { data } = await supaClient.rpc('add_orders_to_drawer', {
+    const { data, error } = await supaClient.rpc('add_orders_to_drawer', {
         p_drawer_id: drawerID,
         p_order_ids: orderIDs,
     });
+    if (error) {
+        throw error;
+    }
 
     return data as unknown as RPCPayload;
 };

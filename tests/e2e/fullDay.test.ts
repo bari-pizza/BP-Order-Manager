@@ -1,47 +1,39 @@
 import { test } from '@playwright/test';
 import { CombinedPages } from '../pages/OrdersPage/CombinedOrdersPages';
 import { Logger } from '../utils/Logger';
+import { getSeededDriverNames, seedBusinessDate, wipeBusinessDate } from '../utils/seed';
+import { getManagerCredentials } from '../utils/testAccounts';
+import { BasePage } from '../pages/BasePage/BasePage';
 
-let combinedPages: CombinedPages;
+test.describe('Full business day', () => {
+    test.describe.configure({ mode: 'serial' });
 
-// npx playwright test
+    test.beforeAll(async () => {
+        Logger.startLog();
+        Logger.setLogLevel('debug');
+        await seedBusinessDate();
+    });
 
-test.beforeAll(async () => {
-    Logger.startLog();
-    Logger.setLogLevel('debug');
-    combinedPages = await CombinedPages.create();
-    
-    const testEmail = process.env.TEST_USER_EMAIL;
-    const testPassword = process.env.TEST_USER_PASSWORD;
-    
-    if (!testEmail || !testPassword) {
-        throw new Error('TEST_USER_EMAIL and TEST_USER_PASSWORD must be set in .env file');
-    }
-    
-    await combinedPages.loginWithCredentials(testEmail, testPassword);
+    test.afterAll(async () => {
+        await wipeBusinessDate();
+    });
+
+    test('End-to-end flow for managing a business day', async ({ page, context, browser }) => {
+        test.setTimeout(1000 * 60 * 15);
+        BasePage.todaysDrivers = [];
+        CombinedPages.resetGeneratedOrders();
+
+        const combinedPages = new CombinedPages(page, context, browser);
+        const { email, password } = getManagerCredentials();
+        await combinedPages.loginWithCredentials(email, password);
+        await combinedPages.addDriversToDay(getSeededDriverNames());
+        await combinedPages.initMobileBrowsers();
+        await combinedPages.addMockOrders(20, 40);
+        await combinedPages.assignOrders();
+        await combinedPages.addMockTips();
+        await combinedPages.closeAllDrawers();
+        await combinedPages.closeDay();
+        await combinedPages.quitMobileBrowsers();
+        await Logger.openLogFile();
+    });
 });
-
-test.afterAll(async () => {
-    // Close all browsers after all tests
-    await combinedPages.quitAllBrowsers();
-});
-
-test.only('End-to-end flow for managing a business day', async () => {
-    test.setTimeout(1000 * 60 * 15);
-    // add these methods to combined pages to make them prettier
-    // maybe set managerPage and ordersPageMobile to protected
-    await combinedPages.addDriversToDay(['Faker Test', 'Cedrick Catalan']);
-    await combinedPages.initMobileBrowsers();
-    await combinedPages.addMockOrders(20, 40);
-    await combinedPages.assignOrders();
-    await combinedPages.addMockTips();
-    await combinedPages.closeAllDrawers();
-    await combinedPages.closeDay();
-    Logger.openLogFile();
-});
-
-// check that the UI matches the end state
-// [ ] - all drawers are locked
-// [ ] - all drivers have zero balance
-// [ ] - show business day summary button
-// [ ] - all orders should be locked

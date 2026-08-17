@@ -1,7 +1,8 @@
-import { Browser, BrowserContext, Page, expect } from '@playwright/test';
+import { expect, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { Logger } from '../../utils/Logger';
 import dayjs from 'dayjs';
-import { Order } from '../../../src/typesAndValidators';
+import type { Order } from '../../../src/typesAndValidators';
+import { loginAs } from '../../utils/login';
 export abstract class BasePage {
     protected page: Page;
     protected context: BrowserContext;
@@ -23,6 +24,18 @@ export abstract class BasePage {
     async quitBrowser() {
         await this.context.close();
         await this.browser.close();
+    }
+
+    async reload() {
+        await this.page.reload({ waitUntil: 'domcontentloaded' });
+    }
+
+    async waitForToastsToClear(timeout = 8_000) {
+        const overlay = this.page.locator('.Toastify .MuiBox-root, .Toastify__toast');
+        if ((await overlay.count()) === 0) {
+            return;
+        }
+        await overlay.first().waitFor({ state: 'hidden', timeout }).catch(() => undefined);
     }
 
     initMockedCreatedAt() {
@@ -164,11 +177,12 @@ export abstract class BasePage {
 
     protected async navigateToHref(href: string) {
         // check if already on the right page
-        if (this.page.url() === href) return;
+        const pathname = new URL(this.page.url()).pathname;
+        if (pathname === href) return;
         const link = this.page.locator(`a[href="${href}"]`);
         await expect(link).toBeVisible();
         await link.click();
-        await expect(this.page).toHaveURL(href);
+        await expect(this.page).toHaveURL(new RegExp(`${href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\?|$)`));
         Logger.logDebug(`Navigated to ${href}`);
         await this.page.mouse.move(0, 0);
     }
@@ -184,19 +198,7 @@ export abstract class BasePage {
     }
 
     async loginWithCredentials(email: string, password: string) {
-        await this.page.goto('/login');
-
-        const emailInput = this.page.locator('input[name="email"]');
-        const passwordInput = this.page.locator('input[name="password"]');
-        const loginButton = this.page.locator('button:has-text("Sign In")');
-
-        await expect(emailInput).toBeVisible();
-        await expect(passwordInput).toBeVisible();
-        await expect(loginButton).toBeVisible();
-
-        await emailInput.fill(email);
-        await passwordInput.fill(password);
-        await loginButton.click();
+        await loginAs(this.page, email, password);
         Logger.logInfo(`Logged in as ${email}`);
     }
 

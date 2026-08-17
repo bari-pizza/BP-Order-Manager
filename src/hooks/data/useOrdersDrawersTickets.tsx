@@ -19,7 +19,9 @@ import { useCashTransferAPI } from '../../api/cashTransfer';
 import { useBusinessDaySummaryAPI } from '../../api/businessDateSummary';
 import { useDocumentTitle } from 'usehooks-ts';
 import { useQueryClient } from '@tanstack/react-query';
-import { sortOrders } from '../../utils';
+import { isValidDrawer, sortOrders } from '../../utils';
+import { useBariPizzaContext } from './useContextData';
+import { toast } from '../../toast/toastWrapper';
 
 const unassignedDrawer: Drawer = {
     drawer_id: 'unassigned',
@@ -78,6 +80,7 @@ const unassignedDrawer: Drawer = {
 export const useOrdersDrawersTickets = () => {
     // COMPLETED useSubscribeToTable
     const [businessDate] = useBusinessDate();
+    const { origins } = useBariPizzaContext();
     const { businessDaySummaryAPI } = useBusinessDaySummaryAPI({ businessDate }); // const { data: initialBusinessDaySummary } = businessDaySummaryAPI.getToday;
     // const businessDaySummary = useSubscribeToTable<BusinessDaySummary>({
     // useSubscribeToTable<BusinessDaySummary>({
@@ -204,15 +207,47 @@ export const useOrdersDrawersTickets = () => {
 
     const putTicketsInDrawer = (drawer: Drawer | Driver_Drawer) => {
         const drawerID = drawer.drawer_id;
+        const validOrderIDs: string[] = [];
+        const invalidOrderIDs: string[] = [];
+
+        for (const orderID of selectedTickets) {
+            const order = allOrderPayments.find((row) => row.order_id === orderID);
+            const origin = origins.find((row) => row.origin_id === order?.origin_id);
+            if (order && origin && isValidDrawer(drawer, origin.is_third_party, order.order_type)) {
+                validOrderIDs.push(orderID);
+            } else {
+                invalidOrderIDs.push(orderID);
+            }
+        }
+
+        if (invalidOrderIDs.length > 0) {
+            const drawerHint =
+                drawer.drawer_type === 'third_party'
+                    ? 'Only third-party pickups can go in Third Party'
+                    : drawer.drawer_type === 'driver'
+                      ? 'Only deliveries can go to a driver'
+                      : 'Only in-house pickups can go to a register';
+            toast.error(
+                invalidOrderIDs.length === selectedTickets.length
+                    ? drawerHint
+                    : `${invalidOrderIDs.length} order(s) skipped. ${drawerHint}`,
+            );
+        }
+
+        if (validOrderIDs.length === 0) {
+            setHandlingDrawerClick(false);
+            return;
+        }
+
         const handleSuccess = (response: RPCPayload['data']) => {
             const unsuccessfulOrderIDs = response?.failures.flatMap((failure) => Object.keys(failure)) || [];
-            setSelectedTickets(unsuccessfulOrderIDs);
+            setSelectedTickets([...new Set([...unsuccessfulOrderIDs, ...invalidOrderIDs])]);
             setHandlingDrawerClick(false);
         };
         const handleFailure = () => {
             setHandlingDrawerClick(false);
         };
-        orderAPI.addOrdersToDrawer({ drawerID, orderIDs: selectedTickets, handleSuccess, handleFailure });
+        orderAPI.addOrdersToDrawer({ drawerID, orderIDs: validOrderIDs, handleSuccess, handleFailure });
     };
 
     const removeTicketsFromDrawer = () => {

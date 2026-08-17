@@ -1,7 +1,36 @@
 import { decomposeColor } from '@mui/material';
-import { Drawer, Driver_Drawer, Order_Payment } from './typesAndValidators';
+import type { Drawer, Driver_Drawer, Order_Payment, OrderType } from './typesAndValidators';
 import dayjs from 'dayjs';
 import { cloneElement, isValidElement } from 'react';
+
+export const isValidDrawer = (
+    drawer: Drawer | Driver_Drawer | null,
+    is_third_party: boolean,
+    order_type: OrderType,
+    driverDrawerID?: string,
+) => {
+    if (!drawer) {
+        return true;
+    }
+    const { drawer_type } = drawer;
+
+    if (driverDrawerID) {
+        return drawer.drawer_id === driverDrawerID;
+    }
+
+    if (order_type === 'delivery' && drawer_type === 'driver') {
+        return true;
+    }
+    if (order_type === 'pickup') {
+        if (is_third_party && drawer_type === 'third_party') {
+            return true;
+        }
+        if (!is_third_party && drawer_type === 'register') {
+            return true;
+        }
+    }
+    return false;
+};
 
 export const getDrawerFullName = (drawer: Drawer | Driver_Drawer | null) => {
     if (!drawer) {

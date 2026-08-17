@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { OriginsTable } from '../Tables/OriginsTable';
 import { Controller, useForm } from 'react-hook-form';
@@ -48,7 +48,10 @@ export const OriginsTab = () => {
 
     const onSubmit = async (data: FormValues) => {
         toastRef.current = toast.loading(`Adding origin: ${data.name}`);
-        const { error } = await supaClient.from('OrderOrigin').insert({ name: data.name });
+        const { error } = await supaClient.from('OrderOrigin').insert({
+            name: data.name,
+            is_third_party: true,
+        });
         if (error) {
             toast.update(toastRef.current, {
                 render: error.message,
@@ -68,10 +71,14 @@ export const OriginsTab = () => {
         close();
     };
 
-    const sortedOrigins = [...origins].sort(sortOrigins);
+    const sortedOrigins = [...origins].filter((origin) => origin.is_third_party).sort(sortOrigins);
 
     return (
         <Stack direction="column" alignItems={'center'} gap={2} height="100%">
+            <Typography variant="body2" color="text.secondary" align="center" px={2}>
+                Third-party platforms (DoorDash, Uber Eats, and so on). Bari Pizza is the in-house origin and is not
+                listed here.
+            </Typography>
             <OriginsTable origins={sortedOrigins} />
             <Button onClick={open} variant="contained">
                 Add New Order Origin

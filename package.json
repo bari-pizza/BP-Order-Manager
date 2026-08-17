@@ -11,6 +11,7 @@
     "messages_combine": "node src/rickcedlib/scripts/combineMessages.js",
     "dev": "vite --host",
     "test": "vitest",
+    "test:e2e": "playwright test --project=dev",
     "generate": "npx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
     "build": "tsc -b && vite build",
     "check": "tsc -b",

@@ -1,4 +1,4 @@
-import { Tables } from './supabase';
+import type { Tables } from './supabase';
 
 type ValueOf<Obj> = Obj[keyof Obj];
 type OneOnly<Obj, Key extends keyof Obj> = { [key in Exclude<keyof Obj, Key>]: null } & Pick<Obj, Key>;

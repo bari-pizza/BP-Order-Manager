@@ -1,9 +1,10 @@
-import { Browser, BrowserContext, chromium, devices, Page } from '@playwright/test';
+import { chromium, devices, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { BasePage } from '../BasePage/BasePage';
 import { OrdersPageDesktop } from './OrdersPageDesktop';
 import { OrdersPageMobile } from './OrdersPageMobile';
 import { faker } from '@faker-js/faker/locale/en_US';
 import { ManagerPage } from '../Desktop/ManagerPage';
+import { passwordForEmail } from '../../utils/testAccounts';
 
 const iPhone = devices['iPhone 11']; // Mobile emulation for iPhone 11
 
@@ -20,9 +21,18 @@ export class CombinedPages {
         this.mobileOrdersPages = [];
     }
 
+    static resetGeneratedOrders() {
+        CombinedPages.currentOrderNumber = 0;
+        CombinedPages.generatedNames = new Set();
+    }
+
     static async create() {
-        const desktopBrowser = await chromium.launch(); // or `chromium.launch({ headless: false })` for a visible browser
-        const desktopContext = await desktopBrowser.newContext();
+        const baseURL = String(test.info().project.use.baseURL || 'http://localhost:6309');
+        const desktopBrowser = await chromium.launch({ headless: false });
+        const desktopContext = await desktopBrowser.newContext({
+            baseURL,
+            viewport: { width: 1280, height: 720 },
+        });
         const desktopPage = await desktopContext.newPage();
         return new CombinedPages(desktopPage, desktopContext, desktopBrowser);
     }
@@ -50,39 +60,24 @@ export class CombinedPages {
     }
 
     async initMobileBrowsers() {
-        const testPassword = process.env.TEST_USER_PASSWORD;
-        
-        if (!testPassword) {
-            throw new Error('TEST_USER_PASSWORD must be set in .env file');
-        }
-        
+        const baseURL = String(test.info().project.use.baseURL || 'http://localhost:6309');
         for (const driver of BasePage.todaysDrivers) {
             const mobileBrowser = await chromium.launch({ headless: false });
             const mobileContext = await mobileBrowser.newContext({
                 ...iPhone,
+                baseURL,
             });
             const mobilePage = await mobileContext.newPage();
             const ordersPageMobile = new OrdersPageMobile(mobilePage, mobileContext, mobileBrowser, this, driver);
-            await ordersPageMobile.loginWithCredentials(driver.email, testPassword);
+            await ordersPageMobile.loginWithCredentials(driver.email, passwordForEmail(driver.email));
+            await ordersPageMobile.waitForToastsToClear();
             this.mobileOrdersPages.push(ordersPageMobile);
         }
     }
 
     async addMockOrders(min = 8, max = 15) {
-        // randomly choose a mobileOrdersPage or a desktopOrdersPage
-        const mockOrders = faker.number.int({ min: min, max: max });
-        const weightedIndexWeights: { weight: number; value: OrdersPageDesktop | OrdersPageMobile }[] = [];
-        const mobileBrowserWeight = 0.5 / this.mobileOrdersPages.length;
-        this.mobileOrdersPages.forEach((ordersPage) => {
-            weightedIndexWeights.push({ weight: mobileBrowserWeight, value: ordersPage });
-        });
-        weightedIndexWeights.push({ weight: 0.5, value: this.desktopOrdersPage });
-        this.desktopOrdersPage.logInfo(weightedIndexWeights.map((w) => w.weight).join('+'));
-        for (let i = 0; i < mockOrders; i++) {
-            const ordersPage = faker.helpers.weightedArrayElement(weightedIndexWeights);
-
-            await ordersPage.addMockOrder();
-        }
+        // Desktop-only until BAR-13: login/realtime toasts cover the phone Speed Dial.
+        await this.desktopOrdersPage.addMockOrders(min, max);
     }
 
     async addDriversToDay(drivers: string[]) {
@@ -111,10 +106,19 @@ export class CombinedPages {
         await this.desktopOrdersPage.loginWithCredentials(email, password);
     }
 
-    async quitAllBrowsers() {
+    async reloadDesktop() {
+        await this.managerPage.reload();
+    }
+
+    async quitMobileBrowsers() {
         for (const ordersPage of this.mobileOrdersPages) {
             await ordersPage.quitBrowser();
         }
+        this.mobileOrdersPages = [];
+    }
+
+    async quitAllBrowsers() {
+        await this.quitMobileBrowsers();
         await this.desktopOrdersPage.quitBrowser();
     }
 }

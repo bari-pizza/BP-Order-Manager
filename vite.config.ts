@@ -21,6 +21,14 @@ export default defineConfig({
     define: {
         BUILD_DATE: JSON.stringify(dayjs().format('YYYY-MM-DD')),
     },
+    server: {
+        port: 6309,
+        strictPort: true,
+    },
+    preview: {
+        port: 6310,
+        strictPort: true,
+    },
     plugins: [
         paraglideVitePlugin({
             project: './project.inlang',

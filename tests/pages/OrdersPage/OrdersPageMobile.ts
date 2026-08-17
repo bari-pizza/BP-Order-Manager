@@ -1,4 +1,4 @@
-import { Browser, BrowserContext, Locator, Page } from '@playwright/test';
+import { expect, type Browser, type BrowserContext, type Locator, type Page } from '@playwright/test';
 import { OrdersPageBase } from './OrdersPageBase';
 import { TicketPageMobile } from '../TicketPage/TicketPageMobile';
 import { formatCurrency } from '../../../src/utils';
@@ -27,12 +27,17 @@ export class OrdersPageMobile extends OrdersPageBase {
     }
 
     async clickAddOrder() {
-        await this.page.waitForTimeout(500); // couldnt get this to work without the timeout
-        if (!(await this.addOrderButton.isVisible())) {
-            await this.speedDial.click();
+        const editor = this.page.locator('.order-editor');
+        if (await editor.isVisible()) {
+            return;
         }
-        await this.addOrderButton.click();
-        await this.page.waitForTimeout(500);
+        await this.waitForToastsToClear();
+        if (!(await this.speedDialExpanded.isVisible())) {
+            await this.speedDial.tap();
+            await expect(this.speedDialExpanded).toBeVisible({ timeout: 10_000 });
+        }
+        await this.page.getByRole('menuitem', { name: 'Add Order' }).tap();
+        await expect(editor).toBeVisible({ timeout: 10_000 });
     }
 
     async createOrders(min: number, max: number) {
@@ -40,6 +45,12 @@ export class OrdersPageMobile extends OrdersPageBase {
     }
 
     async addTipsToAllOrders() {
+        await this.waitForToastsToClear();
+        await this.page.evaluate(() => {
+            document.querySelectorAll('.Toastify').forEach((el) => {
+                (el as HTMLElement).style.pointerEvents = 'none';
+            });
+        });
         const orderTicketsCount = await this.page.locator('.order-ticket').count();
         for (let i = 0; i < orderTicketsCount; i++) {
             const tip = OrdersPageBase.generateRandomTip();
