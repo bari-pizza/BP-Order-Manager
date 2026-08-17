@@ -42,8 +42,15 @@ CREATE TABLE "Driver" (
 CREATE TABLE "OrderOrigin" (
     origin_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name text NOT NULL UNIQUE,
+    icon text,
     logo_src text,
     color text,
+    can_deliver boolean DEFAULT false NOT NULL,
+    can_tip boolean DEFAULT false NOT NULL,
+    has_order_number boolean DEFAULT false NOT NULL,
+    default_is_prepaid boolean DEFAULT false NOT NULL,
+    is_prepaid_toggleable boolean DEFAULT false NOT NULL,
+    is_third_party boolean DEFAULT false NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     created_at timestamptz DEFAULT now()
 );
