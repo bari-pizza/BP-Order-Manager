@@ -64,20 +64,39 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         return rows.filter((row) => dirtyRowIds.has(row.origin_id));
     };
 
+    const rowsMatch = (a: OriginRow, b: OriginRow) => JSON.stringify(a) === JSON.stringify(b);
+
     const handleCellEdit = (newRow: OriginRow) => {
         const currentRow = rows.find((row) => row.origin_id === newRow.origin_id);
-        if (currentRow && JSON.stringify(currentRow) === JSON.stringify(newRow)) {
+        if (!currentRow || rowsMatch(currentRow, newRow)) {
             return newRow;
         }
 
-        const originalRow = originalRows.get(newRow.origin_id);
-
-        if (!originalRow && currentRow) {
-            setOriginalRows((prev) => new Map(prev.set(newRow.origin_id, currentRow)));
-        }
+        const originalRow = originalRows.get(newRow.origin_id) ?? currentRow;
+        const isBackToOriginal = rowsMatch(originalRow, newRow);
 
         setRows((prev) => prev.map((row) => (row.origin_id === newRow.origin_id ? newRow : row)));
-        setDirtyRowIds((prev) => new Set(prev.add(newRow.origin_id)));
+
+        if (isBackToOriginal) {
+            setDirtyRowIds((prev) => {
+                const next = new Set(prev);
+                next.delete(newRow.origin_id);
+                return next;
+            });
+            setOriginalRows((prev) => {
+                const next = new Map(prev);
+                next.delete(newRow.origin_id);
+                return next;
+            });
+        } else {
+            setOriginalRows((prev) => {
+                if (prev.has(newRow.origin_id)) {
+                    return prev;
+                }
+                return new Map(prev.set(newRow.origin_id, currentRow));
+            });
+            setDirtyRowIds((prev) => new Set(prev.add(newRow.origin_id)));
+        }
 
         return newRow;
     };
