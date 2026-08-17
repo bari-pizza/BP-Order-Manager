@@ -16,6 +16,7 @@ import { z } from 'zod';
 import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
 import { PostgrestError } from '@supabase/supabase-js';
+import { REQUIRED_RESOURCES, mergeResourcesWithDefaults } from './constants/resources';
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -103,10 +104,23 @@ export const getAllOrigins = async () => {
 export const getAllResources = async () => {
     const { data, error } = await supaClient.from('Resource').select('*');
     if (error) {
-        return [] as Resource[];
+        return mergeResourcesWithDefaults([]);
     }
 
-    return data as unknown as Resource[];
+    const existing = (data ?? []) as Resource[];
+    const existingTitles = new Set(existing.map((resource) => resource.title));
+    const missing = REQUIRED_RESOURCES.filter((resource) => !existingTitles.has(resource.title)).map(
+        ({ title, src }) => ({ title, src }),
+    );
+
+    if (missing.length > 0) {
+        const { data: inserted } = await supaClient.from('Resource').insert(missing).select('*');
+        if (inserted) {
+            return mergeResourcesWithDefaults([...(existing), ...(inserted as Resource[])]);
+        }
+    }
+
+    return mergeResourcesWithDefaults(existing);
 };
 
 export const getAllAppSettings = async () => {

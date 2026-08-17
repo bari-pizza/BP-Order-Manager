@@ -3,7 +3,13 @@ import { useTheme } from '@mui/material/styles';
 import { Checkbox, Box } from '@mui/material';
 import { GridRenderCellParams, GridRenderEditCellParams } from '@mui/x-data-grid';
 
-export const CellCheckbox = ({ params }: { params: GridRenderCellParams }) => {
+export const CellCheckbox = ({
+    params,
+    onChange,
+}: {
+    params: GridRenderCellParams;
+    onChange?: () => void;
+}) => {
     return (
         <Box
             sx={{
@@ -15,7 +21,11 @@ export const CellCheckbox = ({ params }: { params: GridRenderCellParams }) => {
                     width: '100%',
                 },
             }}>
-            <Checkbox checked={!!params.value} />
+            <Checkbox
+                checked={!!params.value}
+                onChange={onChange}
+                onClick={(event) => event.stopPropagation()}
+            />
         </Box>
     );
 };
