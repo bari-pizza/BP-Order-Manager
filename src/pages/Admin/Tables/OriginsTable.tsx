@@ -8,7 +8,6 @@ import {
 import { OrderOrigin } from '../../../typesAndValidators';
 import { CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
 import { LogoUploader } from '../LogoUploader';
-import { useOrderOriginCRUD } from '../../../api/orderOrigin';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { Id, toast } from '../../../toast/toastWrapper';
 import { supaClient } from '../../../supaClient';
@@ -57,7 +56,6 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
     const [dirtyRowIds, setDirtyRowIds] = useState<Set<GridRowId>>(new Set());
     const [originalRows, setOriginalRows] = useState<Map<GridRowId, OriginRow>>(new Map());
     const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>([]);
-    const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['origins'] });
     const toastRef = useRef<Id>('');
 
     const getDirtyRows = () => {
@@ -212,26 +210,44 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
         const count = dirtyRows.length;
         toastRef.current = toast.loading(`Saving ${count} change(s)...`);
 
-        const promises = dirtyRows.map((row) => orderOriginMutations.update(row));
+        const results = await Promise.all(
+            dirtyRows.map((row) =>
+                supaClient
+                    .from('OrderOrigin')
+                    .update({
+                        name: row.name,
+                        can_deliver: row.can_deliver,
+                        can_tip: row.can_tip,
+                        has_order_number: row.has_order_number,
+                        default_is_prepaid: row.default_is_prepaid,
+                        is_prepaid_toggleable: row.is_prepaid_toggleable,
+                        icon: row.icon,
+                        is_third_party: row.is_third_party,
+                    })
+                    .eq('origin_id', row.origin_id)
+                    .select('origin_id'),
+            ),
+        );
 
-        try {
-            await Promise.all(promises);
+        const errors = results.filter((result) => result.error);
+        if (errors.length > 0) {
             toast.update(toastRef.current, {
-                render: `Successfully saved ${count} change(s)`,
-                type: 'success',
-                isLoading: false,
-                autoClose: 5000,
-            });
-            setDirtyRowIds(new Set());
-            setOriginalRows(new Map());
-        } catch (error) {
-            toast.update(toastRef.current, {
-                render: `Failed to save changes`,
+                render: `Failed to save ${errors.length} change(s)`,
                 type: 'error',
                 isLoading: false,
                 autoClose: 5000,
             });
+            return;
         }
+
+        toast.update(toastRef.current, {
+            render: `Successfully saved ${count} change(s)`,
+            type: 'success',
+            isLoading: false,
+            autoClose: 5000,
+        });
+        setDirtyRowIds(new Set());
+        setOriginalRows(new Map());
     };
 
     const { handleConfirmation: confirmSave } = useConfirmationToast<OriginRow[]>({

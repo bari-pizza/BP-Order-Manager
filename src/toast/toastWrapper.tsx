@@ -39,6 +39,11 @@ export const toast = {
     dismiss: (toastId: Id) => {
         originalToast.dismiss(toastId);
     },
+    isActive: (toastId: Id) => originalToast.isActive(toastId),
+    show: (message: any, options?: any) => {
+        const newMessage = capitalizeFirstLetter(message);
+        return originalToast(newMessage, options);
+    },
     promise: (promise: any, options?: any) => {
         return originalToast.promise(promise, options);
     },
