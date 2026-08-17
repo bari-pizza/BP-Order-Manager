@@ -13,34 +13,48 @@ export const ResourcesTab = () => {
                 These are UI icons the app looks up by name (register drawers, missing avatars, add-driver, etc.). Upload
                 an image for each card. They are not a general file library.
             </Typography>
-            <Grid container direction="row" alignItems={'center'} gap={1}>
+            <Grid container spacing={1} alignItems="stretch">
                 {displayResources.map((resource) => {
                     const meta = REQUIRED_RESOURCES.find((item) => item.title === resource.title);
                     return (
-                        <Card
-                            className="lottie-icon-container"
-                            key={resource.title}
-                            sx={{
-                                width: '100%',
-                                maxWidth: 200,
-                                border: '2px solid',
-                            }}>
-                            <CardContent>
-                                <Stack
-                                    sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}
-                                    spacing={2}>
-                                    <ResourceUploader resource={resource} isAnimated />
-                                    <Typography variant="body1" component="div">
-                                        {resource.title}
-                                    </Typography>
-                                    {meta && (
-                                        <Typography variant="caption" color="text.secondary" textAlign="center">
-                                            {meta.description}
+                        <Grid item key={resource.title}>
+                            <Card
+                                className="lottie-icon-container"
+                                sx={{
+                                    width: 200,
+                                    height: 260,
+                                    border: '2px solid',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                }}>
+                                <CardContent sx={{ flex: 1, display: 'flex', p: 2, '&:last-child': { pb: 2 } }}>
+                                    <Stack
+                                        spacing={1.5}
+                                        alignItems="center"
+                                        justifyContent="flex-start"
+                                        width="100%"
+                                        height="100%">
+                                        <ResourceUploader resource={resource} isAnimated />
+                                        <Typography variant="body1" component="div" textAlign="center" minHeight={48}>
+                                            {resource.title}
                                         </Typography>
-                                    )}
-                                </Stack>
-                            </CardContent>
-                        </Card>
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            textAlign="center"
+                                            sx={{
+                                                minHeight: 60,
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 3,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden',
+                                            }}>
+                                            {meta?.description}
+                                        </Typography>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
+                        </Grid>
                     );
                 })}
             </Grid>
