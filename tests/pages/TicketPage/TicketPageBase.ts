@@ -118,20 +118,41 @@ export abstract class TicketPageBase extends BasePage {
     }
 
     async closeTicket() {
-        if (!(await this.orderEditor.isVisible())) {
+        if (!(await this.orderEditor.isVisible().catch(() => false))) {
             return;
         }
-        await this.page.keyboard.press('Escape');
-        if (await this.orderEditor.isVisible()) {
+
+        // Leave payment-edit subview first (no order-level Cancel while editing a payment).
+        const paymentEditing = this.orderEditor.locator('.payment-editor-editing-payment');
+        if (await paymentEditing.isVisible().catch(() => false)) {
+            await this.page.keyboard.press('Escape');
+            await paymentEditing.waitFor({ state: 'hidden', timeout: 5_000 }).catch(() => undefined);
+        }
+
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+            if (!(await this.orderEditor.isVisible().catch(() => false))) {
+                return;
+            }
+            await this.page.keyboard.press('Escape');
+            await this.page.waitForTimeout(150);
+        }
+
+        if (await this.orderEditor.isVisible().catch(() => false)) {
             const backdrop = this.page.locator('.MuiBackdrop-root.MuiModal-backdrop');
-            if (await backdrop.first().isVisible()) {
+            if (await backdrop.first().isVisible().catch(() => false)) {
                 await backdrop.first().click({ force: true, position: { x: 5, y: 5 } }).catch(() => undefined);
             }
         }
+
         const cancel = this.orderEditor.getByRole('button', { name: 'Cancel' });
-        if (await this.orderEditor.isVisible() && (await cancel.isEnabled())) {
+        // Short timeout: Cancel may be missing briefly during payment-edit transitions.
+        if (
+            (await this.orderEditor.isVisible().catch(() => false)) &&
+            (await cancel.isEnabled({ timeout: 1_000 }).catch(() => false))
+        ) {
             await cancel.click();
         }
+
         await expect(this.orderEditor).toBeHidden({ timeout: 10_000 });
     }
 
