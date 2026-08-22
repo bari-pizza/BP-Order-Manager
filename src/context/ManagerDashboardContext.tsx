@@ -34,6 +34,8 @@ interface ManagerDashboardProps {
         forCurrentDrawer: BusinessDayDrawerSummary | null;
         byDrawerID: (drawerID: string) => BusinessDayDrawerSummary | null;
         update: (summary: BusinessDayDrawerSummary) => void;
+        updateAsync: (summary: BusinessDayDrawerSummary) => Promise<unknown>;
+        isUpdating: boolean;
     };
     cashTransfers: {
         all: CashTransfer[];
@@ -88,6 +90,8 @@ export const ManagerDashboardContext = createContext<ManagerDashboardProps>({
         forCurrentDrawer: null,
         byDrawerID: () => null,
         update: () => {},
+        updateAsync: async () => {},
+        isUpdating: false,
     },
     cashTransfers: {
         all: [],

@@ -12,6 +12,8 @@ import { BusinessDayDrawerSummary } from '../typesAndValidators';
 import dayjs from 'dayjs';
 import { PostgrestError } from '@supabase/supabase-js';
 import { useRef } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Id, toast } from '../toast/toastWrapper';
 
 const upsertBusinessDayDrawer: SupabaseInteractor<BusinessDayDrawerSummary, BusinessDayDrawerSummary> = async (
     businessDayDrawerSummary,
@@ -66,21 +68,67 @@ const reopenBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; busines
 
 
 const useUpsertBusinessDayDrawer = ({ queryKey }: { queryKey: string[] }) => {
-    return useInteractionHandler<BusinessDayDrawerSummary, BusinessDayDrawerSummary>({
-        interactor: upsertBusinessDayDrawer,
-        queryKey,
-        getMessages: {
-            // return '' or null if no message necessary
-            pending: () => 'Saving data...',
-            success: () => `Save successful`,
-            mainError: (error) => error!.message,
-            errors: () => `Failed to save data`,
+    const queryClient = useQueryClient();
+    const toastRef = useRef<Id>('');
+
+    return useMutation({
+        mutationFn: upsertBusinessDayDrawer,
+        onMutate: async (summary: BusinessDayDrawerSummary) => {
+            toastRef.current = toast.loading('Saving data...');
+            await queryClient.cancelQueries({ queryKey });
+            const previous = queryClient.getQueryData<BusinessDayDrawerSummary[]>(queryKey);
+
+            // Optimistic: outstanding / form reset must see hours immediately, not after the round-trip.
+            queryClient.setQueryData<BusinessDayDrawerSummary[]>(queryKey, (current = []) => {
+                const index = current.findIndex(
+                    (row) => row.drawer_id === summary.drawer_id && row.business_date === summary.business_date,
+                );
+                if (index === -1) {
+                    return [...current, summary];
+                }
+                const next = [...current];
+                next[index] = { ...current[index], ...summary };
+                return next;
+            });
+
+            return { previous };
         },
-        handleSuccess: (data) => {
-            // Success callback
+        onError: (error: Error, _summary, context) => {
+            if (context?.previous) {
+                queryClient.setQueryData(queryKey, context.previous);
+            }
+            toast.update(toastRef.current, {
+                render: <div dangerouslySetInnerHTML={{ __html: error.message }} />,
+                type: 'error',
+                isLoading: false,
+                autoClose: 10000,
+                closeButton: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+            });
         },
-        handleFailure: (error) => {
-            // Failure callback
+        onSuccess: (payload) => {
+            const saved = payload.data[0];
+            if (saved) {
+                queryClient.setQueryData<BusinessDayDrawerSummary[]>(queryKey, (current = []) => {
+                    const index = current.findIndex(
+                        (row) => row.drawer_id === saved.drawer_id && row.business_date === saved.business_date,
+                    );
+                    if (index === -1) {
+                        return [...current, saved];
+                    }
+                    const next = [...current];
+                    next[index] = saved;
+                    return next;
+                });
+            }
+            queryClient.invalidateQueries({ queryKey });
+            toast.update(toastRef.current, {
+                render: 'Save successful',
+                type: 'success',
+                isLoading: false,
+                autoClose: 2000,
+            });
         },
     });
 };
@@ -174,6 +222,7 @@ export const useBusinessDayDrawerAPI = ({ businessDate }: { businessDate: dayjs.
         [key: string]: (error: PostgrestError | Error) => void;
     }>({});
     const queryKey = ['businessDayDrawerSummaries', businessDate.format('YYYY-MM-DD')];
+    const upsertBusinessDayDrawerMutation = useUpsertBusinessDayDrawer({ queryKey });
     const closeBusinessDayDrawerMutation = useCloseBusinessDayDrawer({
         queryKey,
         handleSuccessRef,
@@ -190,7 +239,9 @@ export const useBusinessDayDrawerAPI = ({ businessDate }: { businessDate: dayjs.
             // create: useCreateBusinessDayDrawerSummary({ queryKey }).mutate,
             // getAll: useGetAllBusinessDayDrawers({ businessDate }),
             // getOne: useGetOneBusinessDayDrawerSummary({ businessDate, drawerID }),
-            upsert: useUpsertBusinessDayDrawer({ queryKey }).mutate,
+            upsert: upsertBusinessDayDrawerMutation.mutate,
+            upsertAsync: upsertBusinessDayDrawerMutation.mutateAsync,
+            isUpserting: upsertBusinessDayDrawerMutation.isPending,
             close: ({
                 drawerID,
                 handleSuccess,
