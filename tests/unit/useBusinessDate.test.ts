@@ -1,6 +1,6 @@
 import { test, expect, Browser, BrowserContext, chromium } from '@playwright/test';
 import dayjs from 'dayjs';
-// import { ManagerPage } from '../pages/Desktop/ManagerPage';
+// import { ManagerPage } from '../pages/desktop/ManagerPage';
 import { OrdersPageDesktop } from '../pages/OrdersPage/OrdersPageDesktop';
 // import { OrdersPageMobile } from '../pages/OrdersPage/OrdersPageMobile';
 

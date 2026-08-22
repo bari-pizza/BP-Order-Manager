@@ -3,7 +3,7 @@ import { BasePage } from '../BasePage/BasePage';
 import { OrdersPageDesktop } from './OrdersPageDesktop';
 import { OrdersPageMobile } from './OrdersPageMobile';
 import { faker } from '@faker-js/faker/locale/en_US';
-import { ManagerPage } from '../Desktop/ManagerPage';
+import { ManagerPage } from '../desktop/ManagerPage';
 import { passwordForEmail } from '../../utils/testAccounts';
 
 const iPhone = devices['iPhone 11']; // Mobile emulation for iPhone 11
