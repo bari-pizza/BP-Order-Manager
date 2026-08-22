@@ -414,7 +414,6 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
-                getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
                 getRowId={(row) => row.origin_id}
                 getRowClassName={(params) => {
                     const isDeleted = params.row.is_deleted;
