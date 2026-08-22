@@ -7,6 +7,7 @@ import { ManagerPage } from '../Desktop/ManagerPage';
 import { passwordForEmail } from '../../utils/testAccounts';
 
 const iPhone = devices['iPhone 11']; // Mobile emulation for iPhone 11
+const isCi = !!process.env.CI;
 
 export class CombinedPages {
     private desktopOrdersPage: OrdersPageDesktop;
@@ -28,10 +29,11 @@ export class CombinedPages {
 
     static async create() {
         const baseURL = String(test.info().project.use.baseURL || 'http://localhost:6309');
-        const desktopBrowser = await chromium.launch({ headless: false });
+        const desktopBrowser = await chromium.launch({ headless: isCi });
         const desktopContext = await desktopBrowser.newContext({
             baseURL,
             viewport: { width: 1280, height: 720 },
+            ...(isCi ? { recordVideo: { dir: 'test-results/extra-videos' } } : {}),
         });
         const desktopPage = await desktopContext.newPage();
         return new CombinedPages(desktopPage, desktopContext, desktopBrowser);
@@ -62,10 +64,11 @@ export class CombinedPages {
     async initMobileBrowsers() {
         const baseURL = String(test.info().project.use.baseURL || 'http://localhost:6309');
         for (const driver of BasePage.todaysDrivers) {
-            const mobileBrowser = await chromium.launch({ headless: false });
+            const mobileBrowser = await chromium.launch({ headless: isCi });
             const mobileContext = await mobileBrowser.newContext({
                 ...iPhone,
                 baseURL,
+                ...(isCi ? { recordVideo: { dir: 'test-results/extra-videos' } } : {}),
             });
             const mobilePage = await mobileContext.newPage();
             const ordersPageMobile = new OrdersPageMobile(mobilePage, mobileContext, mobileBrowser, this, driver);

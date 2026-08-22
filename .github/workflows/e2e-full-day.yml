@@ -1,0 +1,111 @@
+name: E2E Full Day
+
+# Seeds + wipes TODAY's orders/drawers on the Supabase project in secrets.
+# Only run when you intend that. Requires repo secrets:
+#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_wipe:
+        description: 'Type wipe-today to confirm wiping today''s business date on the linked Supabase project'
+        required: true
+        type: string
+
+jobs:
+  full-day:
+    if: github.event.inputs.confirm_wipe == 'wipe-today'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      CI: true
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_ACCOUNT_PASSWORD: ${{ secrets.TEST_ACCOUNT_PASSWORD }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: cache-playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install Playwright Chromium
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps
+        if: steps.cache-playwright.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Verify secrets
+        run: |
+          missing=0
+          for key in VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
+            if [ -z "${!key}" ]; then
+              echo "::error::$key secret is not set"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Build app
+        run: npm run build
+
+      - name: Start preview on 6309
+        run: |
+          npx vite preview --host 127.0.0.1 --port 6309 > preview.log 2>&1 &
+          echo $! > preview.pid
+          for i in $(seq 1 30); do
+            if curl -sf "http://127.0.0.1:6309" >/dev/null; then
+              echo "Preview ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Preview failed to start"
+          cat preview.log
+          exit 1
+
+      - name: Run full-day e2e
+        run: npm run test:e2e:full-day
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-day-e2e-${{ github.run_id }}
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Stop preview
+        if: always()
+        run: |
+          if [ -f preview.pid ]; then
+            kill "$(cat preview.pid)" || true
+          fi

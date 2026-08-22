@@ -12,6 +12,7 @@
     "dev": "vite --host",
     "test": "vitest",
     "test:e2e": "playwright test --project=dev",
+    "test:e2e:full-day": "playwright test --project=dev tests/e2e/fullDay.test.ts",
     "generate": "npx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
     "build": "tsc -b && vite build",
     "check": "tsc -b",
