@@ -1,7 +1,8 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useUploadToast } from '../../hooks/upload/useUploadToast';
 import { BucketName, Profile } from '../../typesAndValidators';
 import { ImageUploader } from '../../components/Base/Uploader/ImageUploader';
-import { useProfileCRUD } from '../../api/profile';
+import { supaClient } from '../../supaClient';
 
 type AvatarUploaderProps = {
     profile: Profile | null;
@@ -12,7 +13,7 @@ type AvatarUploaderProps = {
 };
 
 export const AvatarUploader = ({ profile, onUpload, onSuccess, onError, disabled }: AvatarUploaderProps) => {
-    const { profileMutations } = useProfileCRUD({ queryKey: ['profile'] });
+    const queryClient = useQueryClient();
     const { startToast, successToast, errorToast } = useUploadToast({
         messages: {
             onUpload: () => 'Uploading new avatar...',
@@ -26,11 +27,33 @@ export const AvatarUploader = ({ profile, onUpload, onSuccess, onError, disabled
         startToast();
     };
 
-    const handleSuccess = (downloadURL: string) => {
+    const handleSuccess = async (downloadURL: string) => {
+        if (!profile?.id) {
+            const error = new Error('No profile to attach this avatar to');
+            onError?.(error);
+            errorToast(error);
+            return;
+        }
+
+        const { data, error } = await supaClient
+            .from('Profile')
+            .update({ avatar_src: downloadURL })
+            .eq('id', profile.id)
+            .select('id');
+
+        if (error || !data?.length) {
+            const saveError = error ?? new Error('Profile update did not save');
+            onError?.(saveError);
+            errorToast(saveError);
+            return;
+        }
+
+        queryClient.setQueryData(['profiles'], (current: Profile[] | undefined) =>
+            current?.map((row) => (row.id === profile.id ? { ...row, avatar_src: downloadURL } : row)),
+        );
+        await queryClient.invalidateQueries({ queryKey: ['profiles'] });
         onSuccess?.(downloadURL);
         successToast(downloadURL);
-        const payload = { ...profile!, avatar_src: downloadURL };
-        profileMutations.update(payload);
     };
 
     const handleError = (error: Error) => {

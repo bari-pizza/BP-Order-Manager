@@ -103,7 +103,6 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 columns={columns}
                 disableVirtualization
                 getRowId={(row) => row.order_id}
-                getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
                 getRowClassName={() => {
                     return 'lottie-icon-container';
                 }}

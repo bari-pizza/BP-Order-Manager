@@ -298,7 +298,6 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
-                getRowSpacing={() => ({ top: 5, left: 0, bottom: 10 })}
                 getRowClassName={(params) => {
                     const isDeleted = params.row.is_deleted;
                     if (isDeleted) return 'row-is-deleted';

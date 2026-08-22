@@ -10,12 +10,17 @@ const createNewProfile: SupabaseInteractor<NewProfile, Profile> = async (newProf
 };
 
 const updateProfile: SupabaseInteractor<Profile, Profile> = async (profile) => {
+    const { id, ...fields } = profile;
     const payload = (await supaClient
         .from('Profile')
-        .update([profile])
-        .eq('id', profile.id)
+        .update(fields)
+        .eq('id', id)
         .select('*')) as Payload<Profile>;
-    return handlePayload<Profile>(payload);
+    const result = handlePayload<Profile>(payload);
+    if (!result.data.length) {
+        throw new Error('Profile update did not save');
+    }
+    return result;
 };
 
 const useCreateNewProfile = ({ queryKey }: { queryKey: string[] }) => {

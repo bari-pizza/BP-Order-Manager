@@ -47,12 +47,12 @@ export const useImageUpload = ({
                 upsert: false,
             });
 
-
             if (uploadError) {
                 throw uploadError;
             }
 
-            const downloadURL = `https://vqsrmrwphnuitcxtoxqy.supabase.co/storage/v1/object/public/${bucketName}/${filePath}`;
+            const { data } = supaClient.storage.from(bucketName).getPublicUrl(filePath);
+            const downloadURL = data.publicUrl;
             setUploadedImagePath(downloadURL);
             if (onSuccess) {
                 onSuccess(downloadURL);
