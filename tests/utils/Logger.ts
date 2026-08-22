@@ -16,7 +16,9 @@ export class Logger {
 
     public static startLog() {
         const timestamp = dayjs().format('YYYY-MM-DD-HH-mm-ss');
-        Logger.filePath = path.resolve('./test-results/' + timestamp + '-' + 'test-log.html');
+        const dir = path.resolve('./test-results');
+        fs.mkdirSync(dir, { recursive: true });
+        Logger.filePath = path.resolve(dir, timestamp + '-' + 'test-log.html');
         const styleTag = `<style>body { font-family: monospace; } .error { color: red; }</style><h1>Test Log</h1>`;
         fs.writeFileSync(Logger.filePath, styleTag);
     }
@@ -122,6 +124,9 @@ export class Logger {
     public static async openLogFile() {
         const fileUrl = `${Logger.filePath.replace(/\\/g, '/')}`;
         console.log(`Open log file: ${fileUrl}`);
+        if (process.env.CI) {
+            return;
+        }
         const chromePath = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"`;
 
         // Launch Chrome with the file URL
