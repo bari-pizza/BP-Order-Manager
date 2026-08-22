@@ -22,7 +22,8 @@ export class CloseDrawerProcess {
         const saveTransfer = this.page.locator('button:has([data-testid="SaveIcon"])');
         await expect(saveTransfer).toBeVisible({ timeout: 10_000 });
 
-        const drawerInput = this.page.getByRole('dialog').getByLabel('Drawer');
+        const dialog = this.page.getByRole('dialog');
+        const drawerInput = dialog.getByLabel('Drawer');
         if (await drawerInput.isVisible().catch(() => false)) {
             const currentValue = (await drawerInput.inputValue().catch(() => '')).trim();
             if (!currentValue) {
@@ -32,6 +33,16 @@ export class CloseDrawerProcess {
                 await listbox.getByRole('option').first().click();
             }
         }
+
+        // Wait until the Amount field matches the live outstanding total (avoids saving a stale $0 / old snapshot).
+        // Outstanding is signed; the transfer amount is always abs().
+        const outstanding = dialog.getByTestId('drawer-outstanding-total');
+        await expect(outstanding).toBeVisible({ timeout: 10_000 });
+        const outstandingText = (await outstanding.innerText()).trim().replace('-', '');
+        const amountInput = dialog.getByLabel('Amount');
+        await expect
+            .poll(async () => (await amountInput.inputValue()).replace(/\s/g, ''), { timeout: 10_000 })
+            .toBe(outstandingText.replace(/\s/g, ''));
 
         await saveTransfer.click();
         await Promise.race([

@@ -50,6 +50,7 @@ export const SummaryStack = ({ items }: SummaryStackProps) => {
                             <Stack direction="row" justifyContent="right">
                                 <Typography
                                     variant="body1"
+                                    data-testid={index === items.length - 1 ? 'drawer-outstanding-total' : undefined}
                                     sx={{ fontWeight: index === items.length - 1 ? 'bold' : '' }}>
                                     {formatCurrency(runningTotals[index])}
                                 </Typography>
