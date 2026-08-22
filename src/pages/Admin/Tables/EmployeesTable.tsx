@@ -14,6 +14,7 @@ import { useMutation } from '@tanstack/react-query';
 import { CellEditCheckbox, CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
 import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
 import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
+import { ProfileAvatar } from '../../../components/Base/ProfileAvatar';
 import { Email as EmailIcon } from '@mui/icons-material';
 import { Id, toast } from '../../../toast/toastWrapper';
 import { useDataGrid } from '../../../hooks/ui/useDataGrid';
@@ -187,6 +188,18 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                 }
                 return createCellActions(id, rowModesModel, setRowModesModel, () => confirmDelete(row), is_deleted);
             },
+        },
+        {
+            field: 'avatar_src',
+            headerName: '',
+            width: 56,
+            sortable: false,
+            filterable: false,
+            disableColumnMenu: true,
+            editable: false,
+            align: 'center',
+            headerAlign: 'center',
+            renderCell: ({ row }) => <ProfileAvatar avatarSrc={row.avatar_src} size={36} />,
         },
         {
             field: 'first_name',
