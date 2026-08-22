@@ -56,7 +56,9 @@ export const DrawerSideBar = () => {
 
     const currentDrawer = currentDrawerExists ? drawers.current : null;
     const currentDrawerID = currentDrawer?.drawer_id || '';
-    const drawer1ID = drawers.all[0].drawer_id;
+    // Closing payments must land on a register — drawers.all also includes third_party tills.
+    const registerDrawerID =
+        drawers.all.find((drawer) => drawer.drawer_type === 'register')?.drawer_id || drawers.all[0]?.drawer_id || '';
     const summary = summaries.byDrawerID(currentDrawerID);
 
     const transfers = cashTransfers.forCurrentDrawer;
@@ -471,11 +473,11 @@ export const DrawerSideBar = () => {
                                                     source:
                                                         closingPaymentNeeded > 0
                                                             ? currentDrawer.drawer_id
-                                                            : drawer1ID,
+                                                            : registerDrawerID,
                                                     destination:
                                                         closingPaymentNeeded < 0
                                                             ? currentDrawer.drawer_id
-                                                            : drawer1ID,
+                                                            : registerDrawerID,
                                                 }}
                                             />
                                         ) : (
@@ -494,11 +496,11 @@ export const DrawerSideBar = () => {
                                                         source:
                                                             closingPaymentNeeded > 0
                                                                 ? currentDrawer.drawer_id
-                                                                : drawer1ID,
+                                                                : registerDrawerID,
                                                         destination:
                                                             closingPaymentNeeded < 0
                                                                 ? currentDrawer.drawer_id
-                                                                : drawer1ID,
+                                                                : registerDrawerID,
                                                         title: 'Closing Payment',
                                                     },
                                                     completedFirstStep: true,

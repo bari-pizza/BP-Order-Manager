@@ -21,13 +21,18 @@ export class CloseDrawerProcess {
         await this.page.getByRole('button', { name: /Closing Payment/ }).click();
         const saveTransfer = this.page.locator('button:has([data-testid="SaveIcon"])');
         await expect(saveTransfer).toBeVisible({ timeout: 10_000 });
-        const otherDrawer = this.page.getByRole('dialog').getByLabel('Drawer');
-        if (await otherDrawer.isVisible()) {
-            await otherDrawer.click();
-            const registerOption = this.page.getByRole('option').first();
-            await expect(registerOption).toBeVisible();
-            await registerOption.click();
+
+        const drawerInput = this.page.getByRole('dialog').getByLabel('Drawer');
+        if (await drawerInput.isVisible().catch(() => false)) {
+            const currentValue = (await drawerInput.inputValue().catch(() => '')).trim();
+            if (!currentValue) {
+                await drawerInput.click();
+                const listbox = this.page.getByRole('listbox');
+                await expect(listbox).toBeVisible({ timeout: 10_000 });
+                await listbox.getByRole('option').first().click();
+            }
         }
+
         await saveTransfer.click();
         await Promise.race([
             this.page.getByRole('button', { name: 'Confirm Drawer Closure' }).waitFor({ state: 'visible', timeout: 10_000 }),
