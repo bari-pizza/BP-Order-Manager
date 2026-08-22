@@ -255,7 +255,8 @@ const closeOpenManagerDrawer = async (page: Page, drawer: Locator) => {
         await createClosingPayment.click();
         const saveTransfer = page.locator('button:has([data-testid="SaveIcon"])');
         await expect(saveTransfer).toBeVisible({ timeout: 10_000 });
-        const otherDrawer = page.getByRole('dialog').getByLabel('Drawer');
+        const dialog = page.getByRole('dialog');
+        const otherDrawer = dialog.getByLabel('Drawer');
         if (await otherDrawer.isVisible().catch(() => false)) {
             const currentValue = (await otherDrawer.inputValue().catch(() => '')).trim();
             if (!currentValue) {
@@ -265,6 +266,14 @@ const closeOpenManagerDrawer = async (page: Page, drawer: Locator) => {
                 await listbox.getByRole('option').first().click();
             }
         }
+        const outstandingText = (await dialog.getByTestId('drawer-outstanding-total').innerText())
+            .trim()
+            .replace('-', '');
+        await expect
+            .poll(async () => (await dialog.getByLabel('Amount').inputValue()).replace(/\s/g, ''), {
+                timeout: 10_000,
+            })
+            .toBe(outstandingText.replace(/\s/g, ''));
         await saveTransfer.click();
         await Promise.race([
             page.getByRole('button', { name: 'Confirm Drawer Closure' }).waitFor({ state: 'visible', timeout: 10_000 }),

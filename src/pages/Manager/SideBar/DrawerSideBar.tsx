@@ -100,23 +100,25 @@ export const DrawerSideBar = () => {
     });
 
     useEffect(() => {
-        if (currentDrawerID) {
+        // Don't clobber in-progress hours while save is in flight or Confirm is open
+        // (defaultValues would briefly lag and flash the wrong outstanding).
+        if (currentDrawerID && !isOpen && !summaries.isUpdating) {
             reset(defaultValues);
         }
-    }, [reset, currentDrawerID, defaultValues]);
+    }, [reset, currentDrawerID, defaultValues, isOpen, summaries.isUpdating]);
 
     if (!currentDrawer || currentDrawer.name === 'Unassigned') {
         return null;
     }
 
-    const onSubmit: SubmitHandler<FormValues> = (data) => {
+    const onSubmit: SubmitHandler<FormValues> = async (data) => {
         const hoursInCents = data.hours * constants.default.driver_hourly_wage_in_cents;
         const cleanedData = {
             ...data,
             drawer_id: currentDrawer.drawer_id,
             hours_in_cents: hoursInCents,
         };
-        summaries.update(cleanedData);
+        await summaries.updateAsync(cleanedData);
     };
 
     const drawersOrders = orders.byDrawerID(currentDrawer.drawer_id);
@@ -195,13 +197,17 @@ export const DrawerSideBar = () => {
     const isDriver = 'driver' in currentDrawer;
 
     const handleCloseDrawerClick = () => {
-        // Sync hours → hours_in_cents from the Hours field before opening Confirm,
-        // so outstanding / closing payment use the same value that will be saved.
-        handleSubmit((data) => {
+        // Persist hours (await upsert) before Confirm so outstanding / closing payment
+        // never open against a stale summary while the save is still in transit.
+        handleSubmit(async (data) => {
             const hoursInCents = data.hours * constants.default.driver_hourly_wage_in_cents;
             setValue('hours_in_cents', hoursInCents, { shouldDirty: true });
-            onSubmit({ ...data, hours_in_cents: hoursInCents });
-            open();
+            try {
+                await onSubmit({ ...data, hours_in_cents: hoursInCents });
+                open();
+            } catch {
+                // Toast already shown by mutation; keep Confirm closed.
+            }
         })();
     };
 
@@ -416,7 +422,14 @@ export const DrawerSideBar = () => {
                                             );
                                         };
 
-                                        return <SmartTextField label="Hours" value={value} onChange={handleChange} />;
+                                        return (
+                                            <SmartTextField
+                                                label="Hours"
+                                                value={value}
+                                                onChange={handleChange}
+                                                disabled={summaries.isUpdating}
+                                            />
+                                        );
                                     }}
                                 />
                             )}
@@ -437,7 +450,9 @@ export const DrawerSideBar = () => {
                                     )}
                                 />
                             )}
-                            <Button onClick={handleCloseDrawerClick}>Save & Close Drawer</Button>
+                            <Button onClick={handleCloseDrawerClick} disabled={summaries.isUpdating}>
+                                {summaries.isUpdating ? 'Saving…' : 'Save & Close Drawer'}
+                            </Button>
                         </>
                     )}
                     <Dialog open={isOpen} onClose={closeDialog} fullWidth maxWidth="sm">

@@ -465,6 +465,8 @@ export const useOrdersDrawersTickets = () => {
             forCurrentDrawer: getSummaryByDrawerID(openDrawer?.drawer_id),
             byDrawerID: getSummaryByDrawerID,
             update: businessDayDrawerAPI.upsert,
+            updateAsync: businessDayDrawerAPI.upsertAsync,
+            isUpdating: businessDayDrawerAPI.isUpserting,
         },
         cashTransfers: {
             all: cashTransfers,

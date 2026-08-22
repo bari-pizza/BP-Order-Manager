@@ -1,4 +1,5 @@
 import { Controller, useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import { LabeledStack } from '../../../rickcedlib/components/LabeledStack';
 import {
     CashTransfer,
@@ -132,6 +133,38 @@ export const CashTransferEditor = ({
         reValidateMode: 'onChange',
     });
     const { cashTransfers } = useManagerDashboardContext();
+
+    // Closing Payment seeds amount/counterpart via definedValues. Keep the form in sync if
+    // outstanding changes after mount (tips/transfers landing) — defaultValues alone won't.
+    useEffect(() => {
+        if (!forNewCashTransfer || !definedValues?.cashTransfer) {
+            return;
+        }
+        const { amount_in_cents, source, destination, title } = definedValues.cashTransfer;
+        if (amount_in_cents != null) {
+            setValue('cashTransfer.amount_in_cents', amount_in_cents);
+        }
+        if (source !== undefined) {
+            setValue('cashTransfer.source', source ?? '');
+        }
+        if (destination !== undefined) {
+            setValue('cashTransfer.destination', destination ?? '');
+        }
+        if (title !== undefined) {
+            setValue('cashTransfer.title', title ?? '');
+        }
+        if (definedValues.toFromSpentReceived) {
+            setValue('toFromSpentReceived', definedValues.toFromSpentReceived);
+        }
+    }, [
+        forNewCashTransfer,
+        definedValues?.cashTransfer?.amount_in_cents,
+        definedValues?.cashTransfer?.source,
+        definedValues?.cashTransfer?.destination,
+        definedValues?.cashTransfer?.title,
+        definedValues?.toFromSpentReceived,
+        setValue,
+    ]);
 
     const onSubmit = (data: FormValues) => {
         const { cashTransfer } = data;
