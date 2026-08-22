@@ -23,7 +23,12 @@ export const CloseBusinessDayCard = () => {
     const openOrders: Order[] = [];
 
     combinedDrawersAndDrivers.forEach((drawer) => {
-        if (drawer.drawer_type === 'unassigned' || drawer.name === 'Unassigned') {
+        // Synthetic / non-till Unassigned cannot be locked — never block Close Day.
+        if (
+            drawer.drawer_type === 'unassigned' ||
+            drawer.drawer_id === 'unassigned' ||
+            drawer.name === 'Unassigned'
+        ) {
             return;
         }
         if (!summaries.byDrawerID(drawer.drawer_id)?.is_locked) {
