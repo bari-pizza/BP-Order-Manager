@@ -240,9 +240,13 @@ const closeOpenManagerDrawer = async (page: Page, drawer: Locator) => {
         throw new Error('Neither Save & Close Drawer nor Reopen Drawer appeared after selecting a drawer');
     }
 
-    // Leave driver hours at 0. Filling hours after the dialog opens (or without
-    // updating hours_in_cents) makes the closing-payment amount miss the
-    // outstanding balance, so Confirm Drawer Closure never appears.
+    // Fill Hours when present so outstanding / closing payment use wage cents
+    // derived from the Hours field (BAR-12).
+    const hoursField = page.getByLabel('Hours');
+    if (await hoursField.isVisible().catch(() => false)) {
+        await hoursField.fill('2');
+    }
+
     await saveAndClose.click();
     await expect(page.getByRole('heading', { name: 'Confirm Drawer Close' })).toBeVisible({ timeout: 10_000 });
 

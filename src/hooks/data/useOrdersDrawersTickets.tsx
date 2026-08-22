@@ -118,19 +118,6 @@ export const useOrdersDrawersTickets = () => {
     const { businessDayDrawerAPI } = useBusinessDayDrawerAPI({
         businessDate,
     });
-    // const { data: initialBusinessDayDrawerData } = businessDayDrawerAPI.getAll;
-    // const summaries = useSubscribeToTable<BusinessDayDrawerSummary>({
-    // useSubscribeToTable<BusinessDayDrawerSummary>({
-    //     tableName: 'BusinessDayDrawer',
-    //     // initialData: initialBusinessDayDrawerData,
-    //     primaryKeys: ['drawer_id', 'business_date'],
-    //     // queryKey: ['businessDayDrawers', businessDate.format('YYYY-MM-DD')],
-    //     // showToast: ['delete', 'insert', 'update'],
-    //     queryKey: ['businessDayDrawerSummary', businessDate.format('YYYY-MM-DD')],
-    //     queryFn: () => getBusinessDayDrawerSummaries({ businessDate }),
-    //     showToast: ['delete', 'insert', 'update'],
-    //     isMobile,
-    // });
 
     const summaries = (queryClient.getQueryData(['businessDayDrawerSummaries', businessDate.format('YYYY-MM-DD')]) ??
         []) as BusinessDayDrawerSummary[];

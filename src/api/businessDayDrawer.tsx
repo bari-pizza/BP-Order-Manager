@@ -37,6 +37,11 @@ const closeBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; business
         throw error;
     }
 
+    // Soft failures come back as JSON { error: "..." } with a 200 from PostgREST.
+    if (data && typeof data === 'object' && 'error' in data && (data as { error?: string }).error) {
+        throw new Error(String((data as { error: string }).error));
+    }
+
     return data as unknown as RPCPayload;
 };
 
@@ -50,6 +55,10 @@ const reopenBusinessDayDrawer: SupabaseRPCInteractor<{ drawerID: string; busines
     });
     if (error) {
         throw error;
+    }
+
+    if (data && typeof data === 'object' && 'error' in data && (data as { error?: string }).error) {
+        throw new Error(String((data as { error: string }).error));
     }
 
     return data as unknown as RPCPayload;
@@ -192,10 +201,10 @@ export const useBusinessDayDrawerAPI = ({ businessDate }: { businessDate: dayjs.
                 handleFailure?: (error: PostgrestError | Error) => void;
             }) => {
                 if (handleSuccess) {
-                    handleSuccessRef.current['addOrdersToDrawer'] = handleSuccess;
+                    handleSuccessRef.current['closeBusinessDayDrawer'] = handleSuccess;
                 }
                 if (handleFailure) {
-                    handleFailureRef.current['addOrdersToDrawer'] = handleFailure;
+                    handleFailureRef.current['closeBusinessDayDrawer'] = handleFailure;
                 }
                 closeBusinessDayDrawerMutation.mutate({ drawerID, businessDate });
             },

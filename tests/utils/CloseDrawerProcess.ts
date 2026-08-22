@@ -61,7 +61,12 @@ export class CloseDrawerProcess {
         await expect(this.page.getByRole('button', { name: 'Reopen Drawer' })).toBeVisible({ timeout: 5_000 });
     }
 
-    async completeCloseDriver(_hours?: number) {
+    async completeCloseDriver(hours = 2) {
+        const hoursField = this.page.getByLabel('Hours');
+        if (await hoursField.isVisible().catch(() => false)) {
+            await hoursField.fill(String(hours));
+        }
+
         await this.clickSaveAndCloseDrawer();
         await this.waitForDialog();
 

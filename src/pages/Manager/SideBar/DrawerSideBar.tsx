@@ -193,8 +193,14 @@ export const DrawerSideBar = () => {
     const isDriver = 'driver' in currentDrawer;
 
     const handleCloseDrawerClick = () => {
-        handleSubmit(onSubmit)();
-        open();
+        // Sync hours → hours_in_cents from the Hours field before opening Confirm,
+        // so outstanding / closing payment use the same value that will be saved.
+        handleSubmit((data) => {
+            const hoursInCents = data.hours * constants.default.driver_hourly_wage_in_cents;
+            setValue('hours_in_cents', hoursInCents, { shouldDirty: true });
+            onSubmit({ ...data, hours_in_cents: hoursInCents });
+            open();
+        })();
     };
 
     const handleDrawerClosureClick = () => {
@@ -208,8 +214,8 @@ export const DrawerSideBar = () => {
 
     const total = drawerSummary.total_in_cents;
     const bank = drawerSummary.bank_in_cents;
-    const hours = watch('hours_in_cents'); // this way we dont have to wait for the db to update
-    // const hours = drawerSummary.hours_in_cents;
+    // Derive wage cents from Hours so outstanding never lags a stale hours_in_cents.
+    const hours = (watch('hours') || 0) * constants.default.driver_hourly_wage_in_cents;
     const card = drawerSummary.card_in_cents + drawerSummary.card_tips_in_cents;
     const thirdParty = drawerSummary.third_party_in_cents + drawerSummary.third_party_tips_in_cents;
     const deliveryFees = drawerSummary.delivery_fees_in_cents;
@@ -318,10 +324,14 @@ export const DrawerSideBar = () => {
 
     const outstandingAmount = items.reduce((acc, item) => acc + item.value, 0);
 
-    const closingPmtAmount =
+    // Outstanding already includes an existing Closing Payment in the Payments line.
+    // Strip that contribution so Create/Edit always seeds the full correct amount
+    // (not a stale snapshot from when the editor first mounted).
+    const closingPaymentNeeded =
         outstandingAmount -
         (closingPmtTransfer
-            ? closingPmtTransfer.amount_in_cents * (closingPmtTransfer.source === currentDrawer.drawer_id ? -1 : 1)
+            ? closingPmtTransfer.amount_in_cents *
+              (closingPmtTransfer.source === currentDrawer.drawer_id ? -1 : 1)
             : 0);
 
     const handleClosingPaymentClick = () => {
@@ -449,7 +459,7 @@ export const DrawerSideBar = () => {
                                     {editableCashTransferID === 'closing-cash-transfer' ? (
                                         closingPmtTransfer ? (
                                             <CashTransferEditor
-                                                key="closing-cash-transfer"
+                                                key={`closing-edit-${Math.abs(closingPaymentNeeded)}`}
                                                 isEditing
                                                 setIsEditing={(bool) =>
                                                     setEditableCashTransferID(bool ? 'closing-cash-transfer' : null)
@@ -457,15 +467,20 @@ export const DrawerSideBar = () => {
                                                 drawerID={currentDrawer.drawer_id}
                                                 cashTransfer={{
                                                     ...closingPmtTransfer,
-                                                    amount_in_cents: Math.abs(closingPmtAmount),
-                                                    source: closingPmtAmount > 0 ? currentDrawer.drawer_id : drawer1ID,
+                                                    amount_in_cents: Math.abs(closingPaymentNeeded),
+                                                    source:
+                                                        closingPaymentNeeded > 0
+                                                            ? currentDrawer.drawer_id
+                                                            : drawer1ID,
                                                     destination:
-                                                        closingPmtAmount < 0 ? currentDrawer.drawer_id : drawer1ID,
+                                                        closingPaymentNeeded < 0
+                                                            ? currentDrawer.drawer_id
+                                                            : drawer1ID,
                                                 }}
                                             />
                                         ) : (
                                             <CashTransferEditor
-                                                key="closing-cash-transfer"
+                                                key={`closing-new-${Math.abs(closingPaymentNeeded)}`}
                                                 isEditing
                                                 setIsEditing={(bool) =>
                                                     setEditableCashTransferID(bool ? 'closing-cash-transfer' : null)
@@ -475,15 +490,19 @@ export const DrawerSideBar = () => {
                                                 transferType="payment"
                                                 definedValues={{
                                                     cashTransfer: {
-                                                        amount_in_cents: Math.abs(outstandingAmount),
+                                                        amount_in_cents: Math.abs(closingPaymentNeeded),
                                                         source:
-                                                            outstandingAmount > 0 ? currentDrawer.drawer_id : drawer1ID,
+                                                            closingPaymentNeeded > 0
+                                                                ? currentDrawer.drawer_id
+                                                                : drawer1ID,
                                                         destination:
-                                                            outstandingAmount < 0 ? currentDrawer.drawer_id : drawer1ID,
+                                                            closingPaymentNeeded < 0
+                                                                ? currentDrawer.drawer_id
+                                                                : drawer1ID,
                                                         title: 'Closing Payment',
                                                     },
                                                     completedFirstStep: true,
-                                                    toFromSpentReceived: outstandingAmount < 0 ? 'from' : 'to',
+                                                    toFromSpentReceived: closingPaymentNeeded < 0 ? 'from' : 'to',
                                                     validDrawerFilter: (drawer) => drawer.drawer_type === 'register',
                                                 }}
                                             />
