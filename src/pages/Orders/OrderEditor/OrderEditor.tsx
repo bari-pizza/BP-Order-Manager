@@ -581,7 +581,7 @@ const OrderEditorDialog = ({
                             </Stack>
                         </Stack>
                         <Stack direction="row" alignItems="center" justifyContent="space-around" width="100%">
-                            <Button onClick={handleClose} disabled={!isDirty} color="error">
+                            <Button onClick={handleClose} color="error">
                                 Cancel
                             </Button>
                             <Button onClick={handleSubmit(onSubmit, onError)} disabled={!isDirty}>
