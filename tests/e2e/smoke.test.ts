@@ -256,11 +256,14 @@ const closeOpenManagerDrawer = async (page: Page, drawer: Locator) => {
         const saveTransfer = page.locator('button:has([data-testid="SaveIcon"])');
         await expect(saveTransfer).toBeVisible({ timeout: 10_000 });
         const otherDrawer = page.getByRole('dialog').getByLabel('Drawer');
-        if (await otherDrawer.isVisible()) {
-            await otherDrawer.click();
-            const registerOption = page.getByRole('option').first();
-            await expect(registerOption).toBeVisible();
-            await registerOption.click();
+        if (await otherDrawer.isVisible().catch(() => false)) {
+            const currentValue = (await otherDrawer.inputValue().catch(() => '')).trim();
+            if (!currentValue) {
+                await otherDrawer.click();
+                const listbox = page.getByRole('listbox');
+                await expect(listbox).toBeVisible({ timeout: 10_000 });
+                await listbox.getByRole('option').first().click();
+            }
         }
         await saveTransfer.click();
         await Promise.race([
