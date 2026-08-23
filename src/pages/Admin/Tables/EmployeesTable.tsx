@@ -199,7 +199,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             editable: false,
             align: 'center',
             headerAlign: 'center',
-            renderCell: ({ row }) => <ProfileAvatar avatarSrc={row.avatar_src} size={36} />,
+            renderCell: ({ row }) => <ProfileAvatar avatarSrc={row.avatar_src} size={32} />,
         },
         {
             field: 'first_name',
@@ -296,7 +296,16 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                         '& .actions .MuiButtonBase-root': { color: 'primary.main' },
                     },
                     '.MuiDataGrid-columnHeader': { textTransform: 'capitalize' },
+                    '& .MuiDataGrid-cell': {
+                        display: 'flex',
+                        alignItems: 'center',
+                    },
+                    '& .MuiDataGrid-cell[data-field="avatar_src"]': {
+                        justifyContent: 'center',
+                        py: 0.5,
+                    },
                 }}
+                rowHeight={56}
                 pageSizeOptions={[5, 10, 25]}
                 disableVirtualization
                 onCellDoubleClick={(_params, event) => {
