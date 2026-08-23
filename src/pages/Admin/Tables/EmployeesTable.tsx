@@ -241,6 +241,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             field: 'is_admin',
             headerName: m.admin(),
             width: 100,
+            align: 'center',
             headerAlign: 'center',
             editable: true,
             renderCell: (params) => {
@@ -255,6 +256,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             headerName: m.manager(),
             width: 100,
             editable: true,
+            align: 'center',
             headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
@@ -268,6 +270,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             headerName: m.driver(),
             width: 100,
             editable: true,
+            align: 'center',
             headerAlign: 'center',
             renderCell: (params) => {
                 return <CellCheckbox params={params} />;
@@ -279,6 +282,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
         {
             field: 'send_email',
             headerName: m.sendEmail(),
+            align: 'center',
             headerAlign: 'center',
             width: 175,
             editable: false,
