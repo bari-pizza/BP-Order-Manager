@@ -114,7 +114,7 @@ export const getAllResources = async () => {
     const existing = (data ?? []) as Resource[];
     const existingTitles = new Set(existing.map((resource) => resource.title));
     const missing = REQUIRED_RESOURCES.filter((resource) => !existingTitles.has(resource.title)).map(
-        ({ title, src }) => ({ title, src }),
+        ({ title, src, bucket_name }) => ({ title, src, bucket_name }),
     );
 
     if (missing.length > 0) {
