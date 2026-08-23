@@ -15,11 +15,10 @@ export const CellCheckbox = ({
             sx={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 padding: 0,
                 height: '100%',
-                '& .MuiCheckbox-root': {
-                    width: '100%',
-                },
+                width: '100%',
             }}>
             <Checkbox
                 checked={!!params.value}
@@ -45,14 +44,12 @@ export const CellEditCheckbox = <T,>({ field, params }: { field: keyof T; params
             sx={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 padding: 0,
                 height: '100%',
                 width: '100%',
                 '& .MuiSvgIcon-root': {
                     color: isDirty ? theme.palette.secondary.main : '',
-                },
-                '& .MuiCheckbox-root': {
-                    width: '100%',
                 },
             }}>
             <Checkbox checked={!!params.value} onChange={handleCheckboxChange} />
