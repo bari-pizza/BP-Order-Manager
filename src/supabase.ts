@@ -488,14 +488,17 @@ export type Database = {
       }
       Resource: {
         Row: {
+          bucket_name: string
           src: string | null
           title: string
         }
         Insert: {
+          bucket_name?: string
           src?: string | null
           title: string
         }
         Update: {
+          bucket_name?: string
           src?: string | null
           title?: string
         }
