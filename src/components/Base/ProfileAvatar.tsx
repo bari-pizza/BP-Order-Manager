@@ -13,15 +13,6 @@ export const ProfileAvatar = ({ avatarSrc, size = 36 }: ProfileAvatarProps) => {
     const missing = resources.find((resource: Resource) => resource.title === 'Missing Avatar');
     const imageSrc = avatarSrc || missing?.src || '';
 
-    return (
-        <RoundLottieIcon
-            imageSrc={imageSrc}
-            sx={{
-                width: size,
-                height: size,
-                minWidth: size,
-                flexShrink: 0,
-            }}
-        />
-    );
+    const px = `${size}px`;
+    return <RoundLottieIcon imageSrc={imageSrc} height={px} width={px} />;
 };
