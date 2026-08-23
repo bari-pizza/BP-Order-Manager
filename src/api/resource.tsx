@@ -12,7 +12,16 @@ import { Resource } from '../typesAndValidators';
 const updateResource: SupabaseInteractor<Resource, Resource> = async (resource) => {
     const payload = (await supaClient
         .from('Resource')
-        .upsert([{ title: resource.title, src: resource.src }], { onConflict: 'title' })
+        .upsert(
+            [
+                {
+                    title: resource.title,
+                    src: resource.src,
+                    bucket_name: resource.bucket_name ?? 'resources',
+                },
+            ],
+            { onConflict: 'title' },
+        )
         .select('*')) as Payload<Resource>;
     return handlePayload<Resource>(payload);
 };
