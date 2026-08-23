@@ -102,7 +102,15 @@ export function Login() {
 
     if (!session) {
         return (
-            <Stack direction="column" alignItems="center" justifyContent="center" spacing={2} height="100vh">
+            <Stack
+                component="form"
+                onSubmit={handleSubmit(mode === 'reset_password' ? onResetPassword : onSignIn)}
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+                spacing={2}
+                height="100vh"
+                noValidate>
                 <Typography variant="h3">{title}</Typography>
                 <Controller
                     name="email"
@@ -114,12 +122,13 @@ export function Login() {
                             variant="outlined"
                             error={!!errors.email}
                             helperText={errors.email?.message}
+                            autoComplete="email"
                         />
                     )}
                 />
                 {mode === 'reset_password' ? (
                     <Button
-                        onClick={handleSubmit(onResetPassword)}
+                        type="submit"
                         variant="contained"
                         color="primary"
                         disabled={!dirtyFields.email || isSubmitting}>
@@ -138,6 +147,7 @@ export function Login() {
                                     error={!!errors.password}
                                     helperText={errors.password?.message}
                                     type={showPassword ? 'text' : 'password'}
+                                    autoComplete="current-password"
                                     // TODO: add this to the theme instead of hardcoding it here
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
@@ -158,6 +168,7 @@ export function Login() {
                                                         };
                                                         return (
                                                             <IconButton
+                                                                type="button"
                                                                 onClick={handleClick}
                                                                 edge="end"
                                                                 aria-label="toggle password visibility">
@@ -173,7 +184,7 @@ export function Login() {
                             )}
                         />
                         <Button
-                            onClick={handleSubmit(onSignIn)}
+                            type="submit"
                             variant="contained"
                             color="primary"
                             disabled={!dirtyFields.email || !dirtyFields.password || isSubmitting}>
@@ -193,7 +204,11 @@ export function Login() {
                             }
                         };
                         return (
-                            <Button onClick={handleClick} variant="text" color={value ? 'primary' : 'error'}>
+                            <Button
+                                type="button"
+                                onClick={handleClick}
+                                variant="text"
+                                color={value ? 'primary' : 'error'}>
                                 {value ? 'Back' : 'Forgot Password'}
                             </Button>
                         );

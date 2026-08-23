@@ -190,7 +190,14 @@ export const MyAccount = () => {
                 m={4}
                 width="100%"
                 flexGrow={1}>
-                <Stack direction="column" alignItems="center" width={isMobile ? '100%' : '50%'} p={2} spacing={4}>
+                <Stack
+                    direction="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    width={isMobile ? '100%' : '50%'}
+                    p={2}
+                    spacing={4}
+                    flex={1}>
                     <AvatarUploader profile={profile} />
                     {isEditing ? (
                         <Stack direction="column" spacing={2}>
