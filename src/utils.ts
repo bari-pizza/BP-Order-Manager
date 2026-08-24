@@ -124,10 +124,6 @@ export const urlToRoundedBase64 = (url: string, size = 200) => {
             canvas.height = size;
             const ctx = canvas.getContext('2d')!;
 
-            // Cream underlay so transparent / clipped corners don't read as black in Lottie
-            ctx.fillStyle = '#F7F4EF';
-            ctx.fillRect(0, 0, size, size);
-
             // Create a circular clipping path
             ctx.beginPath();
             ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2, true);
