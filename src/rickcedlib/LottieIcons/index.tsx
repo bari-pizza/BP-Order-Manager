@@ -120,9 +120,9 @@ export const RegisterLottieIcon = ({ ...props }: LottieIconProps) => {
 
 // with react query
 export const RoundLottieIcon = ({ imageSrc, ...props }: LottieIconProps & { imageSrc?: string }) => {
-    // v2: circular cream underlay (v1 cached square cream corners outside the ring)
-    const queryKey = ['round-lottie-icon', 'v2', imageSrc];
-    const localStorageKey = `round-lottie-icon-v2-${imageSrc}`;
+    // v3: no cream underlay (v1/v2 cached mattes from the icon redesign)
+    const queryKey = ['round-lottie-icon', 'v3', imageSrc];
+    const localStorageKey = `round-lottie-icon-v3-${imageSrc}`;
     const { data: lottieData } = useQuery({
         queryKey: queryKey,
         queryFn: async () => {

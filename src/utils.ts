@@ -124,16 +124,11 @@ export const urlToRoundedBase64 = (url: string, size = 200) => {
             canvas.height = size;
             const ctx = canvas.getContext('2d')!;
 
-            // Clip first so the cream underlay stays inside the circle (fill before clip
-            // left opaque square corners that stuck out past the Lottie ring).
+            // Create a circular clipping path
             ctx.beginPath();
             ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.clip();
-
-            // Cream underlay so transparent art doesn't read as black in Lottie
-            ctx.fillStyle = '#F7F4EF';
-            ctx.fillRect(0, 0, size, size);
 
             // Draw the image onto the canvas
             const smallerDimension = Math.min(img.width, img.height);
