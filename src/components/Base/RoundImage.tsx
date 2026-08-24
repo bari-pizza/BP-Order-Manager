@@ -45,6 +45,9 @@ export const RoundImage = ({
 
     const finalStyle = {
         borderRadius: '50%',
+        objectFit: 'cover' as const,
+        // Cream fill so square-art black corners never show through circular clips
+        backgroundColor: '#F7F4EF',
         ...(size === 'small' ? smallStyle : {}),
         ...(size === 'medium' ? mediumStyle : {}),
         ...(size === 'large' ? largeStyle : {}),

@@ -1,6 +1,7 @@
 import { Resource } from '../typesAndValidators';
 
 export const IN_HOUSE_ORIGIN_RESOURCE_TITLE = 'Bari Pizza';
+export const DEFAULT_ORIGIN_RESOURCE_TITLE = 'Default Origin';
 
 export const REQUIRED_RESOURCES: Array<Resource & { description: string; bucket_name: string }> = [
     {
@@ -8,6 +9,12 @@ export const REQUIRED_RESOURCES: Array<Resource & { description: string; bucket_
         src: null,
         bucket_name: 'resources',
         description: 'Logo for in-house Bari Pizza orders on tickets.',
+    },
+    {
+        title: DEFAULT_ORIGIN_RESOURCE_TITLE,
+        src: null,
+        bucket_name: 'resources',
+        description: 'Fallback logo when a third-party origin has no custom icon.',
     },
     {
         title: 'Register',

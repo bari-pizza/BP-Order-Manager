@@ -19,6 +19,7 @@ import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { ExampleOrderTypeSelector, ExamplePaymentSelector } from '../../Orders/OrderEditor/PaymentEditor';
 import { m } from '../../../types/messages';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ExampleOrigin = ({ origin }: { origin: OrderOrigin }) => {
     if (!origin) return null;
@@ -67,8 +68,16 @@ const originUpdateFields = (origin: OrderOrigin) => ({
 });
 
 export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
+    const queryClient = useQueryClient();
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<OriginRow>({ data: origins });
     const toastRef = useRef<Id>('');
+
+    const patchOriginDeleted = (id: string, is_deleted: boolean) => {
+        queryClient.setQueryData<OrderOrigin[]>(['origins'], (prev) =>
+            (prev ?? []).map((origin) => (origin.origin_id === id ? { ...origin, is_deleted } : origin)),
+        );
+        setRows((prev) => prev.map((row) => (row.origin_id === id ? { ...row, is_deleted } : row)));
+    };
 
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -177,6 +186,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                 isLoading: false,
                 autoClose: 5000,
             });
+            patchOriginDeleted(id, true);
             setRowModesModel({
                 ...rowModesModel,
                 [id]: { mode: GridRowModes.View },
@@ -203,6 +213,7 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                 isLoading: false,
                 autoClose: 5000,
             });
+            patchOriginDeleted(id, false);
         }
     };
 
