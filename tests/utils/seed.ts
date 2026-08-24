@@ -5,6 +5,7 @@ import { getDriverEmails, getTestPassword, TEST_ACCOUNTS, type TestAccount } fro
 
 const REQUIRED_RESOURCE_TITLES = [
     'Bari Pizza',
+    'Default Origin',
     'Register',
     'Third Party Pickup',
     'Unassigned Drawer',

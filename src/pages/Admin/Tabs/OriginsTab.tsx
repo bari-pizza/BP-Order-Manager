@@ -1,10 +1,10 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { OriginsTable } from '../Tables/OriginsTable';
 import { Controller, useForm } from 'react-hook-form';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { useDialogProps } from '../../../hooks/ui/useDialogProps';
-import { useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Id, toast } from '../../../toast/toastWrapper';
 import { OrderOrigin } from '../../../typesAndValidators';
 import { supaClient } from '../../../supaClient';
@@ -39,6 +39,7 @@ export const OriginsTab = () => {
     const toastRef = useRef<Id>('');
     const { origins } = useBariPizzaContext();
     const { isOpen, open, close } = useDialogProps();
+    const [showDeleted, setShowDeleted] = useState(false);
     const {
         control,
         handleSubmit,
@@ -71,7 +72,14 @@ export const OriginsTab = () => {
         close();
     };
 
-    const sortedOrigins = [...origins].filter((origin) => origin.is_third_party).sort(sortOrigins);
+    const sortedOrigins = useMemo(() => {
+        return [...origins]
+            .filter((origin) => origin.is_third_party)
+            .filter((origin) => showDeleted || !origin.is_deleted)
+            .sort(sortOrigins);
+    }, [origins, showDeleted]);
+
+    const deletedCount = origins.filter((origin) => origin.is_third_party && origin.is_deleted).length;
 
     return (
         <Stack direction="column" alignItems={'center'} gap={2} height="100%">
@@ -79,6 +87,16 @@ export const OriginsTab = () => {
                 Third-party platforms (DoorDash, Uber Eats, and so on). Bari Pizza is the in-house origin and is not
                 listed here.
             </Typography>
+            <FormControlLabel
+                control={
+                    <Switch
+                        checked={showDeleted}
+                        onChange={(_, checked) => setShowDeleted(checked)}
+                        color="primary"
+                    />
+                }
+                label={deletedCount > 0 ? `Show deleted (${deletedCount})` : 'Show deleted'}
+            />
             <OriginsTable origins={sortedOrigins} />
             <Button onClick={open} variant="contained">
                 Add New Order Origin
