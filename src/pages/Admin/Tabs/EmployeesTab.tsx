@@ -13,8 +13,8 @@ import { supaClient } from '../../../supaClient';
 import { useRef } from 'react';
 import { Id, toast } from '../../../toast/toastWrapper';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
-import { getEnv } from '../../../utils';
 import { m } from '../../../types/messages';
+import { invalidateDriversAndProfiles } from '../../../utils/queryInvalidation';
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';
@@ -80,15 +80,15 @@ export const EmployeesTab = () => {
         .sort(sortEmployees);
 
     const onSubmit = async (formData: FormValues) => {
-        const { email, first_name, last_name, phone } = formData;
+        const email = formData.email.trim().toLowerCase();
+        const first_name = formData.first_name.trim();
+        const last_name = formData.last_name.trim();
+        const phone = formData.phone.trim();
 
         toastRef.current = toast.loading(`${m.creating()} ${m.employee()}`);
 
         const { error } = await supaClient.functions.invoke('create-user', {
             body: { email, first_name, last_name, phone },
-            headers: {
-                Authorization: `Bearer ${getEnv('VITE_SUPABASE_ANON_KEY')}`,
-            },
         });
 
         if (error) {
@@ -100,6 +100,8 @@ export const EmployeesTab = () => {
             });
             return;
         }
+
+        await invalidateDriversAndProfiles(queryClient);
 
         toast.update(toastRef.current, {
             // render: `Employee ${first_name} ${last_name} created successfully`,
