@@ -10,7 +10,8 @@ import {
 } from '@mui/x-data-grid';
 import { Employee } from '../../../typesAndValidators';
 import { updateEmployee } from '../../../supabaseQueries';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { invalidateDriversAndProfiles } from '../../../utils/queryInvalidation';
 import { CellEditCheckbox, CellCheckbox } from '../../../components/Base/DataGrid/CellCheckbox';
 import { CellEditTextField } from '../../../components/Base/DataGrid/CellTextField';
 import { createCellActions } from '../../../components/Base/DataGrid/createCellActions';
@@ -24,6 +25,7 @@ import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { m } from '../../../types/messages';
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
+    const queryClient = useQueryClient();
     const { rows, setRows, rowModesModel, setRowModesModel } = useDataGrid<Employee>({ data: employees });
     const toastRef = useRef<Id>('');
 
@@ -50,6 +52,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                 isLoading: false,
                 autoClose: 5000,
             });
+            void invalidateDriversAndProfiles(queryClient);
             // take row out of edit mode
             setRowModesModel({
                 ...rowModesModel,
@@ -78,6 +81,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                 isLoading: false,
                 autoClose: 5000,
             });
+            void invalidateDriversAndProfiles(queryClient);
         }
     };
 
@@ -150,6 +154,7 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
                 is_driver: driver && !driver.is_deleted,
             };
             setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
+            void invalidateDriversAndProfiles(queryClient);
         },
         onError: (error) => {
         },

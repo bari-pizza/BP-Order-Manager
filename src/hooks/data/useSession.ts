@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { supaClient } from '../../supaClient';
 import { Profile } from '../../typesAndValidators';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { invalidateDriversAndProfiles } from '../../utils/queryInvalidation';
 
 export interface SupashipUserInfo {
     session: Session | null;
@@ -32,8 +33,11 @@ export const useSession = (): SupashipUserInfo => {
 
     // Listen to auth changes
     useEffect(() => {
-        const { data: listener } = supaClient.auth.onAuthStateChange((_event, newSession) => {
+        const { data: listener } = supaClient.auth.onAuthStateChange((event, newSession) => {
             queryClient.setQueryData(['session'], newSession);
+            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+                void invalidateDriversAndProfiles(queryClient);
+            }
         });
 
         return () => {
