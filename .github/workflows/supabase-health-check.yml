@@ -1,0 +1,28 @@
+name: Supabase Health Check
+
+on:
+  schedule:
+    # Run every day at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Supabase Health Check
+        run: |
+          # Simple query to keep project active
+          SUPABASE_URL="${{ secrets.BARI_PIZZA_SUPABASE_URL }}"
+          curl -X GET \
+            "${SUPABASE_URL}/rest/v1/Profile?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" && \
+          echo "✅ Supabase project is active"
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "⚠️ Health check failed - project may be paused"
+          echo "Check your Supabase dashboard"
