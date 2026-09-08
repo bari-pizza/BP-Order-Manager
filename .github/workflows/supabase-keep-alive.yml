@@ -1,0 +1,23 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Daily 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        url:
+          - https://bp-order-manager-flax.vercel.app/api/keep-alive
+          - https://dev-bp-order-manager.vercel.app/api/keep-alive
+    steps:
+      - name: Ping ${{ matrix.url }}
+        run: |
+          curl -fsS --retry 2 --retry-delay 5 "${{ matrix.url }}"
+          echo
+          echo "ok: ${{ matrix.url }}"
