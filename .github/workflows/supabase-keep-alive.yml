@@ -7,17 +7,45 @@ on:
   workflow_dispatch:
 
 jobs:
-  ping:
+  keep-alive:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        url:
-          - https://bp-order-manager-flax.vercel.app/api/keep-alive
-          - https://dev-bp-order-manager.vercel.app/api/keep-alive
+        include:
+          - name: production
+            url_secret: SUPABASE_URL_PROD
+            key_secret: SUPABASE_ANON_KEY_PROD
+          - name: development
+            url_secret: SUPABASE_URL_DEV
+            key_secret: SUPABASE_ANON_KEY_DEV
     steps:
-      - name: Ping ${{ matrix.url }}
+      - name: Ping ${{ matrix.name }} Supabase
+        env:
+          SUPABASE_URL_PROD: ${{ secrets.SUPABASE_URL_PROD }}
+          SUPABASE_ANON_KEY_PROD: ${{ secrets.SUPABASE_ANON_KEY_PROD }}
+          SUPABASE_URL_DEV: ${{ secrets.SUPABASE_URL_DEV }}
+          SUPABASE_ANON_KEY_DEV: ${{ secrets.SUPABASE_ANON_KEY_DEV }}
+          TARGET: ${{ matrix.name }}
         run: |
-          curl -fsS --retry 2 --retry-delay 5 "${{ matrix.url }}"
+          set -euo pipefail
+          if [ "$TARGET" = "production" ]; then
+            URL="$SUPABASE_URL_PROD"
+            KEY="$SUPABASE_ANON_KEY_PROD"
+          else
+            URL="$SUPABASE_URL_DEV"
+            KEY="$SUPABASE_ANON_KEY_DEV"
+          fi
+
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "Missing secrets for $TARGET (need URL + anon key)."
+            exit 1
+          fi
+
+          # Tiny read so free-tier projects stay active
+          curl -fsS --retry 2 --retry-delay 5 \
+            "${URL}/rest/v1/OrderOrigin?select=origin_id&limit=1" \
+            -H "apikey: ${KEY}" \
+            -H "Authorization: Bearer ${KEY}"
           echo
-          echo "ok: ${{ matrix.url }}"
+          echo "ok: $TARGET"
