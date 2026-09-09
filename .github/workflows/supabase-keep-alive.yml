@@ -14,18 +14,16 @@ jobs:
       matrix:
         include:
           - name: production
-            url_secret: SUPABASE_URL_PROD
-            key_secret: SUPABASE_ANON_KEY_PROD
           - name: development
-            url_secret: SUPABASE_URL_DEV
-            key_secret: SUPABASE_ANON_KEY_DEV
     steps:
       - name: Ping ${{ matrix.name }} Supabase
         env:
+          # Prod: SUPABASE_URL_PROD + SUPABASE_ANON_KEY_PROD
           SUPABASE_URL_PROD: ${{ secrets.SUPABASE_URL_PROD }}
           SUPABASE_ANON_KEY_PROD: ${{ secrets.SUPABASE_ANON_KEY_PROD }}
-          SUPABASE_URL_DEV: ${{ secrets.SUPABASE_URL_DEV }}
-          SUPABASE_ANON_KEY_DEV: ${{ secrets.SUPABASE_ANON_KEY_DEV }}
+          # Dev: reuse existing CI/e2e secrets
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           TARGET: ${{ matrix.name }}
         run: |
           set -euo pipefail
@@ -33,8 +31,8 @@ jobs:
             URL="$SUPABASE_URL_PROD"
             KEY="$SUPABASE_ANON_KEY_PROD"
           else
-            URL="$SUPABASE_URL_DEV"
-            KEY="$SUPABASE_ANON_KEY_DEV"
+            URL="$VITE_SUPABASE_URL"
+            KEY="$VITE_SUPABASE_ANON_KEY"
           fi
 
           if [ -z "$URL" ] || [ -z "$KEY" ]; then
