@@ -19,7 +19,6 @@ export const ResourcesTab = () => {
                     return (
                         <Grid item key={resource.title}>
                             <Card
-                                className="lottie-icon-container"
                                 sx={{
                                     width: 200,
                                     height: 260,
@@ -34,7 +33,7 @@ export const ResourcesTab = () => {
                                         justifyContent="flex-start"
                                         width="100%"
                                         height="100%">
-                                        <ResourceUploader resource={resource} isAnimated />
+                                        <ResourceUploader resource={resource} />
                                         <Typography variant="body1" component="div" textAlign="center" minHeight={48}>
                                             {resource.title}
                                         </Typography>

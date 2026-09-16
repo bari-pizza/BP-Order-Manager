@@ -1,22 +1,20 @@
 import { useBariPizzaContext, useUserContext } from '../../hooks/data/useContextData';
-import { RoundLottieIcon } from '../../rickcedlib/LottieIcons';
+import { RoundImage } from './RoundImage';
 import type { Resource } from '../../typesAndValidators';
 
 export const UserAvatar = () => {
     const { resources } = useBariPizzaContext();
     const { session, profile } = useUserContext();
+    const missingAvatarSrc = resources.find((resource: Resource) => resource.title === 'Missing Avatar')?.src;
+
     if (profile) {
-        if (profile.avatar_src) {
-            return <RoundLottieIcon imageSrc={profile.avatar_src} />;
-        }
-        const resource = resources.find((resource: Resource) => resource.title === 'Missing Avatar');
-        if (resource) {
-            return <RoundLottieIcon imageSrc={resource.src!} />;
-        }
-        return null;
+        const src = profile.avatar_src || missingAvatarSrc;
+        return src ? <RoundImage src={src} alt="Your profile" size="medium" bump /> : null;
     }
 
     if (!session) {
-        return <RoundLottieIcon imageSrc="" />;
+        return missingAvatarSrc ? <RoundImage src={missingAvatarSrc} alt="" size="medium" bump /> : null;
     }
+
+    return null;
 };

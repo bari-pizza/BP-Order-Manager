@@ -9,7 +9,6 @@ type LottieIconProps = {
     width?: string;
     autoPlay?: boolean;
     className?: string;
-    playOnce?: boolean;
 };
 
 export const LottieIcon = ({
@@ -18,59 +17,34 @@ export const LottieIcon = ({
     width = '35px',
     autoPlay = false,
     className,
-    playOnce = false,
 }: LottieIconProps) => {
     const playerRef = useRef<Player | null>(null); // Ref to access Player methods
     const containerRef = useRef<HTMLDivElement | null>(null); // Ref to access DOM methods
-    const [hasPlayed, setHasPlayed] = useState(false); // Track if played once
 
     useEffect(() => {
         const hoverAncestor = containerRef.current?.closest('.lottie-icon-container'); // Detect the closest ancestor with the hover class
         if (!hoverAncestor) return;
 
+        // One play per hover. stop() rewinds to frame 0 so hovering again replays it
+        // rather than resuming a finished animation.
         const handleHover = () => {
-            // if (playerRef.current) {
-            //     playerRef.current.play();
-            //     playerRef.current.setLoop(true);
-            // }
-            if (playerRef.current) {
-                if (playOnce && hasPlayed) return; // If playOnce and already played, do nothing
-                playerRef.current.play();
-                if (playOnce) {
-                    setHasPlayed(true); // Mark as played
-                    // playerRef.current.addEventListener('complete', () => {
-                    //     playerRef.current?.stop();
-                    // });
-                } else {
-                    playerRef.current.setLoop(true);
-                }
-            }
-        };
-
-        const handleLeave = () => {
-            if (playerRef.current) {
-                playerRef.current.setLoop(false);
-            }
+            const player = playerRef.current;
+            if (!player) return;
+            player.setLoop(false);
+            player.stop();
+            player.play();
         };
 
         hoverAncestor.addEventListener('mouseenter', handleHover);
-        hoverAncestor.addEventListener('mouseleave', handleLeave);
 
         return () => {
             hoverAncestor.removeEventListener('mouseenter', handleHover);
-            hoverAncestor.removeEventListener('mouseleave', handleLeave);
         };
-    }, [hasPlayed, playOnce]);
+    }, []);
 
     useEffect(() => {
-        if (playerRef.current) {
-            if (autoPlay) {
-                playerRef.current.play();
-            } else {
-                setTimeout(() => {
-                    playerRef.current?.setLoop(false);
-                }, 150);
-            }
+        if (autoPlay) {
+            playerRef.current?.play();
         }
     }, [autoPlay]);
 

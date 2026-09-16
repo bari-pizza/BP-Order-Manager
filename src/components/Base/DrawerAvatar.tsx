@@ -11,7 +11,9 @@ import {
 } from './DrawerCardBase';
 // import { createElement } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { LockLottieIcon, RoundLottieIcon } from '../../rickcedlib/LottieIcons';
+import { LockLottieIcon } from '../../rickcedlib/LottieIcons';
+import { RoundImage } from './RoundImage';
+import { getDrawerFullName } from '../../utils';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
 
 type DrawerAvatarProps = {
@@ -19,7 +21,8 @@ type DrawerAvatarProps = {
     variant?: 'standard' | 'border';
     sx?: DrawerCardOverrideSX;
     drawer?: Drawer | Driver_Drawer;
-    playOnce?: boolean;
+    /** Lift on hover. Off in tables, on for the drawer cards. */
+    bump?: boolean;
     // props?: DrawerCardSlotProps;
     // drawerRef?: React.RefObject<HTMLDivElement>;
     isLocked?: boolean;
@@ -62,7 +65,7 @@ export const DrawerAvatar = ({
     size = 'medium',
     variant = 'standard',
     sx,
-    playOnce = false,
+    bump = false,
     // props,
     // drawerRef,
     isLocked = false,
@@ -117,12 +120,12 @@ export const DrawerAvatar = ({
             }}
             overlap="circular"
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-            <RoundLottieIcon
-                imageSrc={imageSrc}
-                height={finalAvatarSx.height as string}
-                width={finalAvatarSx.width as string}
+            <RoundImage
+                src={imageSrc}
+                alt={getDrawerFullName(drawer)}
                 className={'drawer-avatar-' + drawer.drawer_id}
-                playOnce={playOnce}
+                style={finalAvatarSx as React.CSSProperties}
+                bump={bump}
             />
             {/* <Avatar
                 className={'drawer-avatar-' + drawer.drawer_id}

@@ -154,6 +154,7 @@ export const DrawerCardBase = ({
                         sx={overrideSX}
                         // props={props}
                         isLocked={isLocked}
+                        bump
                     />
                 </Badge>
                 <Stack justifyContent="center" alignItems="center" height="50px" {...props?.nameStack}>

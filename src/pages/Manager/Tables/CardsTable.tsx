@@ -45,7 +45,7 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
                 } = row;
                 return (
                     <Stack direction="row" alignItems="center" height="100%" spacing={2}>
-                        <OriginLogo orderOrigin={origin} playOnce />
+                        <OriginLogo orderOrigin={origin} />
                         <OrderTypeIcon orderType={order_type} />
                         <span>{order_number ?? order_name}</span>
                     </Stack>
@@ -73,9 +73,6 @@ export const CardsTable = ({ payments }: { payments: PaymentWithFullDetails[] })
                 columns={columns}
                 disableVirtualization
                 getRowId={(row) => row.order_id}
-                getRowClassName={() => {
-                    return 'lottie-icon-container';
-                }}
                 hideFooter
             />
         </Stack>
