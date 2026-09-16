@@ -15,6 +15,7 @@ import {
 import type { Drawer, Driver_Drawer } from '../../typesAndValidators';
 import { SxProps, useTheme } from '@mui/material/styles';
 import { DrawerAvatar, DrawerAvatarSkeleton } from './DrawerAvatar';
+import { hoverBumpSx } from './hoverBump';
 
 export interface DrawerCardSlotProps {
     button?: Partial<ButtonProps>;
@@ -144,7 +145,8 @@ export const DrawerCardBase = ({
                 <Badge
                     // badgeCount={{ start: previousBadgeCount, end: badgeCount }}
                     badgeContent={badgeCount}
-                    sx={overrideSX.badge}
+                    // Lift here rather than on the avatar so the count and lock badges move with it.
+                    sx={{ ...overrideSX.badge, ...hoverBumpSx }}
                     overlap="circular"
                     {...props?.badge}
                     key={badgeCount}>
@@ -154,7 +156,6 @@ export const DrawerCardBase = ({
                         sx={overrideSX}
                         // props={props}
                         isLocked={isLocked}
-                        bump
                     />
                 </Badge>
                 <Stack justifyContent="center" alignItems="center" height="50px" {...props?.nameStack}>

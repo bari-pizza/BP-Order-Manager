@@ -21,8 +21,6 @@ type DrawerAvatarProps = {
     variant?: 'standard' | 'border';
     sx?: DrawerCardOverrideSX;
     drawer?: Drawer | Driver_Drawer;
-    /** Lift on hover. Off in tables, on for the drawer cards. */
-    bump?: boolean;
     // props?: DrawerCardSlotProps;
     // drawerRef?: React.RefObject<HTMLDivElement>;
     isLocked?: boolean;
@@ -65,7 +63,6 @@ export const DrawerAvatar = ({
     size = 'medium',
     variant = 'standard',
     sx,
-    bump = false,
     // props,
     // drawerRef,
     isLocked = false,
@@ -125,7 +122,6 @@ export const DrawerAvatar = ({
                 alt={getDrawerFullName(drawer)}
                 className={'drawer-avatar-' + drawer.drawer_id}
                 style={finalAvatarSx as React.CSSProperties}
-                bump={bump}
             />
             {/* <Avatar
                 className={'drawer-avatar-' + drawer.drawer_id}

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Stack, Typography, Paper } from '@mui/material';
+import { Stack, Typography, Paper, Badge } from '@mui/material';
 import { RoundImage } from './RoundImage';
+import { hoverBumpSx } from './hoverBump';
 import avatarImage from '../../assets/add-user.png';
 
 const meta = {
@@ -43,8 +44,41 @@ export const Bump: Story = {
 };
 
 /**
- * Real-world trigger: hovering anywhere on the card plays the bump, because the card carries
- * the .lottie-icon-container class. This is how drawer cards and nav items behave.
+ * Resource rows ship with an empty src until someone uploads one, so this is what dev
+ * currently looks like. It must not render a broken image.
+ */
+export const MissingImageFallback: Story = {
+    args: { src: '', alt: 'Unassigned' },
+    render: () => (
+        <Stack spacing={3} padding={3}>
+            <Typography variant="h6">Empty or broken src</Typography>
+            <Stack direction="row" spacing={6} alignItems="center">
+                {[
+                    { src: '', alt: 'Unassigned', label: 'empty src' },
+                    { src: '', alt: 'Test Driver1', label: 'empty src, driver' },
+                    { src: 'https://example.invalid/nope.png', alt: 'DoorDash', label: 'broken url' },
+                ].map(({ src, alt, label }) => (
+                    <Stack key={label} spacing={1} alignItems="center" width={140}>
+                        <RoundImage src={src} alt={alt} size="large" variant="border" />
+                        <Typography variant="caption" textAlign="center">
+                            {label}
+                        </Typography>
+                    </Stack>
+                ))}
+            </Stack>
+            <Typography variant="h6">Fallback at every size</Typography>
+            <Stack direction="row" spacing={6} alignItems="center">
+                {(['small', 'medium', 'large', 'xlarge'] as const).map((size) => (
+                    <RoundImage key={size} src="" alt="Unassigned" size={size} variant="border" />
+                ))}
+            </Stack>
+        </Stack>
+    ),
+};
+
+/**
+ * Real-world trigger: hovering anywhere on the card lifts the avatar *and* its badges,
+ * because the badge wrapper carries hoverBumpSx. This is how drawer cards behave.
  */
 export const HoverFromParentCard: Story = {
     args: { src: avatarImage, alt: 'sample avatar' },
@@ -55,16 +89,29 @@ export const HoverFromParentCard: Story = {
                 <Paper
                     className="lottie-icon-container"
                     elevation={3}
-                    sx={{ padding: 3, width: 160, textAlign: 'center', cursor: 'pointer' }}>
+                    sx={{ padding: 3, width: 170, textAlign: 'center', cursor: 'pointer' }}>
                     <Stack spacing={1} alignItems="center">
-                        <RoundImage src={avatarImage} alt="bump" size="large" variant="border" bump />
-                        <Typography variant="subtitle2">bump</Typography>
+                        <Badge badgeContent={1} color="error" overlap="circular" sx={hoverBumpSx}>
+                            <RoundImage src={avatarImage} alt="badged" size="large" variant="border" />
+                        </Badge>
+                        <Typography variant="subtitle2">badge lifts too</Typography>
                     </Stack>
                 </Paper>
                 <Paper
                     className="lottie-icon-container"
                     elevation={3}
-                    sx={{ padding: 3, width: 160, textAlign: 'center', cursor: 'pointer' }}>
+                    sx={{ padding: 3, width: 170, textAlign: 'center', cursor: 'pointer' }}>
+                    <Stack spacing={1} alignItems="center">
+                        <Badge badgeContent={1} color="error" overlap="circular" sx={hoverBumpSx}>
+                            <RoundImage src="" alt="Unassigned" size="large" variant="border" />
+                        </Badge>
+                        <Typography variant="subtitle2">fallback, badged</Typography>
+                    </Stack>
+                </Paper>
+                <Paper
+                    className="lottie-icon-container"
+                    elevation={3}
+                    sx={{ padding: 3, width: 170, textAlign: 'center', cursor: 'pointer' }}>
                     <Stack spacing={1} alignItems="center">
                         <RoundImage src={avatarImage} alt="static" size="large" variant="border" />
                         <Typography variant="subtitle2">static, as in tables</Typography>

@@ -1,4 +1,5 @@
-import { Box, useTheme } from '@mui/material';
+import { Avatar, useTheme } from '@mui/material';
+import { BUMP_SHADOW, BUMP_TRANSFORM, BUMP_TRANSITION } from './hoverBump';
 
 export type RoundImageProps = {
     src: string;
@@ -7,7 +8,7 @@ export type RoundImageProps = {
     variant?: 'border' | 'standard';
     size?: 'small' | 'medium' | 'large' | 'xlarge';
     className?: string;
-    /** Lift slightly on hover. Off in tables and lists, where movement is just noise. */
+    /** Lift on hover. Leave off in tables and lists, and when a wrapper carries hoverBumpSx. */
     bump?: boolean;
 };
 
@@ -35,11 +36,17 @@ const xlargeStyle = {
     border: '4px solid',
 };
 
-const bumpHover = {
-    transform: 'translateY(-2px) scale(1.06)',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.25)',
+const sizeStyles = {
+    small: smallStyle,
+    medium: mediumStyle,
+    large: largeStyle,
+    xlarge: xlargeStyle,
 };
 
+/**
+ * Round avatar/logo. Falls back to the alt's initial when `src` is empty or fails to load,
+ * which matters because Resource rows ship with an empty src until someone uploads one.
+ */
 export const RoundImage = ({
     src,
     alt,
@@ -51,28 +58,25 @@ export const RoundImage = ({
 }: RoundImageProps) => {
     const theme = useTheme();
 
+    const sizeStyle = sizeStyles[size];
+    // Keep the fallback initial in proportion however the size was set.
+    const heightPx = parseInt(String(style?.height ?? sizeStyle.height), 10);
+
     return (
-        <Box
-            component="img"
-            src={src}
+        <Avatar
+            // An empty string resolves against the page URL and renders a broken image.
+            src={src || undefined}
             alt={alt}
             className={className}
             sx={{
-                borderRadius: '50%',
-                objectFit: 'cover',
-                ...(size === 'small' ? smallStyle : {}),
-                ...(size === 'medium' ? mediumStyle : {}),
-                ...(size === 'large' ? largeStyle : {}),
-                ...(size === 'xlarge' ? xlargeStyle : {}),
+                ...sizeStyle,
                 ...(variant === 'border' ? {} : { border: 'none' }),
                 borderColor: theme.palette.primary.main,
+                fontSize: Number.isFinite(heightPx) ? `${Math.round(heightPx * 0.4)}px` : undefined,
                 ...(bump && {
-                    transition: 'transform 180ms ease-out, box-shadow 180ms ease-out',
-                    transform: 'translateY(0) scale(1)',
-                    // Hovering the avatar itself, or any card/row that opts in by carrying the
-                    // .lottie-icon-container class, plays the bump.
-                    '&:hover': bumpHover,
-                    '.lottie-icon-container:hover &': bumpHover,
+                    transition: BUMP_TRANSITION,
+                    '&:hover': { transform: BUMP_TRANSFORM, boxShadow: BUMP_SHADOW },
+                    '.lottie-icon-container:hover &': { transform: BUMP_TRANSFORM, boxShadow: BUMP_SHADOW },
                     '@media (prefers-reduced-motion: reduce)': {
                         transition: 'none',
                         '&:hover': { transform: 'none', boxShadow: 'none' },
