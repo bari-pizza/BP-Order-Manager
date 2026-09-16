@@ -1,7 +1,7 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
-/// <reference types="vitest" />
 /// <reference types="vite/client" />
-import { defineConfig } from 'vite';
+// defineConfig comes from vitest/config (not vite) so the `test` block below type-checks.
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { qrcode } from 'vite-plugin-qrcode';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -84,10 +84,12 @@ export default defineConfig({
             },
         }),
     ],
-    // test: {
-    // only for vitest: https://stackoverflow.com/questions/72146352/vitest-defineconfig-test-does-not-exist-in-type-userconfigexport
-    //     globals: true,
-    //     environment: 'jsdom',
-    //     setupFiles: './vitest.setup.ts',
-    // },
+    test: {
+        environment: 'jsdom',
+        setupFiles: './vitest.setup.ts',
+        // tests/e2e is Playwright, which Vitest cannot run. Keep the two suites disjoint:
+        // `npm test` for unit tests, `npm run test:e2e` for Playwright.
+        include: ['tests/unit/**/*.{test,spec}.{ts,tsx}', 'src/**/*.{test,spec}.{ts,tsx}'],
+        exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/**'],
+    },
 });
