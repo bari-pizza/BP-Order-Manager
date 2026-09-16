@@ -8,6 +8,7 @@ import { useRef } from 'react';
 import { Id, toast } from '../../toast/toastWrapper';
 import { useQueryClient } from '@tanstack/react-query';
 import { Profile } from '../../typesAndValidators';
+import { normalizeEmail } from '../../utils';
 
 type FormValues = {
     email: string;
@@ -33,8 +34,9 @@ export function Login() {
     const showPassword = watch('showPassword');
 
     const onResetPassword = async (data: FormValues) => {
-        toastRef.current = toast.loading(`Sending password reset email to ${data.email}`);
-        const { error } = await supaClient.auth.resetPasswordForEmail(data.email, {
+        const email = normalizeEmail(data.email);
+        toastRef.current = toast.loading(`Sending password reset email to ${email}`);
+        const { error } = await supaClient.auth.resetPasswordForEmail(email, {
             redirectTo: '/myaccount',
         });
         if (error) {
@@ -47,7 +49,7 @@ export function Login() {
             return;
         }
         toast.update(toastRef.current, {
-            render: `Password reset email sent to ${data.email}`,
+            render: `Password reset email sent to ${email}`,
             type: 'success',
             isLoading: false,
             autoClose: 5000,
@@ -56,9 +58,10 @@ export function Login() {
     };
 
     const onSignIn = async (data: FormValues) => {
+        const email = normalizeEmail(data.email);
         toastRef.current = toast.loading('Signing in...');
         const profiles = queryClient.getQueryData(['profiles']) as Profile[];
-        const profile = profiles.find((p) => p.email === data.email) || null;
+        const profile = profiles.find((p) => normalizeEmail(p.email) === email) || null;
         if (!profile) {
             toast.update(toastRef.current, {
                 render: 'Could not sign in. Profile not found.',
@@ -80,7 +83,7 @@ export function Login() {
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { data: _, error } = await supaClient.auth.signInWithPassword({
-            email: data.email,
+            email,
             password: data.password,
         });
         if (error) {

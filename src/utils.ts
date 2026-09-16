@@ -89,6 +89,9 @@ export const nonZeroModulo = (a: number, b: number) => {
     return c === 0 ? b : c;
 };
 
+/** Supabase auth treats emails as case-insensitive; match that when looking up or signing in. */
+export const normalizeEmail = (email: string | null | undefined) => (email ?? '').trim().toLowerCase();
+
 export const getEnv = (variableName: string): string => {
     if (variableName === 'MODE') {
         const mode = import.meta.env.MODE;

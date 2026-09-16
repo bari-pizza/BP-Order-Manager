@@ -15,6 +15,9 @@ import { Id, toast } from '../../../toast/toastWrapper';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { m } from '../../../types/messages';
 import { invalidateDriversAndProfiles } from '../../../utils/queryInvalidation';
+import { normalizeEmail } from '../../../utils';
+
+const required = (label: string) => (value: string) => (value.trim() ? true : `${label} is required`);
 
 const sortEmployees = (a: Profile, b: Profile) => {
     const aFirstName = a.first_name?.toLowerCase() || '';
@@ -80,7 +83,7 @@ export const EmployeesTab = () => {
         .sort(sortEmployees);
 
     const onSubmit = async (formData: FormValues) => {
-        const email = formData.email.trim().toLowerCase();
+        const email = normalizeEmail(formData.email);
         const first_name = formData.first_name.trim();
         const last_name = formData.last_name.trim();
         const phone = formData.phone.trim();
@@ -127,11 +130,18 @@ export const EmployeesTab = () => {
                         <Controller
                             control={control}
                             name="email"
-                            rules={{ required: 'Email is required' }}
+                            rules={{
+                                validate: (value) => {
+                                    const email = normalizeEmail(value);
+                                    if (!email) return 'Email is required';
+                                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || 'Must be a valid email';
+                                },
+                            }}
                             render={({ field }) => (
                                 <SmartTextField
                                     {...field}
                                     label="Email"
+                                    type="email"
                                     isDirty={dirtyFields.email}
                                     error={!!errors.email}
                                     helperText={errors.email?.message}
@@ -141,20 +151,21 @@ export const EmployeesTab = () => {
                         <Controller
                             control={control}
                             name="first_name"
-                            rules={{ required: 'First Name is required' }}
+                            rules={{ validate: required('First Name') }}
                             render={({ field }) => (
                                 <SmartTextField
                                     {...field}
                                     label="First Name"
                                     isDirty={dirtyFields.first_name}
                                     error={!!errors.first_name}
+                                    helperText={errors.first_name?.message}
                                 />
                             )}
                         />
                         <Controller
                             control={control}
                             name="last_name"
-                            rules={{ required: 'Last Name is required' }}
+                            rules={{ validate: required('Last Name') }}
                             render={({ field }) => (
                                 <SmartTextField
                                     {...field}
@@ -168,11 +179,18 @@ export const EmployeesTab = () => {
                         <Controller
                             control={control}
                             name="phone"
-                            rules={{ required: 'Phone is required' }}
+                            rules={{
+                                validate: (value) => {
+                                    const phone = value.trim();
+                                    if (!phone) return 'Phone is required';
+                                    return phone.length >= 5 || 'Must be at least 5 characters';
+                                },
+                            }}
                             render={({ field }) => (
                                 <SmartTextField
                                     {...field}
                                     label="Phone"
+                                    type="tel"
                                     isDirty={dirtyFields.phone}
                                     error={!!errors.phone}
                                     helperText={errors.phone?.message}
