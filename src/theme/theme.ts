@@ -15,4 +15,25 @@ export const themeOptions: ThemeOptions = {
             dark: '#AB3022',
         },
     },
+    components: {
+        MuiButtonBase: {
+            defaultProps: {
+                disableRipple: true,
+            },
+        },
+        MuiTextField: {
+            // Login passes its own autoComplete values, which override this default.
+            defaultProps: {
+                autoComplete: 'off',
+            },
+        },
+        MuiDialogTitle: {
+            // Message catalog stores lowercase titles ("add employee").
+            styleOverrides: {
+                root: {
+                    textTransform: 'capitalize',
+                },
+            },
+        },
+    },
 };
