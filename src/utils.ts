@@ -91,9 +91,23 @@ export const nonZeroModulo = (a: number, b: number) => {
 
 export const getEnv = (variableName: string): string => {
     if (variableName === 'MODE') {
-        return import.meta.env.MODE || (process.env.NODE_ENV as string);
+        const mode = import.meta.env.MODE;
+        if (mode) return mode;
+        // Node/test only — `process` is not defined in the browser
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV) {
+            return process.env.NODE_ENV;
+        }
+        return '';
     }
-    return import.meta.env[variableName] || process.env[variableName];
+
+    const fromVite = import.meta.env[variableName];
+    if (fromVite != null && fromVite !== '') return String(fromVite);
+
+    if (typeof process !== 'undefined' && process.env?.[variableName]) {
+        return process.env[variableName] as string;
+    }
+
+    return '';
 };
 
 export const devOnly = (child: React.ReactElement) => {
