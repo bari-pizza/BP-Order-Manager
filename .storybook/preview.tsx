@@ -36,7 +36,11 @@ const preview: Preview = {
                 date: /Date$/i,
             },
             expanded: true,
+            // Don't hide the panel when a story has no args — show a hint instead.
+            hideNoControlsWarning: false,
         },
+        // Prefer Canvas (where Controls live) over Docs as the default view.
+        viewMode: 'story',
         layout: 'centered',
         options: {
             storySort: {

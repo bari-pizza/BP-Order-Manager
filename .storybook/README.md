@@ -1,19 +1,19 @@
 # Storybook
 
-Component gallery for Bari Pizza Order Manager.
-
 ```bash
 npm run storybook
+# → http://localhost:6006
 ```
 
-Opens [http://localhost:6006](http://localhost:6006) (also startable from the local-dev-dashboard **Storybook** service).
+Also startable from the local-dev-dashboard **Storybook** service.
 
-## How to tweak props live
+## Finding Controls (live props)
 
-1. Open a story under **Foundation** or **Shop** (start with `Foundation / RoundImage / Playground`).
-2. Open the **Controls** panel at the bottom of the canvas (or press `A` then pick Controls).
-3. Change size / bump / badge count — the preview updates immediately.
+1. Stay on the **Canvas** tab (not Docs).
+2. Open **Foundation → RoundImage → Playground** (or **Shop → DrawerCard → Playground**).
+3. Look at the **bottom panel**. You should see tabs like Controls / Actions / Accessibility.
+4. If the panel is missing: press **D** (toggle addon panel), or click the square icon in the Storybook toolbar that shows/hides the bottom panel, then click **Controls**.
 
-Stories that are layout demos (NavBar, Home, galleries) disable Controls on purpose; use the arg-driven **Playground** stories for interviews.
+Change `size`, `bump`, or the image select — the preview updates immediately.
 
-Sidebar groups: **Foundation** → **Shop** → **Layout** → **Pages**.
+Layout stories (NavBar, Home) don’t use Controls; Playground stories do.

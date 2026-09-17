@@ -1,31 +1,16 @@
 import { BariPizzaContext, emptyShopContext } from '../../src/context/BariPizzaContext';
 import { createContextDecorator } from '.';
 import { dummyDrawers } from '../../src/dummyData';
-import type { OrderOrigin, Resource } from '../../src/typesAndValidators';
-import {
-    DEFAULT_ORIGIN_RESOURCE_TITLE,
-    IN_HOUSE_ORIGIN_RESOURCE_TITLE,
-    mergeResourcesWithDefaults,
-} from '../../src/constants/resources';
-import avatarImage from '../../src/assets/add-user.png';
+import type { OrderOrigin } from '../../src/typesAndValidators';
+import { resourceSrc, storyResources } from '../fixtures/resources';
 
 const { drawers, drivers } = dummyDrawers;
-
-const resources: Resource[] = mergeResourcesWithDefaults([
-    { title: IN_HOUSE_ORIGIN_RESOURCE_TITLE, src: avatarImage, bucket_name: 'resources' },
-    { title: DEFAULT_ORIGIN_RESOURCE_TITLE, src: avatarImage, bucket_name: 'resources' },
-    { title: 'Register', src: avatarImage, bucket_name: 'resources' },
-    { title: 'Third Party Pickup', src: avatarImage, bucket_name: 'resources' },
-    { title: 'Unassigned Drawer', src: avatarImage, bucket_name: 'resources' },
-    { title: 'Missing Avatar', src: avatarImage, bucket_name: 'resources' },
-    { title: 'Add Driver', src: avatarImage, bucket_name: 'resources' },
-]);
 
 const origins: OrderOrigin[] = [
     {
         origin_id: 'origin-in-house',
         name: 'Bari Pizza',
-        icon: avatarImage,
+        icon: resourceSrc.bariPizza,
         is_third_party: false,
         can_deliver: true,
         can_tip: true,
@@ -53,7 +38,7 @@ const shopValue = {
     drawers,
     drivers: drivers.slice(0, 3),
     origins,
-    resources,
+    resources: storyResources,
 };
 
 export default {

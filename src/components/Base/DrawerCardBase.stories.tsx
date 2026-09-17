@@ -4,13 +4,17 @@ import { DrawerCardBase } from './DrawerCardBase';
 import { dummyDrawers } from '../../dummyData';
 
 const register = dummyDrawers.drawers[0];
+const thirdParty = dummyDrawers.drawers[2];
 const driver = dummyDrawers.drivers[0];
 
 const meta = {
     title: 'Shop/DrawerCard',
     component: DrawerCardBase,
     tags: ['autodocs'],
-    parameters: { layout: 'padded' },
+    parameters: {
+        layout: 'padded',
+        controls: { expanded: true },
+    },
     args: {
         drawer: register,
         badgeCount: 3,
@@ -22,7 +26,15 @@ const meta = {
         isOpen: { control: 'boolean' },
         isLocked: { control: 'boolean' },
         handleClick: { action: 'clicked' },
-        drawer: { control: false },
+        drawer: {
+            control: 'select',
+            options: ['Register', 'Third Party', 'Driver'],
+            mapping: {
+                Register: register,
+                'Third Party': thirdParty,
+                Driver: driver,
+            },
+        },
         sx: { control: false },
         props: { control: false },
     },
@@ -31,29 +43,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Register: Story = {};
+/** Bottom **Controls**: badge count, lock, which drawer. */
+export const Playground: Story = {};
 
-export const Driver: Story = {
-    args: {
-        drawer: driver,
-        badgeCount: 2,
-    },
-};
-
-export const Locked: Story = {
-    args: {
-        drawer: driver,
-        isLocked: true,
-        badgeCount: 0,
-    },
-};
-
-export const Gallery: Story = {
+export const Row: Story = {
     parameters: { controls: { disable: true } },
     render: () => (
         <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
             <DrawerCardBase drawer={register} badgeCount={5} />
-            <DrawerCardBase drawer={dummyDrawers.drawers[2]} badgeCount={1} />
+            <DrawerCardBase drawer={thirdParty} badgeCount={1} />
             <DrawerCardBase drawer={driver} badgeCount={2} />
             <DrawerCardBase drawer={driver} badgeCount={0} isLocked />
         </Stack>
