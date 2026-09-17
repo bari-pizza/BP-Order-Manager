@@ -7,7 +7,6 @@ import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { useRef } from 'react';
 import { Id, toast } from '../../toast/toastWrapper';
 import { useQueryClient } from '@tanstack/react-query';
-import { Profile } from '../../typesAndValidators';
 import { normalizeEmail } from '../../utils';
 
 type FormValues = {
@@ -60,29 +59,10 @@ export function Login() {
     const onSignIn = async (data: FormValues) => {
         const email = normalizeEmail(data.email);
         toastRef.current = toast.loading('Signing in...');
-        const profiles = queryClient.getQueryData(['profiles']) as Profile[];
-        const profile = profiles.find((p) => normalizeEmail(p.email) === email) || null;
-        if (!profile) {
-            toast.update(toastRef.current, {
-                render: 'Could not sign in. Profile not found.',
-                type: 'error',
-                isLoading: false,
-                autoClose: 5000,
-            });
-            return;
-        }
-        if (profile.is_deleted) {
-            toast.update(toastRef.current, {
-                render: 'Could not sign in. Your account has been deleted.',
-                type: 'error',
-                isLoading: false,
-                autoClose: 5000,
-            });
-            return;
-        }
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { data: _, error } = await supaClient.auth.signInWithPassword({
+        // Authenticate before touching Profile. The row is only readable once a session exists,
+        // and reading it beforehand meant the whole table had to be world-readable.
+        const { data: signIn, error } = await supaClient.auth.signInWithPassword({
             email,
             password: data.password,
         });
@@ -95,8 +75,30 @@ export function Login() {
             });
             return;
         }
+
+        const { data: profile } = await supaClient
+            .from('Profile')
+            .select('first_name, is_deleted')
+            .eq('id', signIn.user.id)
+            .maybeSingle();
+
+        // Deleted employees keep their auth user, so the session has to be thrown away again.
+        if (profile?.is_deleted) {
+            await supaClient.auth.signOut();
+            toast.update(toastRef.current, {
+                render: 'Could not sign in. Your account has been deleted.',
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+            return;
+        }
+
+        // The bootstrap fetched this list anonymously; refetch it now that we're a real user.
+        await queryClient.invalidateQueries({ queryKey: ['profiles'] });
+
         toast.update(toastRef.current, {
-            render: `Welcome ${profile.first_name}!`,
+            render: profile ? `Welcome ${profile.first_name}!` : 'Welcome!',
             type: 'success',
             isLoading: false,
             autoClose: 5000,
