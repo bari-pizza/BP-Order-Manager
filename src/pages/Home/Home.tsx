@@ -1,33 +1,53 @@
 import { Player } from '@lottiefiles/react-lottie-player';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import PizzaShopLottie from '../../assets/Pizza Shop.json';
 import PizzaShopMobileLottie from '../../assets/Pizza Shop Mobile.json';
 import { useLayoutContext } from '../../hooks/data/useContextData';
 
+/**
+ * Mobile Lottie is 1550×4025 — taller than most phones when fit-to-width.
+ * Fit the whole composition inside the visible area (meet) and anchor to the
+ * bottom so the pizza shop stays on-screen instead of getting clipped.
+ */
 export const Home = () => {
     const { isMobile } = useLayoutContext();
-    // Mobile Lottie is 1550×4025 (very tall). Cap both axes so it can't force horizontal scroll on phones.
-    const playerStyle = {
-        width: '100%',
-        maxWidth: '100%',
-        maxHeight: '100%',
-        height: 'auto',
-    } as const;
 
     return (
         <Stack
             alignItems="center"
             justifyContent="center"
             direction="column"
-            height="100%"
-            minHeight="100vh"
             width="100%"
-            overflow="hidden">
-            {isMobile ? (
-                <Player autoplay src={PizzaShopMobileLottie} style={playerStyle} keepLastFrame />
-            ) : (
-                <Player autoplay src={PizzaShopLottie} style={playerStyle} keepLastFrame />
-            )}
+            // dvh tracks the visible viewport on mobile browsers (100vh often
+            // includes the area under the URL bar and clips the bottom).
+            height="100dvh"
+            maxHeight="100dvh"
+            overflow="hidden"
+            sx={{ minHeight: '-webkit-fill-available' }}>
+            <Box
+                sx={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    // Lottie injects an svg; force it to respect the box.
+                    '& svg': {
+                        width: '100% !important',
+                        height: '100% !important',
+                    },
+                }}>
+                <Player
+                    autoplay
+                    keepLastFrame
+                    src={isMobile ? PizzaShopMobileLottie : PizzaShopLottie}
+                    style={{ width: '100%', height: '100%' }}
+                    rendererSettings={{
+                        // xMidYMax = horizontally centered, vertically bottom-aligned.
+                        preserveAspectRatio: isMobile ? 'xMidYMax meet' : 'xMidYMid meet',
+                    }}
+                />
+            </Box>
         </Stack>
     );
 };
