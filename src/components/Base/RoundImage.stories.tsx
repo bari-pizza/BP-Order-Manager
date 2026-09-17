@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Stack, Typography, Paper, Badge } from '@mui/material';
+import { Stack, Typography, Paper, Badge, Button } from '@mui/material';
 import { RoundImage } from './RoundImage';
 import { hoverBumpSx } from './hoverBump';
 import avatarImage from '../../assets/add-user.png';
@@ -72,6 +72,39 @@ export const MissingImageFallback: Story = {
                     <RoundImage key={size} src="" alt="Unassigned" size={size} variant="border" />
                 ))}
             </Stack>
+        </Stack>
+    ),
+};
+
+/**
+ * DrawerCardBase sizes its avatar as `height: 4em`, which must resolve against the button's
+ * inherited font size. Guards against the avatar collapsing if Avatar's own font-size wins.
+ */
+export const SizedInEm: Story = {
+    args: { src: avatarImage, alt: 'sample avatar' },
+    render: () => (
+        <Stack direction="row" spacing={3} padding={3}>
+            {[
+                { label: 'with image', src: avatarImage },
+                { label: 'fallback', src: '' },
+            ].map(({ label, src }) => (
+                <Button
+                    key={label}
+                    variant="outlined"
+                    className="lottie-icon-container"
+                    sx={{ height: 175, width: 100 }}>
+                    <Stack alignItems="center" gap={1}>
+                        <Badge badgeContent={2} color="error" overlap="circular" sx={hoverBumpSx}>
+                            <RoundImage
+                                src={src}
+                                alt="Drawer 1"
+                                style={{ height: '4em', width: '4em', border: '4px solid #00875A' }}
+                            />
+                        </Badge>
+                        <Typography variant="body2">{label}</Typography>
+                    </Stack>
+                </Button>
+            ))}
         </Stack>
     ),
 };

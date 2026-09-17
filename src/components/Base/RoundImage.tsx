@@ -1,4 +1,5 @@
 import { Avatar, useTheme } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 import { BUMP_SHADOW, BUMP_TRANSFORM, BUMP_TRANSITION } from './hoverBump';
 
 export type RoundImageProps = {
@@ -59,8 +60,6 @@ export const RoundImage = ({
     const theme = useTheme();
 
     const sizeStyle = sizeStyles[size];
-    // Keep the fallback initial in proportion however the size was set.
-    const heightPx = parseInt(String(style?.height ?? sizeStyle.height), 10);
 
     return (
         <Avatar
@@ -72,7 +71,11 @@ export const RoundImage = ({
                 ...sizeStyle,
                 ...(variant === 'border' ? {} : { border: 'none' }),
                 borderColor: theme.palette.primary.main,
-                fontSize: Number.isFinite(heightPx) ? `${Math.round(heightPx * 0.4)}px` : undefined,
+                // Callers size this in `em` (DrawerCardBase uses 4em). Avatar would otherwise
+                // resolve that against its own 1.25rem default instead of the inherited size.
+                fontSize: 'inherit',
+                // Match the bare <img> this replaced; the grey only belongs behind the fallback.
+                ...(src ? { bgcolor: 'transparent' } : {}),
                 ...(bump && {
                     transition: BUMP_TRANSITION,
                     '&:hover': { transform: BUMP_TRANSFORM, boxShadow: BUMP_SHADOW },
@@ -84,7 +87,10 @@ export const RoundImage = ({
                     },
                 }),
                 ...style,
-            }}
-        />
+            }}>
+            {/* Only rendered when src is empty or the image fails; sized by percentage so it
+                tracks the avatar whatever units the caller used. */}
+            <PersonIcon sx={{ width: '75%', height: '75%' }} />
+        </Avatar>
     );
 };
