@@ -8,12 +8,15 @@ loadTestEnv();
 
 const isCi = !!process.env.CI;
 
+// Headless everywhere; pass --headed to watch a run.
+const headless = true;
+
 const projects: NonNullable<PlaywrightTestConfig['projects']> = [
     {
         name: 'dev',
         use: {
             baseURL: 'http://localhost:6309',
-            headless: isCi,
+            headless,
             viewport: { width: 1280, height: 720 },
             actionTimeout: 5000,
             video: isCi ? 'on' : 'off',
@@ -28,7 +31,7 @@ if (process.env.PLAYWRIGHT_PROD === '1') {
         name: 'prod',
         use: {
             baseURL: 'https://app.bari.pizza',
-            headless: isCi,
+            headless,
             viewport: { width: 1280, height: 720 },
             actionTimeout: 5000,
             video: isCi ? 'on' : 'off',

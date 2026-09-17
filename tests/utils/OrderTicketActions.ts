@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { orderOriginsWithTypes, type OrderData } from './data';
+import { parseOriginName } from './ticketClasses';
 
 export class OrderTicketActions {
     // find ticket based on order info (order_number, order_name, origin, order_type, payment_type, total_in_cents)
@@ -51,7 +52,7 @@ export class OrderTicketActions {
         const totalText = (await lastTicket.locator('.order-total').textContent()) || '';
 
         // Parse and format the scraped data
-        const origin = originClass?.match(/origin-logo-(.*)/)?.[1]?.replace(/\./g, ' ');
+        const origin = parseOriginName(originClass);
         const orderType = orderTypeClass?.match(/order-type-(.*)-icon/)?.[1];
         const total_in_cents = parseFloat(totalText?.replace('$', '')) * 100;
 
