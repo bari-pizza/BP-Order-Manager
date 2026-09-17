@@ -14,5 +14,13 @@ export const ProfileAvatar = ({ avatarSrc, size = 32 }: ProfileAvatarProps) => {
     const imageSrc = avatarSrc || missing?.src || '';
 
     const px = `${size}px`;
-    return <RoundImage src={imageSrc} alt="" style={{ height: px, width: px, flexShrink: 0 }} />;
+    return (
+        <RoundImage
+            src={imageSrc}
+            alt=""
+            // The ring used to be painted into the Lottie artwork; it's a real border now.
+            variant="border"
+            style={{ height: px, width: px, borderWidth: '2px', flexShrink: 0 }}
+        />
+    );
 };

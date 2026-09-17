@@ -19,7 +19,9 @@ export const OriginLogo = ({ orderOrigin }: OriginLogoProps) => {
             src={imageSrc}
             alt={orderOrigin.name}
             className={`origin-logo-${orderOrigin.name}`}
-            style={{ height: '25px', width: '25px' }}
+            // The ring used to be painted into the Lottie artwork; it's a real border now.
+            variant="border"
+            style={{ height: '25px', width: '25px', borderWidth: '2px', flexShrink: 0 }}
         />
     );
 };

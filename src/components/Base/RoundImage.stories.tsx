@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Stack, Typography, Paper, Badge, Button } from '@mui/material';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import { RoundImage } from './RoundImage';
 import { hoverBumpSx } from './hoverBump';
 import avatarImage from '../../assets/add-user.png';
@@ -72,6 +73,42 @@ export const MissingImageFallback: Story = {
                     <RoundImage key={size} src="" alt="Unassigned" size={size} variant="border" />
                 ))}
             </Stack>
+        </Stack>
+    ),
+};
+
+/**
+ * The OrdersTable cell: a row of avatar + svg icon + text. The avatar must sit on the same
+ * centre line as the icon and the text, and keep its ring.
+ */
+export const InTableRow: Story = {
+    args: { src: avatarImage, alt: 'sample avatar' },
+    render: () => (
+        <Stack spacing={2} padding={3}>
+            {[
+                { label: 'with image', src: avatarImage },
+                { label: 'fallback', src: '' },
+            ].map(({ label, src }) => (
+                <Stack
+                    key={label}
+                    direction="row"
+                    alignItems="center"
+                    height={52}
+                    spacing={2}
+                    sx={{ borderBottom: '1px solid #eee', width: 320 }}>
+                    <RoundImage
+                        src={src}
+                        alt="Bari Pizza"
+                        variant="border"
+                        style={{ height: '25px', width: '25px', borderWidth: '2px', flexShrink: 0 }}
+                    />
+                    <DirectionsCarIcon color="primary" />
+                    <span>1</span>
+                    <Typography variant="body2" color="text.secondary">
+                        {label}
+                    </Typography>
+                </Stack>
+            ))}
         </Stack>
     ),
 };
