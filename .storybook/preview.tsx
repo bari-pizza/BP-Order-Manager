@@ -4,19 +4,29 @@ import { reactRouterParameters, withRouter } from 'storybook-addon-remix-react-r
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import { bariPizzaContextDecorators } from './contextDecorators';
+import { themeOptions } from '../src/theme/theme';
 
-const withLocalizationProvider = (storyFn: () => React.ReactNode) => {
-    return <LocalizationProvider dateAdapter={AdapterDayjs}>{storyFn()}</LocalizationProvider>;
-};
+const theme = createTheme(themeOptions);
 
-const queryClient = new QueryClient();
+const withAppProviders = (Story: () => React.ReactNode) => (
+    <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <QueryClientProvider client={queryClient}>
+                <Story />
+            </QueryClientProvider>
+        </LocalizationProvider>
+    </ThemeProvider>
+);
 
-const withQueryClient = (storyFn: () => React.ReactNode) => {
-    return <QueryClientProvider client={queryClient}>{storyFn()}</QueryClientProvider>;
-};
-
-// TODO: create a decorator to provide theme options
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: { retry: false },
+    },
+});
 
 const preview: Preview = {
     parameters: {
@@ -25,10 +35,17 @@ const preview: Preview = {
                 color: /(background|color)$/i,
                 date: /Date$/i,
             },
+            expanded: true,
+        },
+        layout: 'centered',
+        options: {
+            storySort: {
+                order: ['Foundation', 'Shop', 'Layout', 'Pages'],
+            },
         },
         reactRouter: reactRouterParameters({ location: { pathParams: {}, searchParams: {} } }),
     },
-    decorators: [withRouter, withQueryClient, bariPizzaContextDecorators.default, withLocalizationProvider],
+    decorators: [withRouter, withAppProviders, bariPizzaContextDecorators.default],
 };
 
 export default preview;

@@ -6,16 +6,45 @@ import { hoverBumpSx } from './hoverBump';
 import avatarImage from '../../assets/add-user.png';
 
 const meta = {
-    title: 'Base/RoundImage',
+    title: 'Foundation/RoundImage',
     component: RoundImage,
+    tags: ['autodocs'],
+    args: {
+        src: avatarImage,
+        alt: 'Sample avatar',
+        size: 'large',
+        variant: 'border',
+        bump: false,
+    },
+    argTypes: {
+        src: { control: 'text', description: 'Image URL. Empty string uses the person fallback.' },
+        alt: { control: 'text' },
+        size: {
+            control: 'select',
+            options: ['small', 'medium', 'large', 'xlarge'],
+        },
+        variant: {
+            control: 'radio',
+            options: ['border', 'standard'],
+        },
+        bump: {
+            control: 'boolean',
+            description: 'Lift on hover (off in tables; on for avatars / drawer cards).',
+        },
+        style: { control: false },
+        className: { control: false },
+    },
 } satisfies Meta<typeof RoundImage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Use the Controls panel (bottom) to tweak props live — this is the interview demo story. */
+export const Playground: Story = {};
+
 /** Hover to compare the bump against a static avatar, at each size the app uses. */
 export const Bump: Story = {
-    args: { src: avatarImage, alt: 'sample avatar' },
+    parameters: { controls: { disable: true } },
     render: () => (
         <Stack spacing={4} padding={3}>
             <Typography variant="h6">Hover each avatar</Typography>
@@ -49,7 +78,7 @@ export const Bump: Story = {
  * currently looks like. It must not render a broken image.
  */
 export const MissingImageFallback: Story = {
-    args: { src: '', alt: 'Unassigned' },
+    parameters: { controls: { disable: true } },
     render: () => (
         <Stack spacing={3} padding={3}>
             <Typography variant="h6">Empty or broken src</Typography>
@@ -82,7 +111,7 @@ export const MissingImageFallback: Story = {
  * centre line as the icon and the text, and keep its ring.
  */
 export const InTableRow: Story = {
-    args: { src: avatarImage, alt: 'sample avatar' },
+    parameters: { controls: { disable: true } },
     render: () => (
         <Stack spacing={2} padding={3}>
             {[
@@ -118,7 +147,7 @@ export const InTableRow: Story = {
  * inherited font size. Guards against the avatar collapsing if Avatar's own font-size wins.
  */
 export const SizedInEm: Story = {
-    args: { src: avatarImage, alt: 'sample avatar' },
+    parameters: { controls: { disable: true } },
     render: () => (
         <Stack direction="row" spacing={3} padding={3}>
             {[
@@ -151,7 +180,7 @@ export const SizedInEm: Story = {
  * because the badge wrapper carries hoverBumpSx. This is how drawer cards behave.
  */
 export const HoverFromParentCard: Story = {
-    args: { src: avatarImage, alt: 'sample avatar' },
+    parameters: { controls: { disable: true } },
     render: () => (
         <Stack spacing={3} padding={3}>
             <Typography variant="h6">Hover anywhere on the card</Typography>
