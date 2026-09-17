@@ -20,7 +20,6 @@ import OrderHistoryIcon from '../../assets/lottie-icons/Order History Icon.json'
 import PickupIcon from '../../assets/lottie-icons/Pickup Icon.json';
 import PizzaIcon from '../../assets/lottie-icons/Pizza Icon.json';
 import RegisterIcon from '../../assets/lottie-icons/Register Icon.json';
-import RoundIcon from '../../assets/lottie-icons/Round Icon.json';
 import SaveIcon from '../../assets/lottie-icons/Save Icon.json';
 import SearchIcon from '../../assets/lottie-icons/Search Icon.json';
 import SettingsIcon from '../../assets/lottie-icons/Settings Icon.json';
@@ -30,15 +29,11 @@ import TimeIcon from '../../assets/lottie-icons/Time Icon.json';
 import UnlockIcon from '../../assets/lottie-icons/Unlock Icon.json';
 import UploadIcon from '../../assets/lottie-icons/Upload Icon.json';
 import UserProfileIcon from '../../assets/lottie-icons/User Profile Icon.json';
-import { copyAndCleanLottie, urlToRoundedBase64 } from '../../utils';
-import { useQuery } from '@tanstack/react-query';
 type LottieIconProps = {
     height?: string;
     width?: string;
-    loop?: boolean;
     autoPlay?: boolean;
     className?: string;
-    playOnce?: boolean;
 };
 
 export const AdminShieldLottieIcon = ({ ...props }: LottieIconProps) => {
@@ -116,49 +111,6 @@ export const OrderHistoryLottieIcon = ({ ...props }: LottieIconProps) => {
 
 export const RegisterLottieIcon = ({ ...props }: LottieIconProps) => {
     return <LottieIcon lottieSrc={RegisterIcon} {...props} />;
-};
-
-// with react query
-export const RoundLottieIcon = ({ imageSrc, ...props }: LottieIconProps & { imageSrc?: string }) => {
-    // v3: no cream underlay (v1/v2 cached mattes from the icon redesign)
-    const queryKey = ['round-lottie-icon', 'v3', imageSrc];
-    const localStorageKey = `round-lottie-icon-v3-${imageSrc}`;
-    const { data: lottieData } = useQuery({
-        queryKey: queryKey,
-        queryFn: async () => {
-            const cachedData = localStorage.getItem(localStorageKey);
-            if (cachedData) {
-                return JSON.parse(cachedData);
-            }
-
-            let updatedLottieData;
-            if (!imageSrc) {
-                updatedLottieData = copyAndCleanLottie(RoundIcon, 'Front Side', 'Front Side', 'it.1.c.k');
-            } else {
-                const base64 = await urlToRoundedBase64(imageSrc);
-                updatedLottieData = copyAndCleanLottie(RoundIcon, 'Front Side', 'Front Side', 'it.1.c.k');
-                // @ts-expect-error not worth the effort to write a type for lottiedata
-                updatedLottieData.assets[0].p = base64;
-            }
-
-            localStorage.setItem(localStorageKey, JSON.stringify(updatedLottieData));
-            return updatedLottieData;
-        },
-        staleTime: Infinity,
-        enabled: true,
-        gcTime: Infinity,
-    });
-
-    const { className, ...rest } = props;
-
-    return (
-        <LottieIcon
-            loop={false}
-            lottieSrc={lottieData as string}
-            className={`lottie-round ${className || ''}`}
-            {...rest}
-        />
-    );
 };
 
 export const PickupLottieIcon = ({ ...props }: LottieIconProps) => {

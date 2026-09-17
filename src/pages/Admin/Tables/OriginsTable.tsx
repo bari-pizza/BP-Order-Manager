@@ -308,12 +308,11 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                 return (
                     <Stack
                         direction="row"
-                        alignItems="end"
+                        alignItems="center"
                         height="100%"
                         spacing={2}
-                        justifyContent="center"
-                        className="lottie-icon-container">
-                        <LogoUploader origin={params.row} disabled isAnimated />
+                        justifyContent="center">
+                        <LogoUploader origin={params.row} disabled />
                     </Stack>
                 );
             },
@@ -322,8 +321,8 @@ export const OriginsTable = ({ origins }: { origins: OrderOrigin[] }) => {
                     params.api.setEditCellValue({ id: params.id, field: 'icon', value: downloadURL });
                 };
                 return (
-                    <Stack direction="row" alignItems="end" height="100%" spacing={2} justifyContent="center">
-                        <LogoUploader origin={params.row} onSuccess={onSuccess} isAnimated />
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2} justifyContent="center">
+                        <LogoUploader origin={params.row} onSuccess={onSuccess} />
                     </Stack>
                 );
             },

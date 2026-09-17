@@ -1,7 +1,9 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
-    stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+    // No .mdx glob: the docs addon that compiles MDX is not installed, so Vite tries to parse
+    // src/stories/Configure.mdx as JS and throws an error overlay over every story.
+    stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
     addons: [
         '@storybook/addon-onboarding',
         '@storybook/addon-links',

@@ -1,14 +1,12 @@
 import { OrderOrigin } from '../../typesAndValidators';
-import { RoundLottieIcon } from '../../rickcedlib/LottieIcons';
+import { RoundImage } from '../Base/RoundImage';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
-import {
-    DEFAULT_ORIGIN_RESOURCE_TITLE,
-    IN_HOUSE_ORIGIN_RESOURCE_TITLE,
-} from '../../constants/resources';
+import { DEFAULT_ORIGIN_RESOURCE_TITLE, IN_HOUSE_ORIGIN_RESOURCE_TITLE } from '../../constants/resources';
 
-type OriginLogoProps = { orderOrigin: OrderOrigin; playOnce?: boolean };
+type OriginLogoProps = { orderOrigin: OrderOrigin };
 
-export const OriginLogo = ({ orderOrigin, playOnce }: OriginLogoProps) => {
+/** Origin logos are identity, not feedback, so they never animate. */
+export const OriginLogo = ({ orderOrigin }: OriginLogoProps) => {
     const { resources } = useBariPizzaContext();
     const inHouseLogo = resources.find((resource) => resource.title === IN_HOUSE_ORIGIN_RESOURCE_TITLE)?.src;
     const defaultOriginLogo = resources.find((resource) => resource.title === DEFAULT_ORIGIN_RESOURCE_TITLE)?.src;
@@ -17,12 +15,13 @@ export const OriginLogo = ({ orderOrigin, playOnce }: OriginLogoProps) => {
         : inHouseLogo || orderOrigin.icon || defaultOriginLogo || '';
 
     return (
-        <RoundLottieIcon
-            imageSrc={imageSrc}
-            height="25px"
-            width="25px"
+        <RoundImage
+            src={imageSrc}
+            alt={orderOrigin.name}
             className={`origin-logo-${orderOrigin.name}`}
-            playOnce={playOnce}
+            // The ring used to be painted into the Lottie artwork; it's a real border now.
+            variant="border"
+            style={{ height: '25px', width: '25px', borderWidth: '2px', flexShrink: 0 }}
         />
     );
 };

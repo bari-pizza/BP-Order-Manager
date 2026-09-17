@@ -11,10 +11,9 @@ type LogoUploaderProps = {
     onSuccess?: (downloadURL: string) => void;
     onError?: (error: Error) => void;
     disabled?: boolean;
-    isAnimated?: boolean;
 };
 
-export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled, isAnimated }: LogoUploaderProps) => {
+export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled }: LogoUploaderProps) => {
     const { resources } = useBariPizzaContext();
     const defaultOriginLogo = resources.find((resource) => resource.title === DEFAULT_ORIGIN_RESOURCE_TITLE)?.src;
     const { orderOriginMutations } = useOrderOriginCRUD({ queryKey: ['order_origins'] });
@@ -52,5 +51,5 @@ export const LogoUploader = ({ origin, onUpload, onSuccess, onError, disabled, i
         originalURL: origin.icon || defaultOriginLogo || '',
     };
 
-    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="medium" isAnimated={isAnimated} />;
+    return <ImageUploader {...imageUploaderProps} disabled={disabled} size="medium" />;
 };

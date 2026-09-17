@@ -34,7 +34,7 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 const { order_number, order_name, origin, order_type } = row;
                 return (
                     <Stack direction="row" alignItems="center" height="100%" spacing={2}>
-                        <OriginLogo orderOrigin={origin} playOnce />
+                        <OriginLogo orderOrigin={origin} />
                         <OrderTypeIcon orderType={order_type} />
                         <span>{order_number ?? order_name}</span>
                     </Stack>
@@ -49,9 +49,9 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 const { row } = params;
                 const { drawer, driver } = row;
                 return (
-                    <Stack direction="row" alignItems="end" height="100%" spacing={2}>
-                        <DrawerAvatar drawer={driver ?? drawer} variant="border" playOnce />
-                        <Typography alignSelf="center">{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2}>
+                        <DrawerAvatar drawer={driver ?? drawer} variant="border" />
+                        <Typography>{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
                     </Stack>
                 );
             },
@@ -103,9 +103,6 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 columns={columns}
                 disableVirtualization
                 getRowId={(row) => row.order_id}
-                getRowClassName={() => {
-                    return 'lottie-icon-container';
-                }}
                 hideFooter
             />
         </Stack>

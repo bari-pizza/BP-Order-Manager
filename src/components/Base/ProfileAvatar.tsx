@@ -1,6 +1,5 @@
-import { Box } from '@mui/material';
 import { useBariPizzaContext } from '../../hooks/data/useContextData';
-import { RoundLottieIcon } from '../../rickcedlib/LottieIcons';
+import { RoundImage } from './RoundImage';
 import type { Resource } from '../../typesAndValidators';
 
 type ProfileAvatarProps = {
@@ -8,7 +7,7 @@ type ProfileAvatarProps = {
     size?: number;
 };
 
-/** Small round avatar for tables/lists (uses Missing Avatar resource when empty). */
+/** Small round avatar for tables/lists (uses Missing Avatar resource when empty). Static by design. */
 export const ProfileAvatar = ({ avatarSrc, size = 32 }: ProfileAvatarProps) => {
     const { resources } = useBariPizzaContext();
     const missing = resources.find((resource: Resource) => resource.title === 'Missing Avatar');
@@ -16,19 +15,12 @@ export const ProfileAvatar = ({ avatarSrc, size = 32 }: ProfileAvatarProps) => {
 
     const px = `${size}px`;
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: size,
-                height: size,
-                flexShrink: 0,
-                lineHeight: 0,
-                overflow: 'hidden',
-                borderRadius: '50%',
-            }}>
-            <RoundLottieIcon imageSrc={imageSrc} height={px} width={px} />
-        </Box>
+        <RoundImage
+            src={imageSrc}
+            alt=""
+            // The ring used to be painted into the Lottie artwork; it's a real border now.
+            variant="border"
+            style={{ height: px, width: px, borderWidth: '2px', flexShrink: 0 }}
+        />
     );
 };
