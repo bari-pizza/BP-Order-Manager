@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, lazy } from 'react';
+import { useEffect, useMemo, useRef, useState, lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router';
 import { QueryClientProvider, QueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import { Stack, Drawer, Button, Box, Typography } from '@mui/material';
@@ -22,7 +22,7 @@ import { Login } from './pages/Profile/Login.tsx';
 import { HowTo } from './pages/HowTo/HowTo.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { getAllAppSettings, getAllDrawers, getAllDrivers, getAllOrigins, getAllResources } from './supabaseQueries.ts';
-import { BariPizzaContext } from './context/BariPizzaContext.tsx';
+import { BariPizzaContext, emptyShopContext } from './context/BariPizzaContext.tsx';
 import { AdminDashboardSkeleton } from './pages/Admin/AdminDashboardSkeleton.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -147,18 +147,11 @@ export default App;
 const queryClient = new QueryClient();
 
 
-function Layout() {
-    const { session, profile, loading } = useSession();
-    const sideBarRef = useRef<HTMLDivElement>(null);
-    const sideBarSkeletonRef = useRef<HTMLDivElement>(null);
-    const [sideBarWidth, setSideBarWidth] = useState<number | string>(0);
-    const [sideBarSkeletonWidth, setSideBarSkeletonWidth] = useState<number | string>(0);
-    const isMobile = useMediaQuery(
-        '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
-    );
-    const isPWA = useMediaQuery('(display-mode: standalone)');
-    useMidnightEffect();
-    // MAYBE include useSubscribeToTable here but these shouldnt be changed often
+/**
+ * Shop tables + realtime only after auth. Mounting this on session (and unmounting on sign-out)
+ * also re-subscribes realtime channels so they pick up the new JWT — they honour RLS.
+ */
+function AuthenticatedShopData({ isMobile, children }: { isMobile: boolean; children: ReactNode }) {
     const [{ data: drawers }, { data: drivers }, { data: origins }, { data: constants }, { data: resources }] =
         useSuspenseQueries({
             queries: [
@@ -196,6 +189,38 @@ function Layout() {
             ],
         });
     const [businessDate] = useBusinessDate();
+    useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
+
+    const sortedDrivers = useMemo(
+        () => [...drivers].sort((a, b) => a.name.localeCompare(b.name)),
+        [drivers],
+    );
+
+    return (
+        <BariPizzaContext.Provider
+            value={{
+                drawers,
+                drivers: sortedDrivers,
+                origins,
+                constants,
+                resources,
+            }}>
+            {children}
+        </BariPizzaContext.Provider>
+    );
+}
+
+function Layout() {
+    const { session, profile, loading } = useSession();
+    const sideBarRef = useRef<HTMLDivElement>(null);
+    const sideBarSkeletonRef = useRef<HTMLDivElement>(null);
+    const [sideBarWidth, setSideBarWidth] = useState<number | string>(0);
+    const [sideBarSkeletonWidth, setSideBarSkeletonWidth] = useState<number | string>(0);
+    const isMobile = useMediaQuery(
+        '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
+    );
+    const isPWA = useMediaQuery('(display-mode: standalone)');
+    useMidnightEffect();
 
     const profileLocale = profile?.locale || 'en';
 
@@ -231,8 +256,6 @@ function Layout() {
             setLocale(profile?.locale);
         }
     }, [profile?.locale]);
-
-    useSetupAllSubscriptions({ businessDate, showToast: ['insert', 'update'], isMobile });
 
     useEffect(() => {
         if (isMobile && !isPWA) {
@@ -274,6 +297,60 @@ function Layout() {
         }
     }, [isMobile, isPWA]);
 
+    const shell = (
+        <>
+            <ToastContainer />
+            <Stack
+                id="main"
+                direction="row"
+                height="100vh"
+                justifyContent="center"
+                className={isMobile ? 'for-mobile' : ''}>
+                <NavBar />
+                <Stack id="content" direction="column" overflow="auto" width={'100%'}>
+                    <Outlet />
+                </Stack>
+                {!isMobile && (
+                    <>
+                        <Drawer
+                            sx={{
+                                width: sideBarWidth,
+                                flexShrink: 0,
+                                '& .MuiDrawer-paper': {
+                                    width: sideBarWidth,
+                                    boxSizing: 'border-box',
+                                },
+                            }}
+                            id="sidebar-drawer"
+                            anchor="right"
+                            variant="permanent">
+                            <Stack id="sidebar" direction="column" ref={sideBarRef} sx={{ height: '100vh' }} />
+                        </Drawer>
+                        <Drawer
+                            sx={{
+                                width: sideBarSkeletonWidth,
+                                flexShrink: 0,
+                                '& .MuiDrawer-paper': {
+                                    width: sideBarSkeletonWidth,
+                                    boxSizing: 'border-box',
+                                },
+                            }}
+                            id="sidebar-skeleton-drawer"
+                            anchor="right"
+                            variant="permanent">
+                            <Stack
+                                id="sidebar-skeleton"
+                                direction="column"
+                                ref={sideBarSkeletonRef}
+                                sx={{ height: '100vh' }}
+                            />
+                        </Drawer>
+                    </>
+                )}
+            </Stack>
+        </>
+    );
+
     return (
         // <APIProvider
         //     onLoad={() => console.log('Maps API has loaded.')}
@@ -282,81 +359,28 @@ function Layout() {
 
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dayJsLocale}>
             <ThemeProvider theme={theme}>
-                <BariPizzaContext.Provider
+                <LayoutContext.Provider
                     value={{
-                        drawers,
-                        drivers: drivers.sort((a, b) => a.name.localeCompare(b.name)),
-                        origins,
-                        constants,
-                        resources,
+                        sideBarRef,
+                        setSideBarWidth,
+                        sideBarSkeletonRef,
+                        setSideBarSkeletonWidth,
+                        isMobile,
+                        isPWA,
                     }}>
-                    <LayoutContext.Provider
-                        value={{
-                            sideBarRef,
-                            setSideBarWidth,
-                            sideBarSkeletonRef,
-                            setSideBarSkeletonWidth,
-                            isMobile,
-                            isPWA,
-                        }}>
-                        <UserContext.Provider value={{ session, profile, loading }}>
-                            <ToastContainer />
-                            <Stack
-                                id="main"
-                                direction="row"
-                                height="100vh"
-                                justifyContent="center"
-                                className={isMobile ? 'for-mobile' : ''}>
-                                <NavBar />
-                                <Stack id="content" direction="column" overflow="auto" width={'100%'}>
-                                    <Outlet />
-                                </Stack>
-                                {!isMobile && (
-                                    <>
-                                        <Drawer
-                                            sx={{
-                                                width: sideBarWidth,
-                                                flexShrink: 0,
-                                                '& .MuiDrawer-paper': {
-                                                    width: sideBarWidth,
-                                                    boxSizing: 'border-box',
-                                                },
-                                            }}
-                                            id="sidebar-drawer"
-                                            anchor="right"
-                                            variant="permanent">
-                                            <Stack
-                                                id="sidebar"
-                                                direction="column"
-                                                ref={sideBarRef}
-                                                sx={{ height: '100vh' }}
-                                            />
-                                        </Drawer>
-                                        <Drawer
-                                            sx={{
-                                                width: sideBarSkeletonWidth,
-                                                flexShrink: 0,
-                                                '& .MuiDrawer-paper': {
-                                                    width: sideBarSkeletonWidth,
-                                                    boxSizing: 'border-box',
-                                                },
-                                            }}
-                                            id="sidebar-skeleton-drawer"
-                                            anchor="right"
-                                            variant="permanent">
-                                            <Stack
-                                                id="sidebar-skeleton"
-                                                direction="column"
-                                                ref={sideBarSkeletonRef}
-                                                sx={{ height: '100vh' }}
-                                            />
-                                        </Drawer>
-                                    </>
-                                )}
-                            </Stack>
-                        </UserContext.Provider>
-                    </LayoutContext.Provider>
-                </BariPizzaContext.Provider>
+                    <UserContext.Provider value={{ session, profile, loading }}>
+                        {session ? (
+                            <Suspense
+                                fallback={
+                                    <BariPizzaContext.Provider value={emptyShopContext}>{shell}</BariPizzaContext.Provider>
+                                }>
+                                <AuthenticatedShopData isMobile={isMobile}>{shell}</AuthenticatedShopData>
+                            </Suspense>
+                        ) : (
+                            <BariPizzaContext.Provider value={emptyShopContext}>{shell}</BariPizzaContext.Provider>
+                        )}
+                    </UserContext.Provider>
+                </LayoutContext.Provider>
             </ThemeProvider>
         </LocalizationProvider>
         // </APIProvider>

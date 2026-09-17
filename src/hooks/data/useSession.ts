@@ -29,7 +29,9 @@ export const useSession = (): SupashipUserInfo => {
     const profiles = (queryClient.getQueryData(['profiles']) || []) as Profile[];
 
     const profile = profiles.find((p) => p.id === session?.user?.id) || null;
-    const profileLoading = profiles.length === 0;
+    // Profiles are only fetched after sign-in (see AuthenticatedShopData). Signed-out must not
+    // look "loading" forever just because the cache is empty — that used to force anon reads on /login.
+    const profileLoading = Boolean(session) && profiles.length === 0;
 
     // Listen to auth changes
     useEffect(() => {
