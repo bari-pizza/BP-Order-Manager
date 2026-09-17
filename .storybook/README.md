@@ -16,4 +16,6 @@ Also startable from the local-dev-dashboard **Storybook** service.
 
 Change `size`, `bump`, or the image select — the preview updates immediately.
 
-Layout stories: **NavBar → Playground** has signed-in + admin/manager/driver/mobile knobs. **Home → Mobile** uses a phone viewport so the portrait Lottie isn’t crushed.
+Layout: **NavBar → Playground** has signed-in + role knobs. **Home → Playground** has a `device` select (iPhone SE → wide desktop); you can also use the Storybook **viewport** toolbar icon to cycle sizes on any story.
+
+The mobile home Lottie is authored very tall (1550×4025) — lots of sky above the pizza shop is intentional. Horizontal scroll was a real bug (Player only capped height); Home now constrains width too.

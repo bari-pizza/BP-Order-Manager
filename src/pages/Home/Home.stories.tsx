@@ -2,80 +2,76 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Box } from '@mui/material';
 import { Home } from './Home';
 import { LayoutContext } from '../../context/LayoutContext';
+import { shopViewports, type ShopViewportKey } from '../../../.storybook/viewports';
 
-const phoneViewport = {
-    name: 'iPhone 13',
-    styles: { width: '390px', height: '844px' },
-    type: 'mobile' as const,
+type HomeStoryArgs = {
+    device: ShopViewportKey;
 };
 
 const meta = {
     title: 'Pages/Home',
-    component: Home,
     parameters: {
-        layout: 'fullscreen',
-        controls: { disable: true },
-    },
-} satisfies Meta<typeof Home>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Desktop: Story = {
-    decorators: [
-        (Story) => (
-            <LayoutContext.Provider
-                value={{
-                    sideBarRef: { current: null },
-                    setSideBarWidth: () => undefined,
-                    sideBarSkeletonRef: { current: null },
-                    setSideBarSkeletonWidth: () => undefined,
-                    isMobile: false,
-                    isPWA: false,
-                }}>
-                <Box sx={{ height: '100vh', width: '100%' }}>
-                    <Story />
-                </Box>
-            </LayoutContext.Provider>
-        ),
-    ],
-};
-
-/**
- * Sets both `isMobile` (picks the mobile Lottie) and a phone viewport so the canvas
- * is portrait — otherwise the mobile animation looks crushed in a wide iframe.
- */
-export const Mobile: Story = {
-    parameters: {
-        viewport: {
-            viewports: { iphone13: phoneViewport },
-            defaultViewport: 'iphone13',
-        },
         layout: 'centered',
+        controls: { expanded: true },
     },
-    decorators: [
-        (Story) => (
+    args: {
+        device: 'iphone13',
+    } satisfies HomeStoryArgs,
+    argTypes: {
+        device: {
+            control: 'select',
+            options: Object.keys(shopViewports),
+            description:
+                'Cycle devices here, or use the viewport toolbar (phone icon). Mobile Lottie is used below ~800px width.',
+        },
+    },
+    render: ({ device }) => {
+        const vp = shopViewports[device];
+        const width = parseInt(vp.styles.width, 10);
+        const height = parseInt(vp.styles.height, 10);
+        // Match App.tsx media roughly: portrait phones use the mobile Lottie.
+        const isMobile = vp.type === 'mobile';
+
+        return (
             <LayoutContext.Provider
                 value={{
                     sideBarRef: { current: null },
                     setSideBarWidth: () => undefined,
                     sideBarSkeletonRef: { current: null },
                     setSideBarSkeletonWidth: () => undefined,
-                    isMobile: true,
+                    isMobile,
                     isPWA: false,
                 }}>
                 <Box
                     sx={{
-                        width: 390,
-                        height: 844,
+                        width,
+                        height,
                         overflow: 'hidden',
                         bgcolor: 'background.default',
                         border: '1px solid',
                         borderColor: 'divider',
+                        borderRadius: isMobile ? '24px' : 1,
                     }}>
-                    <Story />
+                    <Home />
                 </Box>
             </LayoutContext.Provider>
-        ),
-    ],
+        );
+    },
+} satisfies Meta<HomeStoryArgs>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/**
+ * Controls → device. Also: Storybook toolbar → viewport icon to resize the whole canvas.
+ * Mobile Lottie is 1550×4025 (very tall) — empty sky above the shop is the art, not a bug.
+ */
+export const Playground: Story = {};
+
+export const Desktop: Story = {
+    args: { device: 'laptop' },
+};
+
+export const Mobile: Story = {
+    args: { device: 'iphone13' },
 };

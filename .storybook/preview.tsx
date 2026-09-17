@@ -8,6 +8,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { bariPizzaContextDecorators } from './contextDecorators';
 import { themeOptions } from '../src/theme/theme';
+import { shopViewports } from './viewports';
 
 const theme = createTheme(themeOptions);
 
@@ -42,6 +43,10 @@ const preview: Preview = {
         // Prefer Canvas (where Controls live) over Docs as the default view.
         viewMode: 'story',
         layout: 'centered',
+        viewport: {
+            viewports: shopViewports,
+            defaultViewport: 'reset',
+        },
         options: {
             storySort: {
                 order: ['Foundation', 'Shop', 'Layout', 'Pages'],

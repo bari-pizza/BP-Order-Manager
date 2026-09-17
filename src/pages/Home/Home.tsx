@@ -6,12 +6,27 @@ import { useLayoutContext } from '../../hooks/data/useContextData';
 
 export const Home = () => {
     const { isMobile } = useLayoutContext();
+    // Mobile Lottie is 1550×4025 (very tall). Cap both axes so it can't force horizontal scroll on phones.
+    const playerStyle = {
+        width: '100%',
+        maxWidth: '100%',
+        maxHeight: '100%',
+        height: 'auto',
+    } as const;
+
     return (
-        <Stack alignItems="center" justifyContent="center" direction="column" height="100vh">
+        <Stack
+            alignItems="center"
+            justifyContent="center"
+            direction="column"
+            height="100%"
+            minHeight="100vh"
+            width="100%"
+            overflow="hidden">
             {isMobile ? (
-                <Player autoplay src={PizzaShopMobileLottie} style={{ maxHeight: '100vh' }} keepLastFrame />
+                <Player autoplay src={PizzaShopMobileLottie} style={playerStyle} keepLastFrame />
             ) : (
-                <Player autoplay src={PizzaShopLottie} style={{ maxHeight: '100vh' }} keepLastFrame />
+                <Player autoplay src={PizzaShopLottie} style={playerStyle} keepLastFrame />
             )}
         </Stack>
     );
