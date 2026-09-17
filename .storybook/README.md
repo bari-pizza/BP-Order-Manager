@@ -16,4 +16,4 @@ Also startable from the local-dev-dashboard **Storybook** service.
 
 Change `size`, `bump`, or the image select — the preview updates immediately.
 
-Layout stories (NavBar, Home) don’t use Controls; Playground stories do.
+Layout stories: **NavBar → Playground** has signed-in + admin/manager/driver/mobile knobs. **Home → Mobile** uses a phone viewport so the portrait Lottie isn’t crushed.
