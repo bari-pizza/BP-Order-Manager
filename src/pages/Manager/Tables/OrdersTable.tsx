@@ -49,9 +49,9 @@ export const OrdersTable = ({ orders }: { orders: OrderWithFullDetails[] }) => {
                 const { row } = params;
                 const { drawer, driver } = row;
                 return (
-                    <Stack direction="row" alignItems="end" height="100%" spacing={2}>
+                    <Stack direction="row" alignItems="center" height="100%" spacing={2}>
                         <DrawerAvatar drawer={driver ?? drawer} variant="border" />
-                        <Typography alignSelf="center">{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
+                        <Typography>{driver?.name ?? drawer?.name ?? 'Unassigned'}</Typography>
                     </Stack>
                 );
             },
