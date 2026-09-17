@@ -325,6 +325,19 @@ test('driver on a phone can see their order and add a tip', async ({ browser }) 
     await page.goto('/orders');
     await expect(page.getByText('Ask manager to assign you to work today')).toBeHidden();
 
+    // The install-to-home-screen toast sits over the ticket on mobile and swallows taps.
+    // OrdersPageMobile does this before tipping too; this test drives the page directly.
+    await page
+        .locator('.Toastify__toast')
+        .first()
+        .waitFor({ state: 'hidden', timeout: 8_000 })
+        .catch(() => undefined);
+    await page.evaluate(() => {
+        document.querySelectorAll('.Toastify').forEach((el) => {
+            (el as HTMLElement).style.pointerEvents = 'none';
+        });
+    });
+
     const ticket = page.locator('.order-ticket').filter({ hasText: 'Order #2' });
     await expect(ticket).toBeVisible({ timeout: 15_000 });
     await ticket.locator('.order-total').click();
