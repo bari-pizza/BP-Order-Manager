@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 import type { Drawer, Driver_Drawer, OrderOrigin, Resource } from '../typesAndValidators';
 
-interface BariPizzaContextProps {
+export interface BariPizzaContextProps {
     drawers: Drawer[];
     drivers: Driver_Drawer[];
     origins: OrderOrigin[];
@@ -18,7 +18,8 @@ interface BariPizzaContextProps {
     };
 }
 
-export const BariPizzaContext = createContext<BariPizzaContextProps>({
+/** Empty shop payload for signed-out routes (login/home). Real data loads only after a session. */
+export const emptyShopContext: BariPizzaContextProps = {
     drawers: [],
     drivers: [],
     origins: [],
@@ -33,6 +34,8 @@ export const BariPizzaContext = createContext<BariPizzaContextProps>({
             register_for_cash_transfers: 'feb2fc5d-19bd-42ab-b16e-38f12c86ce6a',
         },
     },
-});
+};
+
+export const BariPizzaContext = createContext<BariPizzaContextProps>(emptyShopContext);
 
 // For all drawers, drivers, and origins

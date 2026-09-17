@@ -106,9 +106,9 @@ export const getAllOrigins = async () => {
 };
 
 /**
- * Read-only on purpose. This used to insert any missing required resources, but it runs on boot
- * before anyone signs in, so it needed the Resource table to accept anonymous writes. Gaps are
- * filled in memory instead; admins persist real rows from the Resources tab.
+ * Read-only on purpose. This used to insert any missing required resources, but it ran on every
+ * boot (including signed-out), which needed anonymous writes. Gaps are filled in memory instead;
+ * admins persist real rows from the Resources tab. Called only after a session exists.
  */
 export const getAllResources = async () => {
     const { data, error } = await supaClient.from('Resource').select('*');

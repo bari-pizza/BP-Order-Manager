@@ -94,7 +94,7 @@ export function Login() {
             return;
         }
 
-        // The bootstrap fetched this list anonymously; refetch it now that we're a real user.
+        // AuthenticatedShopData mounts on session and loads profiles; invalidate so it refetches fresh.
         await queryClient.invalidateQueries({ queryKey: ['profiles'] });
 
         toast.update(toastRef.current, {
