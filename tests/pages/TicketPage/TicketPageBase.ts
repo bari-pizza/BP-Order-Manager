@@ -4,6 +4,7 @@ import { orderOriginsWithTypes, type OrderData } from '../../utils/data';
 import type { Payment } from '../../../src/typesAndValidators';
 import { formatCurrency } from '../../../src/utils';
 import { Logger } from '../../utils/Logger';
+import { parseOriginName } from '../../utils/ticketClasses';
 
 export abstract class TicketPageBase extends BasePage {
     protected orderEditor: Locator = this.page.locator('.order-editor');
@@ -54,7 +55,7 @@ export abstract class TicketPageBase extends BasePage {
         const totalText = (await lastTicket.locator('.order-total').textContent()) || '';
 
         // Parse and format the scraped data
-        const origin = originClass?.match(/origin-logo-(.*)/)?.[1]?.replace(/\./g, ' ');
+        const origin = parseOriginName(originClass);
         const orderType = orderTypeClass?.match(/order-type-(.*)-icon/)?.[1];
         const total_in_cents = parseFloat(totalText?.replace('$', '')) * 100;
 
@@ -87,7 +88,7 @@ export abstract class TicketPageBase extends BasePage {
         const tipText = (await nthTicket.locator('.order-tips').textContent()) || '';
 
         // Parse and format the scraped data
-        const origin = originClass?.match(/origin-logo-(.*)/)?.[1]?.replace(/\./g, ' ');
+        const origin = parseOriginName(originClass);
         const orderType = orderTypeClass?.match(/order-type-(.*)-icon/)?.[1];
         const total_in_cents = parseFloat(totalText?.replace('$', '')) * 100;
         const tip_in_cents = parseFloat(tipText?.replace('$', '')) * 100;

@@ -9,6 +9,10 @@ import { passwordForEmail } from '../../utils/testAccounts';
 const iPhone = devices['iPhone 11']; // Mobile emulation for iPhone 11
 const isCi = !!process.env.CI;
 
+// These browsers are launched directly rather than through the test fixture, so they do not
+// inherit playwright.config.ts. Read the project's setting so --headed still works here.
+const projectHeadless = () => test.info().project.use.headless ?? true;
+
 export class CombinedPages {
     private desktopOrdersPage: OrdersPageDesktop;
     private mobileOrdersPages: OrdersPageMobile[];
@@ -29,7 +33,7 @@ export class CombinedPages {
 
     static async create() {
         const baseURL = String(test.info().project.use.baseURL || 'http://localhost:6309');
-        const desktopBrowser = await chromium.launch({ headless: isCi });
+        const desktopBrowser = await chromium.launch({ headless: projectHeadless() });
         const desktopContext = await desktopBrowser.newContext({
             baseURL,
             viewport: { width: 1280, height: 720 },
@@ -64,7 +68,7 @@ export class CombinedPages {
     async initMobileBrowsers() {
         const baseURL = String(test.info().project.use.baseURL || 'http://localhost:6309');
         for (const driver of BasePage.todaysDrivers) {
-            const mobileBrowser = await chromium.launch({ headless: isCi });
+            const mobileBrowser = await chromium.launch({ headless: projectHeadless() });
             const mobileContext = await mobileBrowser.newContext({
                 ...iPhone,
                 baseURL,

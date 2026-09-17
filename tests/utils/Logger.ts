@@ -124,20 +124,17 @@ export class Logger {
     public static async openLogFile() {
         const fileUrl = `${Logger.filePath.replace(/\\/g, '/')}`;
         console.log(`Open log file: ${fileUrl}`);
-        if (process.env.CI) {
+        if (process.env.CI || process.env.OPEN_TEST_LOG !== '1') {
             return;
         }
-        const chromePath = `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"`;
 
-        // Launch Chrome with the file URL
-        exec(`${chromePath} "${fileUrl}"`, (error, stdout, stderr) => {
+        // Used to hardcode a Windows Chrome path, which just errored on every run elsewhere.
+        const opener = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start ""' : 'xdg-open';
+
+        exec(`${opener} "${fileUrl}"`, (error) => {
             if (error) {
-                console.error(`Error opening Chrome: ${error.message}`);
+                console.error(`Could not open the log file: ${error.message}`);
             }
-            if (stderr) {
-                console.error(`Chrome stderr: ${stderr}`);
-            }
-            console.log(stdout);
         });
     }
 }
