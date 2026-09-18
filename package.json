@@ -31,7 +31,7 @@
     "db:ping:dev": "node scripts/db-apply.mjs --env=dev --ping",
     "db:ping:prod": "node scripts/db-apply.mjs --env=prod --ping",
     "db:apply:dev": "node scripts/db-apply.mjs --env=dev",
-    "db:apply:prod": "node scripts/db-apply.mjs --env=prod --i-know-this-is-prod"
+    "db:apply:prod": "node scripts/db-apply.mjs --env=prod"
   },
   "dependencies": {
     "@emotion/react": "^11.13.0",

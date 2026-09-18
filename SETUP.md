@@ -61,9 +61,11 @@ To run files under `supabase-functions/` without the Supabase SQL editor, add **
 ```bash
 npm run db:ping:dev
 npm run db:apply:dev -- supabase-functions/update-employee.sql
-# After verifying on dev:
-npm run db:apply:prod -- supabase-functions/update-employee.sql
+# After verifying on dev (you must pass the confirm flag yourself):
+npm run db:apply:prod -- supabase-functions/update-employee.sql --i-know-this-is-prod
 ```
+
+SQL is wrapped in a transaction by default. Pass `--no-transaction` only for rare DDL that Postgres cannot run inside a transaction.
 
 ### 5. (Optional) Set Up Sentry Error Monitoring
 

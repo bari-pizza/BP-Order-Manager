@@ -6,6 +6,7 @@
  *   node scripts/db-apply.mjs --env=dev --file=supabase-functions/update-employee.sql
  *   node scripts/db-apply.mjs --env=prod --file=supabase-functions/update-employee.sql --i-know-this-is-prod
  *   node scripts/db-apply.mjs --env=dev --ping
+ *   node scripts/db-apply.mjs --env=dev --file=… --no-transaction   # rare DDL that cannot run in a txn
  *
  * Prefer Session pooler URIs (IPv4). Never commit real DATABASE_URL_* values.
  */
@@ -32,11 +33,12 @@ function loadEnv(filePath) {
 }
 
 function parseArgs(argv) {
-    const args = { env: null, file: null, ping: false, confirmProd: false };
+    const args = { env: null, file: null, ping: false, confirmProd: false, noTransaction: false };
     for (let i = 0; i < argv.length; i++) {
         const raw = argv[i];
         if (raw === '--ping') args.ping = true;
         else if (raw === '--i-know-this-is-prod') args.confirmProd = true;
+        else if (raw === '--no-transaction') args.noTransaction = true;
         else if (raw.startsWith('--env=')) args.env = raw.slice('--env='.length);
         else if (raw.startsWith('--file=')) args.file = raw.slice('--file='.length);
         else if (raw === '--file') args.file = argv[++i] ?? null;
@@ -61,14 +63,18 @@ function usage(exitCode = 1) {
   npm run db:ping:dev
   npm run db:ping:prod
   npm run db:apply:dev -- supabase-functions/<file>.sql
-  npm run db:apply:prod -- supabase-functions/<file>.sql
+  npm run db:apply:prod -- supabase-functions/<file>.sql --i-know-this-is-prod
 
-Prod apply requires --i-know-this-is-prod (the npm script passes it).
+Prod apply requires you to pass --i-know-this-is-prod after -- (not baked into the npm script).
+SQL runs in a transaction by default; pass --no-transaction only for DDL Postgres cannot wrap.
 Always apply and verify on dev before prod.`);
     process.exit(exitCode);
 }
 
 async function withClient(connectionString, fn) {
+    // Session pooler presents a cert chain Node rejects as SELF_SIGNED_CERT_IN_CHAIN when
+    // rejectUnauthorized is true (verified against aws-0-…pooler.supabase.com). Keep TLS on,
+    // but skip CA verification so apply scripts work; prefer private networks / VPN for ops.
     const client = new Client({
         connectionString,
         ssl: { rejectUnauthorized: false },
@@ -79,6 +85,21 @@ async function withClient(connectionString, fn) {
         return await fn(client);
     } finally {
         await client.end().catch(() => undefined);
+    }
+}
+
+async function applySql(client, sql, { noTransaction }) {
+    if (noTransaction) {
+        await client.query(sql);
+        return;
+    }
+    await client.query('BEGIN');
+    try {
+        await client.query(sql);
+        await client.query('COMMIT');
+    } catch (error) {
+        await client.query('ROLLBACK').catch(() => undefined);
+        throw error;
     }
 }
 
@@ -128,10 +149,12 @@ async function main() {
         process.exit(1);
     }
 
-    console.log(`Applying ${path.relative(root, filePath)} …`);
-    await withClient(connectionString, async (client) => {
-        await client.query(sql);
-    });
+    console.log(
+        `Applying ${path.relative(root, filePath)}${args.noTransaction ? ' (no transaction)' : ' (transaction)'} …`,
+    );
+    await withClient(connectionString, (client) =>
+        applySql(client, sql, { noTransaction: args.noTransaction }),
+    );
     console.log('Done.');
 }
 
