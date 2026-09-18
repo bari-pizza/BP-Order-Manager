@@ -22,15 +22,17 @@ const meta = {
             control: 'select',
             options: Object.keys(shopViewports),
             description:
-                'Cycle devices here, or use the viewport toolbar (phone icon). Mobile Lottie is used below ~800px width.',
+                'Cycle devices here, or use the viewport toolbar. isMobile matches App.tsx (≤800px portrait or ≤600px landscape).',
         },
     },
     render: ({ device }) => {
         const vp = shopViewports[device];
         const width = parseInt(vp.styles.width, 10);
         const height = parseInt(vp.styles.height, 10);
-        // Match App.tsx media roughly: portrait phones use the mobile Lottie.
-        const isMobile = vp.type === 'mobile';
+        // Match App.tsx useMediaQuery:
+        // (max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)
+        const isPortrait = height >= width;
+        const isMobile = (isPortrait && width <= 800) || (!isPortrait && width <= 600);
 
         return (
             <LayoutContext.Provider
