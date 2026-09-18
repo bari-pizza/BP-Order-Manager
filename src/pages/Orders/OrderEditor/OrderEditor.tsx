@@ -31,6 +31,8 @@ import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
 import { useSession } from '../../../hooks/data/useSession';
 import { useDrivers } from '../../../hooks/data/useDrivers';
 import { isValidDrawer } from '../../../utils';
+import { formatUserError, logDevError } from '../../../utils/userError';
+import { toast } from '../../../toast/toastWrapper';
 
 const paymentTypes: { value: PaymentType; label: string }[] = [
     {
@@ -160,7 +162,10 @@ export const OrderEditor = ({
         },
 
         onError: (error) => {
-            setError('root', { message: "Couldn't create new order" });
+            logDevError('createNewOrder', error);
+            const message = formatUserError(error, "Couldn't create new order");
+            setError('root', { message });
+            toast.error(message);
         },
     });
 
@@ -170,8 +175,11 @@ export const OrderEditor = ({
             reset(data[0]);
         },
         onError: (error) => {
+            logDevError('updateOrder', error);
             reset();
-            setError('root', { message: "Couldn't update order" });
+            const message = formatUserError(error, "Couldn't update order");
+            setError('root', { message });
+            toast.error(message);
         },
     });
 

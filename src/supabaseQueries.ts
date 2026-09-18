@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
 import { PostgrestError } from '@supabase/supabase-js';
 import { mergeResourcesWithDefaults } from './constants/resources';
+import { logDevError } from './utils/userError';
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -46,6 +47,7 @@ export const handleResponse = <T>({
     shouldThrow?: boolean;
 }) => {
     if (error) {
+        logDevError('supabase', error);
         if (shouldThrow) {
             throw error;
         }
@@ -53,6 +55,18 @@ export const handleResponse = <T>({
     }
     if (!data) {
         return [] as T[];
+    }
+    // Legacy RPCs returned HTTP 200 with `{ error: "..." }` instead of raising — treat as failure.
+    if (!Array.isArray(data) && typeof data === 'object' && data !== null && 'error' in data) {
+        const rpcError = (data as { error?: unknown }).error;
+        if (rpcError) {
+            const message = typeof rpcError === 'string' ? rpcError : 'Request failed';
+            logDevError('supabase-rpc-body', rpcError);
+            if (shouldThrow) {
+                throw new Error(message);
+            }
+            return [] as T[];
+        }
     }
     if (!Array.isArray(data)) {
         return [data as T];

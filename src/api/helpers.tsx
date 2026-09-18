@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { Id, toast } from '../toast/toastWrapper';
 import { OneOfType } from '../typesAndValidators';
+import { formatUserError } from '../utils/userError';
 
 export type Payload<T> =
     | {
@@ -165,10 +166,8 @@ export const useInteractionHandler = <T, U>({
             }
         },
         onError: (error: Error) => {
-            // I think this only happens when an error is thrown
-            // might need to add error throwing in the interactor
             toast.update(toastRef.current, {
-                render: <div dangerouslySetInnerHTML={{ __html: error.message }} />,
+                render: formatUserError(error, getMessages.mainError(error)),
                 type: 'error',
                 isLoading: false,
                 autoClose: 10000,
@@ -232,7 +231,7 @@ export const useRPCInteractionHandler = <T,>({
                 });
             } else {
                 toast.update(toastRef.current, {
-                    render: getMessages.mainError(),
+                    render: formatUserError(null, getMessages.mainError()),
                     type: 'error',
                     isLoading: false,
                     autoClose: 2000,
@@ -242,7 +241,7 @@ export const useRPCInteractionHandler = <T,>({
                 const error = Object.values(data)[0];
                 const errorMessage = getMessages.errors(new Error(error));
                 if (errorMessage) {
-                    toast.error(errorMessage);
+                    toast.error(formatUserError(new Error(error), errorMessage));
                 }
                 forEachError(error);
             });
@@ -251,10 +250,8 @@ export const useRPCInteractionHandler = <T,>({
             }
         },
         onError: (error) => {
-            // I think this only happens when an error is thrown
-            // might need to add error throwing in the interactor
             toast.update(toastRef.current, {
-                render: <div dangerouslySetInnerHTML={{ __html: error.message }} />,
+                render: formatUserError(error, getMessages.mainError(error)),
                 type: 'error',
                 isLoading: false,
                 autoClose: 10000,

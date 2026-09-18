@@ -23,6 +23,7 @@ import { useRef, useState } from 'react';
 import { supaClient } from '../../../supaClient';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { m } from '../../../types/messages';
+import { formatUserError, logDevError } from '../../../utils/userError';
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const queryClient = useQueryClient();
@@ -155,18 +156,26 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             };
             setRows((prev) => prev.map((row) => (row.id === updatedRow.id ? updatedRow : row)));
             void invalidateDriversAndProfiles(queryClient);
+            toast.success('Employee updated');
         },
         onError: (error) => {
+            logDevError('updateEmployee', error);
+            toast.error(formatUserError(error, m.operationFailed()));
         },
     });
 
-    const processRowUpdate = (newRow: GridRowModel) => {
+    const processRowUpdate = async (newRow: GridRowModel, oldRow: GridRowModel) => {
         const updatedRow = {
             ...(newRow as Employee),
         };
-        updateEmployeeMutation.mutate(updatedRow);
-        setRows((prev) => prev.map((row) => (row.id === newRow.id ? updatedRow : row)));
-        return updatedRow;
+        try {
+            await updateEmployeeMutation.mutateAsync(updatedRow);
+            return updatedRow;
+        } catch {
+            // DataGrid keeps edit state until processRowUpdate resolves; restore prior row on failure.
+            setRows((prev) => prev.map((row) => (row.id === oldRow.id ? (oldRow as Employee) : row)));
+            throw new Error(m.operationFailed());
+        }
     };
 
     const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
@@ -350,7 +359,7 @@ const RenderEmail = ({ email, disabled }: { email: string; disabled: boolean }) 
         await supaClient.auth.resetPasswordForEmail(email, { redirectTo: '/myaccount' }).then(({ error }) => {
             if (error) {
                 toast.update(toastRef.current, {
-                    render: error.message,
+                    render: formatUserError(error, m.operationFailed()),
                     type: 'error',
                     isLoading: false,
                     autoClose: 5000,
