@@ -28,6 +28,14 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
 
+      # @lottielab/lottie-player pins lottie-web via a GitHub git dep; local npm
+      # often writes git+ssh / git@ into the lockfile, which hangs on runners without SSH keys.
+      - name: Prefer HTTPS for GitHub git deps
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: |
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci

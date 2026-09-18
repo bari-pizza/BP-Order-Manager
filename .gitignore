@@ -28,6 +28,7 @@ test-results/*
 *.sw?
 
 *storybook.log
+storybook-static/
 
 schema.sql
 

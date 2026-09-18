@@ -1,0 +1,23 @@
+---
+description: Always close the loop on CodeRabbit PR review feedback
+alwaysApply: true
+---
+
+# CodeRabbit review feedback
+
+When working on CodeRabbit (CR) feedback for a pull request:
+
+1. **Read every actionable CR thread** on the PR (inline review comments + summary).
+2. **Verify each finding** against the current code. Fix still-valid issues; skip obsolete ones with a brief reason.
+3. **Keep changes minimal** — only what the finding requires (plus closely related breakage).
+4. **Reply on each thread** after you address it (or decide not to):
+   - What you changed (file / approach), or why you skipped.
+   - Tag `@coderabbitai` so CR can resolve the thread or follow up.
+5. **Do not leave CR threads unanswered** when you claim the feedback is done.
+6. Prefer top-level replies on the review comment thread (`in_reply_to`), not a single catch-all PR comment that buries per-finding context.
+
+Example reply after a fix:
+
+```text
+Fixed — aligned Storybook deps to 8.6.18 and regenerated the lockfile. @coderabbitai
+```

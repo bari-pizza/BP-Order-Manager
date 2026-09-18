@@ -1,16 +1,19 @@
-import { BariPizzaContext } from '../../src/context/BariPizzaContext';
+import { BariPizzaContext, emptyShopContext } from '../../src/context/BariPizzaContext';
 import { createContextDecorator } from '.';
 import { dummyDrawers } from '../../src/dummyData';
+import { storyOriginsList, storyResources } from '../fixtures/resources';
 
 const { drawers, drivers } = dummyDrawers;
 
-// TODO: add origins
+const shopValue = {
+    ...emptyShopContext,
+    drawers,
+    drivers: drivers.slice(0, 3),
+    origins: storyOriginsList,
+    resources: storyResources,
+};
 
 export default {
-    default: createContextDecorator(BariPizzaContext, {
-        drawers,
-        drivers: drivers.slice(0, 3),
-        origins: [],
-    }),
-    noDrivers: createContextDecorator(BariPizzaContext, { drawers, drivers: [], origins: [] }),
+    default: createContextDecorator(BariPizzaContext, shopValue),
+    noDrivers: createContextDecorator(BariPizzaContext, { ...shopValue, drivers: [] }),
 };
