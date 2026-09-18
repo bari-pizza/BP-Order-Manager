@@ -11,8 +11,8 @@ type NavBarStoryArgs = {
     isAdmin: boolean;
     isManager: boolean;
     isCashier: boolean;
-    /** Employee with a driver drawer — no extra nav items, but signed-in profile still shows. */
-    isDriver: boolean;
+    /** When false, UserAvatar shows the missing-avatar placeholder. */
+    hasAvatar: boolean;
     isMobile: boolean;
 };
 
@@ -20,13 +20,13 @@ const buildProfile = (args: NavBarStoryArgs): Profile => ({
     id: 'story-user',
     email: 'demo@baripizza.com',
     phone: null,
-    first_name: args.isAdmin ? 'Admin' : args.isManager ? 'Manager' : args.isDriver ? 'Driver' : 'Alex',
+    first_name: args.isAdmin ? 'Admin' : args.isManager ? 'Manager' : 'Alex',
     last_name: 'Demo',
     is_admin: args.isAdmin,
     is_manager: args.isManager,
     is_cashier: args.isCashier,
     is_deleted: false,
-    avatar_src: args.isDriver ? null : resourceSrc.missingAvatar,
+    avatar_src: args.hasAvatar ? resourceSrc.missingAvatar : null,
     locale: 'en',
 });
 
@@ -41,7 +41,7 @@ const meta = {
         isAdmin: true,
         isManager: true,
         isCashier: false,
-        isDriver: false,
+        hasAvatar: true,
         isMobile: false,
     } satisfies NavBarStoryArgs,
     argTypes: {
@@ -49,10 +49,10 @@ const meta = {
         isAdmin: { control: 'boolean', if: { arg: 'signedIn' }, description: 'Shows Admin nav item.' },
         isManager: { control: 'boolean', if: { arg: 'signedIn' }, description: 'Shows Manager nav item.' },
         isCashier: { control: 'boolean', if: { arg: 'signedIn' } },
-        isDriver: {
+        hasAvatar: {
             control: 'boolean',
             if: { arg: 'signedIn' },
-            description: 'Signed-in employee (no extra nav items beyond Orders).',
+            description: 'Profile has avatar_src (UserAvatar); off uses the placeholder path.',
         },
         isMobile: { control: 'boolean', description: 'Narrow rail (hides Admin/Manager).' },
     },
