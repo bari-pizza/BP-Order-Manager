@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { supaClient } from '../../supaClient';
 import { Profile } from '../../typesAndValidators';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { invalidateDriversAndProfiles } from '../../utils/queryInvalidation';
+import { clearDriversAndProfiles, invalidateDriversAndProfiles } from '../../utils/queryInvalidation';
 
 export interface SupashipUserInfo {
     session: Session | null;
@@ -37,7 +37,11 @@ export const useSession = (): SupashipUserInfo => {
     useEffect(() => {
         const { data: listener } = supaClient.auth.onAuthStateChange((event, newSession) => {
             queryClient.setQueryData(['session'], newSession);
-            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+            // PWA / SPA: sign-out must drop the 30min drivers cache; sign-in and cold start
+            // (INITIAL_SESSION) must refetch so a newly marked driver is not "not found".
+            if (event === 'SIGNED_OUT') {
+                clearDriversAndProfiles(queryClient);
+            } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
                 void invalidateDriversAndProfiles(queryClient);
             }
         });
