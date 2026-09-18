@@ -27,7 +27,11 @@
     "machine-translate": "inlang machine translate --project project.inlang",
     "patch": "node src/rickcedlib/scripts/updateVersion.js",
     "minor": "node src/rickcedlib/scripts/updateVersion.js minor",
-    "major": "node src/rickcedlib/scripts/updateVersion.js major"
+    "major": "node src/rickcedlib/scripts/updateVersion.js major",
+    "db:ping:dev": "node scripts/db-apply.mjs --env=dev --ping",
+    "db:ping:prod": "node scripts/db-apply.mjs --env=prod --ping",
+    "db:apply:dev": "node scripts/db-apply.mjs --env=dev",
+    "db:apply:prod": "node scripts/db-apply.mjs --env=prod"
   },
   "dependencies": {
     "@emotion/react": "^11.13.0",
@@ -81,6 +85,7 @@
     "eslint-plugin-storybook": "^0.8.0",
     "globals": "^15.9.0",
     "jsdom": "^24.1.1",
+    "pg": "^8.23.0",
     "storybook": "8.6.14",
     "storybook-addon-remix-react-router": "^3.0.0",
     "typescript": "^5.5.4",
