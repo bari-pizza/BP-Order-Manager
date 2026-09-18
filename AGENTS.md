@@ -16,23 +16,26 @@ curl -sS http://localhost:4000/api/agent-protocol
 
 If any dashboard response has `"stale": true`, repeat this pull, update `AGENTS.md`, then retry with the new protocol. Do **not** expect full instructions in the stale POST body — only `protocolUrl` / `message`.
 
-Dashboard: `/Users/cedrick/Documents/Projects/local-dev-dashboard`  
+Dashboard repo (this machine): `/Users/cedrick/Documents/Projects/local-dev-dashboard`  
 Base URL: `http://localhost:4000`
 
 ---
 
 ## Register a project
 
-```bash
-node "/Users/cedrick/Documents/Projects/local-dev-dashboard/register.mjs" "<Project Name>" "<absolute-directory>" <port>
-```
-
-Or:
+**Preferred (portable)** — works as long as the dashboard is running:
 
 ```bash
 curl -sS -X POST http://localhost:4000/api/register \
   -H 'Content-Type: application/json' \
   -d '{"protocol":1,"name":"Project Name","directory":"/absolute/path","port":5180}'
+```
+
+Optional local helper (only if you have the dashboard checkout):
+
+```bash
+node "$LOCAL_DEV_DASHBOARD/register.mjs" "<Project Name>" "<absolute-directory>" <port>
+# example: LOCAL_DEV_DASHBOARD=/Users/cedrick/Documents/Projects/local-dev-dashboard
 ```
 
 Confirm name, directory, and port after registering.
@@ -45,6 +48,8 @@ Tell the dashboard when you **start** and **finish** work so the card shows “a
 
 ### Start
 
+Replace `<PR_NUMBER>` with the **active** pull request for this branch (do not copy a stale example number).
+
 ```bash
 curl -sS -X POST http://localhost:4000/api/agent-activity \
   -H 'Content-Type: application/json' \
@@ -52,7 +57,7 @@ curl -sS -X POST http://localhost:4000/api/agent-activity \
     "protocol": 1,
     "phase": "start",
     "directory": "/absolute/path/to/this/project",
-    "pr": 129,
+    "pr": <PR_NUMBER>,
     "summary": "Fixing CodeRabbit actionable comments",
     "agent": "cursor"
   }'

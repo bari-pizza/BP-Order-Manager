@@ -93,6 +93,11 @@ async function applySql(client, sql, { noTransaction }) {
         await client.query(sql);
         return;
     }
+    if (sqlHasTopLevelTxnControl(sql)) {
+        throw new Error(
+            'SQL contains top-level COMMIT/ROLLBACK, which would break the wrapper transaction. Re-run with --no-transaction.',
+        );
+    }
     await client.query('BEGIN');
     try {
         await client.query(sql);
@@ -101,6 +106,12 @@ async function applySql(client, sql, { noTransaction }) {
         await client.query('ROLLBACK').catch(() => undefined);
         throw error;
     }
+}
+
+/** Rough strip of comments, then detect statement-level COMMIT/ROLLBACK. */
+function sqlHasTopLevelTxnControl(sql) {
+    const stripped = sql.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/--[^\n]*/g, ' ');
+    return /(?:^|;)[\s\n]*(COMMIT|ROLLBACK)\b/i.test(stripped);
 }
 
 async function main() {
