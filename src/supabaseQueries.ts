@@ -57,13 +57,14 @@ export const handleResponse = <T>({
         return [] as T[];
     }
     // Legacy RPCs returned HTTP 200 with `{ error: "..." }` instead of raising — treat as failure.
+    // Do not put arbitrary body text on Error.message for UI; log it and throw a generic error.
+    // Intentional messages from RAISE EXCEPTION still arrive as PostgrestError and are allowlisted in formatUserError.
     if (!Array.isArray(data) && typeof data === 'object' && data !== null && 'error' in data) {
         const rpcError = (data as { error?: unknown }).error;
         if (rpcError) {
-            const message = typeof rpcError === 'string' ? rpcError : 'Request failed';
             logDevError('supabase-rpc-body', rpcError);
             if (shouldThrow) {
-                throw new Error(message);
+                throw new Error('Request failed');
             }
             return [] as T[];
         }

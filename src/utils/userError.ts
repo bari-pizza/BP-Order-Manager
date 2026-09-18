@@ -9,13 +9,13 @@ const NETWORK_HINT = 'Check your connection and try again.';
 
 /**
  * Turn auth / PostgREST / generic failures into a short toast-friendly message.
- * Prefer actionable text over raw stack dumps; keep the server message when it's useful.
+ * Only known, intentional messages reach the user — never raw backend diagnostics.
  */
 export const formatUserError = (error: unknown, fallback = 'Something went wrong. Please try again.'): string => {
     if (error == null) return fallback;
 
     if (typeof error === 'string') {
-        return mapKnownMessage(error) || error || fallback;
+        return mapKnownMessage(error) ?? fallback;
     }
 
     const err = error as ErrorLike;
@@ -48,24 +48,23 @@ export const formatUserError = (error: unknown, fallback = 'Something went wrong
         return 'That record already exists.';
     }
 
-    const mapped = mapKnownMessage(message);
-    if (mapped) return mapped;
-
-    // Prefer a clean server message when present (employee RPC raises these intentionally).
-    if (message && message.length < 200 && !/^\s*Error:/.test(message)) {
-        return message;
-    }
-
-    return fallback;
+    return mapKnownMessage(message) ?? fallback;
 };
 
+/** Allowlist of intentional server / RPC messages safe to show (exact or patterned). */
 const mapKnownMessage = (message: string): string | null => {
     if (!message) return null;
     if (/failed to fetch|networkerror|load failed|network request failed/i.test(message)) {
         return `Unable to reach the server. ${NETWORK_HINT}`;
     }
-    if (/only admins can update employees/i.test(message)) {
+    if (/^Only admins can update employees$/i.test(message)) {
         return 'Only admins can update employees.';
+    }
+    if (/^Only admins can delete or restore employees$/i.test(message)) {
+        return 'Only admins can delete or restore employees.';
+    }
+    if (/^No profile found for /i.test(message)) {
+        return 'Employee profile not found.';
     }
     return null;
 };

@@ -20,9 +20,20 @@ describe('formatUserError', () => {
         expect(formatUserError(new TypeError('Failed to fetch'))).toMatch(/Unable to reach the server/);
     });
 
-    it('keeps useful RPC messages', () => {
+    it('maps allowlisted RPC messages', () => {
         expect(formatUserError({ message: 'Only admins can update employees' })).toBe(
             'Only admins can update employees.',
+        );
+        expect(formatUserError({ message: 'Only admins can delete or restore employees' })).toBe(
+            'Only admins can delete or restore employees.',
+        );
+        expect(formatUserError({ message: 'No profile found for abc-123' })).toBe('Employee profile not found.');
+    });
+
+    it('does not pass through unknown strings or server messages', () => {
+        expect(formatUserError('SELECT * FROM secrets', 'Could not save.')).toBe('Could not save.');
+        expect(formatUserError({ message: 'relation "secret_table" does not exist' }, 'Could not save.')).toBe(
+            'Could not save.',
         );
     });
 
