@@ -8,6 +8,7 @@ import { useRef } from 'react';
 import { Id, toast } from '../../toast/toastWrapper';
 import { useQueryClient } from '@tanstack/react-query';
 import { normalizeEmail } from '../../utils';
+import { formatUserError } from '../../utils/userError';
 
 type FormValues = {
     email: string;
@@ -40,7 +41,7 @@ export function Login() {
         });
         if (error) {
             toast.update(toastRef.current, {
-                render: error.message,
+                render: formatUserError(error, 'Could not send password reset email.'),
                 type: 'error',
                 isLoading: false,
                 autoClose: 5000,
@@ -68,7 +69,7 @@ export function Login() {
         });
         if (error) {
             toast.update(toastRef.current, {
-                render: error.message,
+                render: formatUserError(error, 'Could not sign in.'),
                 type: 'error',
                 isLoading: false,
                 autoClose: 5000,

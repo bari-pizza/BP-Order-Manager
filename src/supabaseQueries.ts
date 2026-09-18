@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import { dayjsToMDY } from './utils';
 import { PostgrestError } from '@supabase/supabase-js';
 import { mergeResourcesWithDefaults } from './constants/resources';
+import { logDevError } from './utils/userError';
 
 type DirtyDriverDrawer = { drawer: Drawer; driver: Profile };
 
@@ -46,6 +47,7 @@ export const handleResponse = <T>({
     shouldThrow?: boolean;
 }) => {
     if (error) {
+        logDevError('supabase', error);
         if (shouldThrow) {
             throw error;
         }
@@ -53,6 +55,19 @@ export const handleResponse = <T>({
     }
     if (!data) {
         return [] as T[];
+    }
+    // Legacy RPCs returned HTTP 200 with `{ error: "..." }` instead of raising — treat as failure.
+    // Do not put arbitrary body text on Error.message for UI; log it and throw a generic error.
+    // Intentional messages from RAISE EXCEPTION still arrive as PostgrestError and are allowlisted in formatUserError.
+    if (!Array.isArray(data) && typeof data === 'object' && data !== null && 'error' in data) {
+        const rpcError = (data as { error?: unknown }).error;
+        if (rpcError) {
+            logDevError('supabase-rpc-body', rpcError);
+            if (shouldThrow) {
+                throw new Error('Request failed');
+            }
+            return [] as T[];
+        }
     }
     if (!Array.isArray(data)) {
         return [data as T];
