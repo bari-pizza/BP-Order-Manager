@@ -54,6 +54,17 @@ VITE_SENTRY_DSN=https://your-key@sentry.io/project-id
 
 **Important:** Never commit your `.env` file to git. It's already in `.gitignore`.
 
+### 4b. (Optional) Apply SQL to remote databases
+
+To run files under `supabase-functions/` without the Supabase SQL editor, add **Session pooler** URIs (Dashboard → **Connect**, port `5432`) as `DATABASE_URL_DEV` / `DATABASE_URL_PROD`. Direct `db.*.supabase.co` hosts are IPv6-only and often fail on home networks.
+
+```bash
+npm run db:ping:dev
+npm run db:apply:dev -- supabase-functions/update-employee.sql
+# After verifying on dev:
+npm run db:apply:prod -- supabase-functions/update-employee.sql
+```
+
 ### 5. (Optional) Set Up Sentry Error Monitoring
 
 Sentry captures errors in production and sends them to a dashboard for monitoring.
