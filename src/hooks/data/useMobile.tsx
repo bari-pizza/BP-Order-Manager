@@ -3,6 +3,7 @@ import { useBariPizzaContext, useLayoutContext, useUserContext } from './useCont
 import { useDrivers } from './useDrivers';
 // import { useRef } from 'react';
 import { useOrdersDrawersTickets } from './useOrdersDrawersTickets';
+import { isDriverWorkingToday } from '../../utils/drivers';
 
 /* TODO: Finishing Touches
 
@@ -80,7 +81,8 @@ export const useMobile = () => {
             cashTransfers: [],
         };
 
-    const driverIsWorkingToday = todaysDrivers.some((driver) => driver.drawer_id === driver.drawer_id);
+    // Do not shadow `driver` in the callback — that treated any assigned driver as "me".
+    const driverIsWorkingToday = isDriverWorkingToday(todaysDrivers, driver.drawer_id);
 
     if (!driverIsWorkingToday) {
         return {
