@@ -34,8 +34,8 @@ curl -sS -X POST http://localhost:4000/api/register \
 Optional local helper (only if you have the dashboard checkout):
 
 ```bash
+export LOCAL_DEV_DASHBOARD=/Users/cedrick/Documents/Projects/local-dev-dashboard
 node "$LOCAL_DEV_DASHBOARD/register.mjs" "<Project Name>" "<absolute-directory>" <port>
-# example: LOCAL_DEV_DASHBOARD=/Users/cedrick/Documents/Projects/local-dev-dashboard
 ```
 
 Confirm name, directory, and port after registering.
