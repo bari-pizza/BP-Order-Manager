@@ -1,19 +1,65 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { toast } from '../../toast/toastWrapper';
+import { getCalendarToday, parseBusinessDateParam } from './businessDate';
 
-const today = dayjs();
+export { getCalendarToday, parseBusinessDateParam } from './businessDate';
 
-export const useBusinessDate = (): [dayjs.Dayjs, (date: dayjs.Dayjs) => void] => {
+/**
+ * Keeps a live calendar-day value across long-lived PWA sessions.
+ * Refreshes at local midnight and when the tab regains focus/visibility.
+ */
+export const useCalendarToday = (): Dayjs => {
+    const [today, setToday] = useState<Dayjs>(() => getCalendarToday());
+
+    const refresh = useCallback(() => {
+        setToday((prev) => {
+            const next = getCalendarToday();
+            return prev.isSame(next, 'day') ? prev : next;
+        });
+    }, []);
+
+    useEffect(() => {
+        let timeoutId: ReturnType<typeof setTimeout>;
+
+        const scheduleMidnight = () => {
+            const msUntilNextDay = dayjs().endOf('day').diff(dayjs()) + 50;
+            timeoutId = setTimeout(() => {
+                refresh();
+                scheduleMidnight();
+            }, Math.max(msUntilNextDay, 50));
+        };
+
+        scheduleMidnight();
+
+        const onFocus = () => refresh();
+        const onVisibility = () => {
+            if (document.visibilityState === 'visible') refresh();
+        };
+
+        window.addEventListener('focus', onFocus);
+        document.addEventListener('visibilitychange', onVisibility);
+
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('focus', onFocus);
+            document.removeEventListener('visibilitychange', onVisibility);
+        };
+    }, [refresh]);
+
+    return today;
+};
+
+export const useBusinessDate = (): [Dayjs, (date: Dayjs) => void] => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [businessDate, setBusinessDate] = useState<dayjs.Dayjs>(today);
+    const today = useCalendarToday();
+    const [businessDate, setBusinessDate] = useState<Dayjs>(() => getCalendarToday());
 
     useEffect(() => {
         const dateString = searchParams.get('businessDate');
-        const parsedDate = dayjs(dateString, 'YYYY-MM-DD', true);
-        const isValidDate = parsedDate.isValid() && !parsedDate.isAfter(today);
-        if (isValidDate) {
+        const parsedDate = parseBusinessDateParam(dateString, today);
+        if (parsedDate) {
             setBusinessDate(parsedDate);
         } else if (dateString) {
             const urlSearchParams = new URLSearchParams(searchParams);
@@ -22,9 +68,9 @@ export const useBusinessDate = (): [dayjs.Dayjs, (date: dayjs.Dayjs) => void] =>
         } else {
             setBusinessDate(today);
         }
-    }, [searchParams, setSearchParams]);
+    }, [searchParams, setSearchParams, today]);
 
-    const updateBusinessDate = (date: dayjs.Dayjs) => {
+    const updateBusinessDate = (date: Dayjs) => {
         if (date.isSame(today, 'day')) {
             const urlSearchParams = new URLSearchParams(searchParams);
             urlSearchParams.delete('businessDate');
@@ -56,6 +102,6 @@ export const useMidnightEffect = () => {
             }
         }, timeUntilMidnight);
 
-        return () => clearTimeout(timeout); // Cleanup on unmount
+        return () => clearTimeout(timeout);
     }, [searchParams, setSearchParams]);
 };
