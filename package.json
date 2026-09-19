@@ -13,6 +13,8 @@
     "test": "vitest",
     "test:unit": "vitest run",
     "test:e2e": "playwright test --project=dev",
+    "test:e2e:smoke": "playwright test --project=dev tests/e2e/smoke.test.ts",
+    "test:e2e:edge": "playwright test --project=dev tests/e2e/edgeCases.test.ts",
     "test:e2e:full-day": "playwright test --project=dev tests/e2e/fullDay.test.ts",
     "generate": "npx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
     "build": "tsc -b && vite build",
