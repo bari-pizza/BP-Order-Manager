@@ -20,10 +20,12 @@ security definer
 set search_path = public
 as $function$
 begin
-    if not exists (
-        select 1 from public."Profile"
-        where id = auth.uid() and is_admin and not is_deleted
-    ) then
+    -- service_role (Edge Functions / e2e seed) has no auth.uid(); allow it explicitly.
+    if coalesce(auth.jwt() ->> 'role', '') <> 'service_role'
+       and not exists (
+           select 1 from public."Profile"
+           where id = auth.uid() and is_admin and not is_deleted
+       ) then
         raise exception 'Only admins can delete or restore employees'
             using errcode = '42501';
     end if;
@@ -48,4 +50,4 @@ end;
 $function$;
 
 revoke all on function public.update_employee(uuid, boolean) from public, anon;
-grant execute on function public.update_employee(uuid, boolean) to authenticated;
+grant execute on function public.update_employee(uuid, boolean) to authenticated, service_role;

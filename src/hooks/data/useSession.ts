@@ -1,5 +1,5 @@
 import { Session } from '@supabase/supabase-js';
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { supaClient } from '../../supaClient';
 import { Profile } from '../../typesAndValidators';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
@@ -14,6 +14,18 @@ export interface SupashipUserInfo {
 // for the future
 // https://dev.to/ankitjey/the-magic-of-react-query-and-supabase-1pom
 
+const EMPTY_PROFILES: Profile[] = [];
+
+const subscribeProfiles = (queryClient: ReturnType<typeof useQueryClient>, onChange: () => void) =>
+    queryClient.getQueryCache().subscribe((event) => {
+        if (event?.query.queryKey[0] === 'profiles') {
+            onChange();
+        }
+    });
+
+const getProfilesSnapshot = (queryClient: ReturnType<typeof useQueryClient>) =>
+    (queryClient.getQueryData(['profiles']) as Profile[] | undefined) ?? EMPTY_PROFILES;
+
 export const useSession = (): SupashipUserInfo => {
     const queryClient = useQueryClient();
 
@@ -26,7 +38,15 @@ export const useSession = (): SupashipUserInfo => {
         },
     });
 
-    const profiles = (queryClient.getQueryData(['profiles']) || []) as Profile[];
+    // Subscribe to the ['profiles'] cache AuthenticatedShopData fills. Plain getQueryData
+    // does not re-render Layout when that query resolves, so Admin/Manager nav and /manager
+    // stayed stuck after sign-in. Avoid a second useQuery here — it raced the suspense fetch
+    // and remounted the order editor mid-interaction.
+    const profiles = useSyncExternalStore(
+        (onChange) => subscribeProfiles(queryClient, onChange),
+        () => getProfilesSnapshot(queryClient),
+        () => EMPTY_PROFILES,
+    );
 
     const profile = profiles.find((p) => p.id === session?.user?.id) || null;
     // Profiles are only fetched after sign-in (see AuthenticatedShopData). Signed-out must not

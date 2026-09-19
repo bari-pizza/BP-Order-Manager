@@ -67,6 +67,16 @@ npm run db:apply:prod -- supabase-functions/update-employee.sql --i-know-this-is
 
 SQL is wrapped in a transaction by default. Pass `--no-transaction` only for rare DDL that Postgres cannot run inside a transaction.
 
+For BAR-15 RLS (dev first):
+
+```bash
+npm run db:apply:dev -- supabase-functions/handle-employee-update.sql
+npm run db:apply:dev -- supabase-functions/update-employee.sql
+npm run db:apply:dev -- supabase-functions/table-policies.sql
+```
+
+Confirm anon cannot read shop tables before applying the same files to prod with `--i-know-this-is-prod`.
+
 ### 5. (Optional) Set Up Sentry Error Monitoring
 
 Sentry captures errors in production and sends them to a dashboard for monitoring.
