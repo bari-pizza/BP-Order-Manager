@@ -10,6 +10,23 @@
 --   * Drawer / Driver rows: created by handle_employee_update (DEFINER); no direct client writes
 --
 -- Helper predicates are SECURITY DEFINER so policies that reference Profile do not recurse.
+-- Soft-delete does not revoke Auth sessions; every authenticated policy must require an
+-- active (not is_deleted) Profile so retained JWTs cannot keep reading/writing shop data.
+
+CREATE OR REPLACE FUNCTION public.is_active_employee()
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM public."Profile"
+        WHERE id = auth.uid()
+          AND NOT is_deleted
+    );
+$$;
 
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
@@ -43,8 +60,10 @@ AS $$
     );
 $$;
 
+REVOKE ALL ON FUNCTION public.is_active_employee() FROM PUBLIC, anon;
 REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC, anon;
 REVOKE ALL ON FUNCTION public.is_admin_or_manager() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_active_employee() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.is_admin_or_manager() TO authenticated;
 
@@ -59,15 +78,17 @@ DROP POLICY IF EXISTS "profile_update_own" ON public."Profile";
 CREATE POLICY "profile_select_authenticated"
 ON public."Profile" FOR SELECT
 TO authenticated
-USING (true);
+-- Active employees see the roster; soft-deleted users may still read their own row
+-- so the client can detect is_deleted and sign them out.
+USING (public.is_active_employee() OR id = auth.uid());
 
 -- Own row only. Role / soft-delete columns are not in the column GRANT below,
 -- so even this policy cannot elevate privileges via PostgREST.
 CREATE POLICY "profile_update_own"
 ON public."Profile" FOR UPDATE
 TO authenticated
-USING (id = auth.uid())
-WITH CHECK (id = auth.uid());
+USING (id = auth.uid() AND public.is_active_employee())
+WITH CHECK (id = auth.uid() AND public.is_active_employee());
 
 REVOKE ALL ON TABLE public."Profile" FROM anon, authenticated;
 GRANT SELECT ON TABLE public."Profile" TO authenticated;
@@ -92,12 +113,12 @@ DROP POLICY IF EXISTS "driver_select_authenticated" ON public."Driver";
 CREATE POLICY "drawer_select_authenticated"
 ON public."Drawer" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 CREATE POLICY "driver_select_authenticated"
 ON public."Driver" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 REVOKE ALL ON TABLE public."Drawer" FROM anon, authenticated;
 REVOKE ALL ON TABLE public."Driver" FROM anon, authenticated;
@@ -121,7 +142,7 @@ DROP POLICY IF EXISTS "app_setting_write_admin_manager" ON public."AppSetting";
 CREATE POLICY "order_origin_select_authenticated"
 ON public."OrderOrigin" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 CREATE POLICY "order_origin_write_admin_manager"
 ON public."OrderOrigin" FOR ALL
@@ -132,7 +153,7 @@ WITH CHECK (public.is_admin_or_manager());
 CREATE POLICY "resource_select_authenticated"
 ON public."Resource" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 CREATE POLICY "resource_write_admin_manager"
 ON public."Resource" FOR ALL
@@ -143,7 +164,7 @@ WITH CHECK (public.is_admin_or_manager());
 CREATE POLICY "app_setting_select_authenticated"
 ON public."AppSetting" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 CREATE POLICY "app_setting_write_admin_manager"
 ON public."AppSetting" FOR ALL
@@ -170,14 +191,14 @@ DROP POLICY IF EXISTS "payment_all_authenticated" ON public."Payment";
 CREATE POLICY "order_all_authenticated"
 ON public."Order" FOR ALL
 TO authenticated
-USING (true)
-WITH CHECK (true);
+USING (public.is_active_employee())
+WITH CHECK (public.is_active_employee());
 
 CREATE POLICY "payment_all_authenticated"
 ON public."Payment" FOR ALL
 TO authenticated
-USING (true)
-WITH CHECK (true);
+USING (public.is_active_employee())
+WITH CHECK (public.is_active_employee());
 
 REVOKE ALL ON TABLE public."Order" FROM anon, authenticated;
 REVOKE ALL ON TABLE public."Payment" FROM anon, authenticated;
@@ -204,7 +225,7 @@ DROP POLICY IF EXISTS "cash_transfer_write_admin_manager" ON public."CashTransfe
 CREATE POLICY "bdd_select_authenticated"
 ON public."BusinessDayDriver" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 CREATE POLICY "bdd_write_admin_manager"
 ON public."BusinessDayDriver" FOR ALL
@@ -215,7 +236,7 @@ WITH CHECK (public.is_admin_or_manager());
 CREATE POLICY "bddrawer_select_authenticated"
 ON public."BusinessDayDrawer" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 CREATE POLICY "bddrawer_write_admin_manager"
 ON public."BusinessDayDrawer" FOR ALL
@@ -226,7 +247,7 @@ WITH CHECK (public.is_admin_or_manager());
 CREATE POLICY "bdsummary_select_authenticated"
 ON public."BusinessDaySummary" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 -- Closing / reopening the shop day is admin or manager only.
 CREATE POLICY "bdsummary_write_admin_manager"
@@ -238,7 +259,7 @@ WITH CHECK (public.is_admin_or_manager());
 CREATE POLICY "cash_transfer_select_authenticated"
 ON public."CashTransfer" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 CREATE POLICY "cash_transfer_write_admin_manager"
 ON public."CashTransfer" FOR ALL
@@ -265,7 +286,7 @@ DROP POLICY IF EXISTS "gct_select_authenticated" ON public."GlobalChangeTracker"
 CREATE POLICY "gct_select_authenticated"
 ON public."GlobalChangeTracker" FOR SELECT
 TO authenticated
-USING (true);
+USING (public.is_active_employee());
 
 REVOKE ALL ON TABLE public."GlobalChangeTracker" FROM anon, authenticated;
 GRANT SELECT ON TABLE public."GlobalChangeTracker" TO authenticated;
