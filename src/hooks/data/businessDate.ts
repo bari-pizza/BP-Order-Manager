@@ -1,4 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
 
 /** Calendar “today” for business-date validation (not frozen at module load). */
 export const getCalendarToday = (): Dayjs => dayjs();
