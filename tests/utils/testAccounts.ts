@@ -19,6 +19,14 @@ export const TEST_ACCOUNTS: TestAccount[] = [
         is_driver: false,
     },
     {
+        email: 'test.cashier@gmail.com',
+        first_name: 'Test',
+        last_name: 'Cashier',
+        is_admin: false,
+        is_manager: false,
+        is_driver: false,
+    },
+    {
         email: 'test.driver1@gmail.com',
         first_name: 'Test',
         last_name: 'Driver1',

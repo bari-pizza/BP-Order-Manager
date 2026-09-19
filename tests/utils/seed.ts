@@ -320,3 +320,96 @@ export const seedBusinessDate = async (businessDate = todayBusinessDate()) => {
     await ensureBaseDrawers(client);
     await ensureTestUsers(client);
 };
+
+export const setProfileDeleted = async (email: string, isDeleted: boolean) => {
+    const client = await createSeedClient();
+    const { data: profile, error: findError } = await client
+        .from('Profile')
+        .select('id')
+        .ilike('email', email)
+        .maybeSingle();
+    throwIfError(`Find profile ${email}`, findError);
+    if (!profile) {
+        throw new Error(`No profile for ${email}`);
+    }
+    // Direct Profile update (service_role). Avoid update_employee RPC here — DEV drawers may
+    // lack is_deleted, and RLS only needs Profile.is_deleted for is_active_employee().
+    const { error } = await client.from('Profile').update({ is_deleted: isDeleted }).eq('id', profile.id);
+    throwIfError(`Set is_deleted=${isDeleted} on ${email}`, error);
+};
+
+export const setBusinessDayLocked = async (isLocked: boolean, businessDate = todayBusinessDate()) => {
+    const client = await createSeedClient();
+    const { error } = await client.from('BusinessDaySummary').upsert(
+        { business_date: businessDate, is_locked: isLocked },
+        { onConflict: 'business_date' },
+    );
+    throwIfError(`Set business day locked=${isLocked}`, error);
+};
+
+/** Insert an unassigned Bari Pizza pickup so Close Day stays blocked. */
+export const insertUnassignedPickupOrder = async (businessDate = todayBusinessDate()) => {
+    const client = await createSeedClient();
+    const { data: origin, error: originError } = await client
+        .from('OrderOrigin')
+        .select('origin_id')
+        .eq('name', 'Bari Pizza')
+        .maybeSingle();
+    throwIfError('Find Bari Pizza origin', originError);
+    if (!origin) {
+        throw new Error('Bari Pizza origin missing — run seedBusinessDate first');
+    }
+
+    const { data: order, error } = await client
+        .from('Order')
+        .insert({
+            origin_id: origin.origin_id,
+            order_type: 'pickup',
+            business_date: businessDate,
+            order_number: 99001,
+            total_in_cents: 1000,
+            delivery_fee_in_cents: 0,
+            drawer_id: null,
+            is_locked: false,
+        })
+        .select('order_id')
+        .single();
+    throwIfError('Insert unassigned pickup', error);
+    return order;
+};
+
+/** Mark every real till locked for today so Close Day only cares about unassigned orders. */
+export const lockAllTillDrawers = async (businessDate = todayBusinessDate()) => {
+    const client = await createSeedClient();
+    const { data: drawers, error } = await client
+        .from('Drawer')
+        .select('drawer_id, drawer_type')
+        .neq('drawer_type', 'unassigned');
+    throwIfError('List drawers to lock', error);
+
+    for (const drawer of drawers ?? []) {
+        const { error: upsertError } = await client.from('BusinessDayDrawer').upsert(
+            {
+                drawer_id: drawer.drawer_id,
+                business_date: businessDate,
+                is_locked: true,
+                bank_in_cents: 0,
+                hours: 0,
+                hours_in_cents: 0,
+                other_in_cents: 0,
+                special_note: '',
+            },
+            { onConflict: 'drawer_id, business_date' },
+        );
+        throwIfError(`Lock drawer ${drawer.drawer_id}`, upsertError);
+    }
+};
+
+export const getAnonRestConfig = () => {
+    const url = process.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
+    const anon = process.env.VITE_SUPABASE_ANON_KEY;
+    if (!url || !anon) {
+        throw new Error('VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY required for anon REST checks');
+    }
+    return { url, anon };
+};
