@@ -198,7 +198,7 @@ const ensureProfile = async (client: SeedClient, userId: string, account: TestAc
         last_name: account.last_name,
         is_admin: account.is_admin,
         is_manager: account.is_manager,
-        is_cashier: false,
+        is_cashier: account.is_cashier,
         is_deleted: false,
         locale: 'en',
     };

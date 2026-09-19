@@ -40,9 +40,17 @@ test.describe('BAR-5 edge cases', () => {
     });
 
     test.afterAll(async () => {
-        await setProfileDeleted(driverAccount().email, false).catch(() => undefined);
+        let profileRestoreError: unknown;
+        try {
+            await setProfileDeleted(driverAccount().email, false);
+        } catch (error) {
+            profileRestoreError = error;
+        }
         await setBusinessDayLocked(false).catch(() => undefined);
         await wipeBusinessDate();
+        if (profileRestoreError) {
+            throw profileRestoreError;
+        }
     });
 
     test('login accepts mixed-case email', async ({ page }) => {
@@ -139,6 +147,6 @@ test.describe('BAR-5 edge cases', () => {
             },
             data: { src: '' },
         });
-        expect(response.status(), await response.text()).toBeGreaterThanOrEqual(400);
+        expect(response.status(), await response.text()).toBe(403);
     });
 });

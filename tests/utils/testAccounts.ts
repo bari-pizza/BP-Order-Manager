@@ -6,6 +6,7 @@ export type TestAccount = {
     last_name: string;
     is_admin: boolean;
     is_manager: boolean;
+    is_cashier: boolean;
     is_driver: boolean;
 };
 
@@ -16,6 +17,7 @@ export const TEST_ACCOUNTS: TestAccount[] = [
         last_name: 'Admin',
         is_admin: true,
         is_manager: true,
+        is_cashier: false,
         is_driver: false,
     },
     {
@@ -24,6 +26,7 @@ export const TEST_ACCOUNTS: TestAccount[] = [
         last_name: 'Cashier',
         is_admin: false,
         is_manager: false,
+        is_cashier: true,
         is_driver: false,
     },
     {
@@ -32,6 +35,7 @@ export const TEST_ACCOUNTS: TestAccount[] = [
         last_name: 'Driver1',
         is_admin: false,
         is_manager: false,
+        is_cashier: false,
         is_driver: true,
     },
     {
@@ -40,6 +44,7 @@ export const TEST_ACCOUNTS: TestAccount[] = [
         last_name: 'Driver2',
         is_admin: false,
         is_manager: false,
+        is_cashier: false,
         is_driver: true,
     },
 ];
