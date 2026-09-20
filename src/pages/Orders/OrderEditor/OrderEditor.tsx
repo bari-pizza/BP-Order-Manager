@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, Button, Stack, Typography, MenuItem, Divider } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Button, Stack, Typography, MenuItem, Divider, CircularProgress } from '@mui/material';
 import { createNewOrder, updateOrder } from '../../../supabaseQueries';
 import {
     Drawer,
@@ -87,6 +87,7 @@ export const OrderEditor = ({
     const { profile } = useSession();
     const driverIsEditing = !!driverDrawerID;
     const { isMobile } = useLayoutContext();
+    const [sidePanelSaving, setSidePanelSaving] = useState(false);
 
     const defaultDeliveryFee = constants.default.delivery_fee_in_cents;
     const defaultNewOrder = useMemo(() => {
@@ -435,6 +436,29 @@ export const OrderEditor = ({
         }
     };
 
+    /** Side-panel Save: disable + in-button spinner for at least ~1s (BAR-21). Dialog path unchanged. */
+    const onSidePanelSubmit: SubmitHandler<FormValues> = async (data) => {
+        data.drawer_id = data.drawer_id || null;
+        data.last_updated_by = profile?.id || null;
+        const started = Date.now();
+        setSidePanelSaving(true);
+        try {
+            if ('order_id' in data) {
+                await updateOrderMutation.mutateAsync(data);
+            } else {
+                await createNewOrderMutation.mutateAsync({ newOrder: data });
+            }
+        } catch {
+            // mutation onError already set toast / root error
+        } finally {
+            const remaining = 1000 - (Date.now() - started);
+            if (remaining > 0) {
+                await new Promise((resolve) => setTimeout(resolve, remaining));
+            }
+            setSidePanelSaving(false);
+        }
+    };
+
     const onError: SubmitErrorHandler<FieldErrors> = (fields) => {
     };
 
@@ -485,10 +509,22 @@ export const OrderEditor = ({
                     />
                 </Stack>
                 <Stack direction="column" spacing={2} mt={2} justifyContent="space-between" height="100%">
-                    <Button onClick={handleSubmit(onSubmit, onError)} variant="contained" sx={{ height: '75px' }}>
-                        Save
+                    <Button
+                        onClick={handleSubmit(onSidePanelSubmit, onError)}
+                        variant="contained"
+                        disabled={sidePanelSaving}
+                        startIcon={
+                            sidePanelSaving ? <CircularProgress size={22} color="inherit" thickness={5} /> : undefined
+                        }
+                        sx={{ height: '75px' }}>
+                        {sidePanelSaving ? 'Saving…' : 'Save'}
                     </Button>
-                    <Button onClick={handleCancel} variant="outlined" color="error" sx={{ height: '75px' }}>
+                    <Button
+                        onClick={handleCancel}
+                        variant="outlined"
+                        color="error"
+                        disabled={sidePanelSaving}
+                        sx={{ height: '75px' }}>
                         Cancel
                     </Button>
                 </Stack>
