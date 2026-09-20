@@ -6,7 +6,6 @@ import {
     Autocomplete,
     Paper,
     Box,
-    IconButton,
 } from '@mui/material';
 import {
     EditOutlined,
@@ -87,6 +86,7 @@ export const MyAccount = () => {
         setValue,
         watch,
         getValues,
+        reset,
     } = useForm({
         defaultValues: {
             isEditing: false,
@@ -125,15 +125,25 @@ export const MyAccount = () => {
     const updatingPassword = watch('updatingPassword');
 
     const beginEdit = () => {
-        setValue('first_name', profile?.first_name || '');
-        setValue('last_name', profile?.last_name || '');
-        setValue('phone', profile?.phone || '');
-        setValue('email', profile?.email || '');
-        setValue('isEditing', true);
+        reset({
+            ...getValues(),
+            first_name: profile?.first_name || '',
+            last_name: profile?.last_name || '',
+            phone: profile?.phone || '',
+            email: profile?.email || '',
+            isEditing: true,
+        });
     };
 
     const cancelEdit = () => {
-        setValue('isEditing', false);
+        reset({
+            ...getValues(),
+            first_name: profile?.first_name || '',
+            last_name: profile?.last_name || '',
+            phone: profile?.phone || '',
+            email: profile?.email || '',
+            isEditing: false,
+        });
     };
 
     const onSubmit = async ({ first_name, last_name, phone, email }: FormValues) => {
@@ -178,7 +188,7 @@ export const MyAccount = () => {
             isLoading: false,
             autoClose: 5000,
         });
-        setValue('isEditing', false);
+        reset({ ...getValues(), first_name, last_name, phone, email, isEditing: false });
     };
 
     const onSubmitPassword = async ({ newPassword }: FormValues) => {
@@ -243,10 +253,8 @@ export const MyAccount = () => {
                             sx={{ flex: 1, minWidth: 0, width: isMobile ? '100%' : 'auto' }}>
                             <Box sx={{ position: 'relative', flexShrink: 0 }}>
                                 <AvatarUploader profile={profile} />
-                                <IconButton
-                                    size="small"
-                                    aria-label="Change photo"
-                                    tabIndex={-1}
+                                <Box
+                                    aria-hidden
                                     sx={{
                                         position: 'absolute',
                                         right: 4,
@@ -258,10 +266,9 @@ export const MyAccount = () => {
                                         border: '2px solid',
                                         borderColor: 'background.paper',
                                         pointerEvents: 'none',
-                                        '&:hover': { bgcolor: 'primary.dark' },
                                     }}>
                                     <PhotoCamera sx={{ fontSize: 16 }} />
-                                </IconButton>
+                                </Box>
                             </Box>
 
                             <Stack
@@ -421,13 +428,14 @@ export const MyAccount = () => {
                                     renderInput={(params) => (
                                         <SmartTextField
                                             {...params}
+                                            inputProps={{ ...params.inputProps, 'aria-label': 'Language' }}
                                             value={profileLocale}
                                             label=""
                                             isDirty={languageSubmitting}
                                             size="small"
                                         />
                                     )}
-                                    getOptionLabel={(option) => dictionary[option].text}
+                                    getOptionLabel={(option) => dictionary[option]?.text ?? option}
                                 />
                             </Box>
                         </Stack>
