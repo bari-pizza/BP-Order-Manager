@@ -176,28 +176,29 @@ export const MyAccount = () => {
             direction="column"
             height="calc(100vh - 64px)"
             spacing={2}
-            margin={4}
-            alignItems="center"
-            justifyContent="space-between">
-            <Typography variant="h3" textAlign="center">
+            sx={{
+                width: '100%',
+                maxWidth: 960,
+                mx: 'auto',
+                px: { xs: 2, sm: 3 },
+                py: 3,
+                boxSizing: 'border-box',
+            }}>
+            <Typography variant="h3" textAlign="center" sx={{ width: '100%' }}>
                 My Account
             </Typography>
 
             <Stack
                 direction={isMobile ? 'column' : 'row'}
-                height="-webkit-fill-available"
-                spacing={2}
-                m={4}
-                width="100%"
-                flexGrow={1}>
+                spacing={0}
+                sx={{ width: '100%', flexGrow: 1, minHeight: 0 }}
+                alignItems="stretch">
                 <Stack
                     direction="column"
                     alignItems="center"
                     justifyContent="center"
-                    width={isMobile ? '100%' : '50%'}
-                    p={2}
                     spacing={4}
-                    flex={1}>
+                    sx={{ flex: 1, width: isMobile ? '100%' : '50%', p: 2, boxSizing: 'border-box' }}>
                     <AvatarUploader profile={profile} />
                     {isEditing ? (
                         <Stack direction="column" spacing={2}>
@@ -261,10 +262,9 @@ export const MyAccount = () => {
                 <Stack
                     direction="column"
                     gap={2}
-                    width={isMobile ? '100%' : '50%'}
-                    p={2}
                     justifyContent="space-evenly"
-                    alignItems="center">
+                    alignItems="center"
+                    sx={{ flex: 1, width: isMobile ? '100%' : '50%', p: 2, boxSizing: 'border-box' }}>
                     <Stack direction="column" alignItems="center" gap={2}>
                         {updatingPassword && (
                             <>
@@ -322,15 +322,12 @@ export const MyAccount = () => {
                                 );
                             }}
                         />
-                        {/* <SwitchLanguage onChange={handleLanguageChange} /> */}
                         <Autocomplete
                             options={['en', 'pt', 'es']}
                             value={profileLocale}
                             sx={{ width: 225 }}
-                            // onChange={(event) => handleLanguageChange(event)}
                             onChange={(_, value) => handleLanguageChange(value as ValidLanguageCode)}
                             renderInput={(params) => (
-                                // <TextField {...params} label="Language" />
                                 <SmartTextField
                                     {...params}
                                     value={profileLocale}
@@ -339,29 +336,15 @@ export const MyAccount = () => {
                                 />
                             )}
                             getOptionLabel={(option) => dictionary[option].text}
-                            // getOptionLabel={(option) => drawers.find((d) => d.drawer_id === option)?.name || ''}
                         />
-                        {/* <TextField
-                            select
-                            id="locale"
-                            label="Language"
-                            value={profileLocale}
-                            onChange={handleLanguageChange}
-                            // options={
-                            //     [
-                            //         { value: 'en', label: 'English' },
-                            //         { value: 'pt', label: 'Portugues' },
-                            //         { value: 'es', label: 'Espanol' },
-                            //     ]
-                            // }
-                            helperText="Please select your language"
-                            > */}
                     </Stack>
                 </Stack>
             </Stack>
-            <Button onClick={handleLogout} sx={{ width: 'fit-content' }}>
-                Logout
-            </Button>
+            <Stack alignItems="center" sx={{ width: '100%', pb: 1 }}>
+                <Button onClick={handleLogout} sx={{ width: 'fit-content' }}>
+                    Logout
+                </Button>
+            </Stack>
         </Stack>
     );
 };
