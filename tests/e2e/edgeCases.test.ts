@@ -70,7 +70,7 @@ test.describe('BAR-5 edge cases', () => {
         await expect(page.locator('.manager-dashboard')).toHaveCount(0);
     });
 
-    test('non-driver on mobile Orders sees Driver not found', async ({ browser }) => {
+    test('non-driver on mobile Orders sees drivers-only empty state', async ({ browser }) => {
         const account = cashier();
         const context = await browser.newContext({
             ...devices['iPhone 12'],
@@ -78,7 +78,8 @@ test.describe('BAR-5 edge cases', () => {
         const page = await context.newPage();
         await loginAs(page, account.email, getTestPassword());
         await page.goto('/orders');
-        await expect(page.getByText('Driver not found')).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText('This app is for drivers')).toBeVisible({ timeout: 15_000 });
+        await expect(page.getByText(/Use a desktop or tablet for Manager/i)).toBeVisible();
         await context.close();
     });
 

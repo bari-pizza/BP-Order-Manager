@@ -10,6 +10,7 @@ import {
     SpeedDial,
     SpeedDialAction,
     Stack,
+    Typography,
 } from '@mui/material';
 import { Add as AddIcon, Bolt as BoltIcon, ReceiptLong as ReceiptLongIcon } from '@mui/icons-material';
 import { OrderDashboardContext } from '../../context/OrderDashboardContext';
@@ -109,7 +110,21 @@ const OrderDashboardMobile = () => {
 
     // statistics page (with link in navbar)
 
-    if (!driver) return <div>Driver not found</div>;
+    if (!driver) {
+        return (
+            <Stack
+                className="order-dashboard-non-driver"
+                alignItems="center"
+                justifyContent="center"
+                spacing={1}
+                sx={{ height: '100%', px: 3, textAlign: 'center' }}>
+                <Typography variant="h6">This app is for drivers</Typography>
+                <Typography variant="body1" color="text.secondary">
+                    Use a desktop or tablet for Manager.
+                </Typography>
+            </Stack>
+        );
+    }
 
     // TODO: make this responsive to changes
 
