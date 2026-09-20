@@ -1,4 +1,20 @@
-import { Stack, Button, Typography, TextField, Divider, Autocomplete } from '@mui/material';
+import {
+    Stack,
+    Button,
+    Typography,
+    TextField,
+    Autocomplete,
+    Paper,
+    Box,
+} from '@mui/material';
+import {
+    EditOutlined,
+    LockOutlined,
+    Logout as LogoutIcon,
+    MailOutline,
+    PhoneOutlined,
+    PhotoCamera,
+} from '@mui/icons-material';
 import { supaClient } from '../../supaClient';
 import { useLayoutContext, useUserContext } from '../../hooks/data/useContextData';
 import { AvatarUploader } from './AvatarUploader';
@@ -24,6 +40,15 @@ type FormValues = {
 
 type ValidLanguageCode = 'en' | 'es' | 'pt';
 
+const panelSx = {
+    p: { xs: 2.5, sm: 3 },
+    borderRadius: 2,
+    border: '1px solid',
+    borderColor: 'divider',
+    bgcolor: 'background.paper',
+    boxShadow: 'none',
+} as const;
+
 export const MyAccount = () => {
     const { profile } = useUserContext();
     const toastRef = useRef<Id>('');
@@ -35,13 +60,12 @@ export const MyAccount = () => {
     const dictionary: {
         [languageCode: string]: {
             dayJSLocale: string;
-
             text: string;
         };
     } = {
-        es: { dayJSLocale: 'es-us', text: 'Español' },
-        pt: { dayJSLocale: 'pt-br', text: 'Português' },
-        en: { dayJSLocale: 'en', text: 'English' },
+        es: { dayJSLocale: 'es-us', text: 'Español' },
+        pt: { dayJSLocale: 'pt-br', text: 'Português' },
+        en: { dayJSLocale: 'en', text: 'English (US)' },
     };
 
     const handleLanguageChange = async (newLanguageCode: ValidLanguageCode | null) => {
@@ -62,6 +86,7 @@ export const MyAccount = () => {
         setValue,
         watch,
         getValues,
+        reset,
     } = useForm({
         defaultValues: {
             isEditing: false,
@@ -98,6 +123,28 @@ export const MyAccount = () => {
 
     const isEditing = watch('isEditing');
     const updatingPassword = watch('updatingPassword');
+
+    const beginEdit = () => {
+        reset({
+            ...getValues(),
+            first_name: profile?.first_name || '',
+            last_name: profile?.last_name || '',
+            phone: profile?.phone || '',
+            email: profile?.email || '',
+            isEditing: true,
+        });
+    };
+
+    const cancelEdit = () => {
+        reset({
+            ...getValues(),
+            first_name: profile?.first_name || '',
+            last_name: profile?.last_name || '',
+            phone: profile?.phone || '',
+            email: profile?.email || '',
+            isEditing: false,
+        });
+    };
 
     const onSubmit = async ({ first_name, last_name, phone, email }: FormValues) => {
         toastRef.current = toast.loading(m.updatingTarget({ targetName: m.profile() }));
@@ -141,7 +188,7 @@ export const MyAccount = () => {
             isLoading: false,
             autoClose: 5000,
         });
-        setValue('isEditing', false);
+        reset({ ...getValues(), first_name, last_name, phone, email, isEditing: false });
     };
 
     const onSubmitPassword = async ({ newPassword }: FormValues) => {
@@ -168,200 +215,251 @@ export const MyAccount = () => {
         });
     };
 
-    // TODO: handle submit (idk about changing email)
-    // TODO: break up into left and right side and then render differently if isMobile
+    const displayName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Your profile';
 
     return (
-        <Stack
-            direction="column"
-            height="calc(100vh - 64px)"
-            spacing={2}
-            margin={4}
-            alignItems="center"
-            justifyContent="space-between">
-            <Typography variant="h3" textAlign="center">
-                My Account
-            </Typography>
-
+        <Box
+            sx={{
+                width: '100%',
+                minHeight: 'calc(100vh - 64px)',
+                bgcolor: 'grey.50',
+                overflow: 'auto',
+            }}>
             <Stack
-                direction={isMobile ? 'column' : 'row'}
-                height="-webkit-fill-available"
-                spacing={2}
-                m={4}
-                width="100%"
-                flexGrow={1}>
-                <Stack
-                    direction="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    width={isMobile ? '100%' : '50%'}
-                    p={2}
-                    spacing={4}
-                    flex={1}>
-                    <AvatarUploader profile={profile} />
-                    {isEditing ? (
-                        <Stack direction="column" spacing={2}>
-                            <TextField {...register('first_name')} label="First Name" />
-                            <TextField {...register('last_name')} label="Last Name" />
-                            <TextField {...register('phone')} label="Phone" />
-                            <TextField {...register('email')} label="Email" />
-                        </Stack>
-                    ) : (
-                        <>
-                            <Typography variant="body1">
-                                {profile?.first_name} {profile?.last_name}
-                            </Typography>
-                            <Typography variant="body1">{profile?.email}</Typography>
-                            <Typography variant="body1"> {profile?.phone}</Typography>
-                        </>
-                    )}
+                direction="column"
+                spacing={2.5}
+                sx={{
+                    width: '100%',
+                    maxWidth: 960,
+                    mx: 'auto',
+                    px: { xs: 2, sm: 3 },
+                    py: { xs: 2.5, sm: 3.5 },
+                    boxSizing: 'border-box',
+                }}>
+                <Typography variant="h5" fontWeight={700} color="text.primary">
+                    My Account
+                </Typography>
 
-                    <Controller
-                        name="isEditing"
-                        control={control}
-                        render={({ field: { onChange, value } }) => {
-                            const handleClick = () => {
-                                if (!value) {
-                                    setValue('first_name', profile?.first_name || '');
-                                    setValue('last_name', profile?.last_name || '');
-                                    setValue('phone', profile?.phone || '');
-                                    setValue('email', profile?.email || '');
-                                }
-                                onChange(!value);
-                            };
-                            if (value) {
-                                return (
+                <Paper elevation={0} sx={panelSx}>
+                    <Stack
+                        direction={isMobile ? 'column' : 'row'}
+                        spacing={3}
+                        alignItems={isMobile ? 'center' : 'center'}
+                        justifyContent="space-between">
+                        <Stack
+                            direction={isMobile ? 'column' : 'row'}
+                            spacing={2.5}
+                            alignItems="center"
+                            sx={{ flex: 1, minWidth: 0, width: isMobile ? '100%' : 'auto' }}>
+                            <Box sx={{ position: 'relative', flexShrink: 0 }}>
+                                <AvatarUploader profile={profile} />
+                                <Box
+                                    aria-hidden
+                                    sx={{
+                                        position: 'absolute',
+                                        right: 4,
+                                        bottom: 4,
+                                        bgcolor: 'primary.main',
+                                        color: 'primary.contrastText',
+                                        width: 32,
+                                        height: 32,
+                                        border: '2px solid',
+                                        borderColor: 'background.paper',
+                                        pointerEvents: 'none',
+                                    }}>
+                                    <PhotoCamera sx={{ fontSize: 16 }} />
+                                </Box>
+                            </Box>
+
+                            <Stack
+                                spacing={1}
+                                alignItems={isMobile ? 'center' : 'flex-start'}
+                                sx={{ flex: 1, minWidth: 0, width: isMobile ? '100%' : 'auto' }}>
+                                {isEditing ? (
+                                    <Stack spacing={1.5} sx={{ width: '100%', maxWidth: 360 }}>
+                                        <TextField {...register('first_name')} label="First Name" fullWidth size="small" />
+                                        <TextField {...register('last_name')} label="Last Name" fullWidth size="small" />
+                                        <TextField {...register('phone')} label="Phone" fullWidth size="small" />
+                                        <TextField {...register('email')} label="Email" fullWidth size="small" />
+                                        <Stack direction="row" spacing={1} justifyContent={isMobile ? 'center' : 'flex-start'}>
+                                            <Button variant="contained" onClick={handleSubmit(onSubmit)}>
+                                                Save
+                                            </Button>
+                                            <Button variant="outlined" color="error" onClick={cancelEdit}>
+                                                Cancel
+                                            </Button>
+                                        </Stack>
+                                    </Stack>
+                                ) : (
                                     <>
-                                        <Button
-                                            variant="contained"
-                                            onClick={handleSubmit(onSubmit)}
-                                            sx={{ width: 'fit-content' }}>
-                                            Submit
+                                        <Typography variant="h5" fontWeight={700} textAlign={isMobile ? 'center' : 'left'}>
+                                            {displayName}
+                                        </Typography>
+                                        {profile?.email && (
+                                            <Stack direction="row" spacing={1} alignItems="center">
+                                                <MailOutline sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                <Typography variant="body2" color="text.secondary" noWrap>
+                                                    {profile.email}
+                                                </Typography>
+                                            </Stack>
+                                        )}
+                                        {profile?.phone && (
+                                            <Stack direction="row" spacing={1} alignItems="center">
+                                                <PhoneOutlined sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {profile.phone}
+                                                </Typography>
+                                            </Stack>
+                                        )}
+                                    </>
+                                )}
+                            </Stack>
+                        </Stack>
+
+                        {!isEditing && (
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                startIcon={<EditOutlined />}
+                                onClick={beginEdit}
+                                fullWidth={isMobile}
+                                sx={{ flexShrink: 0, alignSelf: isMobile ? 'stretch' : 'center' }}>
+                                Edit profile
+                            </Button>
+                        )}
+                    </Stack>
+                </Paper>
+
+                <Stack direction={isMobile ? 'column' : 'row'} spacing={2.5} alignItems="stretch">
+                    <Paper elevation={0} sx={{ ...panelSx, flex: 1 }}>
+                        <Typography variant="subtitle1" fontWeight={700} mb={2}>
+                            Security
+                        </Typography>
+                        <Stack spacing={2}>
+                            {updatingPassword ? (
+                                <>
+                                    <TextField
+                                        {...register('newPassword', {
+                                            required: "Password can't be empty",
+                                            minLength: {
+                                                value: 8,
+                                                message: 'Password must be at least 8 characters long',
+                                            },
+                                        })}
+                                        autoComplete="new-password"
+                                        fullWidth
+                                        size="small"
+                                        label="New Password"
+                                        type="password"
+                                        error={!!errors.newPassword}
+                                        helperText={errors.newPassword?.message}
+                                    />
+                                    <TextField
+                                        {...register('confirmNewPassword', {
+                                            required: 'Passwords must match',
+                                            validate: (value) => {
+                                                const { newPassword } = getValues();
+                                                return value === newPassword || 'Passwords do not match';
+                                            },
+                                        })}
+                                        autoComplete="new-password"
+                                        fullWidth
+                                        size="small"
+                                        type="password"
+                                        label="Confirm New Password"
+                                        error={!!errors.confirmNewPassword}
+                                        helperText={errors.confirmNewPassword?.message}
+                                    />
+                                    <Stack direction="row" spacing={1}>
+                                        <Button variant="contained" onClick={handleSubmit(onSubmitPassword)} fullWidth>
+                                            Save password
                                         </Button>
+                                        <Controller
+                                            name="updatingPassword"
+                                            control={control}
+                                            render={({ field: { onChange } }) => (
+                                                <Button
+                                                    variant="outlined"
+                                                    color="error"
+                                                    fullWidth
+                                                    onClick={() => {
+                                                        setValue('newPassword', '');
+                                                        setValue('confirmNewPassword', '');
+                                                        onChange(false);
+                                                    }}>
+                                                    Cancel
+                                                </Button>
+                                            )}
+                                        />
+                                    </Stack>
+                                </>
+                            ) : (
+                                <Controller
+                                    name="updatingPassword"
+                                    control={control}
+                                    render={({ field: { onChange } }) => (
                                         <Button
                                             variant="outlined"
-                                            color="error"
-                                            onClick={handleClick}
-                                            sx={{ width: 'fit-content' }}>
-                                            Cancel Changes
+                                            color="inherit"
+                                            fullWidth
+                                            startIcon={<LockOutlined />}
+                                            onClick={() => onChange(true)}
+                                            sx={{
+                                                justifyContent: 'flex-start',
+                                                borderColor: 'divider',
+                                                color: 'text.primary',
+                                                py: 1.25,
+                                            }}>
+                                            Update password
                                         </Button>
-                                    </>
-                                );
-                            }
-
-                            return (
-                                <Button onClick={handleClick} variant="text" sx={{ width: 'fit-content' }}>
-                                    Edit Profile
-                                </Button>
-                            );
-                        }}
-                    />
-                </Stack>
-                {!isMobile && <Divider orientation="vertical" flexItem />}
-                <Stack
-                    direction="column"
-                    gap={2}
-                    width={isMobile ? '100%' : '50%'}
-                    p={2}
-                    justifyContent="space-evenly"
-                    alignItems="center">
-                    <Stack direction="column" alignItems="center" gap={2}>
-                        {updatingPassword && (
-                            <>
-                                <TextField
-                                    {...register('newPassword', {
-                                        required: "Password can't be empty",
-                                        minLength: { value: 8, message: 'Password must be at least 8 characters long' },
-                                    })}
-                                    autoComplete="new-password"
-                                    fullWidth
-                                    label="New Password"
-                                    type="password"
-                                    error={!!errors.newPassword}
-                                    helperText={errors.newPassword?.message}
-                                />
-                                <TextField
-                                    {...register('confirmNewPassword', {
-                                        required: 'Passwords must match',
-                                        validate: (value) => {
-                                            const { newPassword } = getValues();
-                                            return value === newPassword || 'Passwords do not match';
-                                        },
-                                    })}
-                                    autoComplete="new-password"
-                                    type="password"
-                                    label="Confirm New Password"
-                                    error={!!errors.confirmNewPassword}
-                                    helperText={errors.confirmNewPassword?.message}
-                                />
-                                <Button variant="contained" onClick={handleSubmit(onSubmitPassword)}>
-                                    Save Password
-                                </Button>
-                            </>
-                        )}
-                        <Controller
-                            name="updatingPassword"
-                            control={control}
-                            render={({ field: { onChange, value } }) => {
-                                const handleClick = () => {
-                                    if (value) {
-                                        setValue('newPassword', '');
-                                        setValue('confirmNewPassword', '');
-                                    }
-                                    onChange(!value);
-                                };
-
-                                return (
-                                    <Button
-                                        variant={value ? 'outlined' : 'text'}
-                                        color={value ? 'error' : 'primary'}
-                                        onClick={handleClick}
-                                        sx={{ width: 'fit-content' }}>
-                                        {value ? 'Cancel' : 'Update Password'}
-                                    </Button>
-                                );
-                            }}
-                        />
-                        {/* <SwitchLanguage onChange={handleLanguageChange} /> */}
-                        <Autocomplete
-                            options={['en', 'pt', 'es']}
-                            value={profileLocale}
-                            sx={{ width: 225 }}
-                            // onChange={(event) => handleLanguageChange(event)}
-                            onChange={(_, value) => handleLanguageChange(value as ValidLanguageCode)}
-                            renderInput={(params) => (
-                                // <TextField {...params} label="Language" />
-                                <SmartTextField
-                                    {...params}
-                                    value={profileLocale}
-                                    label="Language"
-                                    isDirty={languageSubmitting}
+                                    )}
                                 />
                             )}
-                            getOptionLabel={(option) => dictionary[option].text}
-                            // getOptionLabel={(option) => drawers.find((d) => d.drawer_id === option)?.name || ''}
-                        />
-                        {/* <TextField
-                            select
-                            id="locale"
-                            label="Language"
-                            value={profileLocale}
-                            onChange={handleLanguageChange}
-                            // options={
-                            //     [
-                            //         { value: 'en', label: 'English' },
-                            //         { value: 'pt', label: 'Portugues' },
-                            //         { value: 'es', label: 'Espanol' },
-                            //     ]
-                            // }
-                            helperText="Please select your language"
-                            > */}
-                    </Stack>
+
+                            <Box>
+                                <Typography variant="body2" color="text.secondary" mb={0.75}>
+                                    Language
+                                </Typography>
+                                <Autocomplete
+                                    options={['en', 'pt', 'es'] as ValidLanguageCode[]}
+                                    value={profileLocale}
+                                    fullWidth
+                                    onChange={(_, value) => handleLanguageChange(value)}
+                                    renderInput={(params) => (
+                                        <SmartTextField
+                                            {...params}
+                                            inputProps={{ ...params.inputProps, 'aria-label': 'Language' }}
+                                            value={profileLocale}
+                                            label=""
+                                            isDirty={languageSubmitting}
+                                            size="small"
+                                        />
+                                    )}
+                                    getOptionLabel={(option) => dictionary[option]?.text ?? option}
+                                />
+                            </Box>
+                        </Stack>
+                    </Paper>
+
+                    <Paper elevation={0} sx={{ ...panelSx, flex: 1 }}>
+                        <Typography variant="subtitle1" fontWeight={700} mb={2}>
+                            Session
+                        </Typography>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            fullWidth
+                            startIcon={<LogoutIcon />}
+                            onClick={handleLogout}
+                            sx={{ py: 1.25 }}>
+                            Logout
+                        </Button>
+                        <Typography variant="caption" color="text.secondary" display="block" mt={1.5}>
+                            Signs you out on this device.
+                        </Typography>
+                    </Paper>
                 </Stack>
             </Stack>
-            <Button onClick={handleLogout} sx={{ width: 'fit-content' }}>
-                Logout
-            </Button>
-        </Stack>
+        </Box>
     );
 };
