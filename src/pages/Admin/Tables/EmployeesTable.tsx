@@ -24,6 +24,10 @@ import { supaClient } from '../../../supaClient';
 import { useConfirmationToast } from '../../../toast/useConfirmationToast';
 import { m } from '../../../types/messages';
 import { formatUserError, logDevError } from '../../../utils/userError';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
     const queryClient = useQueryClient();
@@ -291,6 +295,18 @@ export const EmployeesTable = ({ employees }: { employees: Employee[] }) => {
             },
             renderEditCell: (params) => {
                 return <CellEditCheckbox params={params} field="is_driver" />;
+            },
+        },
+        {
+            field: 'last_active_at',
+            headerName: m.lastActivity(),
+            width: 140,
+            editable: false,
+            valueGetter: (_value, row) => row.last_active_at,
+            renderCell: ({ row }) => {
+                const at = row.last_active_at;
+                if (!at) return m.never();
+                return dayjs(at).fromNow();
             },
         },
         {

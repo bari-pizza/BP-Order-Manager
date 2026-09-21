@@ -333,5 +333,15 @@
         "en": "last updated",
         "pt": "atualizado",
         "es": "actualizado"
+    },
+    "lastActivity": {
+        "en": "last activity",
+        "pt": "ultima atividade",
+        "es": "ultima actividad"
+    },
+    "never": {
+        "en": "never",
+        "pt": "nunca",
+        "es": "nunca"
     }
 }

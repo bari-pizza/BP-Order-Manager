@@ -97,7 +97,8 @@ GRANT UPDATE (
     last_name,
     phone,
     avatar_src,
-    locale
+    locale,
+    last_active_at
 ) ON TABLE public."Profile" TO authenticated;
 -- INSERT stays with service_role (create-user Edge Function / seed).
 

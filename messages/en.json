@@ -66,5 +66,7 @@
   "development": "development",
   "production": "production",
   "maintainedByTarget": "maintained by {targetName}",
-  "lastUpdated": "last updated"
+  "lastUpdated": "last updated",
+  "lastActivity": "last activity",
+  "never": "never"
 }

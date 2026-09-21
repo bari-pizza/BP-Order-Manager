@@ -28,6 +28,7 @@ const buildProfile = (args: NavBarStoryArgs): Profile => ({
     is_deleted: false,
     avatar_src: args.hasAvatar ? resourceSrc.missingAvatar : null,
     locale: 'en',
+    last_active_at: null,
 });
 
 const meta = {

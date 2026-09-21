@@ -454,6 +454,7 @@ export type Database = {
           is_cashier: boolean
           is_deleted: boolean
           is_manager: boolean
+          last_active_at: string | null
           last_name: string | null
           locale: string
           phone: string | null
@@ -467,6 +468,7 @@ export type Database = {
           is_cashier?: boolean
           is_deleted?: boolean
           is_manager?: boolean
+          last_active_at?: string | null
           last_name?: string | null
           locale?: string
           phone?: string | null
@@ -480,6 +482,7 @@ export type Database = {
           is_cashier?: boolean
           is_deleted?: boolean
           is_manager?: boolean
+          last_active_at?: string | null
           last_name?: string | null
           locale?: string
           phone?: string | null

@@ -4,6 +4,7 @@ import { supaClient } from '../../supaClient';
 import { Profile } from '../../typesAndValidators';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { clearDriversAndProfiles, invalidateDriversAndProfiles } from '../../utils/queryInvalidation';
+import { touchLastActiveAt } from '../../utils/touchLastActiveAt';
 
 export interface SupashipUserInfo {
     session: Session | null;
@@ -62,6 +63,7 @@ export const useSession = (): SupashipUserInfo => {
             if (event === 'SIGNED_OUT') {
                 clearDriversAndProfiles(queryClient);
             } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+                touchLastActiveAt(newSession?.user?.id);
                 void invalidateDriversAndProfiles(queryClient);
             }
         });

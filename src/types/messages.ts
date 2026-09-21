@@ -68,4 +68,6 @@ development:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 production:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 maintainedByTarget:( params:{targetName: string}, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 lastUpdated:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
+lastActivity:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
+never:( params?:null, options?:{locale?: 'en' | 'pt' | 'es'}) => '',
 };
