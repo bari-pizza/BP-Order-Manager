@@ -29,6 +29,7 @@ import { Player } from '@lottiefiles/react-lottie-player';
 import { useLayoutContext } from '../../hooks/data/useContextData';
 import { SummaryStack } from '../Manager/SideBar/SummaryStack';
 import { buildMobileClosingItems, buildMobileTakeHomeItems } from './mobileClosingSummary';
+import { getClosingTotalPayments } from '../../constants/cashTransfers';
 
 export const OrderDashboard = () => {
     const { isMobile } = useLayoutContext();
@@ -132,6 +133,7 @@ const OrderDashboardMobile = () => {
 
     const bankTransfers = transfers.bank;
     const pmtTransfers = transfers.payment;
+    const closingTotalPayments = getClosingTotalPayments(pmtTransfers);
     const otherTransfers = transfers.other;
     let closingItems: ReturnType<typeof buildMobileClosingItems> = [];
     let takeHomeItems: ReturnType<typeof buildMobileTakeHomeItems> = [];
@@ -153,7 +155,7 @@ const OrderDashboardMobile = () => {
             (total, transfer) => total + (driver?.drawer_id === transfer.source ? -1 : 1) * transfer.amount_in_cents,
             0,
         );
-        const pmts = pmtTransfers.reduce(
+        const pmts = closingTotalPayments.reduce(
             (total, transfer) => total + (driver?.drawer_id === transfer.source ? -1 : 1) * transfer.amount_in_cents,
             0,
         );
@@ -189,7 +191,7 @@ const OrderDashboardMobile = () => {
             deliveryFeesInCents: deliveryFees,
             otherInCents: other,
             paymentsInCents: pmts,
-            paymentTransfers: pmtTransfers,
+            paymentTransfers: closingTotalPayments,
         });
 
         takeHomeItems = buildMobileTakeHomeItems({

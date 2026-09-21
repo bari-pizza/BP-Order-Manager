@@ -36,6 +36,7 @@ import {
     CLOSING_PAYMENT_TITLE,
     countClosingPayments,
     findClosingPayment,
+    getClosingTotalPayments,
 } from '../../../constants/cashTransfers';
 
 type FormValues = BusinessDayDrawerSummary;
@@ -72,6 +73,7 @@ export const DrawerSideBar = () => {
     const pmtTransfers = transfers.payment;
     const otherTransfers = transfers.other;
     const closingPmtTransfer = findClosingPayment(pmtTransfers);
+    const closingTotalPayments = getClosingTotalPayments(pmtTransfers);
     const closingPaymentDupCount = countClosingPayments(pmtTransfers);
 
     const defaultValues = useMemo(() => {
@@ -238,7 +240,7 @@ export const DrawerSideBar = () => {
         (acc, { amount_in_cents, source }) => (source === currentDrawer.drawer_id ? -1 : 1) * amount_in_cents + acc,
         0,
     );
-    const payments = pmtTransfers.reduce(
+    const payments = closingTotalPayments.reduce(
         (acc, { amount_in_cents, source }) => (source === currentDrawer.drawer_id ? -1 : 1) * amount_in_cents + acc,
         0,
     );

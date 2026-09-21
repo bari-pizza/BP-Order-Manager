@@ -18,5 +18,15 @@ export const findClosingPayment = (payments: CashTransfer[]): CashTransfer | und
     return matches[0];
 };
 
+/**
+ * Retain every ordinary payment and only the canonical Closing Payment for drawer-close totals.
+ */
+export const getClosingTotalPayments = (payments: CashTransfer[]): CashTransfer[] => {
+    const closingPayment = findClosingPayment(payments);
+    return payments.filter(
+        (payment) => !isClosingPaymentTitle(payment.title) || payment === closingPayment,
+    );
+};
+
 export const countClosingPayments = (payments: CashTransfer[]): number =>
     payments.filter((pmt) => isClosingPaymentTitle(pmt.title)).length;

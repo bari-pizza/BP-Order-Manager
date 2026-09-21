@@ -3,6 +3,7 @@ import {
     CLOSING_PAYMENT_TITLE,
     countClosingPayments,
     findClosingPayment,
+    getClosingTotalPayments,
     isClosingPaymentTitle,
 } from '../../src/constants/cashTransfers';
 import { formatHoursDetails, buildMobileClosingItems } from '../../src/pages/Orders/mobileClosingSummary';
@@ -43,6 +44,25 @@ describe('cashTransfers closing payment helpers', () => {
         });
         expect(findClosingPayment([late, early])?.cash_transfer_id).toBe('1');
         expect(countClosingPayments([late, early])).toBe(2);
+    });
+
+    it('retains ordinary payments but only the earliest Closing Payment for closing totals', () => {
+        const ordinary = base({ cash_transfer_id: 'ordinary', title: 'Driver payment' });
+        const early = base({
+            cash_transfer_id: 'early',
+            created_at: '2026-09-20T10:00:00.000Z',
+            title: CLOSING_PAYMENT_TITLE,
+        });
+        const late = base({
+            cash_transfer_id: 'late',
+            created_at: '2026-09-20T22:00:00.000Z',
+            title: CLOSING_PAYMENT_TITLE,
+        });
+
+        expect(getClosingTotalPayments([ordinary, late, early]).map((payment) => payment.cash_transfer_id)).toEqual([
+            'ordinary',
+            'early',
+        ]);
     });
 });
 
