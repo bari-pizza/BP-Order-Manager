@@ -115,3 +115,33 @@ describe('transfer type labels', () => {
         expect(collapsedTransferLabel({ title: '  ', transfer_type: 'bank' })).toBe('Bank');
     });
 });
+
+describe('mobile closing Paid By/To', () => {
+    it('matches desktop Closing Payment Paid By/To wording', () => {
+        const closing = base({
+            cash_transfer_id: 'close',
+            title: CLOSING_PAYMENT_TITLE,
+            source: 'driver-1',
+            destination: 'register-1',
+            amount_in_cents: 4500,
+        });
+        const items = buildMobileClosingItems({
+            totalInCents: 100,
+            bankInCents: 20,
+            hours: 2,
+            hoursInCents: 1000,
+            cardBaseInCents: 0,
+            cardTipsInCents: 0,
+            thirdPartyBaseInCents: 0,
+            thirdPartyTipsInCents: 0,
+            deliveryFeesInCents: 0,
+            otherInCents: 0,
+            paymentsInCents: -4500,
+            paymentTransfers: [closing],
+            drawerID: 'driver-1',
+            drawerName: 'Alex',
+        });
+        const payments = items.find((i) => i.label === 'Payments');
+        expect(payments?.details).toContain('Paid By Alex');
+    });
+});

@@ -24,6 +24,8 @@ const sampleClosing = buildMobileClosingItems({
     otherInCents: -8_00,
     paymentsInCents: -45_00,
     paymentTransfers: storyCashTransfers.filter((t) => t.transfer_type === 'payment'),
+    drawerID: storyCashTransfers.find((t) => t.transfer_type === 'payment')!.source!,
+    drawerName: 'Alex Demo',
 });
 
 const sampleTakeHome = buildMobileTakeHomeItems({

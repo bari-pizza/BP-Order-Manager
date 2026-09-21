@@ -192,6 +192,8 @@ const OrderDashboardMobile = () => {
             otherInCents: other,
             paymentsInCents: pmts,
             paymentTransfers: closingTotalPayments,
+            drawerID: driver.drawer_id,
+            drawerName: driver.name,
         });
 
         takeHomeItems = buildMobileTakeHomeItems({

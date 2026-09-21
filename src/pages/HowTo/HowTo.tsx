@@ -1,4 +1,16 @@
-import { List, ListItem, ListItemButton, ListItemText, Stack, Typography, Button } from '@mui/material';
+import {
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Stack,
+    Typography,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+} from '@mui/material';
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -9,6 +21,8 @@ type Story = {
     title: string;
     url: string;
     for: 'Desktop' | 'Mobile';
+    /** Short in-app steps when there is no Scribe embed yet. */
+    steps?: string[];
 };
 
 type StorySection = {
@@ -19,9 +33,10 @@ type StorySection = {
 type StorySectionProps = {
     storySection: StorySection;
     isMobile: boolean;
+    onOpenSteps: (story: Story) => void;
 };
 
-const StorySection = ({ storySection, isMobile }: StorySectionProps) => {
+const StorySection = ({ storySection, isMobile, onOpenSteps }: StorySectionProps) => {
     const [isCollapsed, setIsCollapsed] = useState(true);
     const { section, stories } = storySection;
 
@@ -46,6 +61,15 @@ const StorySection = ({ storySection, isMobile }: StorySectionProps) => {
                 <List>
                     {sectionStories.map((story) => {
                         const title = `${story.title}${!isMobile && story.for === 'Mobile' ? ' (Mobile)' : ''}`;
+                        if (story.steps?.length) {
+                            return (
+                                <ListItem key={title}>
+                                    <ListItemButton sx={{ padding: 0 }} onClick={() => onOpenSteps(story)}>
+                                        <ListItemText primary={title} />
+                                    </ListItemButton>
+                                </ListItem>
+                            );
+                        }
                         if (story.url === '') {
                             return (
                                 <ListItem key={title}>
@@ -75,6 +99,7 @@ const StorySection = ({ storySection, isMobile }: StorySectionProps) => {
 
 export const HowTo = () => {
     const { isMobile } = useLayoutContext();
+    const [guideStory, setGuideStory] = useState<Story | null>(null);
     const storySections: StorySection[] = [
         {
             section: 'Orders',
@@ -228,16 +253,32 @@ export const HowTo = () => {
                     title: 'Adding a Cash Transfer',
                     url: '',
                     for: 'Desktop',
+                    steps: [
+                        'Open Manager → select a drawer → Cash Transfers (unlocked drawers only).',
+                        'Tap New Cash Transfer and pick Bank, Payment, or Other.',
+                        'Choose the other party (Register / Drawer), set direction (From / To / Spent / Received), enter an amount greater than $0, then Save.',
+                        'Bank is only available once per driver day and usually seeds from Add Driver.',
+                    ],
                 },
                 {
                     title: 'Editing a Cash Transfer',
                     url: '',
                     for: 'Desktop',
+                    steps: [
+                        'Open Cash Transfers on the drawer and tap Edit on a row.',
+                        'You can change the amount and direction. Parties (source/destination) stay locked — delete and recreate if you picked the wrong drawers.',
+                        'Save with the check icon, or Cancel to discard.',
+                    ],
                 },
                 {
                     title: 'Deleting a Cash Transfer',
                     url: '',
                     for: 'Desktop',
+                    steps: [
+                        'Open Cash Transfers → Edit the row → trash icon.',
+                        'Confirm the delete toast.',
+                        'Remove all cash transfers before removing a driver from the day.',
+                    ],
                 },
             ],
         },
@@ -297,9 +338,29 @@ export const HowTo = () => {
         <Stack direction="column" spacing={2} width="100%" height="100vh" mt={2} className="hover-scroll">
             <Stack className="hover-scroll-content" height="100%">
                 {storySections.map((storySection) => (
-                    <StorySection key={storySection.section} isMobile={isMobile} storySection={storySection} />
+                    <StorySection
+                        key={storySection.section}
+                        isMobile={isMobile}
+                        storySection={storySection}
+                        onOpenSteps={setGuideStory}
+                    />
                 ))}
             </Stack>
+            <Dialog open={Boolean(guideStory)} onClose={() => setGuideStory(null)} fullWidth maxWidth="sm">
+                <DialogTitle>{guideStory?.title}</DialogTitle>
+                <DialogContent>
+                    <Stack component="ol" spacing={1} sx={{ pl: 2, m: 0 }}>
+                        {guideStory?.steps?.map((step) => (
+                            <Typography component="li" key={step} variant="body1">
+                                {step}
+                            </Typography>
+                        ))}
+                    </Stack>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setGuideStory(null)}>Close</Button>
+                </DialogActions>
+            </Dialog>
         </Stack>
     );
 };
