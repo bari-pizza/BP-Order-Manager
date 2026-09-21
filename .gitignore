@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Native signing (platform gitignores cover build/Pods/public copies)
+*.keystore
+*.jks
+
 .env
 
 test-results/*
