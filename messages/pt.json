@@ -67,6 +67,6 @@
   "production": "producao",
   "maintainedByTarget": "mantido por {targetName}",
   "lastUpdated": "atualizado",
-  "lastActivity": "ultima atividade",
+  "lastActivity": "última atividade",
   "never": "nunca"
 }

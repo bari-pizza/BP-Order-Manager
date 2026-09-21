@@ -19,10 +19,7 @@ export const touchLastActiveAt = (userId: string | undefined | null): void => {
     lastWriteByUser.set(userId, now);
 
     void (async () => {
-        const { error } = await supaClient
-            .from('Profile')
-            .update({ last_active_at: new Date().toISOString() })
-            .eq('id', userId);
+        const { error } = await supaClient.rpc('touch_last_active_at');
         if (error) {
             logDevError('touchLastActiveAt', error);
             // Allow a retry on the next eligible event.

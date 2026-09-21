@@ -7,5 +7,22 @@ alter table public."Profile"
 comment on column public."Profile".last_active_at is
     'Updated on successful sign-in / session restore. Null = never logged in since this column existed.';
 
--- Own-row update already allowed via profile_update_own; grant the new column.
-grant update (last_active_at) on table public."Profile" to authenticated;
+revoke update (last_active_at) on table public."Profile" from authenticated;
+
+create or replace function public.touch_last_active_at()
+returns void
+language sql
+volatile
+security definer
+set search_path = public
+as $$
+    update public."Profile"
+    set last_active_at = clock_timestamp()
+    where id = auth.uid()
+      and not is_deleted;
+$$;
+
+revoke all on function public.touch_last_active_at() from public, anon;
+grant execute on function public.touch_last_active_at() to authenticated;
+
+notify pgrst, 'reload schema';
