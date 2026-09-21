@@ -21,6 +21,10 @@ export type MobileClosingSummaryInput = {
     otherInCents: number;
     paymentsInCents: number;
     paymentTransfers: CashTransfer[];
+    /** Current drawer id — used for Closing Payment Paid By/To wording. */
+    drawerID?: string;
+    /** Current drawer display name for Paid By/To. */
+    drawerName?: string;
 };
 
 /** Hours popover copy — guards divide-by-zero when hours are unset. */
@@ -48,10 +52,22 @@ export const buildMobileClosingItems = (input: MobileClosingSummaryInput): Summa
         otherInCents,
         paymentsInCents,
         paymentTransfers,
+        drawerID,
+        drawerName,
     } = input;
 
     const closingPmt = findClosingPayment(paymentTransfers);
     const hoursDetails = formatHoursDetails(hours, hoursInCents);
+
+    let paymentsDetails = `No ${CLOSING_PAYMENT_TITLE}`;
+    if (closingPmt) {
+        if (drawerID && drawerName) {
+            const paidByOrTo = closingPmt.source === drawerID ? 'By' : 'To';
+            paymentsDetails = `${CLOSING_PAYMENT_TITLE} Paid ${paidByOrTo} ${drawerName}: ${formatCurrency(closingPmt.amount_in_cents)}`;
+        } else {
+            paymentsDetails = `${CLOSING_PAYMENT_TITLE}: ${formatCurrency(closingPmt.amount_in_cents)}`;
+        }
+    }
 
     return [
         { label: 'Total', value: totalInCents },
@@ -80,9 +96,7 @@ export const buildMobileClosingItems = (input: MobileClosingSummaryInput): Summa
         {
             label: 'Payments',
             value: paymentsInCents,
-            details: closingPmt
-                ? `${CLOSING_PAYMENT_TITLE}: ${formatCurrency(closingPmt.amount_in_cents)}`
-                : `No ${CLOSING_PAYMENT_TITLE}`,
+            details: paymentsDetails,
         },
     ];
 };

@@ -380,6 +380,11 @@ export const CashTransferEditor = ({
                                     {...params}
                                     label={counterpartFieldLabel(transferTypeName)}
                                     error={!!errors.cashTransfer?.destination}
+                                    helperText={
+                                        !forNewCashTransfer
+                                            ? "Can't change parties — delete and recreate"
+                                            : undefined
+                                    }
                                 />
                             )}
                             getOptionLabel={(option) =>
@@ -406,6 +411,11 @@ export const CashTransferEditor = ({
                                     {...params}
                                     label={counterpartFieldLabel(transferTypeName)}
                                     error={!!errors.cashTransfer?.source}
+                                    helperText={
+                                        !forNewCashTransfer
+                                            ? "Can't change parties — delete and recreate"
+                                            : undefined
+                                    }
                                 />
                             )}
                             getOptionLabel={(option) =>

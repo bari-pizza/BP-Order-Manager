@@ -306,6 +306,26 @@ export const DrawerSideBar = () => {
                     label: 'Bank',
                     value: bank,
                 },
+                {
+                    label: 'Hours',
+                    value: -hours,
+                    details: `${(hours / constants.default.driver_hourly_wage_in_cents).toFixed(
+                        2,
+                    )} hours @ ${formatCurrency(constants.default.driver_hourly_wage_in_cents)}`,
+                },
+                {
+                    label: 'Other',
+                    value: other,
+                },
+                {
+                    label: 'Payments',
+                    value: payments,
+                    details: closingPmtTransfer
+                        ? `Closing Payment Paid ${
+                              closingPmtTransfer.source === currentDrawer.drawer_id ? 'By' : 'To'
+                          } ${currentDrawer.name}: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
+                        : 'No Closing Payment',
+                },
             );
             break;
         case 'register':
