@@ -1,5 +1,5 @@
 import { Box, Stack, Typography, Tooltip } from '@mui/material';
-import { AnimatePresence, MotionProps } from 'framer-motion';
+import { AnimatePresence, MotionProps, useReducedMotion } from 'framer-motion';
 import { useBariPizzaContext } from '../../../hooks/data/useContextData';
 import { ResourceUploader } from '../ResourceUploader';
 import { REQUIRED_RESOURCES, mergeResourcesWithDefaults } from '../../../constants/resources';
@@ -25,14 +25,16 @@ const tileSx = {
     },
 } as const;
 
-const motionProps: MotionProps = {
-    whileTap: { scale: 0.95 },
-    whileHover: { scale: 1.05 },
-};
-
 export const ResourcesTab = () => {
     const { resources } = useBariPizzaContext();
+    const reducedMotion = useReducedMotion();
     const displayResources = mergeResourcesWithDefaults(resources);
+    const motionProps: MotionProps = reducedMotion
+        ? {}
+        : {
+              whileTap: { scale: 0.95 },
+              whileHover: { scale: 1.05 },
+          };
 
     return (
         <Stack spacing={2} width="100%">
