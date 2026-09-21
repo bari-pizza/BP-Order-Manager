@@ -7,14 +7,16 @@ npm run storybook
 
 Also startable from the local-dev-dashboard **Storybook** service.
 
-## Cash transfers / closing (BAR-38 P0)
+## Cash transfers / closing (BAR-38 P0 / P1)
 
 | Story | What to check |
 | --- | --- |
 | **Shop → ClosingSummary → MobileClosing** | Hours info popover shows `N hours @ $rate` (not blank) |
 | **Shop → ClosingSummary → HoursUnset** | No crash; Hours line still renders |
 | **Shop → ClosingSummary → DuplicateClosingPaymentWarning** | Warning banner + Payments detail |
-| **Shop → CashTransferEditor → ListRows / ClosingPaymentNew** | Edit rows; close-flow title |
+| **Shop → CashTransferEditor → ListRows** | Collapsed labels use title or Bank/Payment/Other (not raw enum) |
+| **Shop → CashTransferEditor → ClosingPaymentNew** | Direction button shows From/To label; Register Autocomplete label |
+| **Shop → CashTransferEditor → NewTransferTypePicker** | Buttons say Bank / Payment / Other |
 | **Shop → AddDriverCard → DialogOpen** | Submit with bank; Actions → `business_date: 2026-09-15` |
 
 ## Finding Controls (live props)

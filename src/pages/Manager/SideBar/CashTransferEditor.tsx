@@ -26,7 +26,26 @@ import {
 import { motion } from 'framer-motion';
 import { InfoPopover } from '../../../rickcedlib/components/InfoPopover';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
-import { CLOSING_PAYMENT_TITLE, isClosingPaymentTitle } from '../../../constants/cashTransfers';
+import {
+    CLOSING_PAYMENT_TITLE,
+    DIRECTION_LABELS,
+    collapsedTransferLabel,
+    humanizeTransferType,
+    isClosingPaymentTitle,
+} from '../../../constants/cashTransfers';
+
+const counterpartFieldLabel = (transferTypeName: CashTransferType | string) =>
+    transferTypeName === 'bank' ? 'Register' : 'Drawer';
+
+const cashTransferAmountRules = {
+    ...validators.payment.amount_in_cents,
+    validate: (value: number) => {
+        const base = validators.payment.amount_in_cents.validate(value);
+        if (base !== true) return base;
+        if (value === 0) return 'Must be greater than 0';
+        return true;
+    },
+};
 
 interface CashTransferEditorBaseProps {
     drawerID: string;
@@ -294,7 +313,7 @@ export const CashTransferEditor = ({
             return (
                 <LabeledStack
                     fixed
-                    label={cashTransfer.title ?? cashTransfer.transfer_type}
+                    label={collapsedTransferLabel(cashTransfer)}
                     direction="row"
                     spacing={2}
                     height={60}
@@ -359,7 +378,7 @@ export const CashTransferEditor = ({
                             renderInput={(params) => (
                                 <SmartTextField
                                     {...params}
-                                    label={transferType === 'bank' ? 'Register' : 'Drawer'}
+                                    label={counterpartFieldLabel(transferTypeName)}
                                     error={!!errors.cashTransfer?.destination}
                                 />
                             )}
@@ -385,7 +404,7 @@ export const CashTransferEditor = ({
                             renderInput={(params) => (
                                 <SmartTextField
                                     {...params}
-                                    label={transferType === 'bank' ? 'Register' : 'Drawer'}
+                                    label={counterpartFieldLabel(transferTypeName)}
                                     error={!!errors.cashTransfer?.source}
                                 />
                             )}
@@ -428,15 +447,26 @@ export const CashTransferEditor = ({
                             setValue('cashTransfer.source', destinationID);
                         };
                         return (
-                            <Button variant="outlined" onClick={handleButtonClick}>
-                                {arrowIcon}
+                            <Button
+                                variant="outlined"
+                                onClick={handleButtonClick}
+                                sx={{ minWidth: 96, textTransform: 'none' }}>
+                                <Stack direction="row" alignItems="center" gap={0.5}>
+                                    {arrowIcon}
+                                    <Typography variant="body2">
+                                        {DIRECTION_LABELS[value as keyof typeof DIRECTION_LABELS]}
+                                    </Typography>
+                                </Stack>
                             </Button>
                         );
                     }}
                 />
             ) : (
-                <Button disabled variant="outlined">
-                    {arrowIcon}
+                <Button disabled variant="outlined" sx={{ minWidth: 96, textTransform: 'none' }}>
+                    <Stack direction="row" alignItems="center" gap={0.5}>
+                        {arrowIcon}
+                        <Typography variant="body2">{DIRECTION_LABELS[toFromSpentReceived]}</Typography>
+                    </Stack>
                 </Button>
             )}
         </Stack>
@@ -499,7 +529,7 @@ export const CashTransferEditor = ({
                                                 key={option}
                                                 value={option}
                                                 color="primary">
-                                                {option}
+                                                {humanizeTransferType(option)}
                                             </Button>
                                         );
                                     })}
@@ -518,7 +548,7 @@ export const CashTransferEditor = ({
     return (
         <Stack direction="column" rowGap={2} mt={2}>
             <LabeledStack
-                label={forNewCashTransfer ? 'New Cash Transfer' : `Edit ${transferTypeName}`}
+                label={forNewCashTransfer ? 'New Cash Transfer' : `Edit ${humanizeTransferType(transferTypeName)}`}
                 direction="column"
                 justifyContent="space-between"
                 mt={1}
@@ -529,7 +559,7 @@ export const CashTransferEditor = ({
                     <Controller
                         name="cashTransfer.amount_in_cents"
                         control={control}
-                        rules={validators.payment.amount_in_cents}
+                        rules={cashTransferAmountRules}
                         render={({ field: { value } }) => {
                             return (
                                 <TextFieldWithMask
