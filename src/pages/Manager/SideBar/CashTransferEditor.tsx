@@ -26,6 +26,7 @@ import {
 import { motion } from 'framer-motion';
 import { InfoPopover } from '../../../rickcedlib/components/InfoPopover';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
+import { CLOSING_PAYMENT_TITLE, isClosingPaymentTitle } from '../../../constants/cashTransfers';
 
 interface CashTransferEditorBaseProps {
     drawerID: string;
@@ -167,15 +168,24 @@ export const CashTransferEditor = ({
     ]);
 
     const onSubmit = (data: FormValues) => {
-        const { cashTransfer } = data;
+        const { cashTransfer: draft } = data;
         // replace empty string with null in source and destination
-        cashTransfer.source = cashTransfer.source === '' ? null : cashTransfer.source;
-        cashTransfer.destination = cashTransfer.destination === '' ? null : cashTransfer.destination;
-        cashTransfer.business_date = businessDate.format('YYYY-MM-DD');
-        if (isExistingCashTransfer(cashTransfer)) {
-            cashTransfers.update(cashTransfer);
+        draft.source = draft.source === '' ? null : draft.source;
+        draft.destination = draft.destination === '' ? null : draft.destination;
+        draft.business_date = businessDate.format('YYYY-MM-DD');
+
+        // Only the close-drawer flow (or editing an existing Closing Payment) may keep that title.
+        const allowClosingTitle =
+            isClosingPaymentTitle(definedValues?.cashTransfer?.title) ||
+            (cashTransfer != null && isClosingPaymentTitle(cashTransfer.title));
+        if (!allowClosingTitle && isClosingPaymentTitle(draft.title)) {
+            draft.title = '';
+        }
+
+        if (isExistingCashTransfer(draft)) {
+            cashTransfers.update(draft);
         } else {
-            cashTransfers.create(cashTransfer);
+            cashTransfers.create(draft);
             reset({
                 cashTransfer: {
                     amount_in_cents: 0,
@@ -390,7 +400,13 @@ export const CashTransferEditor = ({
                     label="Title"
                     error={!!errors.cashTransfer?.title}
                     helperText={errors.cashTransfer?.title?.message}
-                    {...register('cashTransfer.title', { required: transferType === 'other' && 'Title is required' })}
+                    {...register('cashTransfer.title', {
+                        required: transferType === 'other' && 'Title is required',
+                        validate: (value) =>
+                            isClosingPaymentTitle(value)
+                                ? `Reserved for drawer close — use a different title (not “${CLOSING_PAYMENT_TITLE}”)`
+                                : true,
+                    })}
                 />
             )}
             {validTFSRs.length > 1 ? (

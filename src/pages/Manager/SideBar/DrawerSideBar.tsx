@@ -1,4 +1,5 @@
 import {
+    Alert,
     Button,
     ButtonGroup,
     Dialog,
@@ -31,6 +32,11 @@ import { formatCurrency } from '../../../utils';
 import { CashTransferEditor } from './CashTransferEditor';
 import TextFieldWithMask from '../../../rickcedlib/components/TextFieldWithMask';
 import { SmartTextField } from '../../../rickcedlib/components/SmartTextField';
+import {
+    CLOSING_PAYMENT_TITLE,
+    countClosingPayments,
+    findClosingPayment,
+} from '../../../constants/cashTransfers';
 
 type FormValues = BusinessDayDrawerSummary;
 
@@ -65,7 +71,8 @@ export const DrawerSideBar = () => {
     const bankTransfers = transfers.bank;
     const pmtTransfers = transfers.payment;
     const otherTransfers = transfers.other;
-    const closingPmtTransfer = pmtTransfers.find((pmt) => pmt.title === 'Closing Payment');
+    const closingPmtTransfer = findClosingPayment(pmtTransfers);
+    const closingPaymentDupCount = countClosingPayments(pmtTransfers);
 
     const defaultValues = useMemo(() => {
         return {
@@ -458,6 +465,12 @@ export const DrawerSideBar = () => {
                     <Dialog open={isOpen} onClose={closeDialog} fullWidth maxWidth="sm">
                         <DialogTitle>Confirm Drawer Close</DialogTitle>
                         <DialogContent>
+                            {closingPaymentDupCount > 1 && (
+                                <Alert severity="warning" sx={{ mb: 2 }}>
+                                    Multiple &quot;{CLOSING_PAYMENT_TITLE}&quot; rows found — using the earliest. Delete
+                                    extras under Cash Transfers.
+                                </Alert>
+                            )}
                             {isDriver && <SummaryStack items={items} />}
                             {currentDrawer?.drawer_type === 'register' && (
                                 <SummaryDetails
@@ -516,7 +529,7 @@ export const DrawerSideBar = () => {
                                                             closingPaymentNeeded < 0
                                                                 ? currentDrawer.drawer_id
                                                                 : registerDrawerID,
-                                                        title: 'Closing Payment',
+                                                        title: CLOSING_PAYMENT_TITLE,
                                                     },
                                                     completedFirstStep: true,
                                                     toFromSpentReceived: closingPaymentNeeded < 0 ? 'from' : 'to',
@@ -545,6 +558,12 @@ export const DrawerSideBar = () => {
                     <Dialog open={isOpenCashTransfers} onClose={closeCashTransfers} fullWidth maxWidth="sm">
                         <DialogTitle>Cash Transfers for {currentDrawer.name}</DialogTitle>
                         <DialogContent>
+                            {closingPaymentDupCount > 1 && (
+                                <Alert severity="warning" sx={{ mb: 2 }}>
+                                    {closingPaymentDupCount} transfers are titled &quot;{CLOSING_PAYMENT_TITLE}&quot;.
+                                    Only the earliest is used when closing the drawer — delete the extras.
+                                </Alert>
+                            )}
                             {bankTransfers
                                 .sort((a, b) => a.created_at.localeCompare(b.created_at))
                                 .map((cashTransfer) => (
