@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supaClient } from '../../supaClient';
 import { BucketName } from '../../typesAndValidators';
+import { compressImageForUpload } from '../../utils/compressImage';
 
 type UseImageUploadProps = {
     bucketName: BucketName;
@@ -22,16 +23,18 @@ export const useImageUpload = ({
 }: UseImageUploadProps) => {
     const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null);
 
-    const uploadImage = async (file: File) => {
+    const uploadImage = async (rawFile: File) => {
         if (onUpload) {
             onUpload();
         }
 
-        if (!file) {
+        if (!rawFile) {
             throw new Error('No file selected');
         }
 
-        const fileExt = file.name.split('.').pop();
+        const file = await compressImageForUpload(rawFile);
+
+        const fileExt = file.name.split('.').pop() || 'webp';
         const timestamp = Date.now().toString();
         const finalFileName = fileName ? `${fileName}.${fileExt}` : `${Math.random()}.${fileExt}`;
         const filePath = `${basePath ? `${basePath}/` : ''}${timestamp}-${finalFileName}`;
