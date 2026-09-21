@@ -6,7 +6,7 @@
 --   * authenticated: SELECT on shop tables the POS loads after sign-in
 --   * Order / Payment: any signed-in employee may write (no role guard on /orders)
 --   * Business day close / cash / settings / origins / resources: admin or manager
---   * Profile: SELECT roster; UPDATE own non-role columns; role flags via DEFINER RPCs only
+--   * Profile: SELECT roster; UPDATE own editable columns; role flags / activity via DEFINER RPCs only
 --   * Drawer / Driver rows: created by handle_employee_update (DEFINER); no direct client writes
 --
 -- Helper predicates are SECURITY DEFINER so policies that reference Profile do not recurse.
@@ -82,7 +82,7 @@ TO authenticated
 -- so the client can detect is_deleted and sign them out.
 USING (public.is_active_employee() OR id = auth.uid());
 
--- Own row only. Role / soft-delete columns are not in the column GRANT below,
+-- Own row only. Role / soft-delete / activity columns are not in the column GRANT below,
 -- so even this policy cannot elevate privileges via PostgREST.
 CREATE POLICY "profile_update_own"
 ON public."Profile" FOR UPDATE

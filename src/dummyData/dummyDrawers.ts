@@ -45,6 +45,7 @@ const createDummyDriver: () => Driver_Drawer = () => {
             is_cashier: false,
             avatar_src: 'https://i.pravatar.cc/300',
             locale: 'en',
+            last_active_at: null,
         },
     };
 };

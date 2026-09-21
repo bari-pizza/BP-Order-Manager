@@ -51,6 +51,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
             avatar_src: resource?.src || '',
             is_deleted: false,
             locale: 'en',
+            last_active_at: null,
         },
     };
 

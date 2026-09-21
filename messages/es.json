@@ -66,5 +66,7 @@
   "development": "desarrollo",
   "production": "produccion",
   "maintainedByTarget": "mantenido por {targetName}",
-  "lastUpdated": "actualizado"
+  "lastUpdated": "actualizado",
+  "lastActivity": "última actividad",
+  "never": "nunca"
 }

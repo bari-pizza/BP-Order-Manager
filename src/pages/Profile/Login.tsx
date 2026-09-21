@@ -9,6 +9,7 @@ import { Id, toast } from '../../toast/toastWrapper';
 import { useQueryClient } from '@tanstack/react-query';
 import { normalizeEmail } from '../../utils';
 import { formatUserError } from '../../utils/userError';
+import { touchLastActiveAt } from '../../utils/touchLastActiveAt';
 
 type FormValues = {
     email: string;
@@ -94,6 +95,8 @@ export function Login() {
             });
             return;
         }
+
+        touchLastActiveAt(signIn.user.id);
 
         // AuthenticatedShopData mounts on session and loads profiles; invalidate so it refetches fresh.
         await queryClient.invalidateQueries({ queryKey: ['profiles'] });
