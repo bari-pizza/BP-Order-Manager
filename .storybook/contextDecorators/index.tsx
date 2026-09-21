@@ -1,5 +1,6 @@
 import React from 'react';
 import bariPizzaContextDecorators from './bariPizzaContextDecorators';
+import { managerDashboardDecorators } from './managerDashboardDecorators';
 
 function createContextDecorator<T>(context: React.Context<T>, value: T) {
     const withContextDecorator = (storyFn: () => React.ReactNode) => {
@@ -8,4 +9,4 @@ function createContextDecorator<T>(context: React.Context<T>, value: T) {
     return withContextDecorator;
 }
 
-export { bariPizzaContextDecorators, createContextDecorator };
+export { bariPizzaContextDecorators, managerDashboardDecorators, createContextDecorator };

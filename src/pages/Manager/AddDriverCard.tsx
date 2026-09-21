@@ -4,8 +4,8 @@ import { DrawerCardBase } from '../../components/Base/DrawerCardBase';
 import { Dialog, Autocomplete, Button, DialogTitle, DialogContent, DialogActions, Stack, Divider } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import TextFieldWithMask from '../../rickcedlib/components/TextFieldWithMask';
-import dayjs from 'dayjs';
 import { SmartTextField } from '../../rickcedlib/components/SmartTextField';
+import { useBusinessDate } from '../../hooks/data/useBusinessDate';
 
 interface AddDriverCardProps {
     open: () => void;
@@ -17,6 +17,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
     const { resources } = useBariPizzaContext();
     const { drivers, cashTransfers } = useManagerDashboardContext();
     const { constants, drawers } = useBariPizzaContext();
+    const [businessDate] = useBusinessDate();
     const { available: availableDrivers, add: addDriver } = drivers;
     const {
         control,
@@ -91,7 +92,7 @@ export const AddDriverCard = ({ open, close, isOpen }: AddDriverCardProps) => {
         if (bank_in_cents > 0) {
             cashTransfers.create({
                 amount_in_cents: bank_in_cents,
-                business_date: dayjs().format('YYYY-MM-DD'),
+                business_date: businessDate.format('YYYY-MM-DD'),
                 destination: selectedDriver.drawer_id,
                 source: bank_register,
                 special_note: '',

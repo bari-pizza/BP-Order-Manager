@@ -28,7 +28,8 @@ import { OrderTicket } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useLayoutContext } from '../../hooks/data/useContextData';
 import { SummaryStack } from '../Manager/SideBar/SummaryStack';
-import { formatCurrency } from '../../utils';
+import { buildMobileClosingItems, buildMobileTakeHomeItems } from './mobileClosingSummary';
+import { getClosingTotalPayments } from '../../constants/cashTransfers';
 
 export const OrderDashboard = () => {
     const { isMobile } = useLayoutContext();
@@ -132,10 +133,10 @@ const OrderDashboardMobile = () => {
 
     const bankTransfers = transfers.bank;
     const pmtTransfers = transfers.payment;
+    const closingTotalPayments = getClosingTotalPayments(pmtTransfers);
     const otherTransfers = transfers.other;
-    const closingPmtTransfer = pmtTransfers.find((pmt) => pmt.title === 'Closing Payment');
-    const closingItems = [];
-    const takeHomeItems = [];
+    let closingItems: ReturnType<typeof buildMobileClosingItems> = [];
+    let takeHomeItems: ReturnType<typeof buildMobileTakeHomeItems> = [];
     if (summary) {
         let total = 0,
             // orderCount = 0,
@@ -148,13 +149,13 @@ const OrderDashboardMobile = () => {
             deliveryFees = 0;
 
         const bank = bankTransfers[0]?.amount_in_cents;
-        const hours = summary.hours_in_cents;
-        const hoursInCents = summary.hours_in_cents;
+        const hours = summary.hours || 0;
+        const hoursInCents = summary.hours_in_cents || 0;
         const other = otherTransfers.reduce(
             (total, transfer) => total + (driver?.drawer_id === transfer.source ? -1 : 1) * transfer.amount_in_cents,
             0,
         );
-        const pmts = pmtTransfers.reduce(
+        const pmts = closingTotalPayments.reduce(
             (total, transfer) => total + (driver?.drawer_id === transfer.source ? -1 : 1) * transfer.amount_in_cents,
             0,
         );
@@ -178,67 +179,29 @@ const OrderDashboardMobile = () => {
             });
         });
 
-        closingItems.push(
-            {
-                label: 'Total',
-                value: total,
-            },
-            {
-                label: 'Bank',
-                value: bank,
-            },
-            {
-                label: 'Hours',
-                value: -hoursInCents,
-                detail: `${hours} hours @ ${formatCurrency(hoursInCents / hours)}`,
-            },
-            {
-                label: 'Cards',
-                value: -(cardBase + cardTips),
-                details: `${formatCurrency(cardBase)} base |  ${formatCurrency(cardTips)} tips`,
-            },
-            {
-                label: '3rd Party',
-                value: -(thirdPartyBase + thirdPartyTips),
-                details: `${formatCurrency(thirdPartyBase)} base |  ${formatCurrency(thirdPartyTips)} tips`,
-            },
-            {
-                label: 'Delivery Fees',
-                value: -deliveryFees,
-                details: '$4 per order',
-            },
-            {
-                label: 'Other',
-                value: other,
-            },
-            {
-                label: 'Payments',
-                value: pmts,
-                details: closingPmtTransfer
-                    ? `Closing Payment: ${formatCurrency(closingPmtTransfer.amount_in_cents)}`
-                    : 'No Closing Payment',
-            },
-        );
+        closingItems = buildMobileClosingItems({
+            totalInCents: total,
+            bankInCents: bank,
+            hours,
+            hoursInCents,
+            cardBaseInCents: cardBase,
+            cardTipsInCents: cardTips,
+            thirdPartyBaseInCents: thirdPartyBase,
+            thirdPartyTipsInCents: thirdPartyTips,
+            deliveryFeesInCents: deliveryFees,
+            otherInCents: other,
+            paymentsInCents: pmts,
+            paymentTransfers: closingTotalPayments,
+        });
 
-        takeHomeItems.push(
-            {
-                label: 'Hours',
-                value: hoursInCents,
-                detail: `${hours} hours @ ${formatCurrency(hoursInCents / hours)}`,
-            },
-            {
-                label: 'Tips',
-                value: cashTips + cardTips + thirdPartyTips,
-                details: `${formatCurrency(cashTips)} cash | ${formatCurrency(cardTips)} card | ${formatCurrency(
-                    thirdPartyTips,
-                )} third party`,
-            },
-            {
-                label: 'Delivery Fees',
-                value: deliveryFees,
-                details: '$4 per order',
-            },
-        );
+        takeHomeItems = buildMobileTakeHomeItems({
+            hours,
+            hoursInCents,
+            cashTipsInCents: cashTips,
+            cardTipsInCents: cardTips,
+            thirdPartyTipsInCents: thirdPartyTips,
+            deliveryFeesInCents: deliveryFees,
+        });
     }
 
     const isLocked = summary?.is_locked || false;
