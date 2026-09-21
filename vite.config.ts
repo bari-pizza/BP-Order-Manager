@@ -41,48 +41,54 @@ export default defineConfig({
             __APP_VERSION__: JSON.stringify(packageJson.version),
         }),
         qrcode(),
-        VitePWA({
-            registerType: 'autoUpdate',
-            manifest: {
-                name: 'Bari Pizza Order Manager',
-                short_name: 'BP Order Manager',
-                description: 'Allows workers to manage orders on a daily basis',
-                theme_color: '#ffffff',
-                background_color: '#ffffff',
-                display: 'standalone',
-                start_url: '/',
-                icons: [
-                    {
-                        src: '/assets/icons/BP logo 192.png',
-                        sizes: '192x192',
-                        type: 'image/png',
-                    },
-                    {
-                        src: '/assets/icons/BP logo 512.png',
-                        sizes: '512x512',
-                        type: 'image/png',
-                    },
-                ],
-                screenshots: [
-                    {
-                        src: '/assets/screenshots/screenshot-wide-1280.png',
-                        sizes: '1280x720',
-                        type: 'image/png',
-                        form_factor: 'wide',
-                    },
-                    {
-                        src: '/assets/screenshots/screenshot-mobile-720.png',
-                        sizes: '720x1280',
-                        type: 'image/png',
-                        form_factor: 'narrow',
-                    },
-                ],
-            },
-            workbox: {
-                maximumFileSizeToCacheInBytes: 5000000, // 5MB limit
-                globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-            },
-        }),
+        // Service workers fight Capacitor's WKWebView / Android WebView. Skip PWA when
+        // building the shell that `cap sync` copies into ios/ / android/.
+        ...(process.env.CAPACITOR_BUILD === '1'
+            ? []
+            : [
+                  VitePWA({
+                      registerType: 'autoUpdate',
+                      manifest: {
+                          name: 'Bari Pizza Order Manager',
+                          short_name: 'BP Order Manager',
+                          description: 'Allows workers to manage orders on a daily basis',
+                          theme_color: '#ffffff',
+                          background_color: '#ffffff',
+                          display: 'standalone',
+                          start_url: '/',
+                          icons: [
+                              {
+                                  src: '/assets/icons/BP logo 192.png',
+                                  sizes: '192x192',
+                                  type: 'image/png',
+                              },
+                              {
+                                  src: '/assets/icons/BP logo 512.png',
+                                  sizes: '512x512',
+                                  type: 'image/png',
+                              },
+                          ],
+                          screenshots: [
+                              {
+                                  src: '/assets/screenshots/screenshot-wide-1280.png',
+                                  sizes: '1280x720',
+                                  type: 'image/png',
+                                  form_factor: 'wide',
+                              },
+                              {
+                                  src: '/assets/screenshots/screenshot-mobile-720.png',
+                                  sizes: '720x1280',
+                                  type: 'image/png',
+                                  form_factor: 'narrow',
+                              },
+                          ],
+                      },
+                      workbox: {
+                          maximumFileSizeToCacheInBytes: 5000000, // 5MB limit
+                          globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+                      },
+                  }),
+              ]),
     ],
     test: {
         environment: 'jsdom',
