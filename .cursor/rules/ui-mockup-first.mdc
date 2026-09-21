@@ -1,0 +1,28 @@
+---
+description: Mock up appreciable UI changes before implementing; skip mockups for small fixes
+alwaysApply: true
+---
+
+# UI mockups before appreciable changes
+
+When changing UI in this project:
+
+## Mock up first
+
+Show a mockup (image, Storybook-only sketch, or short visual note the user can open) **before** implementing when the change is:
+
+- A **whole new component** or screen
+- A **wholesale replacement** of an existing layout/flow (new structure, not the same chrome with tweaks)
+- A clearly new interaction pattern managers/drivers will need to relearn
+
+Get a quick OK on the mockup, then implement.
+
+## Skip mockups
+
+Do **not** block on mockups for:
+
+- Copy/label fixes, icon swaps, spacing/color tweaks
+- Bug fixes that keep the same structure
+- Small shifts (e.g. humanizing button text, fixing a wrong Autocomplete label, adding a section header)
+
+If unsure, prefer a 30-second sketch over shipping a surprise redesign.

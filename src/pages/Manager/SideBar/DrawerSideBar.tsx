@@ -566,6 +566,11 @@ export const DrawerSideBar = () => {
                                     Only the earliest is used when closing the drawer — delete the extras.
                                 </Alert>
                             )}
+                            {bankTransfers.length > 0 && (
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1, mb: 0.5 }}>
+                                    Banks
+                                </Typography>
+                            )}
                             {bankTransfers
                                 .sort((a, b) => a.created_at.localeCompare(b.created_at))
                                 .map((cashTransfer) => (
@@ -582,6 +587,11 @@ export const DrawerSideBar = () => {
                                         />
                                     </motion.div>
                                 ))}
+                            {pmtTransfers.length > 0 && (
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1, mb: 0.5 }}>
+                                    Payments
+                                </Typography>
+                            )}
                             {pmtTransfers
                                 .sort((a, b) => a.created_at.localeCompare(b.created_at))
                                 .map((cashTransfer) => (
@@ -598,6 +608,11 @@ export const DrawerSideBar = () => {
                                         />
                                     </motion.div>
                                 ))}
+                            {otherTransfers.length > 0 && (
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1, mb: 0.5 }}>
+                                    Other
+                                </Typography>
+                            )}
                             {otherTransfers
                                 .sort((a, b) => a.created_at.localeCompare(b.created_at))
                                 .map((cashTransfer) => (

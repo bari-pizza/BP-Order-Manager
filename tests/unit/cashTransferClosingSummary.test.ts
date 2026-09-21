@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
     CLOSING_PAYMENT_TITLE,
+    collapsedTransferLabel,
     countClosingPayments,
     findClosingPayment,
     getClosingTotalPayments,
+    humanizeTransferType,
     isClosingPaymentTitle,
 } from '../../src/constants/cashTransfers';
 import { formatHoursDetails, buildMobileClosingItems } from '../../src/pages/Orders/mobileClosingSummary';
@@ -97,5 +99,19 @@ describe('buildMobileClosingItems', () => {
         const hoursLine = items.find((i) => i.label === 'Hours');
         expect(hoursLine?.details).toBeDefined();
         expect(hoursLine).not.toHaveProperty('detail');
+    });
+});
+
+describe('transfer type labels', () => {
+    it('humanizes enums', () => {
+        expect(humanizeTransferType('bank')).toBe('Bank');
+        expect(humanizeTransferType('payment')).toBe('Payment');
+        expect(humanizeTransferType('other')).toBe('Other');
+    });
+
+    it('prefers title on collapsed rows, else humanized type', () => {
+        expect(collapsedTransferLabel({ title: 'Gas', transfer_type: 'other' })).toBe('Gas');
+        expect(collapsedTransferLabel({ title: '', transfer_type: 'payment' })).toBe('Payment');
+        expect(collapsedTransferLabel({ title: '  ', transfer_type: 'bank' })).toBe('Bank');
     });
 });
