@@ -9,6 +9,8 @@ type ResourceUploaderProps = {
     onSuccess?: (downloadURL: string) => void;
     onError?: (error: Error) => void;
     disabled?: boolean;
+    size?: 'small' | 'medium' | 'large' | 'xlarge';
+    style?: React.CSSProperties;
 };
 
 export const ResourceUploader = ({
@@ -17,6 +19,8 @@ export const ResourceUploader = ({
     onSuccess,
     onError,
     disabled,
+    size = 'xlarge',
+    style = { height: '6em', width: '6em' },
 }: ResourceUploaderProps) => {
     const { resourceMutations } = useResourceCRUD({ queryKey: ['resources'] });
     const { startToast, successToast, errorToast } = useUploadToast({
@@ -54,11 +58,6 @@ export const ResourceUploader = ({
     };
 
     return (
-        <ImageUploader
-            {...imageUploaderProps}
-            disabled={disabled}
-            size="large"
-            style={{ height: '80px', width: '80px' }}
-        />
+        <ImageUploader {...imageUploaderProps} disabled={disabled} size={size} style={style} />
     );
 };
