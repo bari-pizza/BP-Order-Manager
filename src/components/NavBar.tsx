@@ -147,7 +147,8 @@ export function NavBar() {
             }}
             variant="permanent"
             anchor="left">
-            <Toolbar />
+            {/* Desktop keeps MUI Toolbar spacer; mobile relies on safe-area padding on the paper. */}
+            {!isMobile && <Toolbar />}
             <List
                 className={isMobile ? 'mobile-nav' : 'desktop-nav'}
                 sx={{
