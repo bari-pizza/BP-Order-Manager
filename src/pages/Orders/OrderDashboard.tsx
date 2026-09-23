@@ -100,14 +100,15 @@ const OrderDashboardMobile = () => {
 
     // Auto-open settlement summary once when the drawer flips to locked (easy to miss in SpeedDial).
     useEffect(() => {
-        if (isLocked && !wasLockedRef.current) {
+        if (isLocked && summary && !wasLockedRef.current) {
             openSummary();
+            wasLockedRef.current = true;
         }
-        wasLockedRef.current = isLocked;
         if (!isLocked) {
+            wasLockedRef.current = false;
             closeEditor();
         }
-    }, [isLocked, openSummary, closeEditor]);
+    }, [isLocked, summary, openSummary, closeEditor]);
 
     const handleOpen = () => setOpenSpeedDial(true);
     const handleClose = () => setOpenSpeedDial(false);
@@ -120,6 +121,7 @@ const OrderDashboardMobile = () => {
 
     const handleOpenSummaryClick = () => {
         setOpenSpeedDial(false);
+        if (!summary) return;
         openSummary();
     };
 
@@ -258,6 +260,7 @@ const OrderDashboardMobile = () => {
                 <Fab
                     aria-label="See closing summary"
                     color="secondary"
+                    disabled={!summary}
                     onClick={handleOpenSummaryClick}
                     sx={{ position: 'fixed', bottom: 16, right: 16 }}>
                     <ReceiptLongIcon />

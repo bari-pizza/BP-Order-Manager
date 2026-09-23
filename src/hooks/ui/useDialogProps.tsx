@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 const defaultOptions = {
     onClose: () => {},
@@ -15,13 +15,13 @@ export const useDialogProps = (options?: OptionsProps) => {
 
     const onClose = options?.onClose || defaultOptions.onClose;
     const onOpen = options?.onOpen || defaultOptions.onOpen;
-    const closeDialog = () => {
+    const closeDialog = useCallback(() => {
         onClose();
         setOpen(false);
-    };
-    const openDialog = () => {
+    }, [onClose]);
+    const openDialog = useCallback(() => {
         onOpen();
         setOpen(true);
-    };
+    }, [onOpen]);
     return { open: openDialog, close: closeDialog, isOpen: open };
 };
