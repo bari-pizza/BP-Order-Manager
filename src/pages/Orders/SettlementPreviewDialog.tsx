@@ -56,6 +56,7 @@ export const SettlementPreviewDialog = ({
                                 role="tabpanel"
                                 id={`settlement-panel-${panelName}`}
                                 aria-labelledby={`settlement-tab-${panelName}`}
+                                tabIndex={0}
                                 hidden={activeTab !== tab}>
                                 {activeTab === tab && (
                                     <Stack spacing={2}>

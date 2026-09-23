@@ -58,8 +58,10 @@ describe('SettlementPreviewDialog', () => {
         expect(payTab).toHaveAttribute('aria-selected', 'true');
         expect(payTab).toHaveAttribute('aria-controls', payPanel.id);
         expect(payPanel).toHaveAttribute('aria-labelledby', payTab.id);
+        expect(payPanel).toHaveAttribute('tabindex', '0');
         expect(homeTab).toHaveAttribute('aria-controls', homePanel.id);
         expect(homePanel).toHaveAttribute('role', 'tabpanel');
+        expect(homePanel).toHaveAttribute('tabindex', '0');
         expect(homePanel).not.toBeVisible();
 
         act(() => homeTab.click());
