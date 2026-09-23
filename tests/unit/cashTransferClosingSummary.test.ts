@@ -162,17 +162,18 @@ describe('provisional Closing Payment (BAR-48)', () => {
         paymentTransfers: [] as CashTransfer[],
     };
 
-    it('injects a provisional Payments line that zeros outstanding when no Closing Payment exists', () => {
-        const raw = buildMobileClosingItems(baseClosingInput);
+    it.each([0, 1000, -1000, -10000])('retains ordinary Payments and offsets the full outstanding for %i cents', (paymentsInCents) => {
+        const raw = buildMobileClosingItems({ ...baseClosingInput, paymentsInCents });
         const withProv = withProvisionalClosingPayment(raw, []);
         const payments = withProv.find((i) => i.label === 'Payments');
-        const outstandingWithout = withProv
-            .filter((i) => i.label !== 'Payments')
-            .reduce((sum, i) => sum + i.value, 0);
-        expect(payments?.value).toBe(-outstandingWithout);
-        expect(payments?.details).toMatch(/Provisional/);
+        const provisional = withProv.find((i) => i.label === CLOSING_PAYMENT_TITLE);
+        const outstanding = raw.reduce((sum, i) => sum + i.value, 0);
+        expect(payments).toEqual(raw.find((i) => i.label === 'Payments'));
+        expect(withProv.slice(0, -1)).toEqual(raw);
+        expect(provisional?.value).toBe(-outstanding);
+        expect(provisional?.details).toMatch(/Provisional/);
         expect(withProv.reduce((sum, i) => sum + i.value, 0)).toBe(0);
-        expect(payTheShopHeroCents(withProv)).toBe(Math.abs(outstandingWithout));
+        expect(payTheShopHeroCents(withProv)).toBe(-outstanding);
     });
 
     it('leaves saved Closing Payment lines unchanged', () => {
@@ -190,8 +191,11 @@ describe('provisional Closing Payment (BAR-48)', () => {
             drawerName: 'Alex',
         });
         const withProv = withProvisionalClosingPayment(raw, [closing]);
+        expect(withProv).toBe(raw);
         expect(withProv.find((i) => i.label === 'Payments')?.value).toBe(-4200);
         expect(withProv.find((i) => i.label === 'Payments')?.details).toContain('Paid By');
+        expect(payTheShopHeroCents(withProv)).toBe(-4200);
+        expect(payTheShopHeroCents([{ label: 'Payments', value: 4200 }])).toBe(4200);
     });
 
     it('take-home hero is the final running total', () => {

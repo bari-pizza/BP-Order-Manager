@@ -46,21 +46,21 @@ export const AccountingSummaryStack = ({ items }: { items: SummaryLineItem[] }) 
                                 variant="body1"
                                 fontWeight={600}
                                 textAlign="right"
-                                fontVariantNumeric="tabular-nums">
+                                sx={{ fontVariantNumeric: 'tabular-nums' }}>
                                 {debit}
                             </Typography>
                             <Typography
                                 variant="body1"
                                 fontWeight={600}
                                 textAlign="right"
-                                fontVariantNumeric="tabular-nums">
+                                sx={{ fontVariantNumeric: 'tabular-nums' }}>
                                 {credit}
                             </Typography>
                             <Typography
                                 variant="body1"
                                 fontWeight={isLast ? 700 : 600}
                                 textAlign="right"
-                                fontVariantNumeric="tabular-nums"
+                                sx={{ fontVariantNumeric: 'tabular-nums' }}
                                 data-testid={isLast ? 'settlement-running-total' : undefined}>
                                 {formatCurrency(runningTotals[index] ?? 0)}
                             </Typography>

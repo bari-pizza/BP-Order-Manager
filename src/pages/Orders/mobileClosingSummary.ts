@@ -132,8 +132,8 @@ export const buildMobileTakeHomeItems = (input: {
 };
 
 /**
- * When no Closing Payment exists yet, inject a provisional Payments line that
- * zeros the outstanding (same seed math as manager Create Closing Payment).
+ * When no Closing Payment exists yet, append a provisional closing-payment line
+ * that zeros the outstanding, including ordinary payments.
  */
 export const withProvisionalClosingPayment = (
     items: SummaryLineItem[],
@@ -141,14 +141,13 @@ export const withProvisionalClosingPayment = (
 ): SummaryLineItem[] => {
     if (findClosingPayment(paymentTransfers)) return items;
 
-    const prior = items.filter((item) => item.label !== 'Payments');
-    const outstanding = prior.reduce((sum, item) => sum + item.value, 0);
+    const outstanding = items.reduce((sum, item) => sum + item.value, 0);
     const provisional = -outstanding;
 
     return [
-        ...prior,
+        ...items,
         {
-            label: 'Payments',
+            label: CLOSING_PAYMENT_TITLE,
             value: provisional,
             details:
                 provisional === 0
@@ -158,10 +157,11 @@ export const withProvisionalClosingPayment = (
     ];
 };
 
-/** Absolute closing-payment amount for the Pay the shop hero. */
+/** Signed closing-payment amount, falling back to saved Payments. */
 export const payTheShopHeroCents = (items: SummaryLineItem[]): number => {
+    const closingPayment = items.find((item) => item.label === CLOSING_PAYMENT_TITLE);
     const payments = items.find((item) => item.label === 'Payments');
-    return Math.abs(payments?.value ?? 0);
+    return closingPayment?.value ?? payments?.value ?? 0;
 };
 
 /** Final running total for Take home hero. */
