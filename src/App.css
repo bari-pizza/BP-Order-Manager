@@ -83,3 +83,11 @@ body {
     padding-bottom: env(safe-area-inset-bottom, 0px) !important;
     box-sizing: border-box !important;
 }
+
+.MuiDrawer-paper.MuiDrawer-paperAnchorLeft {
+    left: env(safe-area-inset-left, 0px) !important;
+}
+
+.MuiDrawer-paper.MuiDrawer-paperAnchorRight {
+    right: env(safe-area-inset-right, 0px) !important;
+}
