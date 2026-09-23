@@ -51,6 +51,39 @@ npx cap open ios
 
 Physical device: use your Mac’s LAN IP (`http://192.168.x.x:6309`) and allow cleartext / ATS as needed.
 
+## Test on your iPhone (easiest — no $99 yet)
+
+You can sideload a **debug** build with a free Apple ID. A Personal Team provisioning profile expires after seven days, so the app may need to be rebuilt and reinstalled. A paid Apple Developer Program membership is still required for TestFlight / App Store / longer-lived distribution.
+
+1. Plug in the iPhone with a cable → Unlock → **Trust** this computer.
+2. From the repo root:
+   ```bash
+   npm run cap:ios
+   ```
+3. In Xcode’s device menu (top bar), pick **your iPhone** (not a Simulator).
+4. **Signing & Capabilities** on the `App` target:
+   - Team → **Add Account…** → sign in with your Apple ID (free is fine)
+   - If bundle id collides, change to something unique like `com.baripizza.ordermanager.yourname`
+5. Hit **▶ Run**. First time: on the phone go to **Settings → General → VPN & Device Management** → trust your developer cert.
+6. App installs and opens. Re-run after `npm run cap:sync` when web code changes.
+
+**Faster iteration (live reload):** Mac and phone on same Wi‑Fi:
+
+> [!WARNING]
+> The `CAP_SERVER_URL` command below serves executable code over HTTP and can expose app traffic to interception. Use it only on a trusted, isolated network with test accounts, or use HTTPS for live reload.
+
+```bash
+# Terminal 1
+npm run dev
+
+# Terminal 2 — replace with your Mac’s LAN IP (System Settings → Network)
+CAP_SERVER_URL=http://192.168.1.10:6309 npx cap sync ios
+npx cap open ios
+# ▶ Run on the phone
+```
+
+The phone must be able to reach that IP. If live reload fails, run `CAP_SERVER_URL= npm run cap:ios` from the repository root, select the phone in Xcode, and press **▶ Run** so the bundled app is rebuilt and reinstalled.
+
 ## Run on Android
 
 ```bash

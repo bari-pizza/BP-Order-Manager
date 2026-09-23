@@ -305,7 +305,7 @@ function Layout() {
             <Stack
                 id="main"
                 direction="row"
-                height="100vh"
+                height="100%"
                 justifyContent="center"
                 className={isMobile ? 'for-mobile' : ''}>
                 <NavBar />
@@ -326,7 +326,7 @@ function Layout() {
                             id="sidebar-drawer"
                             anchor="right"
                             variant="permanent">
-                            <Stack id="sidebar" direction="column" ref={sideBarRef} sx={{ height: '100vh' }} />
+                            <Stack id="sidebar" direction="column" ref={sideBarRef} sx={{ height: '100%' }} />
                         </Drawer>
                         <Drawer
                             sx={{
@@ -344,7 +344,7 @@ function Layout() {
                                 id="sidebar-skeleton"
                                 direction="column"
                                 ref={sideBarSkeletonRef}
-                                sx={{ height: '100vh' }}
+                                sx={{ height: '100%' }}
                             />
                         </Drawer>
                     </>

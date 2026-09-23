@@ -21,7 +21,7 @@
     "build:native": "CAPACITOR_BUILD=1 tsc -b && CAPACITOR_BUILD=1 vite build",
     "cap:sync": "npm run build:native && npx cap sync",
     "cap:ios": "npm run cap:sync && npx cap open ios",
-    "cap:run:ios": "npm run cap:sync && npx cap run ios",
+    "cap:run:ios": "npm run cap:sync && npx cap run ios --no-sync --target-name \"iPhone 17\"",
     "cap:android": "npm run cap:sync && npx cap open android",
     "check": "tsc -b",
     "serve": "npx serve -s dist",
