@@ -21,10 +21,9 @@ sudo gem install cocoapods   # or: brew install cocoapods
 
 ## Run on iOS Simulator
 
-From the **repo root** (or any dir via the script):
+From the **repository root**:
 
 ```bash
-cd ~/Documents/Projects/BP-Order-Manager
 npm run cap:run:ios
 # or:
 ./scripts/run-ios-simulator.sh
