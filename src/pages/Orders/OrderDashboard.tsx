@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import {
     Button,
     ButtonGroup,
@@ -6,6 +6,7 @@ import {
     DialogActions,
     DialogTitle,
     Divider,
+    Fab,
     Grid,
     SpeedDial,
     SpeedDialAction,
@@ -30,6 +31,7 @@ import { useLayoutContext } from '../../hooks/data/useContextData';
 import { SummaryStack } from '../Manager/SideBar/SummaryStack';
 import { buildMobileClosingItems, buildMobileTakeHomeItems } from './mobileClosingSummary';
 import { getClosingTotalPayments } from '../../constants/cashTransfers';
+import { isMobileDrawerLocked } from './isMobileDrawerLocked';
 
 export const OrderDashboard = () => {
     const { isMobile } = useLayoutContext();
@@ -92,12 +94,27 @@ const OrderDashboardMobile = () => {
     const { open: openSummary, close: closeSummary, isOpen: summaryIsOpen } = useDialogProps();
     const { driver, orders, ticket, driverIsWorkingToday, isRepeat, summary, cashTransfers: transfers } = useMobile();
     const [activeSummaryTab, setActiveSummaryTab] = useState(0);
+    const wasLockedRef = useRef(false);
+
+    const isLocked = isMobileDrawerLocked(summary, orders);
+
+    // Auto-open settlement summary once when the drawer flips to locked (easy to miss in SpeedDial).
+    useEffect(() => {
+        if (isLocked && !wasLockedRef.current) {
+            openSummary();
+        }
+        wasLockedRef.current = isLocked;
+        if (!isLocked) {
+            closeEditor();
+        }
+    }, [isLocked, openSummary, closeEditor]);
 
     const handleOpen = () => setOpenSpeedDial(true);
     const handleClose = () => setOpenSpeedDial(false);
 
     const handleAddOrderClick = () => {
         setOpenSpeedDial(false);
+        if (isLocked) return;
         openEditor();
     };
 
@@ -105,11 +122,6 @@ const OrderDashboardMobile = () => {
         setOpenSpeedDial(false);
         openSummary();
     };
-    // floating speed dial button to add order
-
-    // create and edit orders in popup/drawer
-
-    // statistics page (with link in navbar)
 
     if (!driver) {
         return (
@@ -206,8 +218,6 @@ const OrderDashboardMobile = () => {
         });
     }
 
-    const isLocked = summary?.is_locked || false;
-
     return (
         <>
             {isLocked ? (
@@ -244,24 +254,26 @@ const OrderDashboardMobile = () => {
                     />
                 </Dialog>
             )}
-            <SpeedDial
-                ariaLabel="SpeedDial"
-                sx={{ position: 'fixed', bottom: 16, right: 16 }}
-                icon={<BoltIcon />}
-                color="secondary"
-                onClose={handleClose}
-                onOpen={handleOpen}
-                open={openSpeedDial}>
-                {isLocked ? (
-                    <SpeedDialAction
-                        icon={<ReceiptLongIcon />}
-                        tooltipTitle={'See Summary'}
-                        onClick={handleOpenSummaryClick}
-                    />
-                ) : (
+            {isLocked ? (
+                <Fab
+                    aria-label="See closing summary"
+                    color="secondary"
+                    onClick={handleOpenSummaryClick}
+                    sx={{ position: 'fixed', bottom: 16, right: 16 }}>
+                    <ReceiptLongIcon />
+                </Fab>
+            ) : (
+                <SpeedDial
+                    ariaLabel="SpeedDial"
+                    sx={{ position: 'fixed', bottom: 16, right: 16 }}
+                    icon={<BoltIcon />}
+                    color="secondary"
+                    onClose={handleClose}
+                    onOpen={handleOpen}
+                    open={openSpeedDial}>
                     <SpeedDialAction icon={<AddIcon />} tooltipTitle={'Add Order'} onClick={handleAddOrderClick} />
-                )}
-            </SpeedDial>
+                </SpeedDial>
+            )}
             <Stack direction="column" className="order-dashboard">
                 {orders.length ? (
                     <ScrollableWindow>
