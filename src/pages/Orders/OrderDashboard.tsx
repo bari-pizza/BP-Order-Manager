@@ -1,10 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import {
     Button,
-    ButtonGroup,
     Dialog,
-    DialogActions,
-    DialogTitle,
     Divider,
     Fab,
     Grid,
@@ -28,8 +25,12 @@ import { ScrollableWindow } from '../../rickcedlib/components/ScrollableWindow';
 import { OrderTicket } from './OrderTicket';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { useLayoutContext } from '../../hooks/data/useContextData';
-import { SummaryStack } from '../Manager/SideBar/SummaryStack';
-import { buildMobileClosingItems, buildMobileTakeHomeItems } from './mobileClosingSummary';
+import {
+    buildMobileClosingItems,
+    buildMobileTakeHomeItems,
+    withProvisionalClosingPayment,
+} from './mobileClosingSummary';
+import { SettlementPreviewDialog } from './SettlementPreviewDialog';
 import { getClosingTotalPayments } from '../../constants/cashTransfers';
 import { isMobileDrawerLocked } from './isMobileDrawerLocked';
 
@@ -93,7 +94,7 @@ const OrderDashboardMobile = () => {
     const { open: openEditor, close: closeEditor, isOpen: editorIsOpen } = useDialogProps();
     const { open: openSummary, close: closeSummary, isOpen: summaryIsOpen } = useDialogProps();
     const { driver, orders, ticket, driverIsWorkingToday, isRepeat, summary, cashTransfers: transfers } = useMobile();
-    const [activeSummaryTab, setActiveSummaryTab] = useState(0);
+    const [activeSummaryTab, setActiveSummaryTab] = useState<0 | 1>(0);
     const wasLockedRef = useRef(false);
 
     const isLocked = isMobileDrawerLocked(summary, orders);
@@ -193,22 +194,25 @@ const OrderDashboardMobile = () => {
             });
         });
 
-        closingItems = buildMobileClosingItems({
-            totalInCents: total,
-            bankInCents: bank,
-            hours,
-            hoursInCents,
-            cardBaseInCents: cardBase,
-            cardTipsInCents: cardTips,
-            thirdPartyBaseInCents: thirdPartyBase,
-            thirdPartyTipsInCents: thirdPartyTips,
-            deliveryFeesInCents: deliveryFees,
-            otherInCents: other,
-            paymentsInCents: pmts,
-            paymentTransfers: closingTotalPayments,
-            drawerID: driver.drawer_id,
-            drawerName: driver.name,
-        });
+        closingItems = withProvisionalClosingPayment(
+            buildMobileClosingItems({
+                totalInCents: total,
+                bankInCents: bank,
+                hours,
+                hoursInCents,
+                cardBaseInCents: cardBase,
+                cardTipsInCents: cardTips,
+                thirdPartyBaseInCents: thirdPartyBase,
+                thirdPartyTipsInCents: thirdPartyTips,
+                deliveryFeesInCents: deliveryFees,
+                otherInCents: other,
+                paymentsInCents: pmts,
+                paymentTransfers: closingTotalPayments,
+                drawerID: driver.drawer_id,
+                drawerName: driver.name,
+            }),
+            closingTotalPayments,
+        );
 
         takeHomeItems = buildMobileTakeHomeItems({
             hours,
@@ -223,28 +227,14 @@ const OrderDashboardMobile = () => {
     return (
         <>
             {isLocked ? (
-                <Dialog open={summaryIsOpen} onClose={closeSummary} fullWidth maxWidth="sm">
-                    <DialogTitle>{activeSummaryTab === 0 ? 'Closing Summary' : 'Take Home'}</DialogTitle>
-                    {activeSummaryTab === 0 ? (
-                        <SummaryStack items={closingItems} />
-                    ) : (
-                        <SummaryStack items={takeHomeItems} />
-                    )}
-                    <DialogActions>
-                        <ButtonGroup>
-                            <Button
-                                onClick={() => setActiveSummaryTab(0)}
-                                variant={activeSummaryTab === 0 ? 'contained' : 'outlined'}>
-                                Closing Summary
-                            </Button>
-                            <Button
-                                onClick={() => setActiveSummaryTab(1)}
-                                variant={activeSummaryTab === 1 ? 'contained' : 'outlined'}>
-                                Take Home
-                            </Button>
-                        </ButtonGroup>
-                    </DialogActions>
-                </Dialog>
+                <SettlementPreviewDialog
+                    open={summaryIsOpen}
+                    onClose={closeSummary}
+                    activeTab={activeSummaryTab}
+                    onTabChange={setActiveSummaryTab}
+                    payTheShopItems={closingItems}
+                    takeHomeItems={takeHomeItems}
+                />
             ) : (
                 <Dialog open={editorIsOpen} onClose={closeEditor} fullWidth maxWidth="sm">
                     <OrderEditor
@@ -258,7 +248,7 @@ const OrderDashboardMobile = () => {
             )}
             {isLocked ? (
                 <Fab
-                    aria-label="See closing summary"
+                    aria-label="See settlement"
                     color="secondary"
                     disabled={!summary}
                     onClick={handleOpenSummaryClick}

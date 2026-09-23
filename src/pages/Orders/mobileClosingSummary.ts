@@ -1,4 +1,4 @@
-import { formatCurrency } from '../../utils';
+import { formatCurrency, getRunningTotal } from '../../utils';
 import { CLOSING_PAYMENT_TITLE, findClosingPayment } from '../../constants/cashTransfers';
 import type { CashTransfer } from '../../typesAndValidators';
 
@@ -129,4 +129,44 @@ export const buildMobileTakeHomeItems = (input: {
             details: '$4 per order',
         },
     ];
+};
+
+/**
+ * When no Closing Payment exists yet, inject a provisional Payments line that
+ * zeros the outstanding (same seed math as manager Create Closing Payment).
+ */
+export const withProvisionalClosingPayment = (
+    items: SummaryLineItem[],
+    paymentTransfers: CashTransfer[],
+): SummaryLineItem[] => {
+    if (findClosingPayment(paymentTransfers)) return items;
+
+    const prior = items.filter((item) => item.label !== 'Payments');
+    const outstanding = prior.reduce((sum, item) => sum + item.value, 0);
+    const provisional = -outstanding;
+
+    return [
+        ...prior,
+        {
+            label: 'Payments',
+            value: provisional,
+            details:
+                provisional === 0
+                    ? `No ${CLOSING_PAYMENT_TITLE}`
+                    : `Provisional ${CLOSING_PAYMENT_TITLE}: ${formatCurrency(Math.abs(provisional))}`,
+        },
+    ];
+};
+
+/** Absolute closing-payment amount for the Pay the shop hero. */
+export const payTheShopHeroCents = (items: SummaryLineItem[]): number => {
+    const payments = items.find((item) => item.label === 'Payments');
+    return Math.abs(payments?.value ?? 0);
+};
+
+/** Final running total for Take home hero. */
+export const takeHomeHeroCents = (items: SummaryLineItem[]): number => {
+    if (items.length === 0) return 0;
+    const running = getRunningTotal(items.map((item) => item.value));
+    return running[running.length - 1] ?? 0;
 };
