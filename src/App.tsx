@@ -39,6 +39,7 @@ import dayjs from 'dayjs';
 // @ts-expect-error missing module declaration
 import { setLocale } from './paraglide/runtime.js';
 import { toast } from './toast/toastWrapper.tsx';
+import { isInstalledShell, resolveAppShell } from './utils/appShell';
 
 // // Lazy load components
 const OrderDashboard = lazy(() =>
@@ -220,6 +221,9 @@ function Layout() {
         '(max-width: 800px) and (orientation: portrait), (max-width: 600px) and (orientation: landscape)',
     );
     const isPWA = useMediaQuery('(display-mode: standalone)');
+    // Capacitor does not report display-mode: standalone — detect native separately.
+    const appShell = resolveAppShell(isPWA);
+    const installedShell = isInstalledShell(appShell);
     useMidnightEffect();
 
     const profileLocale = profile?.locale || 'en';
@@ -258,7 +262,8 @@ function Layout() {
     }, [profile?.locale]);
 
     useEffect(() => {
-        if (isMobile && !isPWA) {
+        // Skip for installed PWA or Capacitor native — already "on the home screen".
+        if (isMobile && !installedShell) {
             toast.info(
                 <Box
                     sx={{
@@ -291,11 +296,8 @@ function Layout() {
                     style: { background: 'purple', color: 'white' },
                 },
             );
-            /**
-             
-             */
         }
-    }, [isMobile, isPWA]);
+    }, [isMobile, installedShell]);
 
     const shell = (
         <>
@@ -367,6 +369,8 @@ function Layout() {
                         setSideBarSkeletonWidth,
                         isMobile,
                         isPWA,
+                        isInstalledShell: installedShell,
+                        appShell,
                     }}>
                     <UserContext.Provider value={{ session, profile, loading }}>
                         {session ? (

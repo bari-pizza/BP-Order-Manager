@@ -43,6 +43,8 @@ const meta = {
                     setSideBarSkeletonWidth: () => undefined,
                     isMobile,
                     isPWA: false,
+                    isInstalledShell: false,
+                    appShell: 'browser',
                 }}>
                 <Box
                     sx={{

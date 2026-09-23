@@ -68,6 +68,8 @@ const meta = {
                     setSideBarSkeletonWidth: () => undefined,
                     isMobile: args.isMobile,
                     isPWA: false,
+                    isInstalledShell: false,
+                    appShell: 'browser',
                 }}>
                 <UserContext.Provider
                     value={{
