@@ -8,7 +8,7 @@ import {
     humanizeTransferType,
     isClosingPaymentTitle,
 } from '../../src/constants/cashTransfers';
-import { formatHoursDetails, buildMobileClosingItems } from '../../src/pages/Orders/mobileClosingSummary';
+import { formatHoursDetails, buildMobileClosingItems, withProvisionalClosingPayment, payTheShopHeroCents, takeHomeHeroCents, buildMobileTakeHomeItems } from '../../src/pages/Orders/mobileClosingSummary';
 import type { CashTransfer } from '../../src/typesAndValidators';
 
 const base = (overrides: Partial<CashTransfer>): CashTransfer => ({
@@ -143,5 +143,70 @@ describe('mobile closing Paid By/To', () => {
         });
         const payments = items.find((i) => i.label === 'Payments');
         expect(payments?.details).toContain('Paid By Alex');
+    });
+});
+
+describe('provisional Closing Payment (BAR-48)', () => {
+    const baseClosingInput = {
+        totalInCents: 310_00,
+        bankInCents: 100_00,
+        hours: 5,
+        hoursInCents: 75_00,
+        cardBaseInCents: 180_00,
+        cardTipsInCents: 30_00,
+        thirdPartyBaseInCents: 30_00,
+        thirdPartyTipsInCents: 10_00,
+        deliveryFeesInCents: 16_00,
+        otherInCents: 0,
+        paymentsInCents: 0,
+        paymentTransfers: [] as CashTransfer[],
+    };
+
+    it.each([0, 1000, -1000, -10000])('retains ordinary Payments and offsets the full outstanding for %i cents', (paymentsInCents) => {
+        const raw = buildMobileClosingItems({ ...baseClosingInput, paymentsInCents });
+        const withProv = withProvisionalClosingPayment(raw, []);
+        const payments = withProv.find((i) => i.label === 'Payments');
+        const provisional = withProv.find((i) => i.label === CLOSING_PAYMENT_TITLE);
+        const outstanding = raw.reduce((sum, i) => sum + i.value, 0);
+        expect(payments).toEqual(raw.find((i) => i.label === 'Payments'));
+        expect(withProv.slice(0, -1)).toEqual(raw);
+        expect(provisional?.value).toBe(-outstanding);
+        expect(provisional?.details).toMatch(/Provisional/);
+        expect(withProv.reduce((sum, i) => sum + i.value, 0)).toBe(0);
+        expect(payTheShopHeroCents(withProv)).toBe(-outstanding);
+    });
+
+    it('leaves saved Closing Payment lines unchanged', () => {
+        const closing = base({
+            cash_transfer_id: 'close',
+            title: CLOSING_PAYMENT_TITLE,
+            source: 'driver-1',
+            amount_in_cents: 4200,
+        });
+        const raw = buildMobileClosingItems({
+            ...baseClosingInput,
+            paymentsInCents: -4200,
+            paymentTransfers: [closing],
+            drawerID: 'driver-1',
+            drawerName: 'Alex',
+        });
+        const withProv = withProvisionalClosingPayment(raw, [closing]);
+        expect(withProv).toBe(raw);
+        expect(withProv.find((i) => i.label === 'Payments')?.value).toBe(-4200);
+        expect(withProv.find((i) => i.label === 'Payments')?.details).toContain('Paid By');
+        expect(payTheShopHeroCents(withProv)).toBe(-4200);
+        expect(payTheShopHeroCents([{ label: 'Payments', value: 4200 }])).toBe(4200);
+    });
+
+    it('take-home hero is the final running total', () => {
+        const items = buildMobileTakeHomeItems({
+            hours: 5,
+            hoursInCents: 75_00,
+            cashTipsInCents: 12_00,
+            cardTipsInCents: 28_00,
+            thirdPartyTipsInCents: 8_00,
+            deliveryFeesInCents: 16_00,
+        });
+        expect(takeHomeHeroCents(items)).toBe(75_00 + 12_00 + 28_00 + 8_00 + 16_00);
     });
 });

@@ -1,4 +1,4 @@
-import { formatCurrency } from '../../utils';
+import { formatCurrency, getRunningTotal } from '../../utils';
 import { CLOSING_PAYMENT_TITLE, findClosingPayment } from '../../constants/cashTransfers';
 import type { CashTransfer } from '../../typesAndValidators';
 
@@ -129,4 +129,44 @@ export const buildMobileTakeHomeItems = (input: {
             details: '$4 per order',
         },
     ];
+};
+
+/**
+ * When no Closing Payment exists yet, append a provisional closing-payment line
+ * that zeros the outstanding, including ordinary payments.
+ */
+export const withProvisionalClosingPayment = (
+    items: SummaryLineItem[],
+    paymentTransfers: CashTransfer[],
+): SummaryLineItem[] => {
+    if (findClosingPayment(paymentTransfers)) return items;
+
+    const outstanding = items.reduce((sum, item) => sum + item.value, 0);
+    const provisional = -outstanding;
+
+    return [
+        ...items,
+        {
+            label: CLOSING_PAYMENT_TITLE,
+            value: provisional,
+            details:
+                provisional === 0
+                    ? `No ${CLOSING_PAYMENT_TITLE}`
+                    : `Provisional ${CLOSING_PAYMENT_TITLE}: ${formatCurrency(Math.abs(provisional))}`,
+        },
+    ];
+};
+
+/** Signed closing-payment amount, falling back to saved Payments. */
+export const payTheShopHeroCents = (items: SummaryLineItem[]): number => {
+    const closingPayment = items.find((item) => item.label === CLOSING_PAYMENT_TITLE);
+    const payments = items.find((item) => item.label === 'Payments');
+    return closingPayment?.value ?? payments?.value ?? 0;
+};
+
+/** Final running total for Take home hero. */
+export const takeHomeHeroCents = (items: SummaryLineItem[]): number => {
+    if (items.length === 0) return 0;
+    const running = getRunningTotal(items.map((item) => item.value));
+    return running[running.length - 1] ?? 0;
 };
