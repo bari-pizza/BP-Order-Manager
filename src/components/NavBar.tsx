@@ -36,6 +36,7 @@ import { Order_Payment } from '../typesAndValidators';
 import { m } from '../types/messages';
 import { useDialogProps } from '../hooks/ui/useDialogProps.js';
 import { getEnv } from '../utils.js';
+import { formatAppShellLabel } from '../utils/appShell';
 
 interface NavBarItem {
     path?: string;
@@ -50,7 +51,7 @@ const today = dayjs();
 
 export function NavBar() {
     const { session, profile } = useUserContext();
-    const { isMobile, isPWA } = useLayoutContext();
+    const { isMobile, isInstalledShell, appShell } = useLayoutContext();
     const [businessDate] = useBusinessDate();
     const { businessDatePicker, showBusinessDatePicker } = useBusinessDatePicker();
     const { open, close, isOpen } = useDialogProps();
@@ -116,7 +117,7 @@ export function NavBar() {
         {
             text: isMobile ? m.mobile() : m.desktop(),
             icon: isMobile ? (
-                isPWA ? (
+                isInstalledShell ? (
                     <MobileLottieIcon />
                 ) : (
                     <Badge badgeContent="!" color="error">
@@ -203,8 +204,8 @@ export function NavBar() {
                         <Typography variant="body1" textTransform={'capitalize'}>
                             {m.maintainedByTarget({ targetName: 'Cedrick Catalan' })}
                         </Typography>
-                        <Typography variant="body1" textTransform={'capitalize'}>
-                            {isPWA ? '' : 'NOT'} running in PWA mode
+                        <Typography variant="body1">
+                            {formatAppShellLabel(appShell)}
                         </Typography>
                     </Stack>
                 </DialogContent>

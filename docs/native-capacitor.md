@@ -21,8 +21,19 @@ sudo gem install cocoapods   # or: brew install cocoapods
 
 ## Run on iOS Simulator
 
+From the **repository root**:
+
 ```bash
-# Uses .env at build time (same VITE_SUPABASE_* as web)
+npm run cap:run:ios
+# or:
+./scripts/run-ios-simulator.sh
+```
+
+That rebuilds web assets, syncs into `ios/`, and **launches the Simulator** with the app (no Xcode ▶ click).
+
+Open Xcode only (edit native project, pick a specific device):
+
+```bash
 npm run cap:ios
 # Xcode opens → pick a Simulator → ▶ Run
 ```
