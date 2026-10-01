@@ -1,9 +1,15 @@
 name: E2E Full Day
 
+permissions:
+  contents: read
+
 # Seeds + wipes TODAY's orders/drawers on the Supabase project in secrets.
 # Only run when you intend that. Requires repo secrets:
 #   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 on:
+  schedule:
+    # Run daily at 4 AM UTC to keep Dev database active with real workflow runs and catch regressions
+    - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
       confirm_wipe:
@@ -13,7 +19,7 @@ on:
 
 jobs:
   full-day:
-    if: github.event.inputs.confirm_wipe == 'wipe-today'
+    if: github.event_name == 'schedule' || github.event.inputs.confirm_wipe == 'wipe-today'
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -21,7 +27,6 @@ jobs:
       CI: true
       VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
       VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       TEST_ACCOUNT_PASSWORD: ${{ secrets.TEST_ACCOUNT_PASSWORD }}
 
     steps:
@@ -61,6 +66,9 @@ jobs:
         run: npx playwright install-deps chromium
 
       - name: Verify secrets
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_URL_PROD: ${{ secrets.SUPABASE_URL_PROD }}
         run: |
           missing=0
           for key in VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
@@ -69,6 +77,10 @@ jobs:
               missing=1
             fi
           done
+          if [ -n "$SUPABASE_URL_PROD" ] && [ "$VITE_SUPABASE_URL" = "$SUPABASE_URL_PROD" ]; then
+            echo "::error::VITE_SUPABASE_URL matches SUPABASE_URL_PROD! Aborting E2E run to protect production."
+            missing=1
+          fi
           exit $missing
 
       - name: Build app
@@ -90,6 +102,8 @@ jobs:
           exit 1
 
       - name: Run full-day e2e
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: npm run test:e2e:full-day
 
       - name: Upload Playwright artifacts

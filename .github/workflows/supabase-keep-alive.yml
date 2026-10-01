@@ -1,5 +1,7 @@
 name: Supabase Keep Alive
 
+permissions: {}
+
 on:
   schedule:
     # Daily 3 AM UTC
@@ -18,32 +20,51 @@ jobs:
     steps:
       - name: Ping ${{ matrix.name }} Supabase
         env:
-          # Prod: SUPABASE_URL_PROD + SUPABASE_ANON_KEY_PROD
+          # Prod: SUPABASE_URL_PROD + SUPABASE_ANON_KEY_PROD (+ optional SUPABASE_SERVICE_ROLE_KEY_PROD)
           SUPABASE_URL_PROD: ${{ secrets.SUPABASE_URL_PROD }}
           SUPABASE_ANON_KEY_PROD: ${{ secrets.SUPABASE_ANON_KEY_PROD }}
+          SUPABASE_SERVICE_ROLE_KEY_PROD: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_PROD }}
           # Dev: reuse existing CI/e2e secrets
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TARGET: ${{ matrix.name }}
         run: |
           set -euo pipefail
           if [ "$TARGET" = "production" ]; then
             URL="$SUPABASE_URL_PROD"
-            KEY="$SUPABASE_ANON_KEY_PROD"
+            ANON_KEY="$SUPABASE_ANON_KEY_PROD"
+            DB_KEY="${SUPABASE_SERVICE_ROLE_KEY_PROD:-$ANON_KEY}"
           else
             URL="$VITE_SUPABASE_URL"
-            KEY="$VITE_SUPABASE_ANON_KEY"
+            ANON_KEY="$VITE_SUPABASE_ANON_KEY"
+            DB_KEY="${SUPABASE_SERVICE_ROLE_KEY:-$ANON_KEY}"
           fi
 
-          if [ -z "$URL" ] || [ -z "$KEY" ]; then
-            echo "Missing secrets for $TARGET (need URL + anon key)."
+          if [ -z "$URL" ] || [ -z "$ANON_KEY" ]; then
+            echo "Missing secrets for $TARGET (need URL + key)."
             exit 1
           fi
 
-          # Tiny read so free-tier projects stay active
+          echo "Pinging Auth service for $TARGET..."
           curl -fsS --retry 2 --retry-delay 5 \
+            "${URL}/auth/v1/health" \
+            -H "apikey: ${ANON_KEY}"
+          echo
+
+          echo "Querying database to reset $TARGET inactivity timer..."
+          STATUS=$(curl -sS --retry 2 --retry-delay 5 -o /dev/null -w '%{http_code}' \
             "${URL}/rest/v1/OrderOrigin?select=origin_id&limit=1" \
-            -H "apikey: ${KEY}" \
-            -H "Authorization: Bearer ${KEY}"
+            -H "apikey: ${DB_KEY}" \
+            -H "Authorization: Bearer ${DB_KEY}") || STATUS=000
+          if [ "$STATUS" != "200" ]; then
+            if [ "$TARGET" = "production" ] && [ -z "${SUPABASE_SERVICE_ROLE_KEY_PROD:-}" ] \
+              && { [ "$STATUS" = "401" ] || [ "$STATUS" = "403" ]; }; then
+              echo "::warning::Production table read failed with HTTP $STATUS (likely RLS). Add SUPABASE_SERVICE_ROLE_KEY_PROD to repo secrets to bypass RLS."
+            else
+              echo "OrderOrigin read failed with HTTP $STATUS"
+              exit 1
+            fi
+          fi
           echo
           echo "ok: $TARGET"
