@@ -4,16 +4,20 @@ name: E2E Full Day
 # Only run when you intend that. Requires repo secrets:
 #   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 on:
+  schedule:
+    # Run daily at 4 AM UTC to keep Dev database active with real workflow runs and catch regressions
+    - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
       confirm_wipe:
         description: 'Type wipe-today to confirm wiping today''s business date on the linked Supabase project'
         required: true
+        default: 'wipe-today'
         type: string
 
 jobs:
   full-day:
-    if: github.event.inputs.confirm_wipe == 'wipe-today'
+    if: github.event_name == 'schedule' || github.event.inputs.confirm_wipe == 'wipe-today'
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
